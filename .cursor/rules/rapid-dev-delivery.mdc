@@ -1,0 +1,21 @@
+---
+description: AI-assisted Salesforce delivery (TS1/TS2). Apply build.md, engineer review, and architecture governance for RapidDev POC and metadata work.
+globs:
+  - docs/rapid-dev/**/*
+  - metadata/**/*
+  - scripts/deploy-*.ts
+  - scripts/*-connectivity*.ts
+  - .cursorrules
+---
+
+# RapidDev delivery (TS2)
+
+When editing files matched by this rule:
+
+1. Follow **`docs/rapid-dev/build.md`** and **`.cursor/skills/ai-assisted-delivery/SKILL.md`**.
+2. Default to **TS2 — Sandbox Build** unless the user explicitly requests **TS1** prototyping only.
+3. **TS1 output** is not production-ready metadata — do not recommend Gearset promotion without TS2 engineer review.
+4. Engineer must review all AI-generated Salesforce metadata; state rollback, permissions, and Flow vs Apex decisions.
+5. Link work to **Jira**; use PR/deployment summary template from `build.md`.
+
+Prompt hint for users: `@docs/rapid-dev/build.md` `@.cursor/skills/ai-assisted-delivery/SKILL.md`

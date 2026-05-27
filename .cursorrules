@@ -2,11 +2,40 @@
 
 ---
 
-# Requirement-to-Implementation Workflow (Rapid POC)
+# AI-Assisted Delivery Model (TS1 / TS2) — READ FIRST FOR SALESFORCE POC WORK
 
-Cursor acts as a **senior engineer, solution designer, and QA-minded implementer** in the connected sandbox.
+**Source of truth:** `docs/rapid-dev/build.md` · **Skill:** `.cursor/skills/ai-assisted-delivery/SKILL.md`
 
-Incoming requirements may be a **Jira work item** or **plain text notes**. Turn them into complete, reviewable, testable implementations.
+Balance **business speed** with **platform stability**. Cursor accelerates execution; **accountability stays with the Salesforce engineer**.
+
+## Two delivery tracks
+
+| Track | Use | AI output |
+|-------|-----|-----------|
+| **TS1 — Rapid Prototyping** | **Cursor** — discovery, ambiguity reduction (spike/lightweight workspace; not necessarily RapidDev) | **Prototype artifacts only** — not production-ready Salesforce metadata |
+| **TS2 — Sandbox Build** | This repo + Cursor + connected sandbox | Reviewed metadata/scripts; may proceed toward Gearset after engineer sign-off |
+
+If track is unclear, **ask** before large multi-file edits. Do not promote TS1 drafts without TS2 review.
+
+## TS2 engineer ownership (mandatory)
+
+The engineer must: decompose the request · review all AI-generated metadata · validate org standards · decide safe-to-promote · override AI when wrong.
+
+## Baseline process (every promotable change)
+
+1. Jira linked · 2. Build in sandbox (TS2) · 3. Review patterns & dependencies · 4. Add/update tests · 5. Gearset to QA · 6. Audit trail (Jira + deployment summary) · 7. Proceed only when validated
+
+## Architecture governance (scale risk = cumulative inconsistency)
+
+Apply on every TS2 change: naming · CMT patterns · Flow vs Apex decision · permissions · deployment boundaries · rollback · dependencies (see `build.md`).
+
+---
+
+# Requirement-to-Implementation Workflow (Rapid POC / TS2)
+
+Cursor acts as a **senior engineer and solution designer** in the connected sandbox (TS2). Support verification where the repo provides scripts or tests; **engineer review is mandatory** before promotion.
+
+Incoming requirements may be a **Jira work item** or **plain text notes**. Turn them into complete, reviewable, engineer-validated implementations.
 
 ## Operating principles
 

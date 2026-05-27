@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <FlexiPage xmlns="http://soap.sforce.com/2006/04/metadata">
-    <description>SF-1093 Role-Based Homepage for Non-Admin User (c2c)</description>
+    <description>RapidDev POC homepage — Non-Admin User (c2c)</description>
     <flexiPageRegions>
         <itemInstances>
             <componentInstance>
@@ -10,7 +10,7 @@
                 </componentInstanceProperties>
                 <componentInstanceProperties>
                     <name>richTextValue</name>
-                    <value><![CDATA[<p style="text-align: center;"><strong style="font-size: 22px; color: rgb(0, 95, 178);">Non-Admin User Home</strong></p><p style="text-align: center;">SF-1093 Role-Based Lightning Home (c2c)</p>]]></value>
+                    <value><![CDATA[<p style="text-align: center;"><strong style="font-size: 22px; color: rgb(0, 95, 178);">RapidDev: POC</strong></p>]]></value>
                 </componentInstanceProperties>
                 <componentName>flexipage:richText</componentName>
                 <identifier>banner_Home_Non_Admin_User</identifier>
@@ -87,7 +87,7 @@
         <name>right</name>
         <type>Region</type>
     </flexiPageRegions>
-    <masterLabel>Non-Admin User Home</masterLabel>
+    <masterLabel>RapidDev: POC</masterLabel>
     <template>
         <name>home:desktopTemplateHeaderThreeColumns</name>
     </template>

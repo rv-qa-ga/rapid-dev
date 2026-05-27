@@ -31,6 +31,7 @@
     "docs:fetch:clm-ba-migration": "ts-node scripts/fetch-clm-ba-migration-confluence.ts",
     "int:connectivity-check": "cross-env ENV=int ts-node scripts/int-connectivity-check.ts",
     "c2c:connectivity-check": "cross-env ENV=c2c ts-node scripts/c2c-sf-connectivity-check.ts",
+    "c2c:deploy:home-flexipages": "cross-env ENV=c2c ts-node scripts/deploy-c2c-home-flexipages.ts",
     "sf1093:c2c:screenshots": "cross-env ENV=c2c ts-node scripts/sf1093-c2c-home-screenshots.ts",
     "test:dynamics:rdm-smoke": "node scripts/run-tests-with-env.js src/features/ui/dynamics/dynamics-rdm-connectivity-smoke.feature --tags \"@dynamics-rdm-connectivity and not @dynamics-rdm-strict-rdm-url\"",
     "test:dynamics:rdm-smoke:strict": "node scripts/run-tests-with-env.js src/features/ui/dynamics/dynamics-rdm-connectivity-smoke.feature --tags @dynamics-rdm-strict-rdm-url",

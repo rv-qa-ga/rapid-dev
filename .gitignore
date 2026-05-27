@@ -73,6 +73,11 @@ server.crt
 !docs/process/GIT_SYNC_WITH_MAIN.md
 !docs/process/CODE_REVIEW_AND_BRANCHING_DIAGRAMS.md
 !docs/process/CURSOR_PROJECT_SKILLS_SKILLMD_GUIDE.md
+# RapidDev — Cursor POC delivery model (developer onboarding)
+!docs/rapid-dev/build.md
+!docs/rapid-dev/CURSOR_RAPID_DEVELOPMENT_GUIDE.md
+!docs/rapid-dev/README.md
+!.cursor/skills/ai-assisted-delivery/SKILL.md
 # GitHub PR template
 !.github/pull_request_template.md
 # Keep MuleSoft setup doc tracked

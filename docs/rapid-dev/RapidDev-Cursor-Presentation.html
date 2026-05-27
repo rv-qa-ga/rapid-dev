@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RapidDev | Developer POC Tool + Cursor</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0ea5e9; --accent: #f97316; --dev: #22c55e;
+            --bg: #0c1222; --bg-card: rgba(20,30,50,0.9);
+            --border: rgba(14,165,233,0.25); --text: #e2e8f0;
+            --text-dim: #94a3b8; --text-bright: #f8fafc;
+            --gradient: linear-gradient(135deg, #0ea5e9 0%, #22c55e 45%, #f97316 100%);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; overflow: hidden; }
+        body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); }
+        .slide {
+            position: absolute; inset: 0; display: flex; flex-direction: column;
+            align-items: center; justify-content: center; padding: 3rem 4rem;
+            opacity: 0; transform: translateY(12px);
+            transition: opacity 0.4s ease, transform 0.4s ease;
+            pointer-events: none; overflow-y: auto;
+        }
+        .slide.active { opacity: 1; transform: translateY(0); pointer-events: all; }
+        .slide::before {
+            content: ''; position: absolute; inset: 0;
+            background: radial-gradient(ellipse 80% 50% at 50% 0%, rgba(14,165,233,0.12), transparent 60%);
+            pointer-events: none;
+        }
+        .slide-content { position: relative; z-index: 1; text-align: center; max-width: 1080px; width: 100%; }
+        h1 { font-family: 'Syne', sans-serif; font-size: clamp(2rem, 4.5vw, 3.75rem); font-weight: 800; line-height: 1.1; margin-bottom: 1rem; }
+        h2 { font-family: 'Syne', sans-serif; font-size: clamp(1.6rem, 3.2vw, 2.75rem); font-weight: 700; margin-bottom: 1rem; }
+        h3 { font-size: 1.15rem; font-weight: 700; color: var(--text-bright); margin-bottom: 0.5rem; }
+        .subtitle { font-size: clamp(0.95rem, 1.6vw, 1.2rem); color: var(--text-dim); line-height: 1.65; max-width: 760px; margin: 0 auto 1.5rem; }
+        .gradient-text { background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .badge { display: inline-block; font-size: 0.72rem; font-weight: 600; padding: 0.4rem 1rem; border-radius: 100px; margin: 0.2rem; letter-spacing: 0.08em; text-transform: uppercase; }
+        .badge-primary { background: rgba(14,165,233,0.15); color: #38bdf8; border: 1px solid var(--border); }
+        .badge-dev { background: rgba(34,197,94,0.15); color: #4ade80; border: 1px solid rgba(34,197,94,0.35); }
+        .badge-accent { background: rgba(249,115,22,0.15); color: #fb923c; border: 1px solid rgba(249,115,22,0.35); }
+        .badge-cursor { background: rgba(139,92,246,0.15); color: #c4b5fd; border: 1px solid rgba(139,92,246,0.35); }
+        .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; text-align: left; margin-top: 1.25rem; }
+        .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem; }
+        .card h4 { font-size: 0.95rem; font-weight: 700; color: var(--text-bright); margin-bottom: 0.35rem; }
+        .card p { font-size: 0.8rem; color: var(--text-dim); line-height: 1.5; }
+        .step-list { text-align: left; max-width: 700px; margin: 1.25rem auto 0; }
+        .step-item { display: flex; gap: 1rem; margin-bottom: 0.9rem; align-items: flex-start; }
+        .step-num { width: 32px; height: 32px; border-radius: 8px; background: var(--gradient); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.85rem; color: white; flex-shrink: 0; }
+        .step-text h4 { font-size: 0.92rem; font-weight: 600; color: var(--text-bright); margin-bottom: 0.15rem; }
+        .step-text p { font-size: 0.8rem; color: var(--text-dim); line-height: 1.5; }
+        .code-inline { font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; color: var(--dev); background: rgba(0,0,0,0.4); padding: 0.2rem 0.5rem; border-radius: 4px; }
+        .terminal { text-align: left; background: #0a0f18; border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem 1.5rem; margin-top: 1.25rem; font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; line-height: 1.7; max-width: 720px; margin-left: auto; margin-right: auto; }
+        .terminal .prompt { color: var(--primary); } .terminal .comment { color: var(--text-dim); } .terminal .cmd { color: var(--text-bright); }
+        .flow-row { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 0.35rem; margin-top: 1.25rem; }
+        .flow-box { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 0.5rem 0.75rem; font-size: 0.72rem; font-weight: 600; color: var(--text-bright); }
+        .flow-arrow { color: var(--accent); }
+        .layer-stack { text-align: left; max-width: 640px; margin: 1.25rem auto 0; }
+        .layer { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 0.65rem 1rem; margin-bottom: 0.4rem; font-size: 0.82rem; display: flex; justify-content: space-between; }
+        .layer span { color: var(--text-dim); font-size: 0.72rem; }
+        .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; text-align: left; margin-top: 1.25rem; }
+        @media (max-width: 768px) { .two-col { grid-template-columns: 1fr; } }
+        .compare-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; text-align: left; margin-top: 1rem; }
+        .compare-table th { background: rgba(14,165,233,0.2); color: var(--text-bright); padding: 0.55rem 0.85rem; }
+        .compare-table td { padding: 0.5rem 0.85rem; border-bottom: 1px solid var(--border); color: var(--text-dim); }
+        .progress-bar { position: fixed; top: 0; left: 0; height: 3px; background: var(--gradient); z-index: 100; transition: width 0.35s ease; }
+        .slide-number { position: fixed; bottom: 1.25rem; right: 1.75rem; font-size: 0.8rem; color: var(--text-dim); z-index: 100; }
+        .nav-hint { position: fixed; bottom: 1.25rem; left: 1.75rem; font-size: 0.72rem; color: var(--text-dim); z-index: 100; opacity: 0.6; }
+        .speaker-notes { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(0,0,0,0.95); border-top: 2px solid var(--primary); padding: 1rem 2rem; z-index: 200; transform: translateY(100%); transition: transform 0.3s ease; max-height: 26vh; overflow-y: auto; }
+        .speaker-notes.visible { transform: translateY(0); }
+        .speaker-notes-label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 2px; color: #38bdf8; margin-bottom: 0.35rem; }
+        .highlight-box { border: 1px solid rgba(34,197,94,0.35); background: rgba(34,197,94,0.08); border-radius: 12px; padding: 1rem 1.25rem; margin-top: 1rem; text-align: left; max-width: 800px; margin-left: auto; margin-right: auto; }
+        .highlight-box li { font-size: 0.82rem; color: var(--text-dim); margin: 0.35rem 0 0.35rem 1.1rem; line-height: 1.5; }
+    </style>
+</head>
+<body>
+    <div class="progress-bar" id="progress"></div>
+    <div class="slide-number"><span id="slideNum">1</span> / <span id="slideTotal">18</span></div>
+    <div class="nav-hint">← → or click · N = notes</div>
+
+    <!-- 1 -->
+    <div class="slide active" data-notes="We are defining a delivery model the org can adopt—not just testing a tool. Speed plus governance. build.md is source of truth. RapidDev is TS2.">
+        <div class="slide-content">
+            <span class="badge badge-dev">Delivery model</span>
+            <span class="badge badge-primary">RapidDev · TS2</span>
+            <h1><span class="gradient-text">RapidDev</span></h1>
+            <p class="subtitle"><strong>Speed for the business</strong> + <strong>architectural controls</strong> for a stable platform at scale.</p>
+            <div class="flow-row">
+                <span class="flow-box">Jira</span><span class="flow-arrow">→</span>
+                <span class="flow-box">Sandbox build</span><span class="flow-arrow">→</span>
+                <span class="flow-box">Engineer review</span><span class="flow-arrow">→</span>
+                <span class="flow-box">Validate</span><span class="flow-arrow">→</span>
+                <span class="flow-box">Gearset → QA</span>
+            </div>
+            <p style="margin-top:1.5rem;font-size:0.85rem;color:var(--text-dim);"><span class="code-inline">docs/rapid-dev/build.md</span> · Cursor accelerates — engineering owns accountability</p>
+        </div>
+    </div>
+
+    <!-- 1b TS1 TS2 -->
+    <div class="slide" data-notes="Cursor only—no other AI IDE. TS1 discovery in Cursor spike or lightweight workspace. TS2 Cursor plus RapidDev plus sandbox. Never promote TS1 without TS2 engineer review.">
+        <div class="slide-content">
+            <span class="badge badge-dev">Two tracks · Cursor only</span>
+            <h2>TS1 vs <span class="gradient-text">TS2</span></h2>
+            <table class="compare-table">
+                <tr><th>Track</th><th>Cursor usage</th><th>Output</th></tr>
+                <tr><td><strong>TS1 — Rapid Prototyping</strong></td><td>Discovery / spikes (not production promote)</td><td>Prototype artifacts — <strong>not</strong> production-ready metadata</td></tr>
+                <tr><td><strong>TS2 — Sandbox Build</strong></td><td><strong>RapidDev</strong> repo + sandbox + deploy scripts</td><td>Reviewed metadata — engineer decides promote</td></tr>
+            </table>
+            <p class="subtitle" style="margin-top:1rem;font-size:0.88rem;">One tool: <strong>Cursor</strong> · RapidDev repo = <strong>TS2</strong></p>
+        </div>
+    </div>
+
+    <!-- 1c baseline -->
+    <div class="slide" data-notes="Walk through 7 steps. Emphasize engineer review and audit trail. Gearset to QA. Only proceed when validated.">
+        <div class="slide-content">
+            <span class="badge badge-dev">Baseline process</span>
+            <h2>Every AI-assisted <span class="gradient-text">change</span></h2>
+            <div class="step-list" style="max-width:640px;font-size:0.85rem">
+                <div class="step-item"><div class="step-num">1</div><div class="step-text"><h4>Jira</h4><p>Requirement captured and linked</p></div></div>
+                <div class="step-item"><div class="step-num">2</div><div class="step-text"><h4>Build</h4><p>Sandbox (TS2) or prototype (TS1)</p></div></div>
+                <div class="step-item"><div class="step-num">3</div><div class="step-text"><h4>Review</h4><p>Org patterns, dependencies — <strong>engineer</strong></p></div></div>
+                <div class="step-item"><div class="step-num">4</div><div class="step-text"><h4>Tests</h4><p>Apex + repo verification</p></div></div>
+                <div class="step-item"><div class="step-num">5</div><div class="step-text"><h4>Gearset</h4><p>Promote to QA</p></div></div>
+                <div class="step-item"><div class="step-num">6</div><div class="step-text"><h4>Audit</h4><p>Jira + deployment summary</p></div></div>
+                <div class="step-item"><div class="step-num">7</div><div class="step-text"><h4>Proceed</h4><p>Only when validated</p></div></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2 Cursor -->
+    <div class="slide" data-notes="Cursor for devs new to the product. Not ChatGPT copy-paste—a folder-aware IDE. RapidDev adds cursorrules so Agent behaves like a senior dev on your team.">
+        <div class="slide-content">
+            <span class="badge badge-cursor">New to Cursor</span>
+            <h2>Cursor = <span class="gradient-text">VS Code + Agent</span></h2>
+            <table class="compare-table">
+                <tr><th></th><th>Browser AI</th><th>Cursor + RapidDev</th></tr>
+                <tr><td><strong>Your codebase</strong></td><td>Manual paste</td><td><span class="code-inline">@file</span> / <span class="code-inline">@folder</span></td></tr>
+                <tr><td><strong>Multi-file POC</strong></td><td>You merge by hand</td><td>Agent diffs → you Accept/Reject</td></tr>
+                <tr><td><strong>Team standards</strong></td><td>None</td><td><span class="code-inline">.cursorrules</span></td></tr>
+            </table>
+        </div>
+    </div>
+
+    <!-- 3 Install -->
+    <div class="slide" data-notes="cursor.com install, sign in, open RapidDev folder. Import VS Code settings optional.">
+        <div class="slide-content">
+            <span class="badge badge-cursor">New to Cursor</span>
+            <h2>Install &amp; <span class="gradient-text">open RapidDev</span></h2>
+            <div class="step-list" style="max-width:560px;">
+                <div class="step-item"><div class="step-num">1</div><div class="step-text"><h4>Download Cursor</h4><p><a href="https://cursor.com" style="color:#38bdf8;">cursor.com</a></p></div></div>
+                <div class="step-item"><div class="step-num">2</div><div class="step-text"><h4>Sign in</h4><p>Company SSO — required for Agent</p></div></div>
+                <div class="step-item"><div class="step-num">3</div><div class="step-text"><h4>Clone RapidDev</h4><p><span class="code-inline">git clone</span> → <span class="code-inline">npm install</span></p></div></div>
+                <div class="step-item"><div class="step-num">4</div><div class="step-text"><h4>Open Folder</h4><p>RapidDev <strong>root</strong> (see <span class="code-inline">.cursorrules</span>)</p></div></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4 AI modes -->
+    <div class="slide" data-notes="Agent is the POC workhorse. Chat for questions. Ctrl+K for tiny edits. Emphasize reviewing diffs.">
+        <div class="slide-content">
+            <span class="badge badge-cursor">New to Cursor</span>
+            <h2>Agent drives <span class="gradient-text">POC work</span></h2>
+            <div class="card-grid" style="grid-template-columns:repeat(2,1fr);max-width:820px;margin:0 auto;">
+                <div class="card"><h4>Chat · Ctrl+L</h4><p>Understand code, errors, design options</p></div>
+                <div class="card"><h4>Ctrl+K</h4><p>Small local edit on selection</p></div>
+                <div class="card" style="border-color:rgba(34,197,94,0.5);"><h4>Agent · Ctrl+I</h4><p><strong>Metadata, scripts, deploy, multi-file POC</strong></p></div>
+                <div class="card"><h4>@ mentions</h4><p><span class="code-inline">@metadata/c2c</span> <span class="code-inline">@scripts/...</span></p></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 5 What is RapidDev -->
+    <div class="slide" data-notes="This is NOT primarily a QA automation onboarding. It's metadata, scripts, api-clients, cursorrules. package.json legacy name—ignore for messaging. Optional features folder for verify when needed.">
+        <div class="slide-content">
+            <span class="badge badge-dev">Dev POC repo</span>
+            <h2>What is <span class="gradient-text">RapidDev</span>?</h2>
+            <p class="subtitle">A single repo to <strong>implement</strong>, <strong>deploy</strong>, and <strong>verify</strong> sandbox POCs — with Cursor enforcing your team’s rules.</p>
+            <table class="compare-table">
+                <tr><th>Tooling</th><th>You use it to…</th></tr>
+                <tr><td><strong>metadata/</strong></td><td>Store &amp; deploy Salesforce XML (FlexiPages, apps, …)</td></tr>
+                <tr><td><strong>scripts/</strong></td><td>Deploy, connectivity, seed, screenshots, diagnostics</td></tr>
+                <tr><td><strong>src/api-clients/</strong></td><td>Call SF / integrations from TypeScript</td></tr>
+                <tr><td><strong>.cursorrules</strong></td><td>Guide Agent through POC → verify → handoff</td></tr>
+                <tr><td><strong>postman-collections/</strong></td><td>Quick API checks per story</td></tr>
+            </table>
+        </div>
+    </div>
+
+    <!-- Governance -->
+    <div class="slide" data-notes="Scale risk is cumulative inconsistency. Naming CMT Flow vs Apex permissions boundaries rollback. Define standards early. build.md table.">
+        <div class="slide-content">
+            <span class="badge badge-accent">Governance</span>
+            <h2>Architecture <span class="gradient-text">at scale</span></h2>
+            <p class="subtitle">Primary risk: <strong>cumulative inconsistency</strong> — not one bad deploy.</p>
+            <div class="card-grid" style="grid-template-columns:repeat(3,1fr);max-width:900px;margin:0 auto">
+                <div class="card"><h4>Naming &amp; CMT</h4><p>Org-wide patterns</p></div>
+                <div class="card"><h4>Flow vs Apex</h4><p>Document decision</p></div>
+                <div class="card"><h4>Permissions</h4><p>FLS, profiles, sets</p></div>
+                <div class="card"><h4>Deploy boundaries</h4><p>Ordering, dependencies</p></div>
+                <div class="card"><h4>Rollback</h4><p>Every promotable story</p></div>
+                <div class="card"><h4>Override AI</h4><p>Engineer when standards conflict</p></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- build.md -->
+    <div class="slide" data-notes="build.md is onboarding and source of truth. cursorrules updated. ai-assisted-delivery skill. rapid-dev-delivery.mdc for metadata paths. Prompt with @build.md @skill.">
+        <div class="slide-content">
+            <span class="badge badge-dev">Repeatable</span>
+            <h2><span class="code-inline">build.md</span> + skills</h2>
+            <table class="compare-table">
+                <tr><th>Asset</th><th>Role</th></tr>
+                <tr><td><strong>build.md</strong></td><td>Blueprint — process, checkpoints, PR template</td></tr>
+                <tr><td><strong>.cursorrules</strong></td><td>TS1/TS2 + TS2 workflow</td></tr>
+                <tr><td><strong>ai-assisted-delivery</strong> skill</td><td>Decompose · impact · prototype vs build · override AI</td></tr>
+            </table>
+            <p class="subtitle" style="margin-top:1rem;font-size:0.82rem;"><span class="code-inline">@docs/rapid-dev/build.md @.cursor/skills/ai-assisted-delivery/SKILL.md</span></p>
+        </div>
+    </div>
+
+    <!-- Why -->
+    <div class="slide" data-notes="RapidDev implements TS2—metadata scripts api clients. Engineer accountable.">
+        <div class="slide-content">
+            <span class="badge badge-accent">RapidDev repo</span>
+            <h2>TS2 <span class="gradient-text">toolkit</span></h2>
+            <div class="card-grid">
+                <div class="card"><h4>⚡ Faster POCs</h4><p>Agent reuses deploy scripts and clients — no reinventing auth each story.</p></div>
+                <div class="card"><h4>🛡️ Guardrails</h4><p>Clarify requirements; sandbox-only; minimal diffs.</p></div>
+                <div class="card"><h4>📦 Versioned deploys</h4><p>Metadata + <span class="code-inline">npm run c2c:deploy:…</span> — repeatable, reviewable.</p></div>
+                <div class="card"><h4>✅ Prove it</h4><p>Connectivity, build, screenshots — evidence for PR reviewers.</p></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 7 Setup -->
+    <div class="slide" data-notes="Clone, npm, env c2c or qa, connectivity check. Secrets never in git.">
+        <div class="slide-content">
+            <span class="badge badge-dev">Setup</span>
+            <h2>Sandbox ready in <span class="gradient-text">~15 min</span></h2>
+            <div class="terminal">
+                <div><span class="prompt">PS></span> <span class="cmd">git clone &lt;repo&gt; RapidDev && cd RapidDev</span></div>
+                <div><span class="prompt">PS></span> <span class="cmd">npm install && npm run build</span></div>
+                <div class="comment"># .env.c2c or Key Vault fetch</div>
+                <div><span class="prompt">PS></span> <span class="cmd">npm run c2c:connectivity-check</span></div>
+                <div class="comment"># Cursor: File → Open Folder → RapidDev</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 8 Agent in repo -->
+    <div class="slide" data-notes="cursorrules is the contract. Example prompt with metadata and deploy script. Ask before profile assignments.">
+        <div class="slide-content">
+            <span class="badge badge-cursor">Cursor + RapidDev</span>
+            <h2>Agent follows <span class="gradient-text">POC rules</span></h2>
+            <div class="highlight-box">
+                <strong style="color:#4ade80;">TS2 prompt</strong>
+                <ul>
+                    <li><span class="code-inline">@docs/rapid-dev/build.md @.cursor/skills/ai-assisted-delivery/SKILL.md</span></li>
+                    <li>Jira SF-XXXX · Engineer review before promote</li>
+                    <li>Deploy + rollback + audit trail in PR/Jira</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- 9 Workflow -->
+    <div class="slide" data-notes="Seven steps—all dev language. Verify not hand to QA. Gearset promote.">
+        <div class="slide-content">
+            <span class="badge badge-dev">POC workflow</span>
+            <h2>Jira → <span class="gradient-text">sandbox proof</span></h2>
+            <div class="step-list">
+                <div class="step-item"><div class="step-num">1</div><div class="step-text"><h4>Intake</h4><p>Scope, permissions, risks</p></div></div>
+                <div class="step-item"><div class="step-num">2</div><div class="step-text"><h4>Design</h4><p>Metadata vs Flow vs Apex — match repo</p></div></div>
+                <div class="step-item"><div class="step-num">3</div><div class="step-text"><h4>Clarify</h4><p>Agent asks if unclear</p></div></div>
+                <div class="step-item"><div class="step-num">4</div><div class="step-text"><h4>Build</h4><p>Sandbox only</p></div></div>
+                <div class="step-item"><div class="step-num">5</div><div class="step-text"><h4>Verify</h4><p>Deploy script, build, connectivity / screenshot</p></div></div>
+                <div class="step-item"><div class="step-num">6</div><div class="step-text"><h4>PR + promote</h4><p>Gearset, rollback notes</p></div></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 10 Layout -->
+    <div class="slide" data-notes="Dev-first layout: metadata and scripts on top. features folder optional for repeatable verify.">
+        <div class="slide-content">
+            <span class="badge badge-dev">Repo layout</span>
+            <h2>Where <span class="gradient-text">dev work</span> lives</h2>
+            <div class="layer-stack">
+                <div class="layer"><strong>metadata/</strong><span>Salesforce POC XML</span></div>
+                <div class="layer"><strong>scripts/</strong><span>Deploy · diagnose · seed</span></div>
+                <div class="layer"><strong>src/api-clients/</strong><span>REST from TypeScript</span></div>
+                <div class="layer"><strong>src/page-objects/</strong><span>Browser verify (when needed)</span></div>
+                <div class="layer"><strong>src/config/env/</strong><span>.env.c2c · .env.qa</span></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 11 Example POC -->
+    <div class="slide" data-notes="SF-1093 style example—metadata home pages, deploy npm script, screenshot optional.">
+        <div class="slide-content">
+            <span class="badge badge-accent">Example POC</span>
+            <h2>Role-based <span class="gradient-text">Home pages</span></h2>
+            <div class="card-grid" style="grid-template-columns:repeat(4,1fr);max-width:900px;margin:0 auto;">
+                <div class="card" style="text-align:center"><h4>1</h4><p style="font-size:0.75rem">Edit <span class="code-inline">metadata/c2c/</span></p></div>
+                <div class="card" style="text-align:center"><h4>2</h4><p style="font-size:0.75rem">Agent / you run deploy</p></div>
+                <div class="card" style="text-align:center"><h4>3</h4><p style="font-size:0.75rem">Connectivity OK</p></div>
+                <div class="card" style="text-align:center"><h4>4</h4><p style="font-size:0.75rem">Screenshot → PR</p></div>
+            </div>
+            <div class="terminal" style="margin-top:1rem">
+                <div><span class="cmd">npm run c2c:deploy:home-flexipages</span></div>
+                <div><span class="cmd">npm run sf1093:c2c:screenshots</span></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 12 Commands -->
+    <div class="slide" data-notes="Lead with deploy and connectivity. build lint for PR. test:interactive optional. Not a test-automation training slide.">
+        <div class="slide-content">
+            <span class="badge badge-dev">Commands</span>
+            <h2>POC commands <span class="gradient-text">first</span></h2>
+            <div class="two-col" style="max-width:900px;margin:0 auto">
+                <div>
+                    <h3>Build &amp; deploy</h3>
+                    <p><span class="code-inline">npm run build</span></p>
+                    <p><span class="code-inline">npm run c2c:deploy:home-flexipages</span></p>
+                    <p><span class="code-inline">npm run c2c:connectivity-check</span></p>
+                </div>
+                <div>
+                    <h3>Prove &amp; ship</h3>
+                    <p><span class="code-inline">npm run sf1093:c2c:screenshots</span></p>
+                    <p><span class="code-inline">npm run lint</span></p>
+                    <p><span class="code-inline">git push</span> → PR</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 13 Governance -->
+    <div class="slide" data-notes="Secrets, branches, signing—same as engineering standards.">
+        <div class="slide-content">
+            <span class="badge badge-accent">Governance</span>
+            <h2>Ship POCs <span class="gradient-text">safely</span></h2>
+            <div class="card-grid">
+                <div class="card"><h4>Secrets</h4><p><span class="code-inline">.env.*</span> / Key Vault only</p></div>
+                <div class="card"><h4>Branch</h4><p><span class="code-inline">feature/SF-XXX-...</span></p></div>
+                <div class="card"><h4>PR</h4><p>Small diff + verify notes + rollback</p></div>
+                <div class="card"><h4>Signed commits</h4><p>Per team policy</p></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 14 Next -->
+    <div class="slide" data-notes="Action: Cursor, clone, one POC story, PR. Questions.">
+        <div class="slide-content">
+            <h2>Start your <span class="gradient-text">first POC</span></h2>
+            <div class="step-list" style="max-width:520px">
+                <div class="step-item"><div class="step-num">1</div><div class="step-text"><h4>Cursor + RapidDev folder</h4><p>Part 1 of the guide · 5‑min exercise</p></div></div>
+                <div class="step-item"><div class="step-num">2</div><div class="step-text"><h4>Sandbox credentials</h4><p>Connectivity check green</p></div></div>
+                <div class="step-item"><div class="step-num">3</div><div class="step-text"><h4>One Jira POC</h4><p>Agent + deploy + verify evidence</p></div></div>
+                <div class="step-item"><div class="step-num">4</div><div class="step-text"><h4>Open PR</h4><p>Reviewers see code + proof</p></div></div>
+            </div>
+            <p style="margin-top:1.5rem;font-size:0.9rem;color:var(--text-dim)"><span class="code-inline">docs/rapid-dev/build.md</span> · <span class="code-inline">CURSOR_RAPID_DEVELOPMENT_GUIDE.md</span></p>
+            <p style="margin-top:1.25rem;font-size:1.1rem;font-weight:600;color:var(--text-bright)">Questions?</p>
+        </div>
+    </div>
+
+    <div class="speaker-notes" id="speakerNotes">
+        <div class="speaker-notes-label">Speaker notes (N)</div>
+        <p id="notesContent"></p>
+    </div>
+
+    <script>
+        var slides = document.querySelectorAll('.slide');
+        var current = 0, notesVisible = false;
+        var notesPanel = document.getElementById('speakerNotes');
+        var notesContent = document.getElementById('notesContent');
+        document.getElementById('slideTotal').textContent = slides.length;
+        function goTo(idx) {
+            if (idx < 0 || idx >= slides.length) return;
+            slides[current].classList.remove('active');
+            current = idx;
+            slides[current].classList.add('active');
+            document.getElementById('slideNum').textContent = current + 1;
+            document.getElementById('progress').style.width = ((current + 1) / slides.length * 100) + '%';
+            var n = slides[current].getAttribute('data-notes');
+            if (n) notesContent.textContent = n;
+        }
+        function next() { goTo(current + 1); }
+        function prev() { goTo(current - 1); }
+        function toggleNotes() { notesVisible = !notesVisible; notesPanel.classList.toggle('visible', notesVisible); }
+        document.addEventListener('keydown', function(e) {
+            if (['ArrowRight','ArrowDown',' ','PageDown'].includes(e.key)) { e.preventDefault(); next(); }
+            else if (['ArrowLeft','ArrowUp','PageUp'].includes(e.key)) { e.preventDefault(); prev(); }
+            else if (e.key === 'n' || e.key === 'N') toggleNotes();
+            else if (e.key === 'Home') { e.preventDefault(); goTo(0); }
+            else if (e.key === 'End') { e.preventDefault(); goTo(slides.length - 1); }
+        });
+        document.addEventListener('click', function(e) {
+            if (e.target.closest('.speaker-notes')) return;
+            if (e.clientX > window.innerWidth * 0.5) next(); else prev();
+        });
+        goTo(0);
+    </script>
+</body>
+</html>
