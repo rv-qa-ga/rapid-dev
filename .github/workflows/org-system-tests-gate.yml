@@ -35,7 +35,7 @@ jobs:
     steps:
       - name: Open check run (exact name system-tests for org ruleset)
         id: open
-        uses: actions/github-script@v7
+        uses: actions/github-script@v9
         with:
           script: |
             const sha =
@@ -71,7 +71,7 @@ jobs:
 
       - name: Complete system-tests check and fail job if validation failed
         if: always()
-        uses: actions/github-script@v7
+        uses: actions/github-script@v9
         env:
           CHECK_RUN_ID: ${{ steps.open.outputs.result }}
           VALIDATE_OUTCOME: ${{ steps.validate.outcome }}
