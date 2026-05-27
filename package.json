@@ -392,7 +392,7 @@
     "@cucumber/cucumber": "^12.5.0",
     "@playwright/test": "^1.40.0",
     "axios": "1.13.5",
-    "dotenv": "^16.3.1",
+    "dotenv": "^17.4.2",
     "exceljs": "^4.4.0",
     "faye": "^1.4.1",
     "glob": "^13.0.6",
