@@ -1,0 +1,62 @@
+{
+  "work_item_id": 46906,
+  "executive_summary": "Reference Data Management | Data Engineering| Phase 1 | Implementing Reserving Line of Business | Adding Reserving Line of Business Table to ODS-Reference - User Story",
+  "affected_objects": [],
+  "assumptions_conflicts": [
+    "Acceptance criterion mentions table(s) and, dbo, accelins_reservinglineofbusiness but these are not found in code changes"
+  ],
+  "test_cases": [
+    {
+      "id": "WI-46906-TC-01",
+      "title": "Validate rollback script exists and is tested",
+      "purpose": "Verify that changes can be safely rolled back if needed",
+      "preconditions": "Rollback script available",
+      "steps": [
+        "-- Verify rollback script exists",
+        "-- Test rollback script in test environment",
+        "-- Verify database returns to previous state"
+      ],
+      "expected_result": "Rollback script successfully reverts all changes",
+      "test_data": "",
+      "priority": "High",
+      "type": "Rollback",
+      "complexity": "Complex",
+      "cleanup": "",
+      "automation_notes": "Requires rollback script execution and state verification",
+      "source_references": [],
+      "category": "Rollback & Upgrade safety"
+    }
+  ],
+  "test_data_matrix": {},
+  "sql_test_scripts": {
+    "WI-46906-TC-01": "-- ============================================================================\n-- Test Script: WI-46906-TC-01\n-- Title: Validate rollback script exists and is tested\n-- Purpose: Verify that changes can be safely rolled back if needed\n-- Category: Rollback & Upgrade safety\n-- Priority: High | Type: Rollback | Complexity: Complex\n-- ============================================================================\n-- Generated for comprehensive test case analysis\n-- Work Item: 46906\n-- ============================================================================\n\n-- PRECONDITIONS\n-- Rollback script available\n\n-- SETUP\n-- Setup: Configure test environment as needed\n\n-- TEST EXECUTION\n-- Verify rollback script exists\n\n-- Test rollback script in test environment\n\n-- Verify database returns to previous state\n\n-- EXPECTED RESULT\n-- Rollback script successfully reverts all changes\n\n-- VERIFICATION\n-- Add assertions here based on expected result\n-- Example:\n-- IF NOT EXISTS (SELECT 1 FROM ... WHERE ...)\n--     THROW 50000, 'Test failed: Expected condition not met', 1\n\n-- CLEANUP\n-- No cleanup required for this test\n\n-- ============================================================================\n-- Automation Notes: Requires rollback script execution and state verification\n-- ============================================================================\n"
+  },
+  "acceptance_criteria_mapping": [
+    {
+      "criterion": "<div>GIVEN I am in the ODS&nbsp; </div><div>WHEN I am in the&nbsp;<span style=\"display:inline !important;\">Reference database</span> </div><div><span style=\"display:inline !important;\">THEN I want to add a new staging table, master table and appropriate views for Reference Line of Business</span> </div><div><span style=\"display:inline !important;\">AND all fields will be pulled from Dataverse table:&nbsp; [dbo].[accelins_reservinglineofbusiness]</span> </div><div><span style=\"display:inline !important;\">AND the view should filter for state code active</span> </div><div><span>AND we need to update the ETL and Jobs associated with refreshing data from dataverse to Reference</span> </div><div><br> </div>",
+      "covered_by": [],
+      "coverage_status": "Missing"
+    }
+  ],
+  "risk_assessment": [],
+  "automation_plan": {
+    "priority_tests": [],
+    "tools": [
+      "tSQLt",
+      "Azure Pipelines",
+      "dbatools",
+      "SQL Server Agent"
+    ],
+    "ci_gates": [
+      "Run unit tests on PR creation",
+      "Run integration tests on merge to main",
+      "Require all high-priority tests to pass"
+    ]
+  },
+  "release_checklist": [
+    "All high-priority test cases executed and passed",
+    "Database backup created before deployment",
+    "Rollback plan tested and documented",
+    "Performance baseline established (if applicable)"
+  ]
+}

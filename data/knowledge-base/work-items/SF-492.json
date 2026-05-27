@@ -1,0 +1,41 @@
+{
+  "key": "SF-492",
+  "summary": "Hide Opportunities fields TerritoriesCovered_c, First-Year Estimated Gross Written Premi_c, and Expressed_Interest_c from non-admin users",
+  "type": "Story",
+  "status": "In QA",
+  "priority": "Medium",
+  "description": {
+    "raw": "User Story: As a Product Owner / Security Lead I want the Opportunity fields TerritoriesCovered_c, First-Year Estimated Gross Written Premi_c and Expressed_Interest_c hidden from non-admin users So that sensitive or irrelevant opportunity data is not visible to standard users while System Administrators and approved support roles retain visibility for troubleshooting and reporting Description / Scope: Hide the Opportunity fields TerritoriesCovered_c, First-Year Estimated Gross Written Premi_c and Expressed_Interest_c for all non-admin users across the org. This is a visibility change only — do not delete the fields or modify field data or underlying business logic.  Acceptance Criteria (GIVEN / WHEN / THEN): Field identity confirmed GIVEN initial analysis WHEN implementation begins THEN the exact API names for the three fields are confirmed (TerritoriesCovered_c, First-Year Estimated Gross Written Premi_c, Expressed_Interest_c) and documented UI visibility (Account detail page) GIVEN a non-admin user WHEN they open any Opportunity record in Lightning Experience THEN TerritoriesCovered_c, First-Year Estimated Gross Written Premi_c and Expressed_Interest_c do not appear anywhere on the page (detail, dynamic form sections, related components, inline edit, quick actions) and cannot be added via personalization GIVEN a System Administrator or approved support role WHEN they open any Opportunity THEN the three fields remain visible Field-Level Security & permission sets GIVEN org profiles and permission sets WHEN FLS is updated THEN the three fields are hidden (read and edit unchecked) for all non-admin profiles and permission sets, and visible for System Administrator and explicitly approved support roles Dynamic Forms, Lightning components & list views GIVEN Opportunity Lightning pages and shared list views WHEN a non-admin user views them THEN the fields are not rendered or included and no component errors occur; admin/support pages still show the fields Search, compact layouts & global search GIVEN a non-admin user performs a search or views compact lists WHEN results or compact/list fields are shown THEN the three fields are not displayed or searchable for that user Reports & dashboards GIVEN a non-admin user builds or views reports and dashboards WHEN they try to add or view these fields THEN the fields are not available in the field picker and do not appear in report results for that user; admins retain full access to report on these fields",
+    "parsed": {
+      "sentences": [
+        "User Story: As a Product Owner / Security Lead I want the Opportunity fields TerritoriesCovered_c, First-Year Estimated Gross Written Premi_c and Expressed_Interest_c hidden from non-admin users So that sensitive or irrelevant opportunity data is not visible to standard users while System Administrators and approved support roles retain visibility for troubleshooting and reporting Description / Scope: Hide the Opportunity fields TerritoriesCovered_c, First-Year Estimated Gross Written Premi_c and Expressed_Interest_c for all non-admin users across the org",
+        "This is a visibility change only — do not delete the fields or modify field data or underlying business logic",
+        "Acceptance Criteria (GIVEN / WHEN / THEN): Field identity confirmed GIVEN initial analysis WHEN implementation begins THEN the exact API names for the three fields are confirmed (TerritoriesCovered_c, First-Year Estimated Gross Written Premi_c, Expressed_Interest_c) and documented UI visibility (Account detail page) GIVEN a non-admin user WHEN they open any Opportunity record in Lightning Experience THEN TerritoriesCovered_c, First-Year Estimated Gross Written Premi_c and Expressed_Interest_c do not appear anywhere on the page (detail, dynamic form sections, related components, inline edit, quick actions) and cannot be added via personalization GIVEN a System Administrator or approved support role WHEN they open any Opportunity THEN the three fields remain visible Field-Level Security & permission sets GIVEN org profiles and permission sets WHEN FLS is updated THEN the three fields are hidden (read and edit unchecked) for all non-admin profiles and permission sets, and visible for System Administrator and explicitly approved support roles Dynamic Forms, Lightning components & list views GIVEN Opportunity Lightning pages and shared list views WHEN a non-admin user views them THEN the fields are not rendered or included and no component errors occur; admin/support pages still show the fields Search, compact layouts & global search GIVEN a non-admin user performs a search or views compact lists WHEN results or compact/list fields are shown THEN the three fields are not displayed or searchable for that user Reports & dashboards GIVEN a non-admin user builds or views reports and dashboards WHEN they try to add or view these fields THEN the fields are not available in the field picker and do not appear in report results for that user; admins retain full access to report on these fields"
+      ],
+      "entities": [
+        "Account",
+        "Opportunity",
+        "Lead",
+        "Product"
+      ],
+      "fields": [],
+      "actions": [
+        "display",
+        "show",
+        "hide",
+        "update",
+        "delete"
+      ]
+    }
+  },
+  "acceptanceCriteria": [],
+  "comments": [],
+  "relatedIssues": [],
+  "fieldDefinitions": {},
+  "generatedFeatures": {
+    "ui": "src/features/ui/SF/SF-492.feature",
+    "api": "src/features/api/SF/SF-492.feature"
+  },
+  "qaReviewedFeatures": {},
+  "extractedAt": "2025-12-17T18:40:31.432Z"
+}

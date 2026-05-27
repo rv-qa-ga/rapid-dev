@@ -1,0 +1,23 @@
+{
+  "name": "prod",
+  "description": "Production environment",
+  "salesforce": {
+    "baseUrl": "https://yourinstance.lightning.force.com",
+    "apiVersion": "v60.0",
+    "loginUrl": "https://login.salesforce.com"
+  },
+  "jira": {
+    "baseUrl": "https://yourcompany.atlassian.net",
+    "projectKey": "SF"
+  },
+  "zephyr": {
+    "baseUrl": "https://yourcompany.atlassian.net",
+    "projectKey": "SF"
+  },
+  "timeouts": {
+    "navigation": 30000,
+    "element": 10000,
+    "api": 30000
+  }
+}
+

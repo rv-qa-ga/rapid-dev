@@ -1,0 +1,36 @@
+{
+  "key": "SF-519",
+  "summary": "Derive Distribution Region from Lead Country",
+  "type": "Story",
+  "status": "In QA",
+  "priority": "Medium",
+  "description": {
+    "raw": "As an MRD I want the Distribution Region on a Lead to be automatically determined by the Country in the Lead’s address So that the correct region is consistently applied without manual selection. Scenario 1: Country must be populated on all Leads   Given a user is creating or editing a Lead   When the user attempts to save the record   Then the Country field must be populated   And the save must be blocked if the Country field is blank   And the error message must state: \"Country is required.\" Scenario 2: Automatically populate Distribution Region based on Country   Given a Lead has a valid Country in its address details   When the Country is entered or updated   Then the Distribution Region field must populate automatically   And the value must correspond to the predefined mapping for that Country Scenario 3: Update Distribution Region when Country changes   Given a Lead has a Distribution Region already populated   When the Country is changed   Then the Distribution Region must update automatically   And reflect the region linked to the new Country Scenario 4: Alignment with central region definitions   Given a predefined country-to-region reference list exists   When deriving the Distribution Region   Then the system must use the centrally maintained list to ensure consistency across all objects and integrations Scenario 5: No Distribution Region when Country is blank or unmapped   Given a Lead has no Country entered or the Country is not included in the mapping   When the Lead is saved   Then the Distribution Region field must remain blank   And the user must not receive an error Scenario 6: Distribution Region field includes help text   Given a user views the Distribution Region field on a Lead   When the help text is displayed   Then it must state:     \"This field is automatically populated from the Country      and reflects where the distribution team sees the member being located.\" Note: this country is the country in the address details",
+    "parsed": {
+      "sentences": [
+        "As an MRD I want the Distribution Region on a Lead to be automatically determined by the Country in the Lead’s address So that the correct region is consistently applied without manual selection",
+        "Scenario 1: Country must be populated on all Leads   Given a user is creating or editing a Lead   When the user attempts to save the record   Then the Country field must be populated   And the save must be blocked if the Country field is blank   And the error message must state: \"Country is required.\" Scenario 2: Automatically populate Distribution Region based on Country   Given a Lead has a valid Country in its address details   When the Country is entered or updated   Then the Distribution Region field must populate automatically   And the value must correspond to the predefined mapping for that Country Scenario 3: Update Distribution Region when Country changes   Given a Lead has a Distribution Region already populated   When the Country is changed   Then the Distribution Region must update automatically   And reflect the region linked to the new Country Scenario 4: Alignment with central region definitions   Given a predefined country-to-region reference list exists   When deriving the Distribution Region   Then the system must use the centrally maintained list to ensure consistency across all objects and integrations Scenario 5: No Distribution Region when Country is blank or unmapped   Given a Lead has no Country entered or the Country is not included in the mapping   When the Lead is saved   Then the Distribution Region field must remain blank   And the user must not receive an error Scenario 6: Distribution Region field includes help text   Given a user views the Distribution Region field on a Lead   When the help text is displayed   Then it must state:     \"This field is automatically populated from the Country      and reflects where the distribution team sees the member being located.\" Note: this country is the country in the address details"
+      ],
+      "entities": [
+        "Lead"
+      ],
+      "fields": [],
+      "actions": [
+        "display",
+        "update",
+        "populate",
+        "map"
+      ]
+    }
+  },
+  "acceptanceCriteria": [],
+  "comments": [],
+  "relatedIssues": [],
+  "fieldDefinitions": {},
+  "generatedFeatures": {
+    "ui": "src/features/ui/SF/SF-519.feature",
+    "api": "src/features/api/SF/SF-519.feature"
+  },
+  "qaReviewedFeatures": {},
+  "extractedAt": "2025-12-17T18:40:41.507Z"
+}

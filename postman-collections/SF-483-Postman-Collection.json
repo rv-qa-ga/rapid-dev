@@ -1,0 +1,912 @@
+{
+  "info": {
+    "_postman_id": "sf-483-api-tests",
+    "name": "SF-483 - Upsell Opportunity Field Visibility - API Tests",
+    "description": "API - SF-483 - Make Upsell Opportunity field visible only on Member and Non-Member MGA accounts\n\n══════════════════════════════════════════════════════════════════════════════\nGenerated: 2025-01-08\n══════════════════════════════════════════════════════════════════════════════\n\nSUMMARY:\n  Make Upsell Opportunity field visible only on Member and Non-Member MGA accounts\n\nSCOPE:\n  - The field visibility change is UI-only\n  - The field should NOT be deleted\n  - API, automations and integrations must continue to function\n  - The field should be accessible via API for ALL Account types (not just MGA)\n  - Field-level security and API access should remain unchanged\n\nAPI TESTING REQUIREMENTS:\n  - Verify Upsell_Opportunity__c field exists on Account object\n  - Verify field can be created/updated/queried via API for all Account types\n  - Verify field is accessible regardless of Account Type (Member MGA, Non-Member MGA, others)\n  - Verify field values can be set and retrieved correctly\n  - Verify API continues to work for automations and integrations\n\nGenerated from: src/features/api/SF/SF-483.feature\n\nThis collection contains API tests for SF-483 work item.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{sf_access_token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "{{sf_base_url}}",
+      "type": "string"
+    },
+    {
+      "key": "api_version",
+      "value": "{{sf_api_version}}",
+      "type": "string"
+    },
+    {
+      "key": "account_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "member_mga_account_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "non_member_mga_account_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "agency_account_id",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Field Existence Verification",
+      "item": [
+        {
+          "name": "SF-483-API-001 - Describe Account Object",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Upsell_Opportunity__c field exists\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    var fields = jsonData.fields;",
+                  "    var field = fields.find(function(f) { return f.name === 'Upsell_Opportunity__c'; });",
+                  "    pm.expect(field).to.not.be.undefined;",
+                  "    pm.expect(field.name).to.equal('Upsell_Opportunity__c');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Account/describe",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "data",
+                "{{api_version}}",
+                "sobjects",
+                "Account",
+                "describe"
+              ]
+            },
+            "description": "Verify Upsell_Opportunity__c field exists on Account"
+          },
+          "response": []
+        },
+        {
+          "name": "SF-483-API-002 - Verify Field Metadata",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Upsell_Opportunity__c field metadata is accessible\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    var fields = jsonData.fields;",
+                  "    var field = fields.find(function(f) { return f.name === 'Upsell_Opportunity__c'; });",
+                  "    pm.expect(field).to.not.be.undefined;",
+                  "    pm.expect(field.type).to.not.be.undefined;",
+                  "    pm.expect(field.label).to.not.be.undefined;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Account/describe",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "data",
+                "{{api_version}}",
+                "sobjects",
+                "Account",
+                "describe"
+              ]
+            },
+            "description": "Verify Upsell_Opportunity__c field metadata is accessible"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Member MGA Accounts",
+      "item": [
+        {
+          "name": "SF-483-API-003 - Create Member MGA Account with Upsell Opportunity",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test(\"Response contains Account ID\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.id).to.not.be.undefined;",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    pm.collectionVariables.set('member_mga_account_id', jsonData.id);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"Name\": \"SF-483 API Test Member MGA Account\",\n  \"Type\": \"Member MGA\",\n  \"Upsell_Opportunity__c\": \"Member MGA\",\n  \"Region__c\": \"US\",\n  \"Functional_Currency__c\": \"USD\",\n  \"BillingCountry\": \"United States\",\n  \"BillingCity\": \"New York\",\n  \"BillingState\": \"New York\",\n  \"BillingPostalCode\": \"10001\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Account/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "data",
+                "{{api_version}}",
+                "sobjects",
+                "Account",
+                ""
+              ]
+            },
+            "description": "Create Member MGA Account with Upsell_Opportunity__c field"
+          },
+          "response": []
+        },
+        {
+          "name": "SF-483-API-004 - Update Upsell_Opportunity__c on Member MGA Account",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 204\", function () {",
+                  "    pm.response.to.have.status(204);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"Upsell_Opportunity__c\": \"Non-Member MGA\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Account/{{member_mga_account_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "data",
+                "{{api_version}}",
+                "sobjects",
+                "Account",
+                "{{member_mga_account_id}}"
+              ]
+            },
+            "description": "Update Upsell_Opportunity__c on Member MGA Account"
+          },
+          "response": []
+        },
+        {
+          "name": "SF-483-API-005 - Query Member MGA Account by Upsell Opportunity",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response contains Account records\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.records).to.be.an('array');",
+                  "    pm.expect(jsonData.records.length).to.be.above(0);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/query/?q=SELECT Id, Name, Type, Upsell_Opportunity__c FROM Account WHERE Upsell_Opportunity__c = 'Member MGA' AND Type = 'Member MGA' LIMIT 10",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "data",
+                "{{api_version}}",
+                "query",
+                ""
+              ],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "SELECT Id, Name, Type, Upsell_Opportunity__c FROM Account WHERE Upsell_Opportunity__c = 'Member MGA' AND Type = 'Member MGA' LIMIT 10"
+                }
+              ]
+            },
+            "description": "Query Member MGA Account by Upsell_Opportunity__c"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Non-Member MGA Accounts",
+      "item": [
+        {
+          "name": "SF-483-API-006 - Create Non-Member MGA Account with Upsell Opportunity",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test(\"Response contains Account ID\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.id).to.not.be.undefined;",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    pm.collectionVariables.set('non_member_mga_account_id', jsonData.id);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"Name\": \"SF-483 API Test Non-Member MGA Account\",\n  \"Type\": \"Non-Member MGA\",\n  \"Upsell_Opportunity__c\": \"Non-Member MGA\",\n  \"Region__c\": \"US\",\n  \"Functional_Currency__c\": \"USD\",\n  \"BillingCountry\": \"United States\",\n  \"BillingCity\": \"New York\",\n  \"BillingState\": \"New York\",\n  \"BillingPostalCode\": \"10001\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Account/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "data",
+                "{{api_version}}",
+                "sobjects",
+                "Account",
+                ""
+              ]
+            },
+            "description": "Create Non-Member MGA Account with Upsell_Opportunity__c field"
+          },
+          "response": []
+        },
+        {
+          "name": "SF-483-API-007 - Update Upsell_Opportunity__c on Non-Member MGA Account",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 204\", function () {",
+                  "    pm.response.to.have.status(204);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"Upsell_Opportunity__c\": \"Member MGA\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Account/{{non_member_mga_account_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "data",
+                "{{api_version}}",
+                "sobjects",
+                "Account",
+                "{{non_member_mga_account_id}}"
+              ]
+            },
+            "description": "Update Upsell_Opportunity__c on Non-Member MGA Account"
+          },
+          "response": []
+        },
+        {
+          "name": "SF-483-API-008 - Query Non-Member MGA Account by Upsell Opportunity",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response contains Account records\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.records).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/query/?q=SELECT Id, Name, Type, Upsell_Opportunity__c FROM Account WHERE Upsell_Opportunity__c = 'Non-Member MGA' AND Type = 'Non-Member MGA' LIMIT 10",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "data",
+                "{{api_version}}",
+                "query",
+                ""
+              ],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "SELECT Id, Name, Type, Upsell_Opportunity__c FROM Account WHERE Upsell_Opportunity__c = 'Non-Member MGA' AND Type = 'Non-Member MGA' LIMIT 10"
+                }
+              ]
+            },
+            "description": "Query Non-Member MGA Account by Upsell_Opportunity__c"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Non-MGA Accounts (API Access Maintained)",
+      "item": [
+        {
+          "name": "SF-483-API-009 - Create Agency Account with Upsell Opportunity",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test(\"Response contains Account ID\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.id).to.not.be.undefined;",
+                  "    pm.collectionVariables.set('agency_account_id', jsonData.id);",
+                  "});",
+                  "",
+                  "pm.test(\"Upsell_Opportunity__c field is accessible via API\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.id).to.not.be.undefined;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"Name\": \"SF-483 API Test Agency Account\",\n  \"Type\": \"Agency\",\n  \"Upsell_Opportunity__c\": \"Member MGA\",\n  \"Region__c\": \"US\",\n  \"Functional_Currency__c\": \"USD\",\n  \"BillingCountry\": \"United States\",\n  \"BillingCity\": \"New York\",\n  \"BillingState\": \"New York\",\n  \"BillingPostalCode\": \"10001\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Account/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "data",
+                "{{api_version}}",
+                "sobjects",
+                "Account",
+                ""
+              ]
+            },
+            "description": "Create non-MGA Account (Agency) with Upsell_Opportunity__c - Verify API access is maintained"
+          },
+          "response": []
+        },
+        {
+          "name": "SF-483-API-010 - Update Upsell_Opportunity__c on Agency Account",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 204\", function () {",
+                  "    pm.response.to.have.status(204);",
+                  "});",
+                  "",
+                  "pm.test(\"Field update should be successful\", function () {",
+                  "    pm.response.to.have.status(204);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"Upsell_Opportunity__c\": \"Non-Member MGA\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Account/{{agency_account_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "data",
+                "{{api_version}}",
+                "sobjects",
+                "Account",
+                "{{agency_account_id}}"
+              ]
+            },
+            "description": "Update Upsell_Opportunity__c on non-MGA Account - Verify API access is maintained"
+          },
+          "response": []
+        },
+        {
+          "name": "SF-483-API-011 - Query Agency Account and Retrieve Upsell Opportunity",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response contains Upsell_Opportunity__c field\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.records).to.be.an('array');",
+                  "    if (jsonData.records.length > 0) {",
+                  "        pm.expect(jsonData.records[0].Upsell_Opportunity__c).to.not.be.undefined;",
+                  "    }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/query/?q=SELECT Id, Name, Type, Upsell_Opportunity__c FROM Account WHERE Id = '{{agency_account_id}}' LIMIT 1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "data",
+                "{{api_version}}",
+                "query",
+                ""
+              ],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "SELECT Id, Name, Type, Upsell_Opportunity__c FROM Account WHERE Id = '{{agency_account_id}}' LIMIT 1"
+                }
+              ]
+            },
+            "description": "Query non-MGA Account and retrieve Upsell_Opportunity__c field - Verify API access"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Valid Picklist Values",
+      "item": [
+        {
+          "name": "SF-483-API-013 - Create Account with Member MGA value",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"Name\": \"SF-483 API Test Member MGA Value Account\",\n  \"Type\": \"Member MGA\",\n  \"Upsell_Opportunity__c\": \"Member MGA\",\n  \"Region__c\": \"US\",\n  \"Functional_Currency__c\": \"USD\",\n  \"BillingCountry\": \"United States\",\n  \"BillingCity\": \"New York\",\n  \"BillingState\": \"New York\",\n  \"BillingPostalCode\": \"10001\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Account/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "data",
+                "{{api_version}}",
+                "sobjects",
+                "Account",
+                ""
+              ]
+            },
+            "description": "Create Account with Upsell_Opportunity__c = 'Member MGA'"
+          },
+          "response": []
+        },
+        {
+          "name": "SF-483-API-013 - Create Account with Non-Member MGA value",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"Name\": \"SF-483 API Test Non-Member MGA Value Account\",\n  \"Type\": \"Member MGA\",\n  \"Upsell_Opportunity__c\": \"Non-Member MGA\",\n  \"Region__c\": \"US\",\n  \"Functional_Currency__c\": \"USD\",\n  \"BillingCountry\": \"United States\",\n  \"BillingCity\": \"New York\",\n  \"BillingState\": \"New York\",\n  \"BillingPostalCode\": \"10001\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Account/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "data",
+                "{{api_version}}",
+                "sobjects",
+                "Account",
+                ""
+              ]
+            },
+            "description": "Create Account with Upsell_Opportunity__c = 'Non-Member MGA'"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Negative / Boundary Tests",
+      "item": [
+        {
+          "name": "SF-483-API-014 - Reject Invalid Upsell_Opportunity__c Value",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code indicates error\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([400, 422]);",
+                  "});",
+                  "",
+                  "pm.test(\"Error response mentions Upsell_Opportunity\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    var errorMessage = JSON.stringify(jsonData).toLowerCase();",
+                  "    pm.expect(errorMessage).to.include('upsell');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"Name\": \"SF-483 API Invalid Test Account\",\n  \"Type\": \"Member MGA\",\n  \"Upsell_Opportunity__c\": \"INVALID_VALUE_###\",\n  \"Region__c\": \"US\",\n  \"Functional_Currency__c\": \"USD\",\n  \"BillingCountry\": \"United States\",\n  \"BillingCity\": \"New York\",\n  \"BillingState\": \"New York\",\n  \"BillingPostalCode\": \"10001\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Account/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "data",
+                "{{api_version}}",
+                "sobjects",
+                "Account",
+                ""
+              ]
+            },
+            "description": "Negative test: Attempt to create Account with invalid Upsell_Opportunity__c value. Expected: Error response"
+          },
+          "response": []
+        },
+        {
+          "name": "SF-483-API-015 - Handle Null Upsell_Opportunity__c Value",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"Name\": \"SF-483 API Null Test Account\",\n  \"Type\": \"Member MGA\",\n  \"Region__c\": \"US\",\n  \"Functional_Currency__c\": \"USD\",\n  \"BillingCountry\": \"United States\",\n  \"BillingCity\": \"New York\",\n  \"BillingState\": \"New York\",\n  \"BillingPostalCode\": \"10001\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Account/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "data",
+                "{{api_version}}",
+                "sobjects",
+                "Account",
+                ""
+              ]
+            },
+            "description": "Create Account without Upsell_Opportunity__c field (null value)"
+          },
+          "response": []
+        },
+        {
+          "name": "SF-483-API-016 - Verify Null Value in Query",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Upsell_Opportunity__c is null or empty\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    if (jsonData.records && jsonData.records.length > 0) {",
+                  "        var fieldValue = jsonData.records[0].Upsell_Opportunity__c;",
+                  "        pm.expect(fieldValue === null || fieldValue === undefined || fieldValue === '').to.be.true;",
+                  "    }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/query/?q=SELECT Id, Name, Type, Upsell_Opportunity__c FROM Account WHERE Name LIKE 'SF-483 API Null Test%' LIMIT 1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "data",
+                "{{api_version}}",
+                "query",
+                ""
+              ],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "SELECT Id, Name, Type, Upsell_Opportunity__c FROM Account WHERE Name LIKE 'SF-483 API Null Test%' LIMIT 1"
+                }
+              ]
+            },
+            "description": "Query Account to verify Upsell_Opportunity__c is null or empty"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Bulk Operations",
+      "item": [
+        {
+          "name": "SF-483-API-017 - Bulk Update Upsell_Opportunity__c",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"allOrNone\": false,\n  \"compositeRequest\": [\n    {\n      \"method\": \"PATCH\",\n      \"url\": \"/services/data/{{api_version}}/sobjects/Account/{{member_mga_account_id}}\",\n      \"referenceId\": \"Account1\",\n      \"body\": {\n        \"Upsell_Opportunity__c\": \"Non-Member MGA\"\n      }\n    },\n    {\n      \"method\": \"PATCH\",\n      \"url\": \"/services/data/{{api_version}}/sobjects/Account/{{non_member_mga_account_id}}\",\n      \"referenceId\": \"Account2\",\n      \"body\": {\n        \"Upsell_Opportunity__c\": \"Member MGA\"\n      }\n    },\n    {\n      \"method\": \"PATCH\",\n      \"url\": \"/services/data/{{api_version}}/sobjects/Account/{{agency_account_id}}\",\n      \"referenceId\": \"Account3\",\n      \"body\": {\n        \"Upsell_Opportunity__c\": \"Member MGA\"\n      }\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/composite",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "data",
+                "{{api_version}}",
+                "composite"
+              ]
+            },
+            "description": "Bulk update Upsell_Opportunity__c on multiple Account types via composite API"
+          },
+          "response": []
+        },
+        {
+          "name": "SF-483-API-018 - Bulk Query Accounts with Upsell_Opportunity__c",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"All Account records have Upsell_Opportunity__c field accessible\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.records).to.be.an('array');",
+                  "    jsonData.records.forEach(function(record) {",
+                  "        pm.expect(record.Upsell_Opportunity__c).to.not.be.undefined;",
+                  "    });",
+                  "});",
+                  "",
+                  "pm.test(\"Field accessible regardless of Account Type\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    var accountTypes = new Set(jsonData.records.map(function(r) { return r.Type; }));",
+                  "    pm.expect(accountTypes.size).to.be.above(0);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/query/?q=SELECT Id, Name, Type, Upsell_Opportunity__c FROM Account WHERE (Id = '{{member_mga_account_id}}' OR Id = '{{non_member_mga_account_id}}' OR Id = '{{agency_account_id}}')",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "data",
+                "{{api_version}}",
+                "query",
+                ""
+              ],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "SELECT Id, Name, Type, Upsell_Opportunity__c FROM Account WHERE (Id = '{{member_mga_account_id}}' OR Id = '{{non_member_mga_account_id}}' OR Id = '{{agency_account_id}}')"
+                }
+              ]
+            },
+            "description": "Bulk query Accounts with Upsell_Opportunity__c field included - Verify API access for all Account Types"
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
+

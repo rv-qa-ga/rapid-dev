@@ -1,0 +1,69 @@
+{
+  "key": "SF-489",
+  "summary": "Delete Account fields Series_Entity__c, Sub_Type__c, Legal_Entity__c, Legal_Entity_Lookup__c, Legal_Entity_Name__c",
+  "type": "Story",
+  "status": "In QA",
+  "priority": "Medium",
+  "description": {
+    "raw": "User Story: As a Product Owner / Business Analyst I want the custom fields Series_Entity__c, Sub_Type__c, Legal_Entity__c, Legal_Entity_Lookup__c and Legal_Entity_Name__c removed from the Account object only So that the Account object is simplified and obsolete/unused fields are cleaned up, while ensuring no other Salesforce object, automation, integration, report, scheduled job, or managed package is negatively affected Description / Scope: Remove the five fields from the Account object only. Do NOT remove or alter fields with the same API names if they exist on other objects. B Acceptance Criteria (GIVEN / WHEN / THEN): Lead/Account-only deletion GIVEN the change is deployed WHEN I inspect object schemas across the org THEN Series_Entity__c, Sub_Type__c, Legal_Entity__c, Legal_Entity_Lookup__c and Legal_Entity_Name__c are removed from the Account object only and any fields with the same API names on other objects remain unchanged Reports, dashboards & BI validation GIVEN reports, dashboards and BI jobs that referenced the Account fields are identified WHEN owners update or remove those references and run tests THEN scheduled and ad-hoc reports and BI jobs run without errors after deletion Data backup & rollback GIVEN production data before deletion WHEN a final backup is taken THEN a verified backup of the five Account fields (by Account Id) is stored with timestamp, owner and retention notes, and a tested rollback procedure to recreate fields and restore data exists",
+    "parsed": {
+      "sentences": [
+        "User Story: As a Product Owner / Business Analyst I want the custom fields Series_Entity__c, Sub_Type__c, Legal_Entity__c, Legal_Entity_Lookup__c and Legal_Entity_Name__c removed from the Account object only So that the Account object is simplified and obsolete/unused fields are cleaned up, while ensuring no other Salesforce object, automation, integration, report, scheduled job, or managed package is negatively affected Description / Scope: Remove the five fields from the Account object only",
+        "Do NOT remove or alter fields with the same API names if they exist on other objects",
+        "B Acceptance Criteria (GIVEN / WHEN / THEN): Lead/Account-only deletion GIVEN the change is deployed WHEN I inspect object schemas across the org THEN Series_Entity__c, Sub_Type__c, Legal_Entity__c, Legal_Entity_Lookup__c and Legal_Entity_Name__c are removed from the Account object only and any fields with the same API names on other objects remain unchanged Reports, dashboards & BI validation GIVEN reports, dashboards and BI jobs that referenced the Account fields are identified WHEN owners update or remove those references and run tests THEN scheduled and ad-hoc reports and BI jobs run without errors after deletion Data backup & rollback GIVEN production data before deletion WHEN a final backup is taken THEN a verified backup of the five Account fields (by Account Id) is stored with timestamp, owner and retention notes, and a tested rollback procedure to recreate fields and restore data exists"
+      ],
+      "entities": [
+        "Account",
+        "Lead",
+        "Product"
+      ],
+      "fields": [
+        "Series_Entity__c",
+        "Sub_Type__c",
+        "Legal_Entity__c",
+        "Legal_Entity_Lookup__c",
+        "Legal_Entity_Name__c"
+      ],
+      "actions": [
+        "create",
+        "update"
+      ]
+    }
+  },
+  "acceptanceCriteria": [],
+  "comments": [],
+  "relatedIssues": [],
+  "fieldDefinitions": {
+    "Series_Entity__c": {
+      "type": "Custom",
+      "required": false,
+      "description": "Field: Series_Entity__c"
+    },
+    "Sub_Type__c": {
+      "type": "Picklist",
+      "required": false,
+      "description": "Field: Sub_Type__c"
+    },
+    "Legal_Entity__c": {
+      "type": "Custom",
+      "required": false,
+      "description": "Field: Legal_Entity__c"
+    },
+    "Legal_Entity_Lookup__c": {
+      "type": "Custom",
+      "required": false,
+      "description": "Field: Legal_Entity_Lookup__c"
+    },
+    "Legal_Entity_Name__c": {
+      "type": "Custom",
+      "required": false,
+      "description": "Field: Legal_Entity_Name__c"
+    }
+  },
+  "generatedFeatures": {
+    "ui": "src/features/ui/SF/SF-489.feature",
+    "api": "src/features/api/SF/SF-489.feature"
+  },
+  "qaReviewedFeatures": {},
+  "extractedAt": "2025-12-17T18:40:32.735Z"
+}

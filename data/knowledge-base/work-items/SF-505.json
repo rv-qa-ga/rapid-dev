@@ -1,0 +1,51 @@
+{
+  "key": "SF-505",
+  "summary": "Broker Sourced Name Field on Account",
+  "type": "Story",
+  "status": "In QA",
+  "priority": "Medium",
+  "description": {
+    "raw": "As an MRD I want the  Broker Sourced Name  field to exist on Member and Non-Member MGA Account records So that we can identify which broker originally sourced the lead, and ensure this information carries through from Lead to Account automatically and cannot be changed later. Scenario 1: Create Broker Sourced Name field on Account   Given the Account object exists   When the Broker_Sourced_Name__c field is created   Then it must be defined as a lookup to the Account object   And added to the page layout for the following Account types:  Member Non-Member MGA Scenario 2: Auto-populate Broker Sourced Name from Lead on conversion   Given a Lead has the \"Broker_Sourced_Name__c\" field populated   When the Lead is converted to an Account   Then the \"Broker_Sourced_Name__c\" field on the Account must be automatically populated   And the value should match the Broker Sourced Name from the originating Lead Scenario 3: Field should not be editable post-conversion   Given an Account has a value in the \"Broker_Sourced_Name__c\" field   When a user views or edits the Account record   Then the \"Broker_Sourced_Name__c\" field should be read-only   And users should not be able to modify or clear its value Scenario 4: Field visibility   Given a user views any other Account type (not Member or Non-Member MGA)   Then the \"Broker_Sourced_Name__c\" field should not be visible on the page layout",
+    "parsed": {
+      "sentences": [
+        "As an MRD I want the  Broker Sourced Name  field to exist on Member and Non-Member MGA Account records So that we can identify which broker originally sourced the lead, and ensure this information carries through from Lead to Account automatically and cannot be changed later",
+        "Scenario 1: Create Broker Sourced Name field on Account   Given the Account object exists   When the Broker_Sourced_Name__c field is created   Then it must be defined as a lookup to the Account object   And added to the page layout for the following Account types:  Member Non-Member MGA Scenario 2: Auto-populate Broker Sourced Name from Lead on conversion   Given a Lead has the \"Broker_Sourced_Name__c\" field populated   When the Lead is converted to an Account   Then the \"Broker_Sourced_Name__c\" field on the Account must be automatically populated   And the value should match the Broker Sourced Name from the originating Lead Scenario 3: Field should not be editable post-conversion   Given an Account has a value in the \"Broker_Sourced_Name__c\" field   When a user views or edits the Account record   Then the \"Broker_Sourced_Name__c\" field should be read-only   And users should not be able to modify or clear its value Scenario 4: Field visibility   Given a user views any other Account type (not Member or Non-Member MGA)   Then the \"Broker_Sourced_Name__c\" field should not be visible on the page layout"
+      ],
+      "entities": [
+        "Account",
+        "Lead"
+      ],
+      "fields": [
+        "Broker_Sourced_Name__c",
+        "When"
+      ],
+      "actions": [
+        "create",
+        "populate",
+        "auto-populate",
+        "convert"
+      ]
+    }
+  },
+  "acceptanceCriteria": [],
+  "comments": [],
+  "relatedIssues": [],
+  "fieldDefinitions": {
+    "Broker_Sourced_Name__c": {
+      "type": "Custom",
+      "required": false,
+      "description": "Field: Broker_Sourced_Name__c"
+    },
+    "When": {
+      "type": "Text",
+      "required": false,
+      "description": "Field: When"
+    }
+  },
+  "generatedFeatures": {
+    "ui": "src/features/ui/SF/SF-505.feature",
+    "api": "src/features/api/SF/SF-505.feature"
+  },
+  "qaReviewedFeatures": {},
+  "extractedAt": "2025-12-17T18:40:30.588Z"
+}

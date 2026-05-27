@@ -1,0 +1,79 @@
+{
+  "fps": 30,
+  "voice": "en-US-AndrewNeural",
+  "rate": "+20%",
+  "paddingFrames": 30,
+  "totalFrames": 7553,
+  "slides": {
+    "01-title": {
+      "seconds": 17.64,
+      "frames": 560,
+      "file": "audio/01-title.mp3"
+    },
+    "02-problem": {
+      "seconds": 15.384,
+      "frames": 492,
+      "file": "audio/02-problem.mp3"
+    },
+    "03-unified": {
+      "seconds": 15.816,
+      "frames": 505,
+      "file": "audio/03-unified.mp3"
+    },
+    "04-architecture": {
+      "seconds": 16.272,
+      "frames": 519,
+      "file": "audio/04-architecture.mp3"
+    },
+    "05-systems": {
+      "seconds": 20.712,
+      "frames": 652,
+      "file": "audio/05-systems.mp3"
+    },
+    "06-tech-stack": {
+      "seconds": 18.576,
+      "frames": 588,
+      "file": "audio/06-tech-stack.mp3"
+    },
+    "07-capabilities": {
+      "seconds": 18.936,
+      "frames": 599,
+      "file": "audio/07-capabilities.mp3"
+    },
+    "build-validation": {
+      "seconds": 17.736,
+      "frames": 563,
+      "file": "audio/build-validation.mp3"
+    },
+    "08-lifecycle": {
+      "seconds": 15.624,
+      "frames": 499,
+      "file": "audio/08-lifecycle.mp3"
+    },
+    "09-ai-test-gen": {
+      "seconds": 17.232,
+      "frames": 547,
+      "file": "audio/09-ai-test-gen.mp3"
+    },
+    "10-integrations": {
+      "seconds": 17.496,
+      "frames": 555,
+      "file": "audio/10-integrations.mp3"
+    },
+    "11-reporting": {
+      "seconds": 17.256,
+      "frames": 548,
+      "file": "audio/11-reporting.mp3"
+    },
+    "12-scale": {
+      "seconds": 16.488,
+      "frames": 525,
+      "file": "audio/12-scale.mp3"
+    },
+    "13-close": {
+      "seconds": 12.336,
+      "frames": 401,
+      "file": "audio/13-close.mp3"
+    }
+  }
+}

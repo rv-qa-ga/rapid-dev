@@ -1,0 +1,1020 @@
+{
+  "workItems": [
+    {
+      "key": "SF-508",
+      "summary": "Opportunity 'Win Reason' Validation Rules Update",
+      "type": "Story",
+      "status": "In QA",
+      "priority": "Medium",
+      "entities": [
+        "Opportunity"
+      ],
+      "fields": [],
+      "featureTypes": [],
+      "relatedItems": [],
+      "contextFile": "data/knowledge-base/work-items/SF-508.json",
+      "v1FeatureFiles": {
+        "ui": "src/features/ui/SF/SF-508.feature",
+        "api": "src/features/api/SF/SF-508.feature"
+      },
+      "v2FeatureFiles": {},
+      "lastUpdated": "2025-12-17T18:40:29.777Z"
+    },
+    {
+      "key": "SF-506",
+      "summary": "Hide Estimated Onboarding Date on Account and Map from Lead to Opportunity",
+      "type": "Story",
+      "status": "In QA",
+      "priority": "Medium",
+      "entities": [
+        "Account",
+        "Opportunity",
+        "Lead"
+      ],
+      "fields": [
+        "Estimated_Onboarding_Date__c",
+        "When"
+      ],
+      "featureTypes": [
+        "display",
+        "create",
+        "populate",
+        "map",
+        "convert"
+      ],
+      "relatedItems": [],
+      "contextFile": "data/knowledge-base/work-items/SF-506.json",
+      "v1FeatureFiles": {
+        "ui": "src/features/ui/SF/SF-506.feature",
+        "api": "src/features/api/SF/SF-506.feature"
+      },
+      "v2FeatureFiles": {},
+      "lastUpdated": "2025-12-17T18:40:30.183Z"
+    },
+    {
+      "key": "SF-505",
+      "summary": "Broker Sourced Name Field on Account",
+      "type": "Story",
+      "status": "In QA",
+      "priority": "Medium",
+      "entities": [
+        "Account",
+        "Lead"
+      ],
+      "fields": [
+        "Broker_Sourced_Name__c",
+        "When"
+      ],
+      "featureTypes": [
+        "create",
+        "populate",
+        "auto-populate",
+        "convert"
+      ],
+      "relatedItems": [],
+      "contextFile": "data/knowledge-base/work-items/SF-505.json",
+      "v1FeatureFiles": {
+        "ui": "src/features/ui/SF/SF-505.feature",
+        "api": "src/features/api/SF/SF-505.feature"
+      },
+      "v2FeatureFiles": {},
+      "lastUpdated": "2025-12-17T18:40:30.591Z"
+    },
+    {
+      "key": "SF-503",
+      "summary": "Remove Sub_Type__c from Lead page layout and make it non-required",
+      "type": "Story",
+      "status": "In QA",
+      "priority": "Medium",
+      "entities": [
+        "Lead",
+        "Product"
+      ],
+      "fields": [
+        "Sub_Type__c"
+      ],
+      "featureTypes": [
+        "create",
+        "update",
+        "delete",
+        "populate"
+      ],
+      "relatedItems": [],
+      "contextFile": "data/knowledge-base/work-items/SF-503.json",
+      "v1FeatureFiles": {
+        "ui": "src/features/ui/SF/SF-503.feature",
+        "api": "src/features/api/SF/SF-503.feature"
+      },
+      "v2FeatureFiles": {},
+      "lastUpdated": "2025-12-17T18:40:31.003Z"
+    },
+    {
+      "key": "SF-492",
+      "summary": "Hide Opportunities fields TerritoriesCovered_c, First-Year Estimated Gross Written Premi_c, and Expressed_Interest_c from non-admin users",
+      "type": "Story",
+      "status": "In QA",
+      "priority": "Medium",
+      "entities": [
+        "Account",
+        "Opportunity",
+        "Lead",
+        "Product"
+      ],
+      "fields": [],
+      "featureTypes": [
+        "display",
+        "show",
+        "hide",
+        "update",
+        "delete"
+      ],
+      "relatedItems": [],
+      "contextFile": "data/knowledge-base/work-items/SF-492.json",
+      "v1FeatureFiles": {
+        "ui": "src/features/ui/SF/SF-492.feature",
+        "api": "src/features/api/SF/SF-492.feature"
+      },
+      "v2FeatureFiles": {},
+      "lastUpdated": "2025-12-17T18:40:31.434Z"
+    },
+    {
+      "key": "SF-491",
+      "summary": "AnnualRevenue only appears for Member MGA and Non-Member MGA Accounts",
+      "type": "Story",
+      "status": "In QA",
+      "priority": "Medium",
+      "entities": [
+        "Account",
+        "Opportunity",
+        "Product"
+      ],
+      "fields": [
+        "AnnualRevenue"
+      ],
+      "featureTypes": [
+        "display",
+        "show",
+        "create",
+        "delete"
+      ],
+      "relatedItems": [],
+      "contextFile": "data/knowledge-base/work-items/SF-491.json",
+      "v1FeatureFiles": {
+        "ui": "src/features/ui/SF/SF-491.feature",
+        "api": "src/features/api/SF/SF-491.feature"
+      },
+      "v2FeatureFiles": {},
+      "lastUpdated": "2025-12-17T18:40:37.477Z"
+    },
+    {
+      "key": "SF-490",
+      "summary": "Hide Annual_GWP_Estimate_Year_1_c and POS_FSCS_Exposure on Account (visible to Admins/support only)",
+      "type": "Story",
+      "status": "In QA",
+      "priority": "Medium",
+      "entities": [
+        "Account",
+        "Lead",
+        "Product"
+      ],
+      "fields": [],
+      "featureTypes": [
+        "display",
+        "show",
+        "hide",
+        "update"
+      ],
+      "relatedItems": [],
+      "contextFile": "data/knowledge-base/work-items/SF-490.json",
+      "v1FeatureFiles": {
+        "ui": "src/features/ui/SF/SF-490.feature",
+        "api": "src/features/api/SF/SF-490.feature"
+      },
+      "v2FeatureFiles": {},
+      "lastUpdated": "2025-12-17T18:40:32.273Z"
+    },
+    {
+      "key": "SF-489",
+      "summary": "Delete Account fields Series_Entity__c, Sub_Type__c, Legal_Entity__c, Legal_Entity_Lookup__c, Legal_Entity_Name__c",
+      "type": "Story",
+      "status": "In QA",
+      "priority": "Medium",
+      "entities": [
+        "Account",
+        "Lead",
+        "Product"
+      ],
+      "fields": [
+        "Series_Entity__c",
+        "Sub_Type__c",
+        "Legal_Entity__c",
+        "Legal_Entity_Lookup__c",
+        "Legal_Entity_Name__c"
+      ],
+      "featureTypes": [
+        "create",
+        "update"
+      ],
+      "relatedItems": [],
+      "contextFile": "data/knowledge-base/work-items/SF-489.json",
+      "v1FeatureFiles": {
+        "ui": "src/features/ui/SF/SF-489.feature",
+        "api": "src/features/api/SF/SF-489.feature"
+      },
+      "v2FeatureFiles": {},
+      "lastUpdated": "2025-12-17T18:40:32.736Z"
+    },
+    {
+      "key": "SF-486",
+      "summary": "Make Affiliate Status and Party Code mandatory when Account Type = Reinsurer and Ownership = Owned",
+      "type": "Story",
+      "status": "Ready for QA",
+      "priority": "Medium",
+      "entities": [
+        "Account",
+        "Product"
+      ],
+      "fields": [],
+      "featureTypes": [
+        "create",
+        "update"
+      ],
+      "relatedItems": [],
+      "contextFile": "data/knowledge-base/work-items/SF-486.json",
+      "v1FeatureFiles": {
+        "ui": "src/features/ui/SF/SF-486.feature",
+        "api": "src/features/api/SF/SF-486.feature"
+      },
+      "v2FeatureFiles": {},
+      "lastUpdated": "2025-12-17T18:40:33.374Z"
+    },
+    {
+      "key": "SF-485",
+      "summary": "Make Functional_Currency__c mandatory for Insurer, Insurer Branch and Reinsurer",
+      "type": "Story",
+      "status": "In QA",
+      "priority": "Medium",
+      "entities": [
+        "Account",
+        "Product"
+      ],
+      "fields": [
+        "Functional_Currency__c"
+      ],
+      "featureTypes": [
+        "show",
+        "create",
+        "populate"
+      ],
+      "relatedItems": [],
+      "contextFile": "data/knowledge-base/work-items/SF-485.json",
+      "v1FeatureFiles": {
+        "ui": "src/features/ui/SF/SF-485.feature",
+        "api": "src/features/api/SF/SF-485.feature"
+      },
+      "v2FeatureFiles": {},
+      "lastUpdated": "2025-12-17T18:40:33.774Z"
+    },
+    {
+      "key": "SF-484",
+      "summary": "Hide Investment_Status_c on Account",
+      "type": "Story",
+      "status": "In QA",
+      "priority": "Medium",
+      "entities": [
+        "Account",
+        "Product"
+      ],
+      "fields": [
+        "Reports"
+      ],
+      "featureTypes": [
+        "validate",
+        "hide",
+        "delete"
+      ],
+      "relatedItems": [],
+      "contextFile": "data/knowledge-base/work-items/SF-484.json",
+      "v1FeatureFiles": {
+        "ui": "src/features/ui/SF/SF-484.feature",
+        "api": "src/features/api/SF/SF-484.feature"
+      },
+      "v2FeatureFiles": {},
+      "lastUpdated": "2025-12-17T18:40:34.256Z"
+    },
+    {
+      "key": "SF-483",
+      "summary": "Make Upsell Opportunity field visible only on Member and Non-Member MGA accounts",
+      "type": "Story",
+      "status": "In QA",
+      "priority": "Medium",
+      "entities": [
+        "Account",
+        "Opportunity",
+        "Product"
+      ],
+      "fields": [],
+      "featureTypes": [
+        "show",
+        "delete"
+      ],
+      "relatedItems": [],
+      "contextFile": "data/knowledge-base/work-items/SF-483.json",
+      "v1FeatureFiles": {
+        "ui": "src/features/ui/SF/SF-483.feature",
+        "api": "src/features/api/SF/SF-483.feature"
+      },
+      "v2FeatureFiles": {},
+      "lastUpdated": "2025-12-17T18:40:34.651Z"
+    },
+    {
+      "key": "SF-482",
+      "summary": "Hide Target Insured Industry field on Account",
+      "type": "Story",
+      "status": "Not Started",
+      "priority": "Medium",
+      "entities": [
+        "Account",
+        "Product"
+      ],
+      "fields": [],
+      "featureTypes": [
+        "validate",
+        "show",
+        "hide",
+        "delete"
+      ],
+      "relatedItems": [],
+      "contextFile": "data/knowledge-base/work-items/SF-482.json",
+      "v1FeatureFiles": {
+        "ui": "src/features/ui/SF/SF-482.feature",
+        "api": "src/features/api/SF/SF-482.feature"
+      },
+      "v2FeatureFiles": {},
+      "lastUpdated": "2025-12-17T18:40:35.060Z"
+    },
+    {
+      "key": "SF-480",
+      "summary": "Delete Account fields Mission_Series_MGA_c and Owned_MGA_c",
+      "type": "Story",
+      "status": "Ready for QA",
+      "priority": "Medium",
+      "entities": [
+        "Account",
+        "Lead",
+        "Product"
+      ],
+      "fields": [],
+      "featureTypes": [
+        "update",
+        "map"
+      ],
+      "relatedItems": [],
+      "contextFile": "data/knowledge-base/work-items/SF-480.json",
+      "v1FeatureFiles": {
+        "ui": "src/features/ui/SF/SF-480.feature",
+        "api": "src/features/api/SF/SF-480.feature"
+      },
+      "v2FeatureFiles": {},
+      "lastUpdated": "2025-12-17T18:40:35.472Z"
+    },
+    {
+      "key": "SF-476",
+      "summary": "Hide Annual_GWP_Estimate_Year_1__c from Account records for non-admin users",
+      "type": "Story",
+      "status": "In QA",
+      "priority": "Medium",
+      "entities": [
+        "Account",
+        "Product"
+      ],
+      "fields": [
+        "Annual_GWP_Estimate_Year_1__c"
+      ],
+      "featureTypes": [
+        "display",
+        "show",
+        "hide"
+      ],
+      "relatedItems": [],
+      "contextFile": "data/knowledge-base/work-items/SF-476.json",
+      "v1FeatureFiles": {
+        "ui": "src/features/ui/SF/SF-476.feature",
+        "api": "src/features/api/SF/SF-476.feature"
+      },
+      "v2FeatureFiles": {},
+      "lastUpdated": "2025-12-17T18:40:35.938Z"
+    },
+    {
+      "key": "SF-44",
+      "summary": "8108: Binding Authority Limited Flag",
+      "type": "Story",
+      "status": "In QA",
+      "priority": "Medium",
+      "entities": [
+        "Account"
+      ],
+      "fields": [
+        "Given"
+      ],
+      "featureTypes": [
+        "display",
+        "show",
+        "create"
+      ],
+      "relatedItems": [],
+      "contextFile": "data/knowledge-base/work-items/SF-44.json",
+      "v1FeatureFiles": {
+        "ui": "src/features/ui/SF/SF-44.feature",
+        "api": "src/features/api/SF/SF-44.feature"
+      },
+      "v2FeatureFiles": {},
+      "lastUpdated": "2025-12-17T18:40:36.342Z"
+    },
+    {
+      "key": "SF-40",
+      "summary": "8105: Standard Account List Views - Member",
+      "type": "Story",
+      "status": "In development",
+      "priority": "Medium",
+      "entities": [
+        "Account",
+        "Lead",
+        "Contract"
+      ],
+      "fields": [],
+      "featureTypes": [
+        "display",
+        "create",
+        "update",
+        "delete"
+      ],
+      "relatedItems": [],
+      "contextFile": "data/knowledge-base/work-items/SF-40.json",
+      "v1FeatureFiles": {
+        "ui": "src/features/ui/SF/SF-40.feature",
+        "api": "src/features/api/SF/SF-40.feature"
+      },
+      "v2FeatureFiles": {},
+      "lastUpdated": "2025-12-17T18:40:36.760Z"
+    },
+    {
+      "key": "SF-510",
+      "summary": "Data Source and Effective From Fields – Visibility and Validation Rules",
+      "type": "Story",
+      "status": "In QA",
+      "priority": "Medium",
+      "entities": [
+        "Account",
+        "Product"
+      ],
+      "fields": [
+        "Data_Source_Written__c",
+        "Account_Type__c",
+        "Status__c",
+        "Data_Source_Claims__c",
+        "Written_Accounting_Period_Effective_From__c",
+        "Claims_Production_Period_Effective_From__c",
+        "Given"
+      ],
+      "featureTypes": [
+        "show",
+        "create",
+        "populate"
+      ],
+      "relatedItems": [],
+      "contextFile": "data/knowledge-base/work-items/SF-510.json",
+      "v1FeatureFiles": {
+        "ui": "src/features/ui/SF/SF-510.feature",
+        "api": "src/features/api/SF/SF-510.feature"
+      },
+      "v2FeatureFiles": {},
+      "lastUpdated": "2025-12-17T18:40:37.899Z"
+    },
+    {
+      "key": "SF-551",
+      "summary": "Make the State and Country field on the Address picklists",
+      "type": "Story",
+      "status": "Blocked",
+      "priority": "Medium",
+      "entities": [
+        "Account",
+        "Contact",
+        "Lead"
+      ],
+      "fields": [],
+      "featureTypes": [
+        "validate",
+        "display",
+        "populate"
+      ],
+      "relatedItems": [],
+      "contextFile": "data/knowledge-base/work-items/SF-551.json",
+      "v1FeatureFiles": {
+        "ui": "src/features/ui/SF/SF-551.feature",
+        "api": "src/features/api/SF/SF-551.feature"
+      },
+      "v2FeatureFiles": {},
+      "lastUpdated": "2025-12-17T18:40:38.310Z"
+    },
+    {
+      "key": "SF-19",
+      "summary": "8099: Display Key Account Fields in Header",
+      "type": "Story",
+      "status": "Ready for QA",
+      "priority": "Medium",
+      "entities": [
+        "Account",
+        "Contact"
+      ],
+      "fields": [
+        "Account_Status__c",
+        "Party_ID_PTY_Code__c",
+        "Primary_Contact__c",
+        "Label"
+      ],
+      "featureTypes": [
+        "display",
+        "create",
+        "update"
+      ],
+      "relatedItems": [],
+      "contextFile": "data/knowledge-base/work-items/SF-19.json",
+      "v1FeatureFiles": {
+        "ui": "src/features/ui/SF/SF-19.feature",
+        "api": "src/features/api/SF/SF-19.feature"
+      },
+      "v2FeatureFiles": {},
+      "lastUpdated": "2025-12-17T18:40:38.710Z"
+    },
+    {
+      "key": "SF-459",
+      "summary": "Update Account field name labels",
+      "type": "Story",
+      "status": "Ready for QA",
+      "priority": "Medium",
+      "entities": [
+        "Account"
+      ],
+      "fields": [],
+      "featureTypes": [
+        "update"
+      ],
+      "relatedItems": [],
+      "contextFile": "data/knowledge-base/work-items/SF-459.json",
+      "v1FeatureFiles": {
+        "ui": "src/features/ui/SF/SF-459.feature",
+        "api": "src/features/api/SF/SF-459.feature"
+      },
+      "v2FeatureFiles": {},
+      "lastUpdated": "2025-12-17T18:40:39.091Z"
+    },
+    {
+      "key": "SF-113",
+      "summary": "Require Account.Region Field",
+      "type": "Story",
+      "status": "In QA",
+      "priority": "Medium",
+      "entities": [
+        "Account"
+      ],
+      "fields": [
+        "Region__c"
+      ],
+      "featureTypes": [
+        "show",
+        "create"
+      ],
+      "relatedItems": [],
+      "contextFile": "data/knowledge-base/work-items/SF-113.json",
+      "v1FeatureFiles": {
+        "ui": "src/features/ui/SF/SF-113.feature",
+        "api": "src/features/api/SF/SF-113.feature"
+      },
+      "v2FeatureFiles": {},
+      "lastUpdated": "2025-12-17T18:40:39.496Z"
+    },
+    {
+      "key": "SF-461",
+      "summary": "Validation check updates to Accounts page",
+      "type": "Story",
+      "status": "In QA",
+      "priority": "Medium",
+      "entities": [
+        "Account"
+      ],
+      "fields": [
+        "Affiliate_Non_Affiliate__c",
+        "When"
+      ],
+      "featureTypes": [
+        "display",
+        "update"
+      ],
+      "relatedItems": [],
+      "contextFile": "data/knowledge-base/work-items/SF-461.json",
+      "v1FeatureFiles": {
+        "ui": "src/features/ui/SF/SF-461.feature",
+        "api": "src/features/api/SF/SF-461.feature"
+      },
+      "v2FeatureFiles": {},
+      "lastUpdated": "2025-12-17T18:40:44.039Z"
+    },
+    {
+      "key": "SF-544",
+      "summary": "Remove Country and State/Province From Account Object",
+      "type": "Story",
+      "status": "In QA",
+      "priority": "Medium",
+      "entities": [
+        "Account"
+      ],
+      "fields": [
+        "Country__c",
+        "State_Province__c"
+      ],
+      "featureTypes": [
+        "update",
+        "delete",
+        "populate"
+      ],
+      "relatedItems": [],
+      "contextFile": "data/knowledge-base/work-items/SF-544.json",
+      "v1FeatureFiles": {
+        "ui": "src/features/ui/SF/SF-544.feature",
+        "api": "src/features/api/SF/SF-544.feature"
+      },
+      "v2FeatureFiles": {},
+      "lastUpdated": "2025-12-17T18:40:40.290Z"
+    },
+    {
+      "key": "SF-524",
+      "summary": "Configure Admission Status Field on Account",
+      "type": "Story",
+      "status": "In QA",
+      "priority": "Medium",
+      "entities": [
+        "Account"
+      ],
+      "fields": [
+        "Admission_Status__c"
+      ],
+      "featureTypes": [
+        "display",
+        "create"
+      ],
+      "relatedItems": [],
+      "contextFile": "data/knowledge-base/work-items/SF-524.json",
+      "v1FeatureFiles": {
+        "ui": "src/features/ui/SF/SF-524.feature",
+        "api": "src/features/api/SF/SF-524.feature"
+      },
+      "v2FeatureFiles": {},
+      "lastUpdated": "2025-12-17T18:40:40.681Z"
+    },
+    {
+      "key": "SF-521",
+      "summary": "Allow Users to Merge Potential Duplicate Records",
+      "type": "Story",
+      "status": "In QA",
+      "priority": "Medium",
+      "entities": [],
+      "fields": [],
+      "featureTypes": [
+        "create"
+      ],
+      "relatedItems": [],
+      "contextFile": "data/knowledge-base/work-items/SF-521.json",
+      "v1FeatureFiles": {
+        "ui": "src/features/ui/SF/SF-521.feature",
+        "api": "src/features/api/SF/SF-521.feature"
+      },
+      "v2FeatureFiles": {},
+      "lastUpdated": "2025-12-17T18:40:41.078Z"
+    },
+    {
+      "key": "SF-519",
+      "summary": "Derive Distribution Region from Lead Country",
+      "type": "Story",
+      "status": "In QA",
+      "priority": "Medium",
+      "entities": [
+        "Lead"
+      ],
+      "fields": [],
+      "featureTypes": [
+        "display",
+        "update",
+        "populate",
+        "map"
+      ],
+      "relatedItems": [],
+      "contextFile": "data/knowledge-base/work-items/SF-519.json",
+      "v1FeatureFiles": {
+        "ui": "src/features/ui/SF/SF-519.feature",
+        "api": "src/features/api/SF/SF-519.feature"
+      },
+      "v2FeatureFiles": {},
+      "lastUpdated": "2025-12-17T18:40:41.512Z"
+    },
+    {
+      "key": "SF-516",
+      "summary": "Autonumber for Account Team Members",
+      "type": "Story",
+      "status": "In QA",
+      "priority": "Medium",
+      "entities": [
+        "Account",
+        "Contact"
+      ],
+      "fields": [
+        "Internal_Contact_Master_ID__c"
+      ],
+      "featureTypes": [
+        "display",
+        "create",
+        "update"
+      ],
+      "relatedItems": [],
+      "contextFile": "data/knowledge-base/work-items/SF-516.json",
+      "v1FeatureFiles": {
+        "ui": "src/features/ui/SF/SF-516.feature",
+        "api": "src/features/api/SF/SF-516.feature"
+      },
+      "v2FeatureFiles": {},
+      "lastUpdated": "2025-12-17T18:40:41.988Z"
+    },
+    {
+      "key": "SF-500",
+      "summary": "More Opportunity consolidation",
+      "type": "Story",
+      "status": "In QA",
+      "priority": "Medium",
+      "entities": [
+        "Opportunity",
+        "Lead",
+        "Product"
+      ],
+      "fields": [],
+      "featureTypes": [
+        "display",
+        "show",
+        "create",
+        "update",
+        "populate",
+        "auto-populate",
+        "map",
+        "convert"
+      ],
+      "relatedItems": [],
+      "contextFile": "data/knowledge-base/work-items/SF-500.json",
+      "v1FeatureFiles": {
+        "ui": "src/features/ui/SF/SF-500.feature",
+        "api": "src/features/api/SF/SF-500.feature"
+      },
+      "v2FeatureFiles": {},
+      "lastUpdated": "2025-12-17T18:40:42.384Z"
+    },
+    {
+      "key": "SF-493",
+      "summary": "Unhide and delete fields in opportunity - consolidation",
+      "type": "Story",
+      "status": "In QA",
+      "priority": "Medium",
+      "entities": [
+        "Account",
+        "Opportunity",
+        "Product"
+      ],
+      "fields": [],
+      "featureTypes": [
+        "hide",
+        "update",
+        "delete"
+      ],
+      "relatedItems": [],
+      "contextFile": "data/knowledge-base/work-items/SF-493.json",
+      "v1FeatureFiles": {
+        "ui": "src/features/ui/SF/SF-493.feature",
+        "api": "src/features/api/SF/SF-493.feature"
+      },
+      "v2FeatureFiles": {},
+      "lastUpdated": "2025-12-17T18:40:42.795Z"
+    },
+    {
+      "key": "SF-479",
+      "summary": "Delete Legal_Entity__c from Lead only; ensure no impact to other objects or systems",
+      "type": "Story",
+      "status": "In QA",
+      "priority": "Medium",
+      "entities": [
+        "Lead",
+        "Product"
+      ],
+      "fields": [
+        "Legal_Entity__c"
+      ],
+      "featureTypes": [
+        "validate",
+        "update"
+      ],
+      "relatedItems": [],
+      "contextFile": "data/knowledge-base/work-items/SF-479.json",
+      "v1FeatureFiles": {
+        "ui": "src/features/ui/SF/SF-479.feature",
+        "api": "src/features/api/SF/SF-479.feature"
+      },
+      "v2FeatureFiles": {},
+      "lastUpdated": "2025-12-17T18:40:43.180Z"
+    },
+    {
+      "key": "SF-477",
+      "summary": "Create Opportunity field Annual_GWP_Estimate_Year_1__c (editable) and sync updates back to Lead",
+      "type": "Story",
+      "status": "In QA",
+      "priority": "Medium",
+      "entities": [
+        "Opportunity",
+        "Lead"
+      ],
+      "fields": [
+        "Annual_GWP_Estimate_Year_1__c"
+      ],
+      "featureTypes": [
+        "create",
+        "update",
+        "populate",
+        "auto-populate",
+        "convert"
+      ],
+      "relatedItems": [],
+      "contextFile": "data/knowledge-base/work-items/SF-477.json",
+      "v1FeatureFiles": {
+        "ui": "src/features/ui/SF/SF-477.feature",
+        "api": "src/features/api/SF/SF-477.feature"
+      },
+      "v2FeatureFiles": {},
+      "lastUpdated": "2025-12-17T18:40:43.618Z"
+    },
+    {
+      "key": "SF-143",
+      "summary": "Leads UAT Final Feedback",
+      "type": "Story",
+      "status": "In QA",
+      "priority": "Medium",
+      "entities": [
+        "Opportunity",
+        "Lead"
+      ],
+      "fields": [
+        "Scenario",
+        "Given"
+      ],
+      "featureTypes": [
+        "display",
+        "show",
+        "hide",
+        "populate",
+        "auto-populate",
+        "convert"
+      ],
+      "relatedItems": [],
+      "contextFile": "data/knowledge-base/work-items/SF-143.json",
+      "v1FeatureFiles": {
+        "ui": "src/features/ui/SF/SF-143.feature",
+        "api": "src/features/api/SF/SF-143.feature"
+      },
+      "v2FeatureFiles": {},
+      "lastUpdated": "2025-12-17T18:40:44.473Z"
+    },
+    {
+      "key": "SF-529",
+      "summary": "Types on the Account Object",
+      "type": "Story",
+      "status": "In QA",
+      "priority": "Medium",
+      "entities": [
+        "Account"
+      ],
+      "fields": [
+        "Then",
+        "When"
+      ],
+      "featureTypes": [
+        "display",
+        "update",
+        "populate"
+      ],
+      "relatedItems": [],
+      "contextFile": "data/knowledge-base/work-items/SF-529.json",
+      "v1FeatureFiles": {
+        "ui": "src/features/ui/SF/SF-529.feature",
+        "api": "src/features/api/SF/SF-529.feature"
+      },
+      "v2FeatureFiles": {},
+      "lastUpdated": "2025-12-17T18:40:27.316Z"
+    },
+    {
+      "key": "SF-520",
+      "summary": "Account Status Field",
+      "type": "Story",
+      "status": "Blocked",
+      "priority": "Medium",
+      "entities": [
+        "Account",
+        "Contract"
+      ],
+      "fields": [],
+      "featureTypes": [],
+      "relatedItems": [],
+      "contextFile": "data/knowledge-base/work-items/SF-520.json",
+      "v1FeatureFiles": {
+        "ui": "src/features/ui/SF/SF-520.feature",
+        "api": "src/features/api/SF/SF-520.feature"
+      },
+      "v2FeatureFiles": {},
+      "lastUpdated": "2025-12-17T18:40:27.748Z"
+    },
+    {
+      "key": "SF-501",
+      "summary": "Account, Opportunity, Role consolidation",
+      "type": "Story",
+      "status": "In QA",
+      "priority": "Medium",
+      "entities": [
+        "Account",
+        "Contact",
+        "Product"
+      ],
+      "fields": [
+        "Relationship_Strength__c",
+        "Account",
+        "GIVEN"
+      ],
+      "featureTypes": [
+        "hide",
+        "update",
+        "delete"
+      ],
+      "relatedItems": [],
+      "contextFile": "data/knowledge-base/work-items/SF-501.json",
+      "v1FeatureFiles": {
+        "ui": "src/features/ui/SF/SF-501.feature",
+        "api": "src/features/api/SF/SF-501.feature"
+      },
+      "v2FeatureFiles": {},
+      "lastUpdated": "2025-12-17T18:40:28.171Z"
+    },
+    {
+      "key": "SF-498",
+      "summary": "Map Region from Lead or Account to Opportunity",
+      "type": "Story",
+      "status": "Blocked",
+      "priority": "Medium",
+      "entities": [
+        "Account",
+        "Opportunity",
+        "Lead"
+      ],
+      "fields": [],
+      "featureTypes": [
+        "create",
+        "populate",
+        "map",
+        "convert"
+      ],
+      "relatedItems": [],
+      "contextFile": "data/knowledge-base/work-items/SF-498.json",
+      "v1FeatureFiles": {
+        "ui": "src/features/ui/SF/SF-498.feature",
+        "api": "src/features/api/SF/SF-498.feature"
+      },
+      "v2FeatureFiles": {},
+      "lastUpdated": "2025-12-17T18:40:28.564Z"
+    },
+    {
+      "key": "SF-550",
+      "summary": "Add TPA Group as an Account Type",
+      "type": "Story",
+      "status": "In QA",
+      "priority": "Medium",
+      "entities": [
+        "Account"
+      ],
+      "fields": [],
+      "featureTypes": [
+        "update"
+      ],
+      "relatedItems": [],
+      "contextFile": "data/knowledge-base/work-items/SF-550.json",
+      "v1FeatureFiles": {
+        "ui": "src/features/ui/SF/SF-550.feature",
+        "api": "src/features/api/SF/SF-550.feature"
+      },
+      "v2FeatureFiles": {},
+      "lastUpdated": "2025-12-17T18:40:28.948Z"
+    }
+  ],
+  "lastUpdated": "2025-12-17T18:40:44.474Z",
+  "version": "1.0.0"
+}

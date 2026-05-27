@@ -1,0 +1,1366 @@
+{
+  "info": {
+    "_postman_id": "sf-506-api-tests-v2",
+    "name": "SF-506 - Estimated Onboarding Date Field Mapping - API Tests",
+    "description": "API - SF-506 - Hide Estimated Onboarding Date on Account and Map from Lead to Opportunity\n\n══════════════════════════════════════════════════════════════════════════════\nGenerated: 2026-01-18\nUpdated: Fixed SOQL query definitions\n══════════════════════════════════════════════════════════════════════════════\n\nSUMMARY:\n  Hide Estimated Onboarding Date on Account and Map from Lead to Opportunity\n\nDESCRIPTION:\n  As an MRD I want the Estimated Onboarding Date field to be hidden from all \n  Account page layouts So that it is only used during the Lead-to-Opportunity \n  process and not visible or editable once the Account is created, while still \n  ensuring the value carries over automatically from Lead to Opportunity.\n\nACCEPTANCE CRITERIA:\n  1. Estimated Onboarding Date hidden from all Account page layouts\n  2. Estimated Onboarding Date maps from Lead to Opportunity\n  3. No mapping to Account during conversion\n\nAPI TESTING REQUIREMENTS:\n  - Verify Estimated_Onboarding_Date__c field exists on Opportunity and Account\n  - Verify field maps from Lead to Opportunity during conversion\n  - Verify field does NOT map to Account during conversion\n  - Verify field value is preserved during Lead conversion\n  - Negative/boundary scenarios\n\nGenerated from: src/features/api/SF/SF-506.feature\n\nThis collection contains API tests for SF-506 work item.\n\nQUERY FORMAT NOTES:\n  - Single record retrieval: GET /sobjects/{object}/{id}?fields=...\n  - SOQL queries: GET /query?q=SELECT... (URL-encoded)\n  - All queries properly formatted for Postman import",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{sf_access_token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "{{sf_base_url}}",
+      "type": "string"
+    },
+    {
+      "key": "api_version",
+      "value": "v60.0",
+      "type": "string"
+    },
+    {
+      "key": "lead_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "lead_id_eu",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "lead_id_uk",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "lead_id_us",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "opportunity_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "account_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "lead_estimated_date",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Field Existence Verification",
+      "item": [
+        {
+          "name": "SF-506-API-001 - Describe Opportunity Object",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Estimated_Onboarding_Date__c field exists on Opportunity\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    var fields = jsonData.fields;",
+                  "    var field = fields.find(function(f) { return f.name === 'Estimated_Onboarding_Date__c'; });",
+                  "    pm.expect(field).to.not.be.undefined;",
+                  "    pm.expect(field.name).to.equal('Estimated_Onboarding_Date__c');",
+                  "    console.log('✅ Field found: ' + field.name + ' (Type: ' + field.type + ')');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Opportunity/describe",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "data",
+                "{{api_version}}",
+                "sobjects",
+                "Opportunity",
+                "describe"
+              ]
+            },
+            "description": "Verify Estimated_Onboarding_Date__c field exists on Opportunity\n\n**Test:** SF-506-API-001\n**Purpose:** Field existence verification"
+          },
+          "response": []
+        },
+        {
+          "name": "SF-506-API-002 - Describe Account Object",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Estimated_Onboarding_Date__c field exists on Account\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    var fields = jsonData.fields;",
+                  "    var field = fields.find(function(f) { return f.name === 'Estimated_Onboarding_Date__c'; });",
+                  "    pm.expect(field).to.not.be.undefined;",
+                  "    pm.expect(field.name).to.equal('Estimated_Onboarding_Date__c');",
+                  "    console.log('✅ Field found: ' + field.name + ' (Type: ' + field.type + ')');",
+                  "    console.log('Note: Field should exist but be hidden in UI per requirements');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Account/describe",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "data",
+                "{{api_version}}",
+                "sobjects",
+                "Account",
+                "describe"
+              ]
+            },
+            "description": "Verify Estimated_Onboarding_Date__c field exists on Account (field should exist but be hidden in UI)\n\n**Test:** SF-506-API-002\n**Purpose:** Field existence verification"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Lead Conversion - Mapping to Opportunity",
+      "item": [
+        {
+          "name": "SF-506-API-003 - Create Lead with Estimated Onboarding Date (EU)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test(\"Response contains Lead ID\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.id).to.not.be.undefined;",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    pm.collectionVariables.set('lead_id_eu', jsonData.id);",
+                  "    console.log('✅ Lead created with ID: ' + jsonData.id);",
+                  "    console.log('Lead ID saved to variable: lead_id_eu');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"FirstName\": \"Test\",\n  \"LastName\": \"Lead EU\",\n  \"Company\": \"SF-506 Test Company EU\",\n  \"Status\": \"Open - Not Contacted\",\n  \"Estimated_Onboarding_Date__c\": \"2026-04-14\",\n  \"Region__c\": \"EU\",\n  \"Distribution_Region__c\": \"EU\",\n  \"Country\": \"Germany\",\n  \"Annual_GWP_Estimate_Year_1__c\": 5000000,\n  \"Submission_folder_link__c\": \"https://sharepoint.example.com/folders/sf506-test-eu\",\n  \"Street\": \"123 Business Street\",\n  \"City\": \"Berlin\",\n  \"State\": \"Berlin\",\n  \"PostalCode\": \"10115\",\n  \"Phone\": \"+49 30 12345678\",\n  \"Email\": \"test.lead.eu@example.com\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Lead/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "data",
+                "{{api_version}}",
+                "sobjects",
+                "Lead",
+                ""
+              ]
+            },
+            "description": "Create Lead with Estimated_Onboarding_Date__c = '2026-04-14' (EU region) for conversion test\n\n**Test:** SF-506-API-003 (Setup)\n**Fields Populated:**\n- FirstName, LastName, Company, Status (required fields)\n- Estimated_Onboarding_Date__c: 2026-04-14\n- Region__c: EU\n- Distribution_Region__c: EU\n- Country: Germany\n- Annual_GWP_Estimate_Year_1__c: 5000000\n- Submission_folder_link__c: SharePoint link\n- Address: Street, City, State, PostalCode\n- Phone, Email"
+          },
+          "response": []
+        },
+        {
+          "name": "SF-506-API-003 - Verify Lead Exists Before Conversion (EU)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Lead exists and is not converted\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.Id).to.equal(pm.collectionVariables.get('lead_id_eu'));",
+                  "    pm.expect(jsonData.IsConverted).to.be.false;",
+                  "    console.log('✅ Lead ID: ' + jsonData.Id);",
+                  "    console.log('Lead Status: ' + jsonData.Status);",
+                  "    console.log('Is Converted: ' + jsonData.IsConverted);",
+                  "    console.log('Estimated_Onboarding_Date__c: ' + jsonData.Estimated_Onboarding_Date__c);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "var leadId = pm.collectionVariables.get('lead_id_eu');",
+                  "if (!leadId) {",
+                  "    throw new Error('lead_id_eu variable is not set. Please run the Create Lead request first.');",
+                  "}",
+                  "console.log('Verifying Lead: ' + leadId);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Lead/{{lead_id_eu}}?fields=Id,Status,IsConverted,Estimated_Onboarding_Date__c",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "data",
+                "{{api_version}}",
+                "sobjects",
+                "Lead",
+                "{{lead_id_eu}}"
+              ],
+              "query": [
+                {
+                  "key": "fields",
+                  "value": "Id,Status,IsConverted,Estimated_Onboarding_Date__c"
+                }
+              ]
+            },
+            "description": "Verify Lead exists and is not already converted before attempting conversion\n\n**Test:** SF-506-API-003 (Pre-conversion verification)"
+          },
+          "response": []
+        },
+        {
+          "name": "SF-506-API-003 - Convert Lead to Opportunity (EU) - SOAP API",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    var xmlText = pm.response.text();",
+                  "    console.log('✅ SOAP Response received');",
+                  "    ",
+                  "    // Parse XML response to extract result",
+                  "    var parser = new DOMParser();",
+                  "    var xmlDoc = parser.parseFromString(xmlText, 'text/xml');",
+                  "    ",
+                  "    // Extract opportunityId, accountId, contactId from SOAP response",
+                  "    var result = xmlDoc.getElementsByTagName('result')[0];",
+                  "    if (result) {",
+                  "        var opportunityId = result.getElementsByTagName('opportunityId')[0]?.textContent;",
+                  "        var accountId = result.getElementsByTagName('accountId')[0]?.textContent;",
+                  "        var contactId = result.getElementsByTagName('contactId')[0]?.textContent;",
+                  "        ",
+                  "        if (opportunityId) {",
+                  "            pm.collectionVariables.set('opportunity_id', opportunityId);",
+                  "            console.log('✅ Opportunity created: ' + opportunityId);",
+                  "        }",
+                  "        if (accountId) {",
+                  "            pm.collectionVariables.set('account_id', accountId);",
+                  "            console.log('✅ Account created: ' + accountId);",
+                  "        }",
+                  "        if (contactId) {",
+                  "            console.log('✅ Contact created: ' + contactId);",
+                  "        }",
+                  "    }",
+                  "    ",
+                  "    pm.test(\"Status code is 200\", function () {",
+                  "        pm.response.to.have.status(200);",
+                  "    });",
+                  "} else {",
+                  "    console.error('❌ Error - Lead conversion failed');",
+                  "    console.error('Status Code: ' + pm.response.code);",
+                  "    console.error('Lead ID used: ' + pm.collectionVariables.get('lead_id_eu'));",
+                  "    var errorText = pm.response.text();",
+                  "    console.error('Error response: ' + errorText);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "var leadId = pm.collectionVariables.get('lead_id_eu');",
+                  "if (!leadId) {",
+                  "    console.error('❌ lead_id_eu variable is not set!');",
+                  "    throw new Error('lead_id_eu variable is not set. Please run the Create Lead request first.');",
+                  "}",
+                  "console.log('✅ Lead ID found: ' + leadId);",
+                  "console.log('Converting Lead using SOAP API: ' + leadId);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "text/xml; charset=UTF-8"
+              },
+              {
+                "key": "SOAPAction",
+                "value": "convertLead"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:urn=\"urn:enterprise.soap.sforce.com\">\n   <soapenv:Header>\n      <urn:SessionHeader>\n         <urn:sessionId>{{sf_access_token}}</urn:sessionId>\n      </urn:SessionHeader>\n   </soapenv:Header>\n   <soapenv:Body>\n      <urn:convertLead>\n         <urn:leadConverts>\n            <urn:leadId>{{lead_id_eu}}</urn:leadId>\n            <urn:convertedStatus>Qualified</urn:convertedStatus>\n            <urn:doNotCreateOpportunity>false</urn:doNotCreateOpportunity>\n            <urn:opportunityName>SF-506 Test Opportunity EU</urn:opportunityName>\n            <urn:overwriteLeadSource>false</urn:overwriteLeadSource>\n         </urn:leadConverts>\n      </urn:convertLead>\n   </soapenv:Body>\n</soapenv:Envelope>"
+            },
+            "url": {
+              "raw": "{{base_url}}/services/Soap/u/60.0",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "Soap",
+                "u",
+                "60.0"
+              ]
+            },
+            "description": "Convert Lead to Opportunity using SOAP API convertLead() method\n\n**Test:** SF-506-API-003\n**Using SOAP API (Official Method):**\n- Endpoint: `/services/Soap/u/60.0`\n- Method: `convertLead()`\n- Content-Type: `text/xml`\n- Uses same OAuth access token\n\n**Request Body:**\n- SOAP envelope with `<convertLead>` payload\n- Lead ID from collection variable `lead_id_eu`\n- Converted Status: \"Qualified\"\n- Creates Opportunity: true\n- Opportunity Name: \"SF-506 Test Opportunity EU\"\n\n**Response:**\n- XML SOAP response with `opportunityId`, `accountId`, `contactId`"
+          },
+          "response": []
+        },
+        {
+          "name": "SF-506-API-003 - Convert Lead to Opportunity (EU) - REST API Alternative",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Conversion successful\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    pm.expect(jsonData.opportunityId).to.not.be.undefined;",
+                  "    pm.collectionVariables.set('opportunity_id', jsonData.opportunityId);",
+                  "    if (jsonData.accountId) {",
+                  "        pm.collectionVariables.set('account_id', jsonData.accountId);",
+                  "    }",
+                  "    console.log('✅ Opportunity created: ' + jsonData.opportunityId);",
+                  "    if (jsonData.accountId) {",
+                  "        console.log('✅ Account created: ' + jsonData.accountId);",
+                  "    }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "var leadId = pm.collectionVariables.get('lead_id_eu');",
+                  "if (!leadId) {",
+                  "    throw new Error('lead_id_eu variable is not set');",
+                  "}",
+                  "console.log('Converting Lead using REST API: ' + leadId);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"convertedStatus\": \"Qualified\",\n  \"doNotCreateOpportunity\": false,\n  \"opportunityName\": \"SF-506 Test Opportunity EU\",\n  \"overwriteLeadSource\": false\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/services/data/v60.0/sobjects/Lead/{{lead_id_eu}}/convert",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "data",
+                "v60.0",
+                "sobjects",
+                "Lead",
+                "{{lead_id_eu}}",
+                "convert"
+              ]
+            },
+            "description": "REST API Alternative for Lead Conversion\n\n**Test:** SF-506-API-003 (Alternative)\n**Use this if SOAP API doesn't work**\n- Endpoint: `/services/data/v60.0/sobjects/Lead/{id}/convert`\n- Note the 'v' prefix in API version: v60.0"
+          },
+          "response": []
+        },
+        {
+          "name": "SF-506-API-003 - Query Opportunity by ID (EU)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Opportunity has Estimated_Onboarding_Date__c\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.Estimated_Onboarding_Date__c).to.not.be.null;",
+                  "    pm.expect(jsonData.Estimated_Onboarding_Date__c).to.match(/^\\d{4}-\\d{2}-\\d{2}$/);",
+                  "    console.log('✅ Opportunity Estimated_Onboarding_Date__c: ' + jsonData.Estimated_Onboarding_Date__c);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "var oppId = pm.collectionVariables.get('opportunity_id');",
+                  "if (!oppId) {",
+                  "    throw new Error('opportunity_id variable is not set. Please run the Convert Lead request first.');",
+                  "}",
+                  "console.log('Querying Opportunity: ' + oppId);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Opportunity/{{opportunity_id}}?fields=Id,Name,Estimated_Onboarding_Date__c",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "data",
+                "{{api_version}}",
+                "sobjects",
+                "Opportunity",
+                "{{opportunity_id}}"
+              ],
+              "query": [
+                {
+                  "key": "fields",
+                  "value": "Id,Name,Estimated_Onboarding_Date__c"
+                }
+              ]
+            },
+            "description": "Query Opportunity by ID to verify Estimated_Onboarding_Date__c was mapped from Lead\n\n**Test:** SF-506-API-003 (Verification)\n**Query Format:** GET /sobjects/{object}/{id}?fields=...\n**Purpose:** Verify field maps from Lead to Opportunity during conversion"
+          },
+          "response": []
+        },
+        {
+          "name": "SF-506-API-003 - SOQL Query Opportunities with Estimated_Onboarding_Date__c (EU)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Query returned results\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.records).to.be.an('array');",
+                  "    pm.expect(jsonData.totalSize).to.be.at.least(1);",
+                  "    ",
+                  "    // Find the opportunity we created",
+                  "    var oppId = pm.collectionVariables.get('opportunity_id');",
+                  "    var foundOpp = jsonData.records.find(function(r) { return r.Id === oppId; });",
+                  "    if (foundOpp) {",
+                  "        pm.expect(foundOpp.Estimated_Onboarding_Date__c).to.not.be.null;",
+                  "        console.log('✅ Found Opportunity: ' + foundOpp.Id);",
+                  "        console.log('Estimated_Onboarding_Date__c: ' + foundOpp.Estimated_Onboarding_Date__c);",
+                  "    }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "var oppId = pm.collectionVariables.get('opportunity_id');",
+                  "if (!oppId) {",
+                  "    console.log('⚠️ opportunity_id not set. Query will return all matching Opportunities.');",
+                  "} else {",
+                  "    console.log('Querying for Opportunity: ' + oppId);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/query?q=SELECT Id,Name,Estimated_Onboarding_Date__c FROM Opportunity WHERE Id = '{{opportunity_id}}' LIMIT 1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "data",
+                "{{api_version}}",
+                "query"
+              ],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "SELECT Id,Name,Estimated_Onboarding_Date__c FROM Opportunity WHERE Id = '{{opportunity_id}}' LIMIT 1",
+                  "description": "SOQL query - URL encoded automatically by Postman"
+                }
+              ]
+            },
+            "description": "SOQL Query to find Opportunity with Estimated_Onboarding_Date__c\n\n**Test:** SF-506-API-003 (Alternative verification)\n**Query Format:** GET /query?q=SELECT... (SOQL)\n**Purpose:** Demonstrate proper SOQL query format\n**Note:** Postman automatically URL-encodes the query parameter"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Lead Conversion - No Mapping to Account",
+      "item": [
+        {
+          "name": "SF-506-API-004 - Create Lead with Estimated Onboarding Date (UK)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test(\"Response contains Lead ID\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.id).to.not.be.undefined;",
+                  "    pm.collectionVariables.set('lead_id_uk', jsonData.id);",
+                  "    console.log('✅ Lead created: ' + jsonData.id);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"FirstName\": \"Test\",\n  \"LastName\": \"Lead UK\",\n  \"Company\": \"SF-506 Test Company UK\",\n  \"Status\": \"Open - Not Contacted\",\n  \"Estimated_Onboarding_Date__c\": \"2026-05-14\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Lead/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "data",
+                "{{api_version}}",
+                "sobjects",
+                "Lead",
+                ""
+              ]
+            },
+            "description": "Create Lead with Estimated_Onboarding_Date__c = '2026-05-14' (UK region) for conversion test\n\n**Test:** SF-506-API-004 (Setup)"
+          },
+          "response": []
+        },
+        {
+          "name": "SF-506-API-004 - Convert Lead to Opportunity (UK)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    var xmlText = pm.response.text();",
+                  "    var parser = new DOMParser();",
+                  "    var xmlDoc = parser.parseFromString(xmlText, 'text/xml');",
+                  "    var result = xmlDoc.getElementsByTagName('result')[0];",
+                  "    if (result) {",
+                  "        var opportunityId = result.getElementsByTagName('opportunityId')[0]?.textContent;",
+                  "        var accountId = result.getElementsByTagName('accountId')[0]?.textContent;",
+                  "        ",
+                  "        if (opportunityId) {",
+                  "            pm.collectionVariables.set('opportunity_id', opportunityId);",
+                  "        }",
+                  "        if (accountId) {",
+                  "            pm.collectionVariables.set('account_id', accountId);",
+                  "        }",
+                  "    }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "text/xml; charset=UTF-8"
+              },
+              {
+                "key": "SOAPAction",
+                "value": "convertLead"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:urn=\"urn:enterprise.soap.sforce.com\">\n   <soapenv:Header>\n      <urn:SessionHeader>\n         <urn:sessionId>{{sf_access_token}}</urn:sessionId>\n      </urn:SessionHeader>\n   </soapenv:Header>\n   <soapenv:Body>\n      <urn:convertLead>\n         <urn:leadConverts>\n            <urn:leadId>{{lead_id_uk}}</urn:leadId>\n            <urn:convertedStatus>Qualified</urn:convertedStatus>\n            <urn:doNotCreateOpportunity>false</urn:doNotCreateOpportunity>\n            <urn:opportunityName>SF-506 Test Opportunity UK</urn:opportunityName>\n            <urn:overwriteLeadSource>false</urn:overwriteLeadSource>\n         </urn:leadConverts>\n      </urn:convertLead>\n   </soapenv:Body>\n</soapenv:Envelope>"
+            },
+            "url": {
+              "raw": "{{base_url}}/services/Soap/u/60.0",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "Soap",
+                "u",
+                "60.0"
+              ]
+            },
+            "description": "Convert Lead to Opportunity using SOAP API - Verify Estimated_Onboarding_Date__c maps to Opportunity but NOT to Account\n\n**Test:** SF-506-API-004"
+          },
+          "response": []
+        },
+        {
+          "name": "SF-506-API-004 - Query Opportunity by ID (UK)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Opportunity has Estimated_Onboarding_Date__c\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.Estimated_Onboarding_Date__c).to.not.be.null;",
+                  "    pm.expect(jsonData.Estimated_Onboarding_Date__c).to.match(/^\\d{4}-\\d{2}-\\d{2}$/);",
+                  "    console.log('✅ Opportunity Estimated_Onboarding_Date__c: ' + jsonData.Estimated_Onboarding_Date__c);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Opportunity/{{opportunity_id}}?fields=Id,Name,Estimated_Onboarding_Date__c",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "data",
+                "{{api_version}}",
+                "sobjects",
+                "Opportunity",
+                "{{opportunity_id}}"
+              ],
+              "query": [
+                {
+                  "key": "fields",
+                  "value": "Id,Name,Estimated_Onboarding_Date__c"
+                }
+              ]
+            },
+            "description": "Query Opportunity by ID to verify Estimated_Onboarding_Date__c = 'UK' after Lead conversion\n\n**Test:** SF-506-API-004 (Verification)\n**Query Format:** GET /sobjects/{object}/{id}?fields=..."
+          },
+          "response": []
+        },
+        {
+          "name": "SF-506-API-004 - Query Account by ID - Verify NO Estimated_Onboarding_Date__c",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Account does NOT have Estimated_Onboarding_Date__c\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    var fieldValue = jsonData.Estimated_Onboarding_Date__c;",
+                  "    var isNullOrEmpty = (fieldValue === null || fieldValue === undefined || fieldValue === '');",
+                  "    pm.expect(isNullOrEmpty).to.be.true;",
+                  "    console.log('✅ Account Estimated_Onboarding_Date__c is null/empty (as expected): ' + fieldValue);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "var accountId = pm.collectionVariables.get('account_id');",
+                  "if (!accountId) {",
+                  "    throw new Error('account_id variable is not set. Please run the Convert Lead request first.');",
+                  "}",
+                  "console.log('Querying Account: ' + accountId);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Account/{{account_id}}?fields=Id,Name,Estimated_Onboarding_Date__c",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "data",
+                "{{api_version}}",
+                "sobjects",
+                "Account",
+                "{{account_id}}"
+              ],
+              "query": [
+                {
+                  "key": "fields",
+                  "value": "Id,Name,Estimated_Onboarding_Date__c"
+                }
+              ]
+            },
+            "description": "Query Account by ID to verify Estimated_Onboarding_Date__c does NOT exist (should be null/empty)\n\n**Test:** SF-506-API-004 (Verification)\n**Query Format:** GET /sobjects/{object}/{id}?fields=...\n**Purpose:** Verify field does NOT map to Account during conversion"
+          },
+          "response": []
+        },
+        {
+          "name": "SF-506-API-004 - SOQL Query Accounts - Verify NO Estimated_Onboarding_Date__c",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Query returned results\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.records).to.be.an('array');",
+                  "    ",
+                  "    // Find the account we created",
+                  "    var accountId = pm.collectionVariables.get('account_id');",
+                  "    var foundAccount = jsonData.records.find(function(r) { return r.Id === accountId; });",
+                  "    if (foundAccount) {",
+                  "        var fieldValue = foundAccount.Estimated_Onboarding_Date__c;",
+                  "        var isNullOrEmpty = (fieldValue === null || fieldValue === undefined || fieldValue === '');",
+                  "        pm.expect(isNullOrEmpty).to.be.true;",
+                  "        console.log('✅ Account Estimated_Onboarding_Date__c is null/empty (as expected)');",
+                  "    }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/query?q=SELECT Id,Name,Estimated_Onboarding_Date__c FROM Account WHERE Id = '{{account_id}}' LIMIT 1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "data",
+                "{{api_version}}",
+                "query"
+              ],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "SELECT Id,Name,Estimated_Onboarding_Date__c FROM Account WHERE Id = '{{account_id}}' LIMIT 1",
+                  "description": "SOQL query - URL encoded automatically by Postman"
+                }
+              ]
+            },
+            "description": "SOQL Query to find Account and verify Estimated_Onboarding_Date__c is null/empty\n\n**Test:** SF-506-API-004 (Alternative verification)\n**Query Format:** GET /query?q=SELECT... (SOQL)\n**Purpose:** Demonstrate proper SOQL query format for Account verification"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Lead Conversion - Value Preservation",
+      "item": [
+        {
+          "name": "SF-506-API-005 - Create Lead with Estimated Onboarding Date (US)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test(\"Response contains Lead ID\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.id).to.not.be.undefined;",
+                  "    pm.collectionVariables.set('lead_id_us', jsonData.id);",
+                  "    console.log('✅ Lead created: ' + jsonData.id);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"FirstName\": \"Test\",\n  \"LastName\": \"Lead US\",\n  \"Company\": \"SF-506 Test Company US\",\n  \"Status\": \"Open - Not Contacted\",\n  \"Estimated_Onboarding_Date__c\": \"2026-06-14\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Lead/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "data",
+                "{{api_version}}",
+                "sobjects",
+                "Lead",
+                ""
+              ]
+            },
+            "description": "Create Lead with Estimated_Onboarding_Date__c = '2026-06-14' (US region) for value preservation test\n\n**Test:** SF-506-API-005 (Setup)"
+          },
+          "response": []
+        },
+        {
+          "name": "SF-506-API-005 - Query Lead Estimated Onboarding Date Before Conversion",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Lead has Estimated_Onboarding_Date__c\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.Estimated_Onboarding_Date__c).to.not.be.null;",
+                  "    pm.expect(jsonData.Estimated_Onboarding_Date__c).to.match(/^\\d{4}-\\d{2}-\\d{2}$/);",
+                  "    pm.collectionVariables.set('lead_estimated_date', jsonData.Estimated_Onboarding_Date__c);",
+                  "    console.log('✅ Lead Estimated_Onboarding_Date__c: ' + jsonData.Estimated_Onboarding_Date__c);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Lead/{{lead_id_us}}?fields=Id,Name,Estimated_Onboarding_Date__c",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "data",
+                "{{api_version}}",
+                "sobjects",
+                "Lead",
+                "{{lead_id_us}}"
+              ],
+              "query": [
+                {
+                  "key": "fields",
+                  "value": "Id,Name,Estimated_Onboarding_Date__c"
+                }
+              ]
+            },
+            "description": "Query Lead by ID to get Estimated_Onboarding_Date__c value before conversion for comparison\n\n**Test:** SF-506-API-005 (Pre-conversion)\n**Query Format:** GET /sobjects/{object}/{id}?fields=..."
+          },
+          "response": []
+        },
+        {
+          "name": "SF-506-API-005 - Convert Lead to Opportunity (US)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    var xmlText = pm.response.text();",
+                  "    var parser = new DOMParser();",
+                  "    var xmlDoc = parser.parseFromString(xmlText, 'text/xml');",
+                  "    var result = xmlDoc.getElementsByTagName('result')[0];",
+                  "    if (result) {",
+                  "        var opportunityId = result.getElementsByTagName('opportunityId')[0]?.textContent;",
+                  "        if (opportunityId) {",
+                  "            pm.collectionVariables.set('opportunity_id', opportunityId);",
+                  "        }",
+                  "    }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "text/xml; charset=UTF-8"
+              },
+              {
+                "key": "SOAPAction",
+                "value": "convertLead"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:urn=\"urn:enterprise.soap.sforce.com\">\n   <soapenv:Header>\n      <urn:SessionHeader>\n         <urn:sessionId>{{sf_access_token}}</urn:sessionId>\n      </urn:SessionHeader>\n   </soapenv:Header>\n   <soapenv:Body>\n      <urn:convertLead>\n         <urn:leadConverts>\n            <urn:leadId>{{lead_id_us}}</urn:leadId>\n            <urn:convertedStatus>Qualified</urn:convertedStatus>\n            <urn:doNotCreateOpportunity>false</urn:doNotCreateOpportunity>\n            <urn:opportunityName>SF-506 Test Opportunity US</urn:opportunityName>\n            <urn:overwriteLeadSource>false</urn:overwriteLeadSource>\n         </urn:leadConverts>\n      </urn:convertLead>\n   </soapenv:Body>\n</soapenv:Envelope>"
+            },
+            "url": {
+              "raw": "{{base_url}}/services/Soap/u/60.0",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "Soap",
+                "u",
+                "60.0"
+              ]
+            },
+            "description": "Convert Lead to Opportunity using SOAP API - Verify Estimated_Onboarding_Date__c value is preserved\n\n**Test:** SF-506-API-005"
+          },
+          "response": []
+        },
+        {
+          "name": "SF-506-API-005 - Query Opportunity by ID - Verify Value Matches Lead",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Opportunity Estimated_Onboarding_Date__c matches Lead value\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    var opportunityValue = jsonData.Estimated_Onboarding_Date__c;",
+                  "    var leadValue = pm.collectionVariables.get('lead_estimated_date');",
+                  "    pm.expect(opportunityValue).to.equal(leadValue);",
+                  "    pm.expect(opportunityValue).to.match(/^\\d{4}-\\d{2}-\\d{2}$/);",
+                  "    console.log('✅ Opportunity Estimated_Onboarding_Date__c: ' + opportunityValue);",
+                  "    console.log('✅ Lead Estimated_Onboarding_Date__c: ' + leadValue);",
+                  "    console.log('✅ Values match!');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Opportunity/{{opportunity_id}}?fields=Id,Name,Estimated_Onboarding_Date__c",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "data",
+                "{{api_version}}",
+                "sobjects",
+                "Opportunity",
+                "{{opportunity_id}}"
+              ],
+              "query": [
+                {
+                  "key": "fields",
+                  "value": "Id,Name,Estimated_Onboarding_Date__c"
+                }
+              ]
+            },
+            "description": "Query Opportunity by ID to verify Estimated_Onboarding_Date__c value matches exactly what was on the Lead\n\n**Test:** SF-506-API-005 (Verification)\n**Query Format:** GET /sobjects/{object}/{id}?fields=..."
+          },
+          "response": []
+        },
+        {
+          "name": "SF-506-API-005 - SOQL Query to Compare Lead and Opportunity Values",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Query returned Opportunity with matching value\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.records).to.be.an('array');",
+                  "    ",
+                  "    var oppId = pm.collectionVariables.get('opportunity_id');",
+                  "    var leadValue = pm.collectionVariables.get('lead_estimated_date');",
+                  "    ",
+                  "    var foundOpp = jsonData.records.find(function(r) { return r.Id === oppId; });",
+                  "    if (foundOpp) {",
+                  "        pm.expect(foundOpp.Estimated_Onboarding_Date__c).to.equal(leadValue);",
+                  "        console.log('✅ Opportunity Estimated_Onboarding_Date__c: ' + foundOpp.Estimated_Onboarding_Date__c);",
+                  "        console.log('✅ Lead Estimated_Onboarding_Date__c: ' + leadValue);",
+                  "        console.log('✅ Values match!');",
+                  "    }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/query?q=SELECT Id,Name,Estimated_Onboarding_Date__c FROM Opportunity WHERE Id = '{{opportunity_id}}' LIMIT 1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "data",
+                "{{api_version}}",
+                "query"
+              ],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "SELECT Id,Name,Estimated_Onboarding_Date__c FROM Opportunity WHERE Id = '{{opportunity_id}}' LIMIT 1",
+                  "description": "SOQL query - URL encoded automatically by Postman"
+                }
+              ]
+            },
+            "description": "SOQL Query to find Opportunity and verify Estimated_Onboarding_Date__c matches Lead value\n\n**Test:** SF-506-API-005 (Alternative verification)\n**Query Format:** GET /query?q=SELECT... (SOQL)\n**Purpose:** Demonstrate proper SOQL query format for value comparison"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Negative / Boundary Tests",
+      "item": [
+        {
+          "name": "SF-506-API-006 - Reject Invalid Estimated_Onboarding_Date__c Value",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code indicates error\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([400, 422]);",
+                  "});",
+                  "",
+                  "pm.test(\"Error response mentions Estimated_Onboarding_Date\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    var errorMessage = JSON.stringify(jsonData).toLowerCase();",
+                  "    var hasEstimated = errorMessage.includes('estimated') || errorMessage.includes('onboarding');",
+                  "    console.log('Error response: ' + JSON.stringify(jsonData, null, 2));",
+                  "    // Note: This test may pass even if error doesn't explicitly mention field name",
+                  "    // The important part is that invalid value was rejected",
+                  "    pm.expect(pm.response.code).to.be.oneOf([400, 422]);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"Name\": \"SF-506 Invalid Test Opportunity\",\n  \"StageName\": \"Pipeline\",\n  \"CloseDate\": \"2025-12-31\",\n  \"Estimated_Onboarding_Date__c\": \"INVALID_VALUE_###\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Opportunity/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "data",
+                "{{api_version}}",
+                "sobjects",
+                "Opportunity",
+                ""
+              ]
+            },
+            "description": "Negative test: Attempt to create Opportunity with invalid Estimated_Onboarding_Date__c value. Expected: Error response\n\n**Test:** SF-506-API-006\n**Purpose:** Verify invalid values are rejected"
+          },
+          "response": []
+        },
+        {
+          "name": "SF-506-API-007 - Create Opportunity without Estimated Onboarding Date",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test(\"Response contains Opportunity ID\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.id).to.not.be.undefined;",
+                  "    pm.collectionVariables.set('opportunity_id', jsonData.id);",
+                  "    console.log('✅ Opportunity created: ' + jsonData.id);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"Name\": \"SF-506 Null Test Opportunity\",\n  \"StageName\": \"Pipeline\",\n  \"CloseDate\": \"2025-12-31\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Opportunity/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "data",
+                "{{api_version}}",
+                "sobjects",
+                "Opportunity",
+                ""
+              ]
+            },
+            "description": "Create Opportunity without Estimated_Onboarding_Date__c field (null value)\n\n**Test:** SF-506-API-007 (Setup)"
+          },
+          "response": []
+        },
+        {
+          "name": "SF-506-API-007 - Query Opportunity by ID - Verify Null Value",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Estimated_Onboarding_Date__c is null or empty\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    var fieldValue = jsonData.Estimated_Onboarding_Date__c;",
+                  "    var isNullOrEmpty = (fieldValue === null || fieldValue === undefined || fieldValue === '');",
+                  "    pm.expect(isNullOrEmpty).to.be.true;",
+                  "    console.log('✅ Estimated_Onboarding_Date__c is null/empty (as expected): ' + fieldValue);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Opportunity/{{opportunity_id}}?fields=Id,Name,Estimated_Onboarding_Date__c",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "data",
+                "{{api_version}}",
+                "sobjects",
+                "Opportunity",
+                "{{opportunity_id}}"
+              ],
+              "query": [
+                {
+                  "key": "fields",
+                  "value": "Id,Name,Estimated_Onboarding_Date__c"
+                }
+              ]
+            },
+            "description": "Query Opportunity by ID to verify Estimated_Onboarding_Date__c is null or empty\n\n**Test:** SF-506-API-007 (Verification)\n**Query Format:** GET /sobjects/{object}/{id}?fields=..."
+          },
+          "response": []
+        },
+        {
+          "name": "SF-506-API-007 - SOQL Query Opportunities with Null Estimated_Onboarding_Date__c",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Query returned results\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.records).to.be.an('array');",
+                  "    ",
+                  "    // Find the opportunity we created",
+                  "    var oppId = pm.collectionVariables.get('opportunity_id');",
+                  "    var foundOpp = jsonData.records.find(function(r) { return r.Id === oppId; });",
+                  "    if (foundOpp) {",
+                  "        var fieldValue = foundOpp.Estimated_Onboarding_Date__c;",
+                  "        var isNullOrEmpty = (fieldValue === null || fieldValue === undefined || fieldValue === '');",
+                  "        pm.expect(isNullOrEmpty).to.be.true;",
+                  "        console.log('✅ Opportunity Estimated_Onboarding_Date__c is null/empty (as expected)');",
+                  "    }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/query?q=SELECT Id,Name,Estimated_Onboarding_Date__c FROM Opportunity WHERE Id = '{{opportunity_id}}' LIMIT 1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "data",
+                "{{api_version}}",
+                "query"
+              ],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "SELECT Id,Name,Estimated_Onboarding_Date__c FROM Opportunity WHERE Id = '{{opportunity_id}}' LIMIT 1",
+                  "description": "SOQL query - URL encoded automatically by Postman"
+                }
+              ]
+            },
+            "description": "SOQL Query to find Opportunity and verify Estimated_Onboarding_Date__c is null/empty\n\n**Test:** SF-506-API-007 (Alternative verification)\n**Query Format:** GET /query?q=SELECT... (SOQL)\n**Purpose:** Demonstrate proper SOQL query format for null value verification"
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

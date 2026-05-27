@@ -1,0 +1,929 @@
+{
+	"info": {
+		"_postman_id": "work-item-sf-143",
+		"name": "SF-143 - Salesforce API Tests",
+		"description": "API - SF-143 - Leads UAT Final Feedback\n\n══════════════════════════════════════════════════════════════════════════════\nGenerated: 2025-12-19T15:09:24.254Z (FeatureGenerator v3.1)\n══════════════════════════════════════════════════════════════════════════════\n═══════════════════════════════════════════════════════════════════════════\nSUMMARY OF UNDERSTANDING\n═══════════════════════════════════════════════════════════════════════════\nOverview: Leads UAT Final Feedback\nPrimary Entity: Opportunity\nTest Requirements (14):\nREQ-1: Target Insu\n\nGenerated from: C:\\Automation\\E2EAutomation\\src\\features\\api\\SF\\SF-143.feature\n\n## Setup Instructions:\n1. Import this collection into Postman\n2. Create a new environment (or use existing Salesforce QA environment)\n3. Set the following environment variables:\n   - `sf_client_id`: Your Connected App Consumer Key\n   - `sf_client_secret`: Your Connected App Consumer Secret\n   - `sf_username`: Your Salesforce username\n   - `sf_password`: Your Salesforce password\n   - `sf_security_token`: Your Salesforce security token\n   - `sf_login_url`: Your Salesforce login URL (e.g., https://login.salesforce.com or https://test.salesforce.com)\n   - `sf_api_version`: API version (e.g., v60.0)\n\n## Authentication:\n1. Run the \"🔐 Get Salesforce Access Token\" request first\n2. The access token and instance URL will be automatically saved to collection variables\n3. All subsequent requests will use this token via Bearer authentication",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{sf_access_token}}",
+				"type": "string"
+			}
+		]
+	},
+	"variable": [
+		{
+			"key": "sf_access_token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "sf_instance_url",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "base_url",
+			"value": "{{sf_instance_url}}",
+			"type": "string"
+		},
+		{
+			"key": "api_version",
+			"value": "{{sf_api_version}}",
+			"type": "string"
+		},
+		{
+			"key": "record_id",
+			"value": "",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "🔐 Get Salesforce Access Token",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response contains access_token\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property(\"access_token\");",
+							"    pm.expect(jsonData.access_token).to.not.be.empty;",
+							"    pm.expect(jsonData).to.have.property(\"instance_url\");",
+							"    ",
+							"    // Save token and instance URL to collection variables",
+							"    pm.collectionVariables.set(\"sf_access_token\", jsonData.access_token);",
+							"    pm.collectionVariables.set(\"sf_instance_url\", jsonData.instance_url);",
+							"    pm.collectionVariables.set(\"sf_base_url\", jsonData.instance_url);",
+							"    ",
+							"    console.log(\"✅ Access token saved to collection variable: sf_access_token\");",
+							"    console.log(\"✅ Instance URL saved: \" + jsonData.instance_url);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "grant_type",
+							"value": "password",
+							"type": "text"
+						},
+						{
+							"key": "client_id",
+							"value": "{{sf_client_id}}",
+							"type": "text"
+						},
+						{
+							"key": "client_secret",
+							"value": "{{sf_client_secret}}",
+							"type": "text"
+						},
+						{
+							"key": "username",
+							"value": "{{sf_username}}",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "{{sf_password}}{{sf_security_token}}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{sf_login_url}}/services/oauth2/token",
+					"host": [
+						"{{sf_login_url}}"
+					],
+					"path": [
+						"services",
+						"oauth2",
+						"token"
+					]
+				},
+				"description": "Obtains a Salesforce access token using OAuth2 Username/Password flow.\n\n**Required Environment Variables:**\n- `sf_client_id`: Your Connected App Consumer Key\n- `sf_client_secret`: Your Connected App Consumer Secret\n- `sf_username`: Your Salesforce username\n- `sf_password`: Your Salesforce password\n- `sf_security_token`: Your Salesforce security token (appended to password)\n- `sf_login_url`: Your Salesforce login URL (e.g., https://login.salesforce.com or https://test.salesforce.com)\n\n**Response:**\nReturns `access_token`, `instance_url`, and other OAuth details. The access token and instance URL are automatically saved to collection variables for use in subsequent requests."
+			},
+			"response": []
+		},
+		{
+			"name": "API - Verify Funnel__c field exists on Opportunity",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response contains fields\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.fields).to.be.an(\"array\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Opportunity/describe",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"services",
+						"data",
+						"{{api_version}}",
+						"sobjects",
+						"Opportunity",
+						"describe"
+					]
+				},
+				"description": "API - API - Verify Funnel__c field exists on Opportunity\n\n**Test ID:** SF-143-API-001\n**Priority:** p1\n**Tags:** @smoke\n\n**Feature:** API - SF-143 - Leads UAT Final Feedback\n"
+			},
+			"response": []
+		},
+		{
+			"name": "API - Verify Funnel__c field exists on Account",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response contains fields\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.fields).to.be.an(\"array\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Account/describe",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"services",
+						"data",
+						"{{api_version}}",
+						"sobjects",
+						"Account",
+						"describe"
+					]
+				},
+				"description": "API - API - Verify Funnel__c field exists on Account\n\n**Test ID:** SF-143-API-002\n**Priority:** p1\n\n**Feature:** API - SF-143 - Leads UAT Final Feedback\n"
+			},
+			"response": []
+		},
+		{
+			"name": "API - Verify Funnel__c maps from Lead to Opportunity during conversion - Create Lead",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"pm.test(\"Response contains record ID\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property(\"id\");",
+							"    pm.expect(jsonData.id).to.not.be.empty;",
+							"    pm.collectionVariables.set(\"lead_id\", jsonData.id);",
+							"    console.log(\"✅ Lead ID saved: \" + jsonData.id);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Lead/",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"services",
+						"data",
+						"{{api_version}}",
+						"sobjects",
+						"Lead",
+						""
+					]
+				},
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"LastName\": \"Test Lead\",\n  \"Company\": \"Test Company\",\n  \"Current_Program_Expiration_Date__c\": \"US\"\n}"
+				},
+				"description": "API - API - Verify Funnel__c maps from Lead to Opportunity during conversion\n\n**Test ID:** SF-143-API-003\n**Priority:** p1\n**Tags:** @smoke\n\n**Feature:** API - SF-143 - Leads UAT Final Feedback\n"
+			},
+			"response": []
+		},
+		{
+			"name": "API - Verify Funnel__c maps from Lead to Opportunity during conversion - Convert Lead",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response contains opportunityId\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property(\"opportunityId\");",
+							"    if (jsonData.opportunityId) {",
+							"        pm.collectionVariables.set(\"opportunity_id\", jsonData.opportunityId);",
+							"    }",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/services/data/v58.0/sobjects/Lead/{{lead_id}}/convert",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"services",
+						"data",
+						"v58.0",
+						"sobjects",
+						"Lead",
+						"{{lead_id}}",
+						"convert"
+					]
+				},
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"convertedStatus\": \"Qualified\",\n  \"doNotCreateOpportunity\": false,\n  \"overwriteLeadSource\": false\n}"
+				},
+				"description": "API - API - Verify Funnel__c maps from Lead to Opportunity during conversion\n\n**Test ID:** SF-143-API-003\n**Priority:** p1\n**Tags:** @smoke\n\n**Feature:** API - SF-143 - Leads UAT Final Feedback\n\n\n**Note:** Using API version v58.0 for Lead conversion. Set {{lead_id}} collection variable from the Create Lead request response."
+			},
+			"response": []
+		},
+		{
+			"name": "API - Verify Funnel__c maps from Lead to Opportunity during conversion - Query Opportunity",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response contains records\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property(\"records\");",
+							"    pm.expect(jsonData.records).to.be.an(\"array\");",
+							"    pm.expect(jsonData.records.length).to.be.greaterThan(0);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/services/data/{{api_version}}/query/",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"services",
+						"data",
+						"{{api_version}}",
+						"query",
+						""
+					],
+					"query": [
+						{
+							"key": "q",
+							"value": "SELECT Id, Name, Funnel FROM Opportunity WHERE Id = '{{opportunity_id}}' LIMIT 1"
+						}
+					]
+				},
+				"description": "API - API - Verify Funnel__c maps from Lead to Opportunity during conversion\n\n**Test ID:** SF-143-API-003\n**Priority:** p1\n**Tags:** @smoke\n\n**Feature:** API - SF-143 - Leads UAT Final Feedback\n\n\n**Note:** Set {{opportunity_id}} from the Convert Lead request response."
+			},
+			"response": []
+		},
+		{
+			"name": "API - Verify Funnel__c maps from Lead to Opportunity for all values during conversion - Create Lead",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"pm.test(\"Response contains record ID\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property(\"id\");",
+							"    pm.expect(jsonData.id).to.not.be.empty;",
+							"    pm.collectionVariables.set(\"lead_id\", jsonData.id);",
+							"    console.log(\"✅ Lead ID saved: \" + jsonData.id);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Lead/",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"services",
+						"data",
+						"{{api_version}}",
+						"sobjects",
+						"Lead",
+						""
+					]
+				},
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"LastName\": \"Test Lead\",\n  \"Company\": \"Test Company\",\n  \"Current_Program_Expiration_Date__c\": \"US\"\n}"
+				},
+				"description": "API - API - Verify Funnel__c maps from Lead to Opportunity for all values during conversion\n\n**Test ID:** SF-143-API-004\n**Priority:** p1\n\n**Feature:** API - SF-143 - Leads UAT Final Feedback\n"
+			},
+			"response": []
+		},
+		{
+			"name": "API - Verify Funnel__c maps from Lead to Opportunity for all values during conversion - Convert Lead",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response contains opportunityId\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property(\"opportunityId\");",
+							"    if (jsonData.opportunityId) {",
+							"        pm.collectionVariables.set(\"opportunity_id\", jsonData.opportunityId);",
+							"    }",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/services/data/v58.0/sobjects/Lead/{{lead_id}}/convert",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"services",
+						"data",
+						"v58.0",
+						"sobjects",
+						"Lead",
+						"{{lead_id}}",
+						"convert"
+					]
+				},
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"convertedStatus\": \"Qualified\",\n  \"doNotCreateOpportunity\": false,\n  \"overwriteLeadSource\": false\n}"
+				},
+				"description": "API - API - Verify Funnel__c maps from Lead to Opportunity for all values during conversion\n\n**Test ID:** SF-143-API-004\n**Priority:** p1\n\n**Feature:** API - SF-143 - Leads UAT Final Feedback\n\n\n**Note:** Using API version v58.0 for Lead conversion. Set {{lead_id}} collection variable from the Create Lead request response."
+			},
+			"response": []
+		},
+		{
+			"name": "API - Verify Funnel__c maps from Lead to Opportunity for all values during conversion - Query Opportunity",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response contains records\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property(\"records\");",
+							"    pm.expect(jsonData.records).to.be.an(\"array\");",
+							"    pm.expect(jsonData.records.length).to.be.greaterThan(0);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/services/data/{{api_version}}/query/",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"services",
+						"data",
+						"{{api_version}}",
+						"query",
+						""
+					],
+					"query": [
+						{
+							"key": "q",
+							"value": "SELECT Id, Name, Funnel FROM Opportunity WHERE Id = '{{opportunity_id}}' LIMIT 1"
+						}
+					]
+				},
+				"description": "API - API - Verify Funnel__c maps from Lead to Opportunity for all values during conversion\n\n**Test ID:** SF-143-API-004\n**Priority:** p1\n\n**Feature:** API - SF-143 - Leads UAT Final Feedback\n\n\n**Note:** Set {{opportunity_id}} from the Convert Lead request response."
+			},
+			"response": []
+		},
+		{
+			"name": "API - Verify Funnel__c does NOT map to Account during Lead conversion - Create Lead",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"pm.test(\"Response contains record ID\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property(\"id\");",
+							"    pm.expect(jsonData.id).to.not.be.empty;",
+							"    pm.collectionVariables.set(\"lead_id\", jsonData.id);",
+							"    console.log(\"✅ Lead ID saved: \" + jsonData.id);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Lead/",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"services",
+						"data",
+						"{{api_version}}",
+						"sobjects",
+						"Lead",
+						""
+					]
+				},
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"LastName\": \"Test Lead\",\n  \"Company\": \"Test Company\",\n  \"Current_Program_Expiration_Date__c\": \"US\"\n}"
+				},
+				"description": "API - API - Verify Funnel__c does NOT map to Account during Lead conversion\n\n**Test ID:** SF-143-API-005\n**Priority:** p1\n**Tags:** @negative\n\n**Feature:** API - SF-143 - Leads UAT Final Feedback\n"
+			},
+			"response": []
+		},
+		{
+			"name": "API - Verify Funnel__c does NOT map to Account during Lead conversion - Convert Lead",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response contains opportunityId\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property(\"opportunityId\");",
+							"    if (jsonData.opportunityId) {",
+							"        pm.collectionVariables.set(\"opportunity_id\", jsonData.opportunityId);",
+							"    }",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/services/data/v58.0/sobjects/Lead/{{lead_id}}/convert",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"services",
+						"data",
+						"v58.0",
+						"sobjects",
+						"Lead",
+						"{{lead_id}}",
+						"convert"
+					]
+				},
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"convertedStatus\": \"Qualified\",\n  \"doNotCreateOpportunity\": false,\n  \"overwriteLeadSource\": false\n}"
+				},
+				"description": "API - API - Verify Funnel__c does NOT map to Account during Lead conversion\n\n**Test ID:** SF-143-API-005\n**Priority:** p1\n**Tags:** @negative\n\n**Feature:** API - SF-143 - Leads UAT Final Feedback\n\n\n**Note:** Using API version v58.0 for Lead conversion. Set {{lead_id}} collection variable from the Create Lead request response."
+			},
+			"response": []
+		},
+		{
+			"name": "API - Verify Funnel__c does NOT map to Account during Lead conversion - Query Opportunity",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response contains records\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property(\"records\");",
+							"    pm.expect(jsonData.records).to.be.an(\"array\");",
+							"    pm.expect(jsonData.records.length).to.be.greaterThan(0);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/services/data/{{api_version}}/query/",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"services",
+						"data",
+						"{{api_version}}",
+						"query",
+						""
+					],
+					"query": [
+						{
+							"key": "q",
+							"value": "SELECT Id, Name, Funnel FROM Opportunity WHERE Id = '{{opportunity_id}}' LIMIT 1"
+						}
+					]
+				},
+				"description": "API - API - Verify Funnel__c does NOT map to Account during Lead conversion\n\n**Test ID:** SF-143-API-005\n**Priority:** p1\n**Tags:** @negative\n\n**Feature:** API - SF-143 - Leads UAT Final Feedback\n\n\n**Note:** Set {{opportunity_id}} from the Convert Lead request response."
+			},
+			"response": []
+		},
+		{
+			"name": "API - Verify Funnel__c value is preserved during Lead conversion - Create Lead",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"pm.test(\"Response contains record ID\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property(\"id\");",
+							"    pm.expect(jsonData.id).to.not.be.empty;",
+							"    pm.collectionVariables.set(\"lead_id\", jsonData.id);",
+							"    console.log(\"✅ Lead ID saved: \" + jsonData.id);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Lead/",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"services",
+						"data",
+						"{{api_version}}",
+						"sobjects",
+						"Lead",
+						""
+					]
+				},
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"LastName\": \"Test Lead\",\n  \"Company\": \"Test Company\",\n  \"Current_Program_Expiration_Date__c\": \"US\"\n}"
+				},
+				"description": "API - API - Verify Funnel__c value is preserved during Lead conversion\n\n**Test ID:** SF-143-API-006\n**Priority:** p2\n\n**Feature:** API - SF-143 - Leads UAT Final Feedback\n"
+			},
+			"response": []
+		},
+		{
+			"name": "API - Verify Funnel__c value is preserved during Lead conversion - Convert Lead",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response contains opportunityId\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property(\"opportunityId\");",
+							"    if (jsonData.opportunityId) {",
+							"        pm.collectionVariables.set(\"opportunity_id\", jsonData.opportunityId);",
+							"    }",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/services/data/v58.0/sobjects/Lead/{{lead_id}}/convert",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"services",
+						"data",
+						"v58.0",
+						"sobjects",
+						"Lead",
+						"{{lead_id}}",
+						"convert"
+					]
+				},
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"convertedStatus\": \"Qualified\",\n  \"doNotCreateOpportunity\": false,\n  \"overwriteLeadSource\": false\n}"
+				},
+				"description": "API - API - Verify Funnel__c value is preserved during Lead conversion\n\n**Test ID:** SF-143-API-006\n**Priority:** p2\n\n**Feature:** API - SF-143 - Leads UAT Final Feedback\n\n\n**Note:** Using API version v58.0 for Lead conversion. Set {{lead_id}} collection variable from the Create Lead request response."
+			},
+			"response": []
+		},
+		{
+			"name": "API - Verify Funnel__c value is preserved during Lead conversion - Query Opportunity",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response contains records\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property(\"records\");",
+							"    pm.expect(jsonData.records).to.be.an(\"array\");",
+							"    pm.expect(jsonData.records.length).to.be.greaterThan(0);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/services/data/{{api_version}}/query/",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"services",
+						"data",
+						"{{api_version}}",
+						"query",
+						""
+					],
+					"query": [
+						{
+							"key": "q",
+							"value": "SELECT Id, Name, Funnel FROM Opportunity WHERE Id = '{{opportunity_id}}' LIMIT 1"
+						}
+					]
+				},
+				"description": "API - API - Verify Funnel__c value is preserved during Lead conversion\n\n**Test ID:** SF-143-API-006\n**Priority:** p2\n\n**Feature:** API - SF-143 - Leads UAT Final Feedback\n\n\n**Note:** Set {{opportunity_id}} from the Convert Lead request response."
+			},
+			"response": []
+		},
+		{
+			"name": "API - Reject invalid Funnel__c value",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"pm.test(\"Response contains record ID\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property(\"id\");",
+							"    pm.expect(jsonData.id).to.not.be.empty;",
+							"    pm.collectionVariables.set(\"record_id\", jsonData.id);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Opportunity/",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"services",
+						"data",
+						"{{api_version}}",
+						"sobjects",
+						"Opportunity"
+					]
+				},
+				"description": "API - API - Reject invalid Funnel__c value\n\n**Test ID:** SF-143-API-007\n**Priority:** p2\n**Tags:** @negative\n\n**Feature:** API - SF-143 - Leads UAT Final Feedback\n",
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"Name\": \"Test Opportunity\"\n}"
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "API - Handle null Funnel__c value",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response contains records\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property(\"records\");",
+							"    pm.expect(jsonData.records).to.be.an(\"array\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/services/data/{{api_version}}/query/?q=SELECT%20Id%2C%20Name%20FROM%20the%20LIMIT%2010",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"services",
+						"data",
+						"{{api_version}}",
+						"query"
+					],
+					"query": [
+						{
+							"key": "q",
+							"value": "SELECT Id, Name FROM the LIMIT 10"
+						}
+					]
+				},
+				"description": "API - API - Handle null Funnel__c value\n\n**Test ID:** SF-143-API-008\n**Priority:** p2\n**Tags:** @negative\n\n**Feature:** API - SF-143 - Leads UAT Final Feedback\n"
+			},
+			"response": []
+		}
+	]
+}

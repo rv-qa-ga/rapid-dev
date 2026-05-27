@@ -1,0 +1,156 @@
+h1. QA Test Automation Framework
+
+_Unified E2E testing platform for the Accelerant ecosystem. Automated test generation, execution, and evidence capture across Salesforce, MuleSoft, and downstream systems._
+
+*At a glance (as of today):*
+* *6* automated phases in the QA lifecycle
+* *449+* feature files
+* *2,500+* test cases created and uploaded to Jira/Zephyr (~*2,200* Salesforce)
+* *9+* systems covered (Salesforce, Dynamics, MuleSoft, SQL Server ODS/TDS, ADP/Snowflake, Lloyd's, go-live programmes, and more)
+* *Cursor AI agents* for test generation, automation, and maintenance (human review at every phase)
+
+_Numbers grow daily. More systems planned._
+
+
+----
+
+h2. Accelerant / BSG Pipeline Architecture
+
+_Testing coverage across the full BSG data pipeline — source systems through integration, warehouse, ODS/TDS, and downstream._
+
+h3. Core and integration systems
+
+* *Salesforce CRM* — Primary CRM platform with one-way data flow to Data Cloud. Full UI + API testing coverage. _Core Platform._
+* *MuleSoft* — Integration layer with bidirectional communication. API contract testing enabled. _Planned._
+* *Microsoft Dynamics* — Business process automation, Reference Data Management (RDM), and Configuration Management Tool (CMT). UI + API testing coverage across all Dynamics apps. _Target System._
+
+h3. Data platforms
+
+* *Data Cloud* — Data platform receiving data from Salesforce. API integration testing enabled. _Planned._
+* *Snowflake* — Data warehouse receiving pipeline from source systems via Fivetran integration. _Planned._
+
+h3. Data warehouse layer
+
+* *ODS / TDS (MS SQL Server)* — Foundation data layer supporting all systems above. Operational and Transactional Data Store validation. Cross-system data integrity testing. _Data Warehouse Layer._
+
+
+----
+
+h2. Complete Automation Workflow
+
+_From work item to deployment validation — every step automated with human oversight._
+
+# *1. Get Work Item* — Add Jira work item to jira-work-items.txt. Review requirements, acceptance criteria, and field definitions in Jira. _Output:_ Work item identified (e.g. SF-520).
+# *2. Create Test Cases* — Generate comprehensive Gherkin test cases from Jira. Review scenarios, validate step definitions. _Output:_ Feature files (e.g. SF-520-UI-001, SF-520-API-001).
+# *3. Create Scripts* — Identify missing steps, create step definitions using Page Object Model and Field Registry. Test locally. _Output:_ Step definitions validated.
+# *4. Upload to Jira–Zephyr* — Upload test cases to Zephyr Scale. Link test cases to Jira work items for traceability. _Output:_ Test cases uploaded (e.g. TC-4521, TC-4522).
+# *5. Create Test Data* — Test Data Factory auto-creates Accounts, Contacts, Opportunities with 24+ fields. Auto-cleanup after execution. _Output:_ Test data ready (e.g. ACC-20241218-001).
+# *6. Execute Tests* — Run UI tests (Playwright) and API tests (REST/JWT) across all integrated systems. Generate test reports. _Output:_ e.g. 15 tests passed, 0 failed.
+# *7. Commit to GitHub* — Create feature branch, stage changes, commit with descriptive message, push to remote, create Pull Request. _Output:_ e.g. PR #142: feature/SF-520-test-cases.
+# *8. Run Tests in VM* — GitHub Actions triggered. Tests execute on Linux VM (GitHub Runner). Results generated and uploaded to Zephyr. _Planned for future._
+# *9. Gearset Validation* — Gearset detects PR, deploys to QA Sandbox, triggers tests, evaluates results. Blocks/allows deployment based on test outcome. _Planned for future._
+
+
+----
+
+h2. 6 QA Lifecycle Phases
+
+_Each phase automated with human review at critical checkpoints._
+
+* *01 — Requirement Analysis* — Extracts acceptance criteria, field definitions, and business rules from Jira work items via API. *Manual review* of requirements before proceeding. _✓ Automated + Manual Review._
+* *02 — Test Case Design* — Generates comprehensive Gherkin (BDD) feature files with positive, negative, and edge case scenarios. *Manual review* of test scenarios required. _✓ Automated + Manual Review._
+* *03 — Test Data Setup* — Creates test data records via Salesforce API with 24+ fields populated. Auto-cleanup included. *Manual review* of test data quality. _✓ Automated + Manual Review._
+* *04 — Test Execution* — Executes UI tests (Playwright) and API tests (REST/JWT) across all integrated systems. *Manual review* of test results and failures. _✓ Automated + Manual Review._
+* *05 — Evidence Generation* — Captures screenshots, generates HTML/JSON reports, uploads evidence to Confluence automatically. *Manual review* of evidence quality. _✓ Automated + Manual Review._
+* *06 — Bug Creation* — Automatically creates Jira bugs for failed tests with reproduction steps and evidence links. *Manual review* of bug details before creation. _Planned._
+
+
+----
+
+h2. Constant Improvement Journey
+
+_From manual QA processes to an intelligent, self-improving automation framework._
+
+* *V2: Manual QA Processes* — Started with manual test case creation, manual execution, and manual reporting. Time-consuming and error-prone. _✓ Foundation._
+* *Automated Test Generation* — AI-powered test case generation from Jira work items. Automated Gherkin feature file creation with positive, negative, and edge case scenarios. _✓ Automated._
+* *Knowledge Base Integration* — Knowledge base capturing domain expertise, field definitions, validation rules, and best practices. Enables consistent, accurate test generation. _✓ Knowledge-Driven._
+* *Better Features & Patterns* — Page Object Model, Field Registry, Test Data Factory, and reusable step definitions. Continuous refinement based on feedback. _✓ Enhanced._
+* *Seamless Integrations* — Integrated with Jira, Zephyr Scale, Confluence, and GitHub. Automated test case upload, result reporting, and evidence capture. Full traceability. _✓ Integrated._
+* *Future: Self-Learning Framework* — Planned: ML-based test optimization, predictive failure analysis, automated test maintenance, and intelligent test data generation. _Planned._
+
+
+----
+
+h2. Technology Stack
+
+_Modern, battle-tested tools for reliable automation._
+
+* *Cucumber.js* — BDD test runner
+* *Playwright* — Browser automation
+* *Axios + JWT* — API testing
+* *TypeScript* — Type-safe code
+* *Custom reports* — HTML/JSON reports
+* *GitHub Actions* — _Planned_
+
+
+----
+
+h2. Command Quick Reference
+
+_Essential commands for the complete automation workflow._
+
+h3. Test generation
+
+{code}
+npm run jira:generate -- --work-item SF-520
+{code}
+Generate UI + API tests.
+
+{code}
+npm run jira:generate -- --work-item SF-520 --type ui
+{code}
+Generate UI tests only.
+
+h3. Test execution
+
+{code}
+npm run test:feature -- --tags "@SF-520"
+{code}
+Run all tests for work item.
+
+{code}
+npm run test:interactive
+{code}
+Run with Playwright Inspector.
+
+h3. Zephyr integration
+
+{code}
+npm run zephyr:UploadTestCase -- --work-item SF-520
+{code}
+Upload test cases.
+
+{code}
+npm run zephyr:UploadResult -- --work-item SF-520
+{code}
+Upload test results.
+
+h3. Validation and cleanup
+
+{code}
+npm run validate:steps -- --work-item SF-520
+{code}
+Validate step definitions.
+
+{code}
+npm run cleanup:accounts
+{code}
+Clean up test data.
+
+
+----
+
+_QA Automation Team | December 2024_
+_Unified E2E testing for the Accelerant / BSG data pipeline_
+
+*More:* [QA Automation Framework – Complete Workflow Guide|https://accelins.atlassian.net/wiki/spaces/TM/pages/2692710418/QA+Automation+Framework+-+Complete+Workflow+Guide]

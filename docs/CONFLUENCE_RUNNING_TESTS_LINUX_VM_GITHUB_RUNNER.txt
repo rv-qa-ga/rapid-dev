@@ -1,0 +1,381 @@
+h1. Running Tests in Linux VM with GitHub Runner
+
+h2. Overview
+
+This document provides a high-level overview of how the E2E Automation Framework executes tests on a Linux VM using a self-hosted GitHub Actions runner. The framework supports automated test execution triggered from GitHub Actions workflows, Jira automation, or manual triggers.
+
+h2. Architecture
+
+h3. Infrastructure Components
+
+* *VM Location*: UK South region (Azure)
+* *VM Name*: vm-p-qat-ukw-01
+* *OS*: Ubuntu 20.04 LTS or 22.04 LTS
+* *Runner Type*: Self-hosted GitHub Actions runner
+* *Runner User*: github-runner (dedicated user with passwordless sudo)
+* *Runner Labels*: self-hosted, Linux, X64
+
+h3. Execution Flow
+
+# GitHub Actions Workflow Trigger
+# Self-Hosted Runner (Linux VM)
+# Code Checkout & Environment Setup
+# Dependency Installation (Node.js, npm, Playwright)
+# Test Execution (Playwright + Cucumber)
+# Results Upload (Zephyr Scale + GitHub Artifacts)
+
+h2. VM and Runner Setup
+
+h3. Prerequisites
+
+* *VM Specifications*:
+** Minimum: Standard_B2s (2 vCPUs, 4 GB RAM)
+** Disk: Minimum 30 GB SSD
+** Network: Outbound internet access, Port 443 (HTTPS) open
+
+* *System Configuration*:
+** Node.js 20.x installed
+** npm installed
+** Playwright system dependencies installed
+** Git configured
+** Passwordless sudo for github-runner user
+
+h3. GitHub Runner Configuration
+
+* *Runner Directory*: ~/actions-runner
+* *Service Name*: actions.runner.rv-qa-ga-rapid-dev.vm-p-qat-ukw-01.service
+* *Service Status*: Running as systemd service, auto-starts on boot
+* *Repository*: rv-qa-ga/rapid-dev
+
+h3. Runner Management
+
+*Check Runner Status*:
+{code:bash}
+sudo systemctl status actions.runner.*.service
+{code}
+
+*View Runner Logs*:
+{code:bash}
+sudo journalctl -u actions.runner.*.service -f
+{code}
+
+*Restart Runner*:
+{code:bash}
+sudo systemctl restart actions.runner.*.service
+{code}
+
+h2. Workflow Configuration
+
+h3. Available Workflows
+
+The framework includes multiple GitHub Actions workflows that run on the self-hosted runner:
+
+# *E2E Tests* (.github/workflows/e2e-tests.yml)
+** Manual trigger with flexible inputs
+** Supports work item tags, feature files, test types
+** Environment selection (dev, qa, uat)
+
+# *Regression Tests* (.github/workflows/regression-tests.yml)
+** Scheduled: Daily at 2 AM UTC
+** Manual trigger available
+** Runs full regression suite
+
+# *Tag-Based Tests* (.github/workflows/tag-based-tests.yml)
+** Manual trigger with tag selection
+** Supports smoke, regression, P1/P2/P3, UI/API tags
+
+# *Test Runner* (.github/workflows/test-runner.yml)
+** Diagnostic workflow to verify runner functionality
+
+h3. Workflow Execution Steps
+
+Each workflow follows a standardized execution pattern:
+
+# *Checkout Code*
+** Checks out specified branch (default: main or trigger branch)
+
+# *Setup Node.js*
+** Installs Node.js 20.x
+** Configures npm cache
+
+# *Install System Dependencies*
+** Installs Playwright system dependencies (libnss3, libatk-bridge2.0-0, etc.)
+** Required for headless browser execution
+
+# *Install Project Dependencies*
+** Runs npm ci to install all npm packages
+** Ensures consistent dependency versions
+
+# *Install Playwright Browsers*
+** Installs Chromium browser with dependencies
+** Required for UI test execution
+
+# *Copy Credentials* (Secure)
+** Copies .env.qa from /home/github-runner/.env.qa if available
+** Copies certificates from /home/github-runner/certs/ if available
+** Sets restrictive permissions (600) on all sensitive files
+
+# *Run Tests*
+** Executes tests based on workflow inputs
+** Supports multiple test types: UI, API, Salesforce, Dynamics, SQL Server
+** Supports tag-based filtering and feature file selection
+
+# *Upload Results*
+** Uploads test results to Zephyr Scale (if configured)
+** Uploads test artifacts to GitHub Actions
+** Generates test summary
+
+h2. Test Execution
+
+h3. Test Types Supported
+
+* *UI Tests*: Playwright-based browser automation
+* *API Tests*: REST API testing
+* *Salesforce Tests*: Salesforce-specific UI and API tests
+* *Dynamics Tests*: Dynamics 365-specific tests
+* *SQL Server Tests*: Database validation tests
+* *Smoke Tests*: Quick validation tests
+* *Regression Tests*: Full test suite
+
+h3. Execution Modes
+
+*By Work Item*:
+{code:bash}
+npm run test:feature -- --tags "@SF-506"
+{code}
+
+*By Tag*:
+{code:bash}
+npm run test:tag:smoke
+npm run test:tag:regression
+{code}
+
+*By Feature File*:
+{code:bash}
+npm run test:feature -- src/features/ui/SF/SF-523.feature
+{code}
+
+*By Test Type*:
+{code:bash}
+npm run test:ui
+npm run test:api
+npm run test:salesforce
+{code}
+
+h3. Environment Configuration
+
+Tests support multiple environments:
+* *dev*: Development environment
+* *qa*: QA environment (default)
+* *uat*: UAT environment
+
+Environment is set via workflow input or ENV environment variable.
+
+h2. Security and Credentials Management
+
+h3. Credential Storage
+
+*On VM* (Persistent):
+* .env.qa file: /home/github-runner/.env.qa
+* Certificates: /home/github-runner/certs/
+* Permissions: 600 (owner read/write only)
+
+*In GitHub* (Secrets):
+* Salesforce credentials (JWT client ID, username, private key)
+* Atlassian credentials (email, API token)
+* Zephyr credentials (base URL, project key)
+* Confluence credentials (base URL, space key)
+
+h3. Security Best Practices
+
+* ✅ Credentials never committed to repository
+* ✅ All sensitive files have restrictive permissions (600)
+* ✅ Environment files copied at runtime, not stored in workspace
+* ✅ Certificates stored separately from code
+* ✅ GitHub Secrets used for sensitive configuration
+* ✅ Runner runs as dedicated user (github-runner)
+
+h2. Monitoring and Troubleshooting
+
+h3. Check Workflow Status
+
+# *GitHub Actions Tab*:
+** Navigate to repository → Actions tab
+** View workflow runs and execution logs
+** Check each step for errors
+
+# *Runner Status*:
+** Repository → Settings → Actions → Runners
+** Verify runner shows "Idle" or "Active" status
+
+h3. Common Issues
+
+*Issue: Workflow not triggering*
+* Verify runner is online in GitHub UI
+* Check workflow file syntax
+* Verify trigger conditions are met
+
+*Issue: Authentication failures*
+* Check .env.qa file exists on VM at /home/github-runner/.env.qa
+* Verify file permissions (should be 600)
+* Check GitHub Secrets are configured correctly
+
+*Issue: Certificate errors*
+* Verify certificates exist in /home/github-runner/certs/
+* Check certificate file permissions (should be 600)
+* Verify certificate format is correct
+
+*Issue: Runner offline*
+* SSH into VM and check service status
+* Restart runner service if needed
+* Check runner logs for errors
+
+*Issue: Tests failing*
+* Check test execution logs in GitHub Actions
+* Verify environment variables are set correctly
+* Check test data availability
+* Review test reports in artifacts
+
+h3. Diagnostic Commands
+
+*On VM* (SSH access):
+{code:bash}
+# Check runner service status
+sudo systemctl status actions.runner.*.service
+
+# View runner logs
+sudo journalctl -u actions.runner.*.service -f
+
+# Check Node.js version
+node --version
+
+# Check npm version
+npm --version
+
+# Check disk space
+df -h
+
+# Check memory
+free -h
+
+# Verify .env.qa exists
+ls -la /home/github-runner/.env.qa
+
+# Verify certificates exist
+ls -la /home/github-runner/certs/
+{code}
+
+h2. Triggering Tests
+
+h3. Method 1: GitHub Actions UI
+
+# Navigate to repository → Actions tab
+# Select workflow (e.g., "E2E Automation Tests")
+# Click "Run workflow"
+# Fill in inputs:
+** Work item (e.g., SF-506)
+** Test type (all, ui, api, etc.)
+** Environment (dev, qa, uat)
+** Branch (optional)
+# Click "Run workflow"
+
+h3. Method 2: Jira Automation
+
+# Open Jira work item (Story or Bug)
+# Click manual trigger button (if configured)
+# Workflow automatically triggers with work item ID
+# Monitor execution in GitHub Actions
+
+h3. Method 3: API Call
+
+{code:bash}
+curl -X POST \
+  -H "Authorization: token YOUR_GITHUB_TOKEN" \
+  -H "Accept: application/vnd.github.v3+json" \
+  https://api.github.com/repos/rv-qa-ga/rapid-dev/actions/workflows/e2e-tests.yml/dispatches \
+  -d '{
+    "ref": "main",
+    "inputs": {
+      "work_item": "SF-506",
+      "environment": "qa",
+      "test_type": "all"
+    }
+  }'
+{code}
+
+h2. Test Results and Artifacts
+
+h3. Results Location
+
+* *GitHub Actions*: Test artifacts uploaded automatically
+* *Zephyr Scale*: Test results uploaded to test cycles
+* *Local Reports*: Available in reports/ directory on VM
+
+h3. Artifact Retention
+
+* *GitHub Artifacts*: 30 days retention
+* *Test Reports*: JSON and HTML formats
+* *Screenshots*: Captured for failed tests (if enabled)
+* *Evidence*: Captured for test steps (if enabled)
+
+h3. Viewing Results
+
+# *GitHub Actions*:
+** Go to workflow run → Artifacts section
+** Download test reports and screenshots
+
+# *Zephyr Scale*:
+** Navigate to test cycle
+** View execution results and status
+
+# *Local Reports*:
+** SSH into VM
+** Navigate to workspace directory
+** Check reports/ folder
+
+h2. Best Practices
+
+h3. Workflow Execution
+
+* ✅ Use specific work item tags when possible (faster execution)
+* ✅ Run smoke tests before full regression
+* ✅ Monitor workflow execution time (timeout: 90 minutes)
+* ✅ Check artifacts after test completion
+
+h3. Maintenance
+
+* ✅ Monitor runner service status regularly
+* ✅ Check disk space on VM periodically
+* ✅ Review workflow execution logs for errors
+* ✅ Update runner software when needed
+* ✅ Rotate credentials periodically
+
+h3. Performance
+
+* ✅ Use concurrency groups to prevent duplicate runs
+* ✅ Queue workflows instead of canceling (prevents data loss)
+* ✅ Use npm cache for faster dependency installation
+* ✅ Keep Playwright browsers updated
+
+h2. Related Documentation
+
+* *VM Setup Guide*: Complete setup instructions for VM and runner
+* *Jira Integration*: How to configure Jira automation triggers
+* *SSH Troubleshooting*: Guide for connecting to VM
+* *Workflow Reference*: Detailed workflow configuration options
+
+h2. Support
+
+For issues or questions:
+
+# Check workflow execution logs in GitHub Actions
+# Review runner service logs on VM
+# Verify Jira automation rule configuration (if using Jira triggers)
+# Check GitHub Actions runner status page
+# Review test execution output and error messages
+
+---
+
+*Last Updated*: [Date]
+*Maintained By*: QA Automation Team
+*VM*: vm-p-qat-ukw-01 (UK South)

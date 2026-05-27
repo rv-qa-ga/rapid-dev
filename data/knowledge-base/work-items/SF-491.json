@@ -1,0 +1,48 @@
+{
+  "key": "SF-491",
+  "summary": "AnnualRevenue only appears for Member MGA and Non-Member MGA Accounts",
+  "type": "Story",
+  "status": "In QA",
+  "priority": "Medium",
+  "description": {
+    "raw": "User Story: As a Product Owner/Business Analyst I want the AnnualRevenue field on Account to appear only on accounts classified as Member MGA or Non-Member MGA So that users only see AnnualRevenue where it is relevant and we reduce confusion and incorrect data entry on other account types Description / Scope: Make the Account field AnnualRevenue visible in the Account UI and related creation surfaces only when the Account is classified as Member MGA or Non-Member MGA. This covers Lightning record pages (Dynamic Forms), page layouts, related list/new buttons, quick actions, compact/layouts, list views and search highlights. The field remains in the schema (not deleted) and system/admin users must still be able to view and report  on it.  Acceptance Criteria (GIVEN / WHEN / THEN): UI visibility — Member MGA & Non-Member MGA GIVEN an Account classified as Member MGA or Non-Member MGA WHEN a standard user opens the Account record in Lightning Experience THEN AnnualRevenue is visible on the record page and available in the Account edit/create flow UI hidden — other account types GIVEN an Account of any other type (not Member MGA or Non-Member MGA) WHEN a standard user opens or edits the Account record THEN AnnualRevenue is not shown anywhere on the record page, is not available to add via page personalization, and is not displayed in compact highlights/list views for that user Quick actions / New Opportunity / Related creation surfaces GIVEN Member MGA/Non-Member MGA Account WHEN a user uses Account quick actions or related-list New buttons to create related records THEN AnnualRevenue is available in the creation form where appropriate GIVEN other Account types WHEN a user uses those creation surfaces THEN AnnualRevenue is not displayed in the creation form Search / compact / list views GIVEN a non-admin user performs global search or views shared list/compact views on non-MGA accounts WHEN the UI renders results THEN AnnualRevenue is not surfaced for non-MGA accounts; for MGA accounts it appears according to configured compact/list definitions Reports & Dashboards GIVEN a standard user building or viewing reports WHEN they view Account-level reports filtered for non-MGA accounts THEN AnnualRevenue is not shown as a relevant field in those reports (report owners are responsible for report configuration); admins retain ability to report across account types API / integrations / automation alignment GIVEN an API call, integration, Flow or scheduled job that reads or writes AnnualRevenue for an Account that is not Member/Non-Member MGA WHEN that call runs THEN the integration respects the business rule (either does not set/display AnnualRevenue for non-MGA accounts or runs under a designated system/integration user and is approved), and any changes are audited; integrations that must write the field for non-MGA accounts require an approved exception",
+    "parsed": {
+      "sentences": [
+        "User Story: As a Product Owner/Business Analyst I want the AnnualRevenue field on Account to appear only on accounts classified as Member MGA or Non-Member MGA So that users only see AnnualRevenue where it is relevant and we reduce confusion and incorrect data entry on other account types Description / Scope: Make the Account field AnnualRevenue visible in the Account UI and related creation surfaces only when the Account is classified as Member MGA or Non-Member MGA",
+        "This covers Lightning record pages (Dynamic Forms), page layouts, related list/new buttons, quick actions, compact/layouts, list views and search highlights",
+        "The field remains in the schema (not deleted) and system/admin users must still be able to view and report  on it",
+        "Acceptance Criteria (GIVEN / WHEN / THEN): UI visibility — Member MGA & Non-Member MGA GIVEN an Account classified as Member MGA or Non-Member MGA WHEN a standard user opens the Account record in Lightning Experience THEN AnnualRevenue is visible on the record page and available in the Account edit/create flow UI hidden — other account types GIVEN an Account of any other type (not Member MGA or Non-Member MGA) WHEN a standard user opens or edits the Account record THEN AnnualRevenue is not shown anywhere on the record page, is not available to add via page personalization, and is not displayed in compact highlights/list views for that user Quick actions / New Opportunity / Related creation surfaces GIVEN Member MGA/Non-Member MGA Account WHEN a user uses Account quick actions or related-list New buttons to create related records THEN AnnualRevenue is available in the creation form where appropriate GIVEN other Account types WHEN a user uses those creation surfaces THEN AnnualRevenue is not displayed in the creation form Search / compact / list views GIVEN a non-admin user performs global search or views shared list/compact views on non-MGA accounts WHEN the UI renders results THEN AnnualRevenue is not surfaced for non-MGA accounts; for MGA accounts it appears according to configured compact/list definitions Reports & Dashboards GIVEN a standard user building or viewing reports WHEN they view Account-level reports filtered for non-MGA accounts THEN AnnualRevenue is not shown as a relevant field in those reports (report owners are responsible for report configuration); admins retain ability to report across account types API / integrations / automation alignment GIVEN an API call, integration, Flow or scheduled job that reads or writes AnnualRevenue for an Account that is not Member/Non-Member MGA WHEN that call runs THEN the integration respects the business rule (either does not set/display AnnualRevenue for non-MGA accounts or runs under a designated system/integration user and is approved), and any changes are audited; integrations that must write the field for non-MGA accounts require an approved exception"
+      ],
+      "entities": [
+        "Account",
+        "Opportunity",
+        "Product"
+      ],
+      "fields": [
+        "AnnualRevenue"
+      ],
+      "actions": [
+        "display",
+        "show",
+        "create",
+        "delete"
+      ]
+    }
+  },
+  "acceptanceCriteria": [],
+  "comments": [],
+  "relatedIssues": [],
+  "fieldDefinitions": {
+    "AnnualRevenue": {
+      "type": "Text",
+      "required": false,
+      "description": "Field: AnnualRevenue"
+    }
+  },
+  "generatedFeatures": {
+    "ui": "src/features/ui/SF/SF-491.feature",
+    "api": "src/features/api/SF/SF-491.feature"
+  },
+  "qaReviewedFeatures": {},
+  "extractedAt": "2025-12-17T18:40:37.475Z"
+}

@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pipeline Testing – Future-Proof Test Architecture</title>
+  <style type="text/css">
+    body { font-family: Arial, sans-serif; line-height: 1.5; color: #333; max-width: 920px; margin: 0 auto; padding: 20px; }
+    h1 { color: #172b4d; border-bottom: 2px solid #0052cc; padding-bottom: 8px; font-size: 1.75em; }
+    h2 { color: #172b4d; margin-top: 28px; font-size: 1.35em; }
+    h3 { color: #42526e; margin-top: 18px; font-size: 1.15em; }
+    p { margin: 8px 0; }
+    ul { margin: 8px 0; padding-left: 24px; }
+    li { margin: 4px 0; }
+    table { border-collapse: collapse; width: 100%; margin: 12px 0; font-size: 14px; }
+    th, td { border: 1px solid #dfe1e6; padding: 8px 12px; text-align: left; }
+    th { background: #f4f5f7; color: #172b4d; font-weight: 600; }
+    tr:nth-child(even) { background: #fafafa; }
+    .review-banner { background: #e3fcef; border: 2px solid #00875a; padding: 12px 16px; border-radius: 4px; margin-bottom: 20px; font-weight: 600; color: #172b4d; }
+    hr { border: none; border-top: 1px solid #dfe1e6; margin: 24px 0; }
+    code { background: #f4f5f7; padding: 2px 6px; border-radius: 3px; font-size: 13px; }
+    pre { background: #f4f5f7; padding: 12px; overflow: auto; font-size: 13px; border-radius: 4px; line-height: 1.4; }
+    .meta { color: #5e6c84; font-size: 14px; margin-top: 8px; }
+  </style>
+</head>
+<body>
+
+<div class="review-banner">📐 Future-proof vision – Test architect perspective. Long-term strategy for ADP → MuleSoft → downstream. Source: docs/lloyds/LLOYDS_PIPELINE_TEST_ARCHITECTURE_FUTURE_PROOF.md</div>
+
+<h1>Pipeline Testing – Future-Proof Test Architecture</h1>
+<p class="meta"><strong>Vision document for testing ADP → MuleSoft → downstream systems</strong></p>
+
+<p>This document describes an <strong>ideal, long-term testing approach</strong> for the data pipeline: <strong>ADP (source) → MuleSoft (orchestration) → downstream systems</strong>. It is written from a <strong>test-architect perspective</strong>, assuming we can evolve or rewrite the automation solution. The goal is a strategy that remains valid when <strong>all data flows in a unified way</strong> (like Lloyd's today) and when <strong>ODS/TDS or other current systems are deprecated</strong> and replaced by new destinations (data lakes, new ERPs, event hubs, etc.).</p>
+
+<hr />
+
+<h2>1. Long-Term Assumptions</h2>
+<table>
+  <thead>
+    <tr><th>Assumption</th><th>Implication for testing</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><strong>Unified data flow</strong></td><td>All data will eventually follow the same pattern: source (ADP) → integration layer (MuleSoft or successor) → one or more destinations. Tests should be <strong>flow-centric</strong>, not system-centric (e.g. "Flow: Tagetik" rather than "ODS/TDS").</td></tr>
+    <tr><td><strong>ODS/TDS may become obsolete</strong></td><td>Assertions must not <strong>depend on</strong> ODS/TDS schema or presence. Prefer <strong>contracts</strong>, <strong>orchestrator logs/traces</strong>, and <strong>destination-agnostic checks</strong> (e.g. "orchestrator delivered payload to destination X") over "query ODS table Y."</td></tr>
+    <tr><td><strong>New destinations will appear</strong></td><td>Adding a new downstream (e.g. new ERP, data lake) should require <strong>new contracts + new boundary tests</strong>, not a rewrite of the test framework.</td></tr>
+    <tr><td><strong>Orchestrator is the stable hub</strong></td><td>MuleSoft (or future integration layer) is the single place we <strong>trigger</strong> and <strong>observe</strong> the pipeline. Tests that trigger at the orchestrator and assert on its outputs (logs, outbound calls, events) remain valid regardless of what sits behind each destination.</td></tr>
+    <tr><td><strong>Framework can be rewritten</strong></td><td>Recommendations below are <strong>architecture-first</strong>; they do not assume the current codebase. Implement when building or refactoring the automation solution.</td></tr>
+  </tbody>
+</table>
+
+<hr />
+
+<h2>2. Pipeline Model (What We Are Testing)</h2>
+<p>We test a <strong>pipeline</strong>, not a set of siloed systems:</p>
+<pre>   ┌─────────┐      ┌─────────────┐      ┌──────────────────────────────────────┐
+   │   ADP   │ ───► │  MuleSoft   │ ───► │  Downstream A  (e.g. Tagetik loader)  │
+   │ (source)│      │(orchestrator)│      │  Downstream B  (e.g. ResQ loader)    │
+   └─────────┘      │              │      │  Downstream C  (e.g. Kafka / D365)   │
+                    │  • Route     │      │  … future destinations               │
+                    │  • Transform │      └──────────────────────────────────────┘
+                    │  • Emit      │
+                    └─────────────┘</pre>
+<ul>
+  <li><strong>Source:</strong> ADP (or future source systems). Emits events/payloads that the orchestrator consumes.</li>
+  <li><strong>Orchestrator:</strong> MuleSoft. Responsibilities: receive from source, route by payload type, transform, call downstream APIs or publish to queues/topics.</li>
+  <li><strong>Destinations:</strong> Today: TDS loaders, ODS, Kafka, D365, ResQ, Tagetik system, etc. Tomorrow: any system that receives data from the orchestrator. <strong>We do not tie the testing strategy to a specific destination technology</strong> (e.g. SQL Server); we tie it to <strong>boundaries</strong> (orchestrator → destination N).</li>
+</ul>
+<p>When ODS/TDS are retired, the <strong>same model</strong> holds: we still have source → orchestrator → destinations. Only the implementation of "destination" changes.</p>
+
+<hr />
+
+<h2>3. Principles of a Future-Proof Testing Strategy</h2>
+<table>
+  <thead>
+    <tr><th>Principle</th><th>Description</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><strong>Contract-first</strong></td><td>Define and test <strong>contracts</strong> at every boundary: what ADP emits, what MuleSoft expects, what each downstream expects. When a new destination is added, we add a contract and tests for that boundary—no big rewrite.</td></tr>
+    <tr><td><strong>Flow-centric</strong></td><td>Organise tests by <strong>flow</strong> (e.g. Tagetik flow, ResQ flow, Dynamics F&O flow). A flow = one path from source (or trigger) to one or more destinations. Tag and select tests by flow and layer.</td></tr>
+    <tr><td><strong>One boundary at a time</strong></td><td>Integration tests validate <strong>one hop</strong>: e.g. ADP → MuleSoft, or MuleSoft → Destination A. Avoid tests that implicitly depend on multiple systems' internals unless that is an explicit pipeline slice.</td></tr>
+    <tr><td><strong>Observability over persistence</strong></td><td>Prefer asserting on <strong>orchestrator logs, traces, and outbound calls</strong> over asserting on a specific database table. When ODS/TDS are replaced, log/trace assertions still apply; DB assertions may not.</td></tr>
+    <tr><td><strong>Destination-agnostic assertions</strong></td><td>Express expectations as "orchestrator delivered payload P to destination D" (e.g. via mock, stub, or trace) rather than "row exists in [TDS].[dbo].[X]." The <strong>mechanism</strong> of "destination D" can change (DB today, API or event tomorrow).</td></tr>
+    <tr><td><strong>Configuration-driven</strong></td><td>Flows, environments, endpoints, and feature flags are <strong>config</strong>. Adding/removing a flow or a destination is a config change plus the tests for that flow; the core framework stays stable.</td></tr>
+    <tr><td><strong>Test doubles for destinations</strong></td><td>Where possible, use <strong>mocks or stubs</strong> for downstream systems so tests do not depend on ODS/TDS availability or schema. Optional: run a smaller set of tests against real destinations (e.g. pre-prod) for confidence.</td></tr>
+    <tr><td><strong>Minimal end-to-end</strong></td><td>Full E2E is expensive and brittle. Use it only for a <strong>small set of critical paths</strong>. Prefer <strong>pipeline slices</strong> (trigger at orchestrator → assert one or two boundaries) over full E2E.</td></tr>
+  </tbody>
+</table>
+
+<hr />
+
+<h2>4. Test Layers (Ideal Pyramid)</h2>
+<pre>        ┌─────────────────────────────────────┐
+        │  L4  Minimal E2E                     │  Full path, real systems, few scenarios
+        ├─────────────────────────────────────┤
+        │  L3  Pipeline slices                 │  Multi-hop: trigger orchestrator →
+        │      (optional)                      │  assert 1–2 boundaries (e.g. log + one destination)
+        ├─────────────────────────────────────┤
+        │  L2  Boundary (integration) tests   │  One hop: trigger one side, assert other
+        │      ADP↔MuleSoft, MuleSoft↔Dest N   │  Use test doubles where appropriate
+        ├─────────────────────────────────────┤
+        │  L1  Contract &amp; health               │  Schemas, API contracts, orchestrator health,
+        │                                      │  "orchestrator is up and loggable"
+        └─────────────────────────────────────┘</pre>
+<ul>
+  <li><strong>L1 – Contract and health:</strong> Fast, many. Validate source and orchestrator contracts (payload schemas, API shapes); orchestrator health and log/trace accessibility. No dependency on downstream systems.</li>
+  <li><strong>L2 – Boundary tests:</strong> One boundary per scenario. E.g. "when ADP publishes event E, MuleSoft log shows flow F executed"; "when MuleSoft is triggered with payload P, destination D receives P (or mock records call)." Destinations can be real or doubled.</li>
+  <li><strong>L3 – Pipeline slices:</strong> Optional. Trigger at orchestrator with test payload; assert on orchestrator logs and one (or two) destinations. Short multi-hop, no full user journey.</li>
+  <li><strong>L4 – E2E:</strong> Minimal. Only for business-critical paths; full source → orchestrator → real destination(s) → business outcome.</li>
+</ul>
+<p>When ODS/TDS are removed, <strong>L1 and L2 remain unchanged</strong> in concept; only the implementation of "destination" in L2/L3 changes.</p>
+
+<hr />
+
+<h2>5. What to Test at Each Boundary</h2>
+
+<h3>5.1 Source → Orchestrator (ADP → MuleSoft)</h3>
+<table>
+  <thead>
+    <tr><th>What to test</th><th>How (future-proof)</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><strong>Contract</strong></td><td>ADP event/payload conforms to schema expected by MuleSoft. Automated schema validation.</td></tr>
+    <tr><td><strong>Reach</strong></td><td>When ADP publishes (or we simulate publish), MuleSoft receives and logs the event (e.g. correlation ID in logs). Assert on <strong>orchestrator logs</strong>, not on a DB.</td></tr>
+    <tr><td><strong>Routing</strong></td><td>For a given payload type, MuleSoft triggers the correct flow (e.g. Tagetik vs ResQ). Assert via logs/traces.</td></tr>
+  </tbody>
+</table>
+<p>No dependency on ODS/TDS.</p>
+
+<h3>5.2 Orchestrator → Destination (MuleSoft → each downstream)</h3>
+<table>
+  <thead>
+    <tr><th>What to test</th><th>How (future-proof)</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><strong>Contract</strong></td><td>Payload sent to destination conforms to that destination's contract (schema or API spec). Prefer contract tests against a stub/mock.</td></tr>
+    <tr><td><strong>Delivery</strong></td><td>When MuleSoft runs with test input, it <strong>attempts</strong> to deliver to the right destination (assert via orchestrator log/trace or outbound call capture).</td></tr>
+    <tr><td><strong>Content</strong></td><td>If using a test double: mock records that it received the expected payload. If using real destination: assert minimal outcome without tying to current ODS/TDS schema.</td></tr>
+  </tbody>
+</table>
+<p>When a destination is retired (e.g. ODS), remove or redirect its tests; when a new destination is added, add contract + delivery tests for that boundary.</p>
+
+<h3>5.3 Orchestrator health and observability</h3>
+<table>
+  <thead>
+    <tr><th>What to test</th><th>How (future-proof)</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><strong>Health</strong></td><td>Orchestrator is up and responsive (e.g. MuleSoft app status, health endpoint).</td></tr>
+    <tr><td><strong>Logs/traces</strong></td><td>We can query orchestrator logs/traces by flow, correlation ID, or time range. Enables L2 assertions without touching destinations.</td></tr>
+    <tr><td><strong>Idempotency / retries</strong></td><td>If the orchestrator supports retries or idempotency keys, test with duplicate events and assert expected behaviour.</td></tr>
+  </tbody>
+</table>
+<p>These tests do not depend on any specific destination.</p>
+
+<hr />
+
+<h2>6. Flow-Centric Test Design</h2>
+<p>A <strong>flow</strong> is one path through the pipeline (e.g. "Tagetik flow": trigger → MuleSoft → Tagetik destination). Flows are first-class in the test design.</p>
+<table>
+  <thead>
+    <tr><th>Flow</th><th>Source / trigger</th><th>Orchestrator behaviour</th><th>Destination(s)</th><th>Tests (future-proof)</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><strong>Tagetik</strong></td><td>ADP (or simulated)</td><td>Route, transform, call Tagetik loader</td><td>Tagetik loader (today: e.g. TDS; tomorrow: any)</td><td>L1: MuleSoft contract &amp; health. L2: ADP→MuleSoft, MuleSoft→Tagetik (assert log or mock/real dest). L3 optional slice.</td></tr>
+    <tr><td><strong>ResQ</strong></td><td>ADP (or simulated)</td><td>Route, transform, call ResQ loader</td><td>ResQ loader</td><td>Same pattern: L1 + L2 (+ optional L3).</td></tr>
+    <tr><td><strong>Dynamics F&amp;O</strong></td><td>ADP / D365 (or simulated)</td><td>Lloyds XML flow, journal posting</td><td>Kafka, ODS/D365 (today); later whatever replaces them</td><td>L1 + L2 for each boundary; assert on logs/Kafka/API, not on ODS schema long term.</td></tr>
+    <tr><td><strong>Future flow</strong></td><td>Any</td><td>New routing/transform</td><td>New destination</td><td>Add new flow in config; add L1 contract + L2 boundary tests for orchestrator → new destination.</td></tr>
+  </tbody>
+</table>
+<p><strong>Regression:</strong> "Existing flows still work" is a set of L2 (and optionally L3) tests per flow. <strong>Data partitioning (e.g. Lloyd's vs non-Lloyds):</strong> Model as <strong>routing rules</strong> and <strong>payload type</strong>; tests validate routing without hardcoding "ODS" in the core framework.</p>
+
+<hr />
+
+<h2>7. Ideal Framework Capabilities (If We Rewrite or Evolve)</h2>
+<p>These are the <strong>capabilities</strong> a future-proof automation solution should have. They are independent of the current framework.</p>
+<table>
+  <thead>
+    <tr><th>Capability</th><th>Purpose</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><strong>Flow registry</strong></td><td>Config or code that lists flows, their source trigger, orchestrator flow name(s), and destination(s). Tests are generated or selected by flow. New flow = new entry + new tests.</td></tr>
+    <tr><td><strong>Contract store</strong></td><td>Schemas (or API specs) for source events, orchestrator inputs/outputs, and each destination. L1 contract tests validate payloads against these.</td></tr>
+    <tr><td><strong>Orchestrator client</strong></td><td>Trigger a flow (e.g. with test payload), query logs/traces by correlation ID or flow name. No dependency on destination implementation.</td></tr>
+    <tr><td><strong>Boundary test primitives</strong></td><td>Reusable steps: "publish test event to source (or simulate)," "trigger orchestrator with payload," "assert orchestrator log contains X," "assert destination received Y" (via mock, trace, or real). Destination is pluggable (mock vs real).</td></tr>
+    <tr><td><strong>Test doubles</strong></td><td>Mocks or stubs for downstream systems so L2 (and L3) tests can run without ODS/TDS or other real systems. Optional real-destination runs for a subset of tests.</td></tr>
+    <tr><td><strong>Config-driven environments</strong></td><td>Environments (dev, test, pre-prod) and endpoints come from config. No hardcoded ODS/TDS connection strings in test logic; only "destination Tagetik" or "destination ResQ."</td></tr>
+    <tr><td><strong>Observability adapter</strong></td><td>Abstract over "how we observe the orchestrator" (e.g. MuleSoft logs today, OpenTelemetry tomorrow). Tests assert on the adapter, not on a specific log format or DB.</td></tr>
+  </tbody>
+</table>
+
+<hr />
+
+<h2>8. Evolution Path (From Today to Future-Proof)</h2>
+<table>
+  <thead>
+    <tr><th>Phase</th><th>Focus</th><th>ODS/TDS role</th><th>Testing approach</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><strong>Phase 1 (current)</strong></td><td>Deliver Lloyd's flows; stabilise automation</td><td>Use ODS/TDS where needed for assertions</td><td>L1 + L2 where possible; assert on MuleSoft logs; use DB assertions for ODS/TDS where no alternative yet. Document which tests depend on ODS/TDS.</td></tr>
+    <tr><td><strong>Phase 2 (transition)</strong></td><td>Reduce dependency on specific destinations</td><td>Introduce test doubles; keep some real-DB checks</td><td>Add mocks/stubs for key destinations; move L2 assertions to "orchestrator log + mock" or "orchestrator log + optional real check." Identify all ODS/TDS-dependent tests and add observability-based alternatives.</td></tr>
+    <tr><td><strong>Phase 3 (future)</strong></td><td>All data flows uniformly; ODS/TDS deprecated</td><td>No dependency on ODS/TDS</td><td>L1/L2 fully contract- and observability-driven; destinations are pluggable (mock by default, real in selected envs). New flows added via flow registry + new boundary tests.</td></tr>
+  </tbody>
+</table>
+<p>This path allows the <strong>same test architecture</strong> to hold across phases; only the implementation of "destination" and the choice of mock vs real change.</p>
+
+<hr />
+
+<h2>9. Summary: What Makes This Approach Future-Proof</h2>
+<table>
+  <thead>
+    <tr><th>Aspect</th><th>Future-proof choice</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><strong>Model</strong></td><td>Pipeline = source → orchestrator → destinations. Tests are flow-centric and boundary-based.</td></tr>
+    <tr><td><strong>Assertions</strong></td><td>Prefer orchestrator logs/traces and destination-agnostic "delivered to X"; avoid hardcoding ODS/TDS schema.</td></tr>
+    <tr><td><strong>New destinations</strong></td><td>Add contract + L2 boundary tests; no framework rewrite.</td></tr>
+    <tr><td><strong>Retired systems</strong></td><td>Remove or redirect tests for that destination; L1 and other L2 tests unchanged.</td></tr>
+    <tr><td><strong>Framework</strong></td><td>Flow registry, contract store, orchestrator client, boundary primitives, optional test doubles, config-driven. Can be implemented in current or new codebase.</td></tr>
+    <tr><td><strong>E2E</strong></td><td>Minimal; prefer L2 and optional L3 slices.</td></tr>
+  </tbody>
+</table>
+<p>By designing for <strong>flows and boundaries</strong> rather than for <strong>current systems (ODS/TDS)</strong>, the testing solution remains valid as the pipeline evolves and as data flows uniformly from ADP via MuleSoft to whatever downstream systems exist in the future.</p>
+
+<hr />
+<p class="meta"><em>Document: Pipeline Testing – Future-Proof Test Architecture. Purpose: Long-term test strategy for ADP → MuleSoft → downstream; independent of current framework and current destination implementations (e.g. ODS/TDS).</em></p>
+
+</body>
+</html>

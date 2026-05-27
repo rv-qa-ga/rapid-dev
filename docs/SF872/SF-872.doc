@@ -1,0 +1,2706 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>[#SF-872] 12. Create Salesforce Product Reference Data Objects To Manage RDM Values</title>
+    <meta http-equiv="Content-Type" Content="application/vnd.ms-word; charset=UTF-8">
+        <style type="text/css">
+
+.tableBorder, .grid
+{
+    background-color: #fff;
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.tableBorder td, .grid td
+{
+    vertical-align: top;
+    padding: 2px;
+    border: 1px solid #ccc;
+}
+
+.noPadding
+{
+    padding: 0 !important;
+}
+
+h3 .subText
+{
+    font-size: 60%;
+    font-weight: normal;
+}
+
+.tabLabel
+{
+    font-weight: bold;
+    border: 1px solid #ccc;
+    border-bottom:none;
+    padding: 2px;
+    display: inline;
+}
+
+td.blank
+{
+    padding: 0;
+    margin: 0;
+}
+
+.blank td
+{
+    border: none;
+}
+
+#descriptionArea
+{
+    margin: 0;
+    padding: 2px;
+    border: 1px solid #ccc;
+}
+
+hr
+{
+    border-top:1px solid #aaa;
+}
+
+hr.fullcontent
+{
+  height: 15px;
+  padding: 10px 0;
+  background: #fff url('https://accelins.atlassian.net/images/icons/hr.gif') no-repeat scroll center;
+}
+
+</style>
+
+</head>
+<body>
+
+<table class="tableBorder" cellpadding="0" cellspacing="0" border="0" width="100%">
+    <tr>
+        <td bgcolor="#f0f0f0" width="100%" colspan="2" valign="top">
+                            <b><a id="parent_issue_summary" href="https://accelins.atlassian.net/browse/SF-308">MO - Product Mapping / Coding</a></b>
+                <span style="font-size: 9px">(<a id="parent_issue_key" href="https://accelins.atlassian.net/browse/SF-308">SF-308</a>)</span>
+                <h3 class="formtitle"><img src="https://accelins.atlassian.net/images/icons/link_out_bot.gif" width="16" height="16" />
+                        [SF-872]&nbsp;<a href="https://accelins.atlassian.net/browse/SF-872">12. Create Salesforce Product Reference Data Objects To Manage RDM Values</a>
+            <span class="subText">
+               Created: 24/Feb/26                   &nbsp;Updated: 08/Apr/26
+
+                                            </span>
+            </h3>
+        </td>
+    </tr>
+    <tr>
+        <td width="20%"><b>Status:</b></td>
+        <td width="80%">In QA</td>
+    </tr>
+    <tr>
+        <td width="20%"><b>Project:</b></td>
+        <td width="80%"><a href="https://accelins.atlassian.net/secure/BrowseProject.jspa?id=11119">Salesforce CLM</a></td>
+    </tr>
+
+        <tr>
+            <td><b>Components:</b></td>
+            <td>
+                            None
+                </td>
+    </tr>
+    
+
+        <tr>
+            <td><b>Affects versions:</b></td>
+            <td>
+                            None
+                </td>
+    </tr>
+    
+
+        <tr>
+            <td><b>Fix versions:</b></td>
+            <td>
+                            None
+                </td>
+    </tr>
+    
+    
+            <td width="20%"><b>Parent:</b></td>
+        <td width="80%"><a href="https://accelins.atlassian.net/browse/SF-308">MO - Product Mapping / Coding</a></td>
+    </table>
+
+<br />
+<table class="grid" cellpadding="0" cellspacing="0" border="0" width="100%">
+    <tr>
+        <td bgcolor="#f0f0f0" valign="top" width="20%">
+            <b>Type:</b>
+        </td>
+        <td bgcolor="#ffffff" valign="top"  width="30%" >
+            Story
+        </td>
+
+                    <td bgcolor="#f0f0f0">
+                <b>Priority:</b>
+            </td>
+            <td bgcolor="#ffffff" valign="top" nowrap>
+                Medium
+            </td>
+            </tr>
+    <tr>
+                        <td bgcolor="#f0f0f0" valign="top" width="20%">
+                <b>Reporter:</b>
+            </td>
+            <td bgcolor="#ffffff" valign="top"  width="30%" >
+                                        
+                
+        
+            <a class="user-hover" rel="712020:ecbcec11-f098-4810-8f24-650664eabec1"
+                id="word_reporter_712020:ecbcec11-f098-4810-8f24-650664eabec1"
+                href="https://accelins.atlassian.net/secure/ViewProfile.jspa?accountId=712020%3Aecbcec11-f098-4810-8f24-650664eabec1">
+                    Ahmed Al-Raweshidy
+                </a>
+
+                            </td>
+        
+                    <td bgcolor="#f0f0f0" width="20%">
+                <b>Assignee:</b>
+            </td>
+            <td bgcolor="#ffffff" valign="top" nowrap  width="30%" >
+                                        
+                
+        
+            <a class="user-hover" rel="712020:5d0ed4b1-f29d-4542-ac0e-69d3eea67de8"
+                id="word_assignee_712020:5d0ed4b1-f29d-4542-ac0e-69d3eea67de8"
+                href="https://accelins.atlassian.net/secure/ViewProfile.jspa?accountId=712020%3A5d0ed4b1-f29d-4542-ac0e-69d3eea67de8">
+                    Ravindranath Vazhenkhat
+                </a>
+
+                            </td>
+            </tr>
+    	<tr>
+		<td bgcolor="#f0f0f0" width="20%">
+			<b>Resolution:</b>
+		</td>
+		<td bgcolor="#ffffff" valign="top" width="30%" nowrap>
+            				Unresolved
+                    </td>
+                    <td bgcolor="#f0f0f0" width="20%">
+                <b>Votes:</b>
+            </td>
+            <td bgcolor="#ffffff" valign="top" width="30%" nowrap>
+                0
+            </td>
+        
+    </tr>
+    
+        <tr>
+        <td bgcolor="#f0f0f0" width="20%">
+            <b>Labels:</b>
+        </td>
+        <td id="labels-1098145-value" class="value" bgcolor="#ffffff" valign="top" colspan="3" nowrap>
+                            None
+                    </td>
+    </tr>
+    
+    	<tr>
+        		<td bgcolor="#f0f0f0" width="20%"><b>Remaining Estimate:</b></td>
+        <td bgcolor="#ffffff" valign="top" nowrap width="80%" colspan="3">
+                            Not Specified
+            		</td>
+    </tr>
+    <tr>
+                <td bgcolor="#f0f0f0" width="20%"><b>Time Spent:</b></td>
+		<td bgcolor="#ffffff" valign="top" nowrap width="80%" colspan="3">
+                            Not Specified
+            		</td>
+	</tr>
+    <tr>
+                <td bgcolor="#f0f0f0" width="20%"><b>Original estimate:</b></td>
+		<td bgcolor="#ffffff" valign="top" nowrap width="80%" colspan="3">
+                            Not Specified
+            		</td>
+    </tr>
+    
+    </table>
+
+
+
+    <br />
+
+    	<table class="grid" cellpadding="0" cellspacing="0" border="0" width="100%">
+            
+
+                <tr>
+            <td bgcolor="#f0f0f0" width=20% valign=top>
+                <b>Attachments:</b>
+            </td>
+            <td bgcolor="#ffffff" valign="top">
+                                    <img src="https://accelins.atlassian.net/images/icons/attach/excel.gif" height="16" width="16" border="0" alt="Microsoft Word">
+                    Active Classes of Business 2-24-2026 4-58-51 PM.xlsx &nbsp;&nbsp;&nbsp;
+                                    <img src="https://accelins.atlassian.net/images/icons/attach/excel.gif" height="16" width="16" border="0" alt="Microsoft Word">
+                    Active POG Products 2-24-2026 4-59-37 PM.xlsx &nbsp;&nbsp;&nbsp;
+                                    <img src="https://accelins.atlassian.net/images/icons/attach/excel.gif" height="16" width="16" border="0" alt="Microsoft Word">
+                    Active OSFI Codes 2-24-2026 4-59-30 PM.xlsx &nbsp;&nbsp;&nbsp;
+                                    <img src="https://accelins.atlassian.net/images/icons/attach/excel.gif" height="16" width="16" border="0" alt="Microsoft Word">
+                    Active Lines of Business 2-24-2026 4-59-09 PM.xlsx &nbsp;&nbsp;&nbsp;
+                                    <img src="https://accelins.atlassian.net/images/icons/attach/excel.gif" height="16" width="16" border="0" alt="Microsoft Word">
+                    Active Member Products-Programs 2-24-2026 4-59-22 PM.xlsx &nbsp;&nbsp;&nbsp;
+                                    <img src="https://accelins.atlassian.net/images/icons/attach/excel.gif" height="16" width="16" border="0" alt="Microsoft Word">
+                    Active Products 2-24-2026 4-59-41 PM.xlsx &nbsp;&nbsp;&nbsp;
+                                    <img src="https://accelins.atlassian.net/images/icons/attach/excel.gif" height="16" width="16" border="0" alt="Microsoft Word">
+                    Active Sub Products 2-24-2026 5-00-04 PM.xlsx &nbsp;&nbsp;&nbsp;
+                                    <img src="https://accelins.atlassian.net/images/icons/attach/excel.gif" height="16" width="16" border="0" alt="Microsoft Word">
+                    Active ASLOBS 2-24-2026 6-48-34 PM.xlsx &nbsp;&nbsp;&nbsp;
+                                    <img src="https://accelins.atlassian.net/images/icons/attach/excel.gif" height="16" width="16" border="0" alt="Microsoft Word">
+                    Active BEGAAP COBS 3-6-2026 12-09-03 PM.xlsx &nbsp;&nbsp;&nbsp;
+                                    <img src="https://accelins.atlassian.net/images/icons/attach/excel.gif" height="16" width="16" border="0" alt="Microsoft Word">
+                    Active Solvency IIS 3-6-2026 12-09-47 PM.xlsx &nbsp;&nbsp;&nbsp;
+                                    <img src="https://accelins.atlassian.net/images/icons/attach/file.gif" height="16" width="16" border="0" alt="File">
+                    [SF-872] 12. Create Salesforce Product Reference Data Objects To Manage RDM Values - Jira - Google Chrome - 16 March 2026.mp4 &nbsp;&nbsp;&nbsp;
+                            </td>
+        </tr>
+        
+            <tr>
+            <td bgcolor="#f0f0f0" width="20%" valign="top">
+                <b>Issue links:</b>
+            </td>
+            <td bgcolor="#ffffff" valign="top" class="noPadding">
+                <table cellpadding="0" cellspacing="0" border="0" width="100%" class="blank">
+                                            <tr>
+                            <td colspan="4" bgcolor="#f0f0f0">
+                                <b>Discovery - Connected</b><br/>
+                            </td>
+                        </tr>
+                                    <tr>
+            <td>
+                connects to
+            </td>
+            <td>
+                <a href="https://accelins.atlassian.net/browse/SF-1022">
+                     SF-1022                 </a>
+            </td>
+            <td>
+                Prevent exact duplicate Product Refer...
+            </td>
+            <td>
+                Not Started
+            </td>
+        </tr>
+            <tr>
+            <td>
+                connects to
+            </td>
+            <td>
+                <a href="https://accelins.atlassian.net/browse/SF-1016">
+                     SF-1016                 </a>
+            </td>
+            <td>
+                Add hidden Dataverse ID to Product Re...
+            </td>
+            <td>
+                Not Started
+            </td>
+        </tr>
+            <tr>
+            <td>
+                connects to
+            </td>
+            <td>
+                <a href="https://accelins.atlassian.net/browse/SF-1020">
+                     SF-1020                 </a>
+            </td>
+            <td>
+                Auto generated Unique ID for product ...
+            </td>
+            <td>
+                Done
+            </td>
+        </tr>
+            <tr>
+            <td>
+                connects to
+            </td>
+            <td>
+                <a href="https://accelins.atlassian.net/browse/SF-1015">
+                     SF-1015                 </a>
+            </td>
+            <td>
+                Align Product Reference Data Objects ...
+            </td>
+            <td>
+                Blocked
+            </td>
+        </tr>
+            <tr>
+            <td>
+                connects to
+            </td>
+            <td>
+                <a href="https://accelins.atlassian.net/browse/SF-1021">
+                     SF-1021                 </a>
+            </td>
+            <td>
+                Implement Status - Based Lifecycle fo...
+            </td>
+            <td>
+                In QA
+            </td>
+        </tr>
+                                                                            <tr>
+                            <td colspan="4" bgcolor="#f0f0f0">
+                                <b>Relates</b><br/>
+                            </td>
+                        </tr>
+                                                                <tr>
+            <td>
+                relates to
+            </td>
+            <td>
+                <a href="https://accelins.atlassian.net/browse/SF-800">
+                     SF-800                 </a>
+            </td>
+            <td>
+                Publish Platform Events for Reference...
+            </td>
+            <td>
+                Backlog
+            </td>
+        </tr>
+            <tr>
+            <td>
+                relates to
+            </td>
+            <td>
+                <a href="https://accelins.atlassian.net/browse/SF-801">
+                     SF-801                 </a>
+            </td>
+            <td>
+                Make Dataverse field identifiers avai...
+            </td>
+            <td>
+                Backlog
+            </td>
+        </tr>
+                                        </table>
+            </td>
+        </tr>
+    
+
+
+    
+                        <tr>
+                <td bgcolor="#f0f0f0" width="20%" valign="top"><b>Sprint:</b></td>
+                <td id="customfield_10020-1098145-value" class="value" bgcolor="#ffffff" width="80%">SF Sprint 100, SF Sprint 102</td>
+            </tr>
+            </table>
+
+    <br/>
+
+    <table cellpadding="2" cellspacing="0" border="0" width="100%" align="center">
+    <tr>
+        <td bgcolor="#bbbbbb" width="1%" nowrap align="center">
+            &nbsp;<font color="#ffffff"><b>Description</b></font>&nbsp;
+        </td>
+        <td>&nbsp;</td>
+    </tr>
+    </table>
+
+    <table cellpadding="0" cellspacing="0" border="0" width="100%">
+    <tr>
+        <td id="descriptionArea">
+            <h1><a name="UserStory"></a><b>User Story</b></h1>
+
+<p><b>Background/Business Context</b></p>
+
+<p>Currently products and product reference data (Line Of Business, Class Of Business, ASLOB, etc.) is housed, created and maintained in custom object records (tables) in D365 Dataverse. These values are then used in Product Maps (or Mappings) which are in turn related to a specific member account and related contracts, which are then consumed by other systems such as forecasting and operations.</p>
+
+<p><b>As a Data Governance user or System Administrator</b><br/>
+I want Salesforce to function as the the System Of Record for creating and updating product data reference table values in RDM, and additionally to have the relevant product fields and field values related to the entries on any Draft and Active Product Maps that are imported and/or created in Salesforce</p>
+
+<p>So that we can:</p>
+
+<ol>
+	<li>More easily manage the product reference data in a manner similar to our current process but with improved features such as duplicate prevention, approval processes, automated notifications, product rules, and date-driven lifecycle management both in the reference table entries and as related to contracts.</li>
+	<li>Be in a better position to start/stop the sale/use of a specifc product entry within a matter of hours instead of days or weeks.</li>
+	<li>Better support the future functionality of creating and managing contracts, approvals, etc. directly in Salesforce.</li>
+	<li>Potentially eliminate the need for RDM in the future.</li>
+</ol>
+
+
+<hr />
+
+<h1><a name="Background%2FBusinessContext"></a><b>Background / Business Context</b></h1>
+
+<p>This framework ensures:</p>
+
+<ul>
+	<li><b>One-to-one name/code mapping between Salesforce and RDM</b></li>
+	<li><b>Governance control over product data</b></li>
+	<li><b>Controlled creation and deactivation</b></li>
+	<li><b>Prevention of duplicate values</b></li>
+	<li><b>Clear auditability and lifecycle management</b></li>
+</ul>
+
+
+<hr />
+
+<h1><a name="ScopeofThisStory"></a><b>Scope of This Story</b></h1>
+
+<p>This story covers:</p>
+
+<ul>
+	<li>Creation of Salesforce custom objects (one per spreadsheet provided)</li>
+	<li>Creation of fields (all spreadsheet columns as free text fields)</li>
+	<li><del>Date-driven Active/Inactive management via</del> <b><del>Valid From</del></b> <del>and</del> <b><del>Valid To</del></b> <del>(manual Status picklist removed)</del></li>
+	<li><del>Duplicate prevention</del></li>
+	<li>Access control and governance</li>
+	<li>High-level reference to RDM sync requirement (integration design out of scope)</li>
+</ul>
+
+
+<hr />
+
+<h1><a name="OutofScope"></a><b>Out of Scope</b></h1>
+
+<ul>
+	<li>MuleSoft integration design or implementation</li>
+	<li>RDM technical synchronization logic</li>
+	<li>Deletion confirmation workflow with RDM</li>
+	<li>Downstream object relationship modeling (TBD)</li>
+	<li>Hierarchical relationships between product entities (future phase)</li>
+</ul>
+
+
+<hr />
+
+<h1><a name="ObjectstoBeCreated"></a><b>Objects to Be Created</b></h1>
+
+<p>Each spreadsheet provided will become its own <b>Salesforce Custom Object</b> (final naming convention TBD):</p>
+
+<ul>
+	<li><del>Products</del> - covered in <a href="https://accelins.atlassian.net/browse/SF-1015" title="smart-link" class="external-link" rel="nofollow noreferrer">https://accelins.atlassian.net/browse/SF-1015</a></li>
+	<li>Sub Products</li>
+	<li>POG Products</li>
+	<li>OSFI Codes</li>
+	<li>Member Products – Programs</li>
+	<li>Lines of Business</li>
+	<li>Classes of Business</li>
+	<li>ASLOBS</li>
+	<li>BEEGAP</li>
+	<li>Solvency II</li>
+</ul>
+
+
+
+
+<hr />
+
+<h1><a name="FieldRequirements"></a><b>Field Requirements</b></h1>
+
+<h2><a name="FieldsfromSpreadsheet"></a><b>Fields from Spreadsheet</b></h2>
+
+<p><del>Every column in the corresponding spreadsheet must be created as a custom field.</del></p>
+
+<p><del>All fields must be:</del></p>
+
+<ul>
+	<li><del>Free text</del></li>
+	<li><del>No enforced length restriction</del></li>
+	<li><del>Not required (unless required for uniqueness logic)</del></li>
+</ul>
+
+
+<hr />
+
+<h2><a name="RecordNameField"></a><b>Record Name Field</b></h2>
+
+<p><del>The</del> <b><del>Name</del></b> <del>field must:</del></p>
+
+<ul>
+	<li><del>Be required</del></li>
+	<li><del>Be unique within the object</del></li>
+	<li><del>Be used for strict name/code matching with RDM</del></li>
+</ul>
+
+
+<p><del>Duplicate values must:</del></p>
+
+<ul>
+	<li><del>Be prevented via validation rule or unique constraint</del></li>
+	<li><del>Block save action</del></li>
+	<li><del>Prevent record progression</del></li>
+</ul>
+
+
+<hr />
+
+<h1><a name="LifecycleDateFields"></a><b>Lifecycle Date Fields</b></h1>
+
+<p><del>Each object must include:</del></p>
+
+<ul>
+	<li><b><del>Valid From (Date)</del></b> <del>– required</del></li>
+	<li><b><del>Valid To (Date)</del></b> <del>– optional (blank = indefinite/open-ended)</del></li>
+</ul>
+
+
+<hr />
+
+<h2><a name="LifecycleBehaviorandGovernance"></a><b>Lifecycle Behavior and Governance</b></h2>
+
+<p><b><del>Valid From and Valid To fully determine Active/Inactive status.</del></b><br/>
+<del>The manual Status picklist is removed and must not be used.</del></p>
+
+<h3><a name="ArecordisActiveifandonlyif%3A"></a><del>A record is</del> <b><del>Active</del></b> <del>if and only if:</del></h3>
+
+<ul>
+	<li><del>Valid From is on or before today</del><br/>
+<del>AND</del></li>
+	<li><del>(Valid To is blank OR Valid To is on or after today)</del></li>
+</ul>
+
+
+<h3><a name="ArecordisInactiveotherwise."></a><del>A record is</del> <b><del>Inactive</del></b> <del>otherwise.</del></h3>
+
+<p><del>Examples:</del></p>
+
+<ul>
+	<li><del>Valid From in the future → Inactive</del></li>
+	<li><del>Valid To before today → Inactive</del></li>
+</ul>
+
+
+<p><del>Additional rules:</del></p>
+
+<ul>
+	<li><del>Future-dated Valid From values are allowed</del></li>
+	<li><del>To deactivate, Data Governance sets Valid To to today or a past date</del></li>
+	<li><del>Valid From defaults to today</del></li>
+	<li><del>Valid To defaults to blank</del></li>
+</ul>
+
+
+<hr />
+
+<h1><a name="StandardValidations"></a><b>Standard Validations</b></h1>
+
+<p><del>The following validations apply on create and edit:</del></p>
+
+<ul>
+	<li><del>Valid From is required</del></li>
+	<li><del>If Valid To is provided, it must be ≥ Valid From</del></li>
+	<li><del>On create, Valid To must not be in the past</del></li>
+	<li><del>On edit, Valid To may be set to today or a past date (for deactivation)</del></li>
+	<li><del>Name is required and must be unique</del></li>
+	<li><del>Prevent conflicting lifecycle logic (Valid From later than Valid To)</del></li>
+	<li><del>All validation logic must be enforced at system level</del></li>
+</ul>
+
+
+<hr />
+
+<h1><a name="AccessandGovernanceModel"></a><b>Access and Governance Model</b></h1>
+
+<p>This entire product data reference framework must be <b>restricted</b>.</p>
+
+<hr />
+
+<h2><a name="DataGovernanceRoleCapabilities"></a><b>Data Governance Role Capabilities</b></h2>
+
+<p>Data Governance users can:</p>
+
+<ul>
+	<li>Create new records</li>
+	<li>Edit existing records</li>
+	<li>Deactivate records (set Valid To)</li>
+</ul>
+
+
+<p>They may not:</p>
+
+<ul>
+	<li>Create new custom objects</li>
+</ul>
+
+
+<p>Deletion:</p>
+
+<ul>
+	<li>Not part of normal lifecycle</li>
+	<li>Must be exceptional and documented</li>
+</ul>
+
+
+<hr />
+
+<h2><a name="SystemAdministrator"></a><b>System Administrator</b></h2>
+
+<p>System Administrators retain:</p>
+
+<ul>
+	<li>Full system-level access</li>
+</ul>
+
+
+<p>Any deletion must be:</p>
+
+<ul>
+	<li>Documented</li>
+	<li>Synchronized with RDM</li>
+</ul>
+
+
+<hr />
+
+<h2><a name="ReadOnlyAccess"></a><b>Read-Only Access</b></h2>
+
+<p>All other users:</p>
+
+<ul>
+	<li>Can view all records (Active and Inactive)</li>
+	<li>Cannot create, edit, deactivate, or delete</li>
+</ul>
+
+
+<hr />
+
+<h1><a name="AuditabilityandReporting"></a><b>Auditability and Reporting</b></h1>
+
+<ul>
+	<li>All create, edit, and deactivate actions must be tracked</li>
+	<li>Field history tracking required for:
+	<ul>
+		<li>Name</li>
+		<li>Valid From</li>
+		<li>Valid To</li>
+		<li>Relevant governance fields</li>
+	</ul>
+	</li>
+	<li>All records (Active and Inactive) must be visible</li>
+	<li>The system must clearly indicate Active vs Inactive status based on date logic</li>
+</ul>
+
+
+<hr />
+
+<h1><a name="DataIntegrityRules"></a><b>Data Integrity Rules</b></h1>
+
+<ul>
+	<li><del>Name must be unique per object</del></li>
+	<li><del>Duplicate prevention enforced at system level</del></li>
+	<li><del>Valid From required</del></li>
+	<li><del>Valid To optional (blank = indefinite)</del></li>
+	<li><del>Active/Inactive status driven solely by date logic</del></li>
+	<li><del>Deactivation via Valid To (deletion not standard lifecycle)</del></li>
+</ul>
+
+
+<hr />
+
+<h1><a name="CanonicalMappingStatement%28ReferenceOnly%29"></a><b><del>Canonical Mapping Statement (Reference Only)</del></b></h1>
+
+<p><del>Salesforce will serve as the</del> <b><del>canonical mapping authority</del></b> <del>for product reference data.</del></p>
+
+<p><del>All record changes (create, edit, deactivate, delete in exceptional cases) must also occur in RDM via MuleSoft integration.</del></p>
+
+<p><del>Technical integration details are</del> <b><del>out of scope</del></b><del>.</del></p>
+
+<hr />
+
+<h1><a name="AcceptanceCriteria"></a><b>Acceptance Criteria</b></h1>
+
+<hr />
+
+<h2><a name="ObjectCreation"></a><b>Object Creation</b></h2>
+
+<p><b>Given</b> the Salesforce configuration is deployed<br/>
+<b>When</b> the framework is reviewed<br/>
+<b>Then</b> all required custom objects are present</p>
+
+<hr />
+
+<h2><a name="SpreadsheetFieldsCreated"></a><b>Spreadsheet Fields Created</b></h2>
+
+<p><b><del>Given</del></b> <del>each custom object corresponds to a spreadsheet</del><br/>
+<b><del>When</del></b> <del>fields are reviewed</del><br/>
+<b><del>Then</del></b> <del>every spreadsheet column exists as a free-text field</del></p>
+
+<hr />
+
+<h2><a name="RecordControls%E2%80%93Creation"></a><b>Record Controls – Creation</b></h2>
+
+<ul>
+	<li><del>Missing Name → system blocks save</del></li>
+	<li><del>Valid To earlier than Valid From → system blocks save</del></li>
+	<li><del>Valid To in the past (on create) → system blocks save</del></li>
+	<li><del>Duplicate Name → system blocks save</del></li>
+</ul>
+
+
+<hr />
+
+<h2><a name="RecordControls%E2%80%93EditandDeactivation"></a><b>Record Controls – Edit and Deactivation</b></h2>
+
+<ul>
+	<li><del>Valid To set to today/past → record becomes Inactive</del></li>
+	<li><del>Valid From set to future → record becomes Inactive until date reached</del></li>
+	<li><del>Valid To earlier than Valid From → system blocks save</del></li>
+</ul>
+
+
+<hr />
+
+<h2><a name="Security"></a><b>Security</b></h2>
+
+<ul>
+	<li>Data Governance role → create, edit, deactivate</li>
+	<li>System Administrator → create, edit, deactivate, exceptional delete</li>
+	<li>All other users → view only</li>
+</ul>
+
+
+<hr />
+
+<h2><a name="Governance"></a><b>Governance</b></h2>
+
+<ul>
+	<li>Deactivation must be recorded in audit history</li>
+	<li>RDM synchronization requirement documented</li>
+	<li>Exceptional deletions must be documented and synchronized</li>
+</ul>
+
+
+<hr />
+
+<h2><a name="IntegrationOutofScope"></a><b>Integration Out of Scope</b></h2>
+
+<p><b>Given</b> the story is reviewed<br/>
+<b>When</b> scope boundaries are assessed<br/>
+<b>Then</b> MuleSoft integration and RDM synchronization logic are clearly marked out of scope</p>
+            <br/>
+        </td>
+    </tr>
+    </table>
+
+    <br/>
+
+    <table cellpadding="2" cellspacing="0" border="0" width="100%" align="center">
+    <tr>
+        <td bgcolor="#bbbbbb" width="1%" nowrap align="center">
+            &nbsp;<font color="#ffffff"><b>Comments</b></font>&nbsp;
+        </td>
+        <td>&nbsp;</td>
+    </tr>
+    </table>
+
+    <table cellpadding="0" cellspacing="0" border="0" width="100%" class="grid" style="margin: 0;">
+                <tr id="comment-header-2632848"><td bgcolor="#f0f0f0">
+            Comment by  
+                                                    
+                
+        
+            <a class="user-hover" rel="712020:ecbcec11-f098-4810-8f24-650664eabec1"
+                id="word_commented_712020:ecbcec11-f098-4810-8f24-650664eabec1"
+                href="https://accelins.atlassian.net/secure/ViewProfile.jspa?accountId=712020%3Aecbcec11-f098-4810-8f24-650664eabec1">
+                    Ahmed Al-Raweshidy
+                </a>
+
+                                        <font size="-2">
+            [
+                <font color="#336699">24/Feb/26</font>
+
+                            ]
+            </font>
+
+        </td></tr>
+        <tr id="comment-body-2632848"><td bgcolor="#ffffff">
+            <p><a href="https://accelins.atlassian.net/secure/ViewProfile.jspa?accountId=712020%3A0d055962-1974-4273-b8d7-7a97dd766aa8" class="user-hover" rel="712020:0d055962-1974-4273-b8d7-7a97dd766aa8" data-account-id="712020:0d055962-1974-4273-b8d7-7a97dd766aa8" accountid="712020:0d055962-1974-4273-b8d7-7a97dd766aa8" rel="noreferrer">Ken Reynolds</a> <a href="https://accelins.atlassian.net/secure/ViewProfile.jspa?accountId=712020%3Ab710f8ec-c074-4013-916b-e98b111f7e29" class="user-hover" rel="712020:b710f8ec-c074-4013-916b-e98b111f7e29" data-account-id="712020:b710f8ec-c074-4013-916b-e98b111f7e29" accountid="712020:b710f8ec-c074-4013-916b-e98b111f7e29" rel="noreferrer">Niraj Thakker</a> need review please - suggest Ken reviews first please for this one</p>
+
+<p>cc <a href="https://accelins.atlassian.net/secure/ViewProfile.jspa?accountId=712020%3Aef6dc51c-ea62-4cfb-9a5c-4c879c9daa7a" class="user-hover" rel="712020:ef6dc51c-ea62-4cfb-9a5c-4c879c9daa7a" data-account-id="712020:ef6dc51c-ea62-4cfb-9a5c-4c879c9daa7a" accountid="712020:ef6dc51c-ea62-4cfb-9a5c-4c879c9daa7a" rel="noreferrer">Alan Slater</a> </p>
+        </td></tr>
+                <tr id="comment-header-2633065"><td bgcolor="#f0f0f0">
+            Comment by  
+                                                    
+                
+        
+            <a class="user-hover" rel="712020:0d055962-1974-4273-b8d7-7a97dd766aa8"
+                id="word_commented_712020:0d055962-1974-4273-b8d7-7a97dd766aa8"
+                href="https://accelins.atlassian.net/secure/ViewProfile.jspa?accountId=712020%3A0d055962-1974-4273-b8d7-7a97dd766aa8">
+                    Ken Reynolds
+                </a>
+
+                                        <font size="-2">
+            [
+                <font color="#336699">25/Feb/26</font>
+
+                            ]
+            </font>
+
+        </td></tr>
+        <tr id="comment-body-2633065"><td bgcolor="#ffffff">
+            <p><a href="https://accelins.atlassian.net/secure/ViewProfile.jspa?accountId=712020%3Aecbcec11-f098-4810-8f24-650664eabec1" class="user-hover" rel="712020:ecbcec11-f098-4810-8f24-650664eabec1" data-account-id="712020:ecbcec11-f098-4810-8f24-650664eabec1" accountid="712020:ecbcec11-f098-4810-8f24-650664eabec1" rel="noreferrer">Ahmed Al-Raweshidy</a> After a quick review I agree with the approach that we have one story to encompass all of this rather than splitting into multiple stories, particularly since 90% of the requirments apply to all of the RDM tables. Also, from a technical perspective I have already done much of the solutioning. However, since <a href="https://accelins.atlassian.net/secure/ViewProfile.jspa?accountId=712020%3A8e32e5a4-f9bd-4093-8833-838bef743021" class="user-hover" rel="712020:8e32e5a4-f9bd-4093-8833-838bef743021" data-account-id="712020:8e32e5a4-f9bd-4093-8833-838bef743021" accountid="712020:8e32e5a4-f9bd-4093-8833-838bef743021" rel="noreferrer">Danny Smith</a> and <a href="https://accelins.atlassian.net/secure/ViewProfile.jspa?accountId=712020%3Aa12e418b-2c1e-4b88-aea9-b64500f8f8f9" class="user-hover" rel="712020:a12e418b-2c1e-4b88-aea9-b64500f8f8f9" data-account-id="712020:a12e418b-2c1e-4b88-aea9-b64500f8f8f9" accountid="712020:a12e418b-2c1e-4b88-aea9-b64500f8f8f9" rel="noreferrer">Abby Parker</a> have put a lot of prior and recent thought into this, I suggest that you, Danny and I set some time aside ASAP (like tomorrow, 25 Feb, to review any prior cancelled stories and any work Abby may have done to make sure we have everything incorporated eveything here without any duplications or omissions. <a href="https://accelins.atlassian.net/secure/ViewProfile.jspa?accountId=712020%3Ab710f8ec-c074-4013-916b-e98b111f7e29" class="user-hover" rel="712020:b710f8ec-c074-4013-916b-e98b111f7e29" data-account-id="712020:b710f8ec-c074-4013-916b-e98b111f7e29" accountid="712020:b710f8ec-c074-4013-916b-e98b111f7e29" rel="noreferrer">Niraj Thakker</a> and <a href="https://accelins.atlassian.net/secure/ViewProfile.jspa?accountId=712020%3Aef6dc51c-ea62-4cfb-9a5c-4c879c9daa7a" class="user-hover" rel="712020:ef6dc51c-ea62-4cfb-9a5c-4c879c9daa7a" data-account-id="712020:ef6dc51c-ea62-4cfb-9a5c-4c879c9daa7a" accountid="712020:ef6dc51c-ea62-4cfb-9a5c-4c879c9daa7a" rel="noreferrer">Alan Slater</a> for visibility.</p>
+        </td></tr>
+                <tr id="comment-header-2634062"><td bgcolor="#f0f0f0">
+            Comment by  
+                                                    
+                
+        
+            <a class="user-hover" rel="712020:ecbcec11-f098-4810-8f24-650664eabec1"
+                id="word_commented_712020:ecbcec11-f098-4810-8f24-650664eabec1"
+                href="https://accelins.atlassian.net/secure/ViewProfile.jspa?accountId=712020%3Aecbcec11-f098-4810-8f24-650664eabec1">
+                    Ahmed Al-Raweshidy
+                </a>
+
+                                        <font size="-2">
+            [
+                <font color="#336699">26/Feb/26</font>
+
+                            ]
+            </font>
+
+        </td></tr>
+        <tr id="comment-body-2634062"><td bgcolor="#ffffff">
+            <p><a href="https://accelins.atlassian.net/secure/ViewProfile.jspa?accountId=712020%3A0d055962-1974-4273-b8d7-7a97dd766aa8" class="user-hover" rel="712020:0d055962-1974-4273-b8d7-7a97dd766aa8" data-account-id="712020:0d055962-1974-4273-b8d7-7a97dd766aa8" accountid="712020:0d055962-1974-4273-b8d7-7a97dd766aa8" rel="noreferrer">Ken Reynolds</a> will review this again and come back to me</p>
+        </td></tr>
+                <tr id="comment-header-2634580"><td bgcolor="#f0f0f0">
+            Comment by  
+                                                    
+                
+        
+            <a class="user-hover" rel="712020:b710f8ec-c074-4013-916b-e98b111f7e29"
+                id="word_commented_712020:b710f8ec-c074-4013-916b-e98b111f7e29"
+                href="https://accelins.atlassian.net/secure/ViewProfile.jspa?accountId=712020%3Ab710f8ec-c074-4013-916b-e98b111f7e29">
+                    Niraj Thakker
+                </a>
+
+                                        <font size="-2">
+            [
+                <font color="#336699">27/Feb/26</font>
+
+                            ]
+            </font>
+
+        </td></tr>
+        <tr id="comment-body-2634580"><td bgcolor="#ffffff">
+            <p><a href="https://accelins.atlassian.net/secure/ViewProfile.jspa?accountId=712020%3Aecbcec11-f098-4810-8f24-650664eabec1" class="user-hover" rel="712020:ecbcec11-f098-4810-8f24-650664eabec1" data-account-id="712020:ecbcec11-f098-4810-8f24-650664eabec1" accountid="712020:ecbcec11-f098-4810-8f24-650664eabec1" rel="noreferrer">Ahmed Al-Raweshidy</a> <a href="https://accelins.atlassian.net/secure/ViewProfile.jspa?accountId=712020%3A0d055962-1974-4273-b8d7-7a97dd766aa8" class="user-hover" rel="712020:0d055962-1974-4273-b8d7-7a97dd766aa8" data-account-id="712020:0d055962-1974-4273-b8d7-7a97dd766aa8" accountid="712020:0d055962-1974-4273-b8d7-7a97dd766aa8" rel="noreferrer">Ken Reynolds</a> <a href="https://accelins.atlassian.net/secure/ViewProfile.jspa?accountId=712020%3A8e32e5a4-f9bd-4093-8833-838bef743021" class="user-hover" rel="712020:8e32e5a4-f9bd-4093-8833-838bef743021" data-account-id="712020:8e32e5a4-f9bd-4093-8833-838bef743021" accountid="712020:8e32e5a4-f9bd-4093-8833-838bef743021" rel="noreferrer">Danny Smith</a> i cant sign off on this story as it is a solution story. My concerns here are around the number of new custom objects being created and the ability to add/remove/edit products and product reference data in SF without tighter access controls for the data governance persona. But i will take Ken’s steer on this from a solution and technical perspective and Danny’s steer on whether the downstream requirements are air-tight</p>
+        </td></tr>
+                <tr id="comment-header-2634585"><td bgcolor="#f0f0f0">
+            Comment by  
+                                                    
+                
+        
+            <a class="user-hover" rel="712020:ecbcec11-f098-4810-8f24-650664eabec1"
+                id="word_commented_712020:ecbcec11-f098-4810-8f24-650664eabec1"
+                href="https://accelins.atlassian.net/secure/ViewProfile.jspa?accountId=712020%3Aecbcec11-f098-4810-8f24-650664eabec1">
+                    Ahmed Al-Raweshidy
+                </a>
+
+                                        <font size="-2">
+            [
+                <font color="#336699">27/Feb/26</font>
+
+                            ]
+            </font>
+
+        </td></tr>
+        <tr id="comment-body-2634585"><td bgcolor="#ffffff">
+            <p><a href="https://accelins.atlassian.net/secure/ViewProfile.jspa?accountId=712020%3Ab710f8ec-c074-4013-916b-e98b111f7e29" class="user-hover" rel="712020:b710f8ec-c074-4013-916b-e98b111f7e29" data-account-id="712020:b710f8ec-c074-4013-916b-e98b111f7e29" accountid="712020:b710f8ec-c074-4013-916b-e98b111f7e29" rel="noreferrer">Niraj Thakker</a> <a href="https://accelins.atlassian.net/secure/ViewProfile.jspa?accountId=712020%3A8e32e5a4-f9bd-4093-8833-838bef743021" class="user-hover" rel="712020:8e32e5a4-f9bd-4093-8833-838bef743021" data-account-id="712020:8e32e5a4-f9bd-4093-8833-838bef743021" accountid="712020:8e32e5a4-f9bd-4093-8833-838bef743021" rel="noreferrer">Danny Smith</a> <a href="https://accelins.atlassian.net/secure/ViewProfile.jspa?accountId=712020%3A0d055962-1974-4273-b8d7-7a97dd766aa8" class="user-hover" rel="712020:0d055962-1974-4273-b8d7-7a97dd766aa8" data-account-id="712020:0d055962-1974-4273-b8d7-7a97dd766aa8" accountid="712020:0d055962-1974-4273-b8d7-7a97dd766aa8" rel="noreferrer">Ken Reynolds</a> could you comment? </p>
+        </td></tr>
+                <tr id="comment-header-2634671"><td bgcolor="#f0f0f0">
+            Comment by  
+                                                    
+                
+        
+            <a class="user-hover" rel="712020:8e32e5a4-f9bd-4093-8833-838bef743021"
+                id="word_commented_712020:8e32e5a4-f9bd-4093-8833-838bef743021"
+                href="https://accelins.atlassian.net/secure/ViewProfile.jspa?accountId=712020%3A8e32e5a4-f9bd-4093-8833-838bef743021">
+                    Danny Smith
+                </a>
+
+                                        <font size="-2">
+            [
+                <font color="#336699">27/Feb/26</font>
+
+                            ]
+            </font>
+
+        </td></tr>
+        <tr id="comment-body-2634671"><td bgcolor="#ffffff">
+            <p><a href="https://accelins.atlassian.net/secure/ViewProfile.jspa?accountId=712020%3Ab710f8ec-c074-4013-916b-e98b111f7e29" class="user-hover" rel="712020:b710f8ec-c074-4013-916b-e98b111f7e29" data-account-id="712020:b710f8ec-c074-4013-916b-e98b111f7e29" accountid="712020:b710f8ec-c074-4013-916b-e98b111f7e29" rel="noreferrer">Niraj Thakker</a> The User Stories relating to the integration of product ref data from Salesforce to RDM have not yet gone through refinement, so I wouldn’t be confident to say that the requirements that are dependant on this story are air-tight until after they have been through refinement</p>
+        </td></tr>
+                <tr id="comment-header-2637784"><td bgcolor="#f0f0f0">
+            Comment by  
+                                                    
+                
+        
+            <a class="user-hover" rel="712020:ecbcec11-f098-4810-8f24-650664eabec1"
+                id="word_commented_712020:ecbcec11-f098-4810-8f24-650664eabec1"
+                href="https://accelins.atlassian.net/secure/ViewProfile.jspa?accountId=712020%3Aecbcec11-f098-4810-8f24-650664eabec1">
+                    Ahmed Al-Raweshidy
+                </a>
+
+                                        <font size="-2">
+            [
+                <font color="#336699">04/Mar/26</font>
+
+                            ]
+            </font>
+
+        </td></tr>
+        <tr id="comment-body-2637784"><td bgcolor="#ffffff">
+            <p>Updated to incliude an actual user story and changed AC to gherkin format</p>
+        </td></tr>
+                <tr id="comment-header-2638761"><td bgcolor="#f0f0f0">
+            Comment by  
+                                                    
+                
+        
+            <a class="user-hover" rel="712020:8e32e5a4-f9bd-4093-8833-838bef743021"
+                id="word_commented_712020:8e32e5a4-f9bd-4093-8833-838bef743021"
+                href="https://accelins.atlassian.net/secure/ViewProfile.jspa?accountId=712020%3A8e32e5a4-f9bd-4093-8833-838bef743021">
+                    Danny Smith
+                </a>
+
+                                        <font size="-2">
+            [
+                <font color="#336699">05/Mar/26</font>
+
+                            ]
+            </font>
+
+        </td></tr>
+        <tr id="comment-body-2638761"><td bgcolor="#ffffff">
+            <p><a href="https://accelins.atlassian.net/secure/ViewProfile.jspa?accountId=712020%3A0d055962-1974-4273-b8d7-7a97dd766aa8" class="user-hover" rel="712020:0d055962-1974-4273-b8d7-7a97dd766aa8" data-account-id="712020:0d055962-1974-4273-b8d7-7a97dd766aa8" accountid="712020:0d055962-1974-4273-b8d7-7a97dd766aa8" rel="noreferrer">Ken Reynolds</a> - As per refinement session please include these scenarios and the Dataverse ID into each of the Product ref data tables:</p>
+
+<ol>
+	<li>They need to be read only</li>
+	<li>Dataverse_ID__c field must be of type Text(36)</li>
+	<li>And it must be excluded from all page layouts</li>
+	<li>And it must be hidden from all standard user profiles</li>
+	<li>And it must be visible and writable via API only to the MuleSoft integration user</li>
+	<li>No user can edit</li>
+</ol>
+
+
+<p><b>Scenario 1: Create hidden Dataverse ID field on Account</b><br/>
+  Given the Account object<br/>
+  When the field "Dataverse_ID__c" is created<br/>
+  Then it must be of type Text(36)<br/>
+  And labeled "Dataverse ID"<br/>
+  And excluded from all page layouts<br/>
+  And visible via API to integration users</p>
+
+<p><b>Scenario 2: New Salesforce Account initially has no Dataverse ID</b><br/>
+  Given a user creates a new Account in Salesforce<br/>
+  When the record is saved<br/>
+  Then "Dataverse_ID__c" should be blank</p>
+
+
+
+
+
+<p><a href="https://accelins.atlassian.net/secure/ViewProfile.jspa?accountId=712020%3Aecbcec11-f098-4810-8f24-650664eabec1" class="user-hover" rel="712020:ecbcec11-f098-4810-8f24-650664eabec1" data-account-id="712020:ecbcec11-f098-4810-8f24-650664eabec1" accountid="712020:ecbcec11-f098-4810-8f24-650664eabec1" rel="noreferrer">Ahmed Al-Raweshidy</a> FYI, the above needs to go in this story (which will save time and effort manging similar stories)</p>
+        </td></tr>
+                <tr id="comment-header-2642586"><td bgcolor="#f0f0f0">
+            Comment by  
+                                                    
+                
+        
+            <a class="user-hover" rel="712020:ecbcec11-f098-4810-8f24-650664eabec1"
+                id="word_commented_712020:ecbcec11-f098-4810-8f24-650664eabec1"
+                href="https://accelins.atlassian.net/secure/ViewProfile.jspa?accountId=712020%3Aecbcec11-f098-4810-8f24-650664eabec1">
+                    Ahmed Al-Raweshidy
+                </a>
+
+                                        <font size="-2">
+            [
+                <font color="#336699">09/Mar/26</font>
+
+                            ]
+            </font>
+
+        </td></tr>
+        <tr id="comment-body-2642586"><td bgcolor="#ffffff">
+            <p><a href="https://accelins.atlassian.net/secure/ViewProfile.jspa?accountId=712020%3A0d055962-1974-4273-b8d7-7a97dd766aa8" class="user-hover" rel="712020:0d055962-1974-4273-b8d7-7a97dd766aa8" data-account-id="712020:0d055962-1974-4273-b8d7-7a97dd766aa8" accountid="712020:0d055962-1974-4273-b8d7-7a97dd766aa8" rel="noreferrer">Ken Reynolds</a> I can see you in the history that you removed the Dataverse ID requirement and made some edits - could I ask why?</p>
+        </td></tr>
+                <tr id="comment-header-2646623"><td bgcolor="#f0f0f0">
+            Comment by  
+                                                    
+                
+        
+            <a class="user-hover" rel="712020:51998624-a399-42d9-bda9-bf91b0c4adf3"
+                id="word_commented_712020:51998624-a399-42d9-bda9-bf91b0c4adf3"
+                href="https://accelins.atlassian.net/secure/ViewProfile.jspa?accountId=712020%3A51998624-a399-42d9-bda9-bf91b0c4adf3">
+                    Ahemaiti Subate
+                </a>
+
+                                        <font size="-2">
+            [
+                <font color="#336699">12/Mar/26</font>
+
+                            ]
+            </font>
+
+        </td></tr>
+        <tr id="comment-body-2646623"><td bgcolor="#ffffff">
+            <div class='table-wrap'>
+<table class='confluenceTable'><tbody>
+<tr>
+<td class='confluenceTd'><b>Component</b></td>
+<td class='confluenceTd'><b>Component Type</b></td>
+</tr>
+<tr>
+<td class='confluenceTd'>Product map</td>
+<td class='confluenceTd'>Custom object</td>
+</tr>
+<tr>
+<td class='confluenceTd'>Sub Products</td>
+<td class='confluenceTd'>Custom object</td>
+</tr>
+<tr>
+<td class='confluenceTd'>POG Products</td>
+<td class='confluenceTd'>Custom object</td>
+</tr>
+<tr>
+<td class='confluenceTd'>OSFI Codes</td>
+<td class='confluenceTd'>Custom object</td>
+</tr>
+<tr>
+<td class='confluenceTd'>Member Products</td>
+<td class='confluenceTd'>Custom object</td>
+</tr>
+<tr>
+<td class='confluenceTd'>Lines of Business</td>
+<td class='confluenceTd'>Custom object</td>
+</tr>
+<tr>
+<td class='confluenceTd'>Classes of Business</td>
+<td class='confluenceTd'>Custom object</td>
+</tr>
+<tr>
+<td class='confluenceTd'>ASLOBS</td>
+<td class='confluenceTd'>Custom object</td>
+</tr>
+<tr>
+<td class='confluenceTd'>BEEGAP</td>
+<td class='confluenceTd'>Custom object</td>
+</tr>
+<tr>
+<td class='confluenceTd'>Solvency II</td>
+<td class='confluenceTd'>Custom object</td>
+</tr>
+<tr>
+<td class='confluenceTd'>Name_is_Required</td>
+<td class='confluenceTd'>Validation RuleApply to all above object)</td>
+</tr>
+<tr>
+<td class='confluenceTd'>Valid_From_Less_Than_Equal_to_Valid_To</td>
+<td class='confluenceTd'>Validation RuleApply to all above object</td>
+</tr>
+<tr>
+<td class='confluenceTd'>Valid_To_Must_not_be_in_Past_on_Create</td>
+<td class='confluenceTd'>Validation RuleApply to all above object</td>
+</tr>
+<tr>
+<td class='confluenceTd'>ASLOB Prevent Duplicate</td>
+<td class='confluenceTd'>Duplicate Rule(Apply to all above object)</td>
+</tr>
+<tr>
+<td class='confluenceTd'>ASLOB Prevent Duplicate matching rule</td>
+<td class='confluenceTd'>matching Rule (Apply to all above object)</td>
+</tr>
+<tr>
+<td class='confluenceTd'>PS Product ReferenceRDM CRU</td>
+<td class='confluenceTd'>Permission Set</td>
+</tr>
+<tr>
+<td class='confluenceTd'>PSG_DataGovernance_User</td>
+<td class='confluenceTd'>Permission Set Group</td>
+</tr>
+</tbody></table>
+</div>
+
+        </td></tr>
+                <tr id="comment-header-2646681"><td bgcolor="#f0f0f0">
+            Comment by  
+                                                    
+                
+        
+            <a class="user-hover" rel="712020:6eb6f4d6-668a-457c-b78b-ae35e825e64f"
+                id="word_commented_712020:6eb6f4d6-668a-457c-b78b-ae35e825e64f"
+                href="https://accelins.atlassian.net/secure/ViewProfile.jspa?accountId=712020%3A6eb6f4d6-668a-457c-b78b-ae35e825e64f">
+                    Gabriel Fuoco
+                </a>
+
+                                        <font size="-2">
+            [
+                <font color="#336699">12/Mar/26</font>
+
+                            ]
+            </font>
+
+        </td></tr>
+        <tr id="comment-body-2646681"><td bgcolor="#ffffff">
+            <p>Commit <font color="green">succeeded</font>: <a href="https://app.gearset.com/finished?deploymentId=271a9f57-2b7b-4dec-a3b4-bf7847882deb" class="external-link" rel="nofollow noreferrer">https://app.gearset.com/finished?deploymentId=271a9f57-2b7b-4dec-a3b4-bf7847882deb</a></p>
+
+<p>Commit notes: </p>
+
+<p>Source: Dev (gearsetintegration@accelins.com.sbxcmn)<br/>
+Target: accelins / Salesforce_Devops / SF-872/12-Create-Salesforce-Product-Reference-Data-Objects-To-Manage-RDM-Values-2</p>
+
+<div class='table-wrap'>
+<table class='confluenceTable'><tbody>
+<tr>
+<th class='confluenceTh'>Difference Type</th>
+<th class='confluenceTh'>Metadata Type</th>
+<th class='confluenceTh'>Name</th>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Custom object</td>
+<td class='confluenceTd'>ASLOB</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Duplicate rule</td>
+<td class='confluenceTd'>ASLOB&#95;&#95;c.ASLOB&#95;Prevent&#95;Duplicate</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Matching rule</td>
+<td class='confluenceTd'>ASLOB&#95;&#95;c.ASLOB&#95;Prevent&#95;Duplicate&#95;matching&#95;rule</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Custom object</td>
+<td class='confluenceTd'>BEEGAP</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Duplicate rule</td>
+<td class='confluenceTd'>BEEGAP&#95;&#95;c.BEEG</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Matching rule</td>
+<td class='confluenceTd'>BEEGAP&#95;&#95;c.BEEGAP&#95;Prevent&#95;Duplicate&#95;matching&#95;rule</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Custom object</td>
+<td class='confluenceTd'>Classes&#95;of&#95;Business</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Duplicate rule</td>
+<td class='confluenceTd'>Classes&#95;of&#95;Business&#95;&#95;c.COB&#95;Duplicate&#95;Rule</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Matching rule</td>
+<td class='confluenceTd'>Classes&#95;of&#95;Business&#95;&#95;c.COB&#95;Duplicate&#95;Rule&#95;matching&#95;rule</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Custom object</td>
+<td class='confluenceTd'>Line&#95;of&#95;Business</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Duplicate rule</td>
+<td class='confluenceTd'>Line&#95;of&#95;Business&#95;&#95;c.Line&#95;Of&#95;Business&#95;Prevent&#95;Duplicate</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Matching rule</td>
+<td class='confluenceTd'>Line&#95;of&#95;Business&#95;&#95;c.Line&#95;Of&#95;Business&#95;Prevent&#95;Duplicate&#95;matching&#95;rule</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Custom object</td>
+<td class='confluenceTd'>Member&#95;Product</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Duplicate rule</td>
+<td class='confluenceTd'>Member&#95;Product&#95;&#95;c.Member&#95;Products&#95;Duplicate&#95;Rule</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Matching rule</td>
+<td class='confluenceTd'>Member&#95;Product&#95;&#95;c.Member&#95;Products&#95;Duplicate&#95;Rule&#95;matching&#95;rule</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Custom object</td>
+<td class='confluenceTd'>OSFI</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Duplicate rule</td>
+<td class='confluenceTd'>OSFI&#95;&#95;c.OSFI&#95;Prevent&#95;Duplicate</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Matching rule</td>
+<td class='confluenceTd'>OSFI&#95;&#95;c.OSFI&#95;Prevent&#95;Duplicate&#95;matching&#95;rule</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Custom object</td>
+<td class='confluenceTd'>POG&#95;Product</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Duplicate rule</td>
+<td class='confluenceTd'>POG&#95;Product&#95;&#95;c.POG&#95;Prevent&#95;Duplicate</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Matching rule</td>
+<td class='confluenceTd'>POG&#95;Product&#95;&#95;c.POG&#95;Prevent&#95;Duplicate&#95;matching&#95;rule</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Custom object</td>
+<td class='confluenceTd'>Product&#95;Map</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Duplicate rule</td>
+<td class='confluenceTd'>Product&#95;Map&#95;&#95;c.Product&#95;Map&#95;prevent&#95;Duplicates</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Matching rule</td>
+<td class='confluenceTd'>Product&#95;Map&#95;&#95;c.Product&#95;Map&#95;prevent&#95;Duplicates&#95;matching&#95;rule</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Permission set group</td>
+<td class='confluenceTd'>PSG&#95;DataGovernance&#95;User</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Custom object</td>
+<td class='confluenceTd'>Solvency&#95;II</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Duplicate rule</td>
+<td class='confluenceTd'>Solvency&#95;II&#95;&#95;c.Solvency&#95;II&#95;Prevent&#95;Name&#95;Duplicate</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Matching rule</td>
+<td class='confluenceTd'>Solvency&#95;II&#95;&#95;c.Solvency&#95;II&#95;Prevent&#95;Name&#95;Duplicate&#95;matching&#95;rule</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Custom object</td>
+<td class='confluenceTd'>Sub&#95;Product</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Matching rule</td>
+<td class='confluenceTd'>Sub&#95;Product&#95;&#95;c.Sub&#95;Product&#95;Duplicate&#95;Rule&#95;matching&#95;rule</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Permission set</td>
+<td class='confluenceTd'>PS&#95;Product&#95;ReferenceRDM&#95;CRU</td>
+</tr>
+</tbody></table>
+</div>
+
+        </td></tr>
+                <tr id="comment-header-2646701"><td bgcolor="#f0f0f0">
+            Comment by  
+                                                    
+                
+        
+            <a class="user-hover" rel="712020:6eb6f4d6-668a-457c-b78b-ae35e825e64f"
+                id="word_commented_712020:6eb6f4d6-668a-457c-b78b-ae35e825e64f"
+                href="https://accelins.atlassian.net/secure/ViewProfile.jspa?accountId=712020%3A6eb6f4d6-668a-457c-b78b-ae35e825e64f">
+                    Gabriel Fuoco
+                </a>
+
+                                        <font size="-2">
+            [
+                <font color="#336699">12/Mar/26</font>
+
+                            ]
+            </font>
+
+        </td></tr>
+        <tr id="comment-body-2646701"><td bgcolor="#ffffff">
+            <p>Commit <font color="green">succeeded</font>: <a href="https://app.gearset.com/finished?deploymentId=da3750b3-8b08-4793-aae1-efed9b4b2f51" class="external-link" rel="nofollow noreferrer">https://app.gearset.com/finished?deploymentId=da3750b3-8b08-4793-aae1-efed9b4b2f51</a></p>
+
+<p>Commit notes: </p>
+
+<p>Source: Dev (gearsetintegration@accelins.com.sbxcmn)<br/>
+Target: accelins / Salesforce_Devops / SF-872/12-Create-Salesforce-Product-Reference-Data-Objects-To-Manage-RDM-Values-2</p>
+
+<div class='table-wrap'>
+<table class='confluenceTable'><tbody>
+<tr>
+<th class='confluenceTh'>Difference Type</th>
+<th class='confluenceTh'>Metadata Type</th>
+<th class='confluenceTh'>Name</th>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Custom field</td>
+<td class='confluenceTd'>Product&#95;Map&#95;&#95;c.Classes&#95;of&#95;Business</td>
+</tr>
+<tr>
+<td class='confluenceTd'>No difference</td>
+<td class='confluenceTd'>Custom object</td>
+<td class='confluenceTd'>Product&#95;Map</td>
+</tr>
+</tbody></table>
+</div>
+
+        </td></tr>
+                <tr id="comment-header-2646730"><td bgcolor="#f0f0f0">
+            Comment by  
+                                                    
+                
+        
+            <a class="user-hover" rel="712020:6eb6f4d6-668a-457c-b78b-ae35e825e64f"
+                id="word_commented_712020:6eb6f4d6-668a-457c-b78b-ae35e825e64f"
+                href="https://accelins.atlassian.net/secure/ViewProfile.jspa?accountId=712020%3A6eb6f4d6-668a-457c-b78b-ae35e825e64f">
+                    Gabriel Fuoco
+                </a>
+
+                                        <font size="-2">
+            [
+                <font color="#336699">12/Mar/26</font>
+
+                            ]
+            </font>
+
+        </td></tr>
+        <tr id="comment-body-2646730"><td bgcolor="#ffffff">
+            <p>Commit <font color="green">succeeded</font>: <a href="https://app.gearset.com/finished?deploymentId=1b0c1536-ffba-4711-83e2-b7116bd86c5e" class="external-link" rel="nofollow noreferrer">https://app.gearset.com/finished?deploymentId=1b0c1536-ffba-4711-83e2-b7116bd86c5e</a></p>
+
+<p>Commit notes: </p>
+
+<p>Source: Dev (gearsetintegration@accelins.com.sbxcmn)<br/>
+Target: accelins / Salesforce_Devops / SF-872/12-Create-Salesforce-Product-Reference-Data-Objects-To-Manage-RDM-Values-2</p>
+
+<div class='table-wrap'>
+<table class='confluenceTable'><tbody>
+<tr>
+<th class='confluenceTh'>Difference Type</th>
+<th class='confluenceTh'>Metadata Type</th>
+<th class='confluenceTh'>Name</th>
+</tr>
+<tr>
+<td class='confluenceTd'>Different</td>
+<td class='confluenceTd'>List view</td>
+<td class='confluenceTd'>Product&#95;Map&#95;&#95;c.All</td>
+</tr>
+<tr>
+<td class='confluenceTd'>Deleted</td>
+<td class='confluenceTd'>Custom field</td>
+<td class='confluenceTd'>Product&#95;Map&#95;&#95;c.COB</td>
+</tr>
+<tr>
+<td class='confluenceTd'>No difference</td>
+<td class='confluenceTd'>Custom object</td>
+<td class='confluenceTd'>Product&#95;Map</td>
+</tr>
+</tbody></table>
+</div>
+
+        </td></tr>
+                <tr id="comment-header-2646745"><td bgcolor="#f0f0f0">
+            Comment by  
+                                                    
+                
+        
+            <a class="user-hover" rel="712020:6eb6f4d6-668a-457c-b78b-ae35e825e64f"
+                id="word_commented_712020:6eb6f4d6-668a-457c-b78b-ae35e825e64f"
+                href="https://accelins.atlassian.net/secure/ViewProfile.jspa?accountId=712020%3A6eb6f4d6-668a-457c-b78b-ae35e825e64f">
+                    Gabriel Fuoco
+                </a>
+
+                                        <font size="-2">
+            [
+                <font color="#336699">12/Mar/26</font>
+
+                            ]
+            </font>
+
+        </td></tr>
+        <tr id="comment-body-2646745"><td bgcolor="#ffffff">
+            <p>Commit <font color="green">succeeded</font>: <a href="https://app.gearset.com/finished?deploymentId=7e288f66-f7e4-410e-a910-5f1caffef796" class="external-link" rel="nofollow noreferrer">https://app.gearset.com/finished?deploymentId=7e288f66-f7e4-410e-a910-5f1caffef796</a></p>
+
+<p>Commit notes: </p>
+
+<p>Source: Dev (gearsetintegration@accelins.com.sbxcmn)<br/>
+Target: accelins / Salesforce_Devops / SF-872/12-Create-Salesforce-Product-Reference-Data-Objects-To-Manage-RDM-Values-2</p>
+
+<div class='table-wrap'>
+<table class='confluenceTable'><tbody>
+<tr>
+<th class='confluenceTh'>Difference Type</th>
+<th class='confluenceTh'>Metadata Type</th>
+<th class='confluenceTh'>Name</th>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Custom tab</td>
+<td class='confluenceTd'>ASLOB</td>
+</tr>
+</tbody></table>
+</div>
+
+        </td></tr>
+                <tr id="comment-header-2646756"><td bgcolor="#f0f0f0">
+            Comment by  
+                                                    
+                
+        
+            <a class="user-hover" rel="712020:6eb6f4d6-668a-457c-b78b-ae35e825e64f"
+                id="word_commented_712020:6eb6f4d6-668a-457c-b78b-ae35e825e64f"
+                href="https://accelins.atlassian.net/secure/ViewProfile.jspa?accountId=712020%3A6eb6f4d6-668a-457c-b78b-ae35e825e64f">
+                    Gabriel Fuoco
+                </a>
+
+                                        <font size="-2">
+            [
+                <font color="#336699">12/Mar/26</font>
+
+                            ]
+            </font>
+
+        </td></tr>
+        <tr id="comment-body-2646756"><td bgcolor="#ffffff">
+            <p>Commit <font color="green">succeeded</font>: <a href="https://app.gearset.com/finished?deploymentId=68c9d292-8582-4114-bf19-7079009eba60" class="external-link" rel="nofollow noreferrer">https://app.gearset.com/finished?deploymentId=68c9d292-8582-4114-bf19-7079009eba60</a></p>
+
+<p>Commit notes: </p>
+
+<p>Source: Dev (gearsetintegration@accelins.com.sbxcmn)<br/>
+Target: accelins / Salesforce_Devops / SF-872/12-Create-Salesforce-Product-Reference-Data-Objects-To-Manage-RDM-Values-2</p>
+
+<div class='table-wrap'>
+<table class='confluenceTable'><tbody>
+<tr>
+<th class='confluenceTh'>Difference Type</th>
+<th class='confluenceTh'>Metadata Type</th>
+<th class='confluenceTh'>Name</th>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Custom tab</td>
+<td class='confluenceTd'>COB</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Custom tab</td>
+<td class='confluenceTd'>Line&#95;of&#95;Business</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Custom tab</td>
+<td class='confluenceTd'>Member&#95;Product</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Custom tab</td>
+<td class='confluenceTd'>OSFI</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Custom tab</td>
+<td class='confluenceTd'>POG&#95;Product</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Custom tab</td>
+<td class='confluenceTd'>Product&#95;Map</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Custom tab</td>
+<td class='confluenceTd'>Solvency&#95;II</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Custom tab</td>
+<td class='confluenceTd'>Sub&#95;Product</td>
+</tr>
+</tbody></table>
+</div>
+
+        </td></tr>
+                <tr id="comment-header-2646764"><td bgcolor="#f0f0f0">
+            Comment by  
+                                                    
+                
+        
+            <a class="user-hover" rel="712020:6eb6f4d6-668a-457c-b78b-ae35e825e64f"
+                id="word_commented_712020:6eb6f4d6-668a-457c-b78b-ae35e825e64f"
+                href="https://accelins.atlassian.net/secure/ViewProfile.jspa?accountId=712020%3A6eb6f4d6-668a-457c-b78b-ae35e825e64f">
+                    Gabriel Fuoco
+                </a>
+
+                                        <font size="-2">
+            [
+                <font color="#336699">12/Mar/26</font>
+
+                            ]
+            </font>
+
+        </td></tr>
+        <tr id="comment-body-2646764"><td bgcolor="#ffffff">
+            <p>Commit <font color="green">succeeded</font>: <a href="https://app.gearset.com/finished?deploymentId=37400475-20f0-44f8-b1c6-4bc14b8c022b" class="external-link" rel="nofollow noreferrer">https://app.gearset.com/finished?deploymentId=37400475-20f0-44f8-b1c6-4bc14b8c022b</a></p>
+
+<p>Commit notes: </p>
+
+<p>Source: Dev (gearsetintegration@accelins.com.sbxcmn)<br/>
+Target: accelins / Salesforce_Devops / SF-872/12-Create-Salesforce-Product-Reference-Data-Objects-To-Manage-RDM-Values-2</p>
+
+<div class='table-wrap'>
+<table class='confluenceTable'><tbody>
+<tr>
+<th class='confluenceTh'>Difference Type</th>
+<th class='confluenceTh'>Metadata Type</th>
+<th class='confluenceTh'>Name</th>
+</tr>
+<tr>
+<td class='confluenceTd'>Deleted</td>
+<td class='confluenceTd'>Custom tab</td>
+<td class='confluenceTd'>COB</td>
+</tr>
+</tbody></table>
+</div>
+
+        </td></tr>
+                <tr id="comment-header-2646767"><td bgcolor="#f0f0f0">
+            Comment by  
+                                                    
+                
+        
+            <a class="user-hover" rel="712020:6eb6f4d6-668a-457c-b78b-ae35e825e64f"
+                id="word_commented_712020:6eb6f4d6-668a-457c-b78b-ae35e825e64f"
+                href="https://accelins.atlassian.net/secure/ViewProfile.jspa?accountId=712020%3A6eb6f4d6-668a-457c-b78b-ae35e825e64f">
+                    Gabriel Fuoco
+                </a>
+
+                                        <font size="-2">
+            [
+                <font color="#336699">12/Mar/26</font>
+
+                            ]
+            </font>
+
+        </td></tr>
+        <tr id="comment-body-2646767"><td bgcolor="#ffffff">
+            <p><img class="emoticon" src="/images/icons/emoticons/check.png" height="16" width="16" align="absmiddle" alt="" border="0"/> Successfully merged <a href="https://github.com/accelins/Salesforce_Devops/pull/558" class="external-link" rel="nofollow noreferrer">PR #558</a> from <tt>gs&#45;pipeline/SF&#45;872/12&#45;Create&#45;Salesforce&#45;Product&#45;Reference&#45;Data&#45;Objects&#45;To&#45;Manage&#45;RDM&#45;Values&#45;2&#95;&#45;&#95;QA</tt> into <tt>QA</tt></p>
+        </td></tr>
+                <tr id="comment-header-2646829"><td bgcolor="#f0f0f0">
+            Comment by  
+                                                    
+                
+        
+            <a class="user-hover" rel="712020:6eb6f4d6-668a-457c-b78b-ae35e825e64f"
+                id="word_commented_712020:6eb6f4d6-668a-457c-b78b-ae35e825e64f"
+                href="https://accelins.atlassian.net/secure/ViewProfile.jspa?accountId=712020%3A6eb6f4d6-668a-457c-b78b-ae35e825e64f">
+                    Gabriel Fuoco
+                </a>
+
+                                        <font size="-2">
+            [
+                <font color="#336699">12/Mar/26</font>
+
+                            ]
+            </font>
+
+        </td></tr>
+        <tr id="comment-body-2646829"><td bgcolor="#ffffff">
+            <p>Commit <font color="green">succeeded</font>: <a href="https://app.gearset.com/finished?deploymentId=c1f9b924-fcc3-453c-bea0-5fb3cf85d138" class="external-link" rel="nofollow noreferrer">https://app.gearset.com/finished?deploymentId=c1f9b924-fcc3-453c-bea0-5fb3cf85d138</a></p>
+
+<p>Commit notes: </p>
+
+<p>Source: Dev (gearsetintegration@accelins.com.sbxcmn)<br/>
+Target: accelins / Salesforce_Devops / SF-872/12-Create-Salesforce-Product-Reference-Data-Objects-To-Manage-RDM-Values-2</p>
+
+<div class='table-wrap'>
+<table class='confluenceTable'><tbody>
+<tr>
+<th class='confluenceTh'>Difference Type</th>
+<th class='confluenceTh'>Metadata Type</th>
+<th class='confluenceTh'>Name</th>
+</tr>
+<tr>
+<td class='confluenceTd'>Different</td>
+<td class='confluenceTd'>Custom tab</td>
+<td class='confluenceTd'>ASLOB</td>
+</tr>
+<tr>
+<td class='confluenceTd'>Different</td>
+<td class='confluenceTd'>Custom tab</td>
+<td class='confluenceTd'>Line&#95;of&#95;Business</td>
+</tr>
+<tr>
+<td class='confluenceTd'>Different</td>
+<td class='confluenceTd'>Custom tab</td>
+<td class='confluenceTd'>Member&#95;Product</td>
+</tr>
+<tr>
+<td class='confluenceTd'>Different</td>
+<td class='confluenceTd'>Custom tab</td>
+<td class='confluenceTd'>OSFI</td>
+</tr>
+<tr>
+<td class='confluenceTd'>Different</td>
+<td class='confluenceTd'>Custom tab</td>
+<td class='confluenceTd'>POG&#95;Product</td>
+</tr>
+<tr>
+<td class='confluenceTd'>Different</td>
+<td class='confluenceTd'>Custom tab</td>
+<td class='confluenceTd'>Product&#95;Map</td>
+</tr>
+<tr>
+<td class='confluenceTd'>Different</td>
+<td class='confluenceTd'>Custom tab</td>
+<td class='confluenceTd'>Solvency&#95;II</td>
+</tr>
+<tr>
+<td class='confluenceTd'>Different</td>
+<td class='confluenceTd'>Custom tab</td>
+<td class='confluenceTd'>Sub&#95;Product</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Custom tab</td>
+<td class='confluenceTd'>BEEGAP</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Custom tab</td>
+<td class='confluenceTd'>Classes&#95;of&#95;Business</td>
+</tr>
+</tbody></table>
+</div>
+
+        </td></tr>
+                <tr id="comment-header-2646836"><td bgcolor="#f0f0f0">
+            Comment by  
+                                                    
+                
+        
+            <a class="user-hover" rel="712020:6eb6f4d6-668a-457c-b78b-ae35e825e64f"
+                id="word_commented_712020:6eb6f4d6-668a-457c-b78b-ae35e825e64f"
+                href="https://accelins.atlassian.net/secure/ViewProfile.jspa?accountId=712020%3A6eb6f4d6-668a-457c-b78b-ae35e825e64f">
+                    Gabriel Fuoco
+                </a>
+
+                                        <font size="-2">
+            [
+                <font color="#336699">12/Mar/26</font>
+
+                            ]
+            </font>
+
+        </td></tr>
+        <tr id="comment-body-2646836"><td bgcolor="#ffffff">
+            <p><img class="emoticon" src="/images/icons/emoticons/check.png" height="16" width="16" align="absmiddle" alt="" border="0"/> Successfully merged <a href="https://github.com/accelins/Salesforce_Devops/pull/560" class="external-link" rel="nofollow noreferrer">PR #560</a> from <tt>gs&#45;pipeline/SF&#45;872/12&#45;Create&#45;Salesforce&#45;Product&#45;Reference&#45;Data&#45;Objects&#45;To&#45;Manage&#45;RDM&#45;Values&#45;2&#95;&#45;&#95;QA</tt> into <tt>QA</tt></p>
+        </td></tr>
+                <tr id="comment-header-2648449"><td bgcolor="#f0f0f0">
+            Comment by  
+                                                    
+                
+        
+            <a class="user-hover" rel="712020:6eb6f4d6-668a-457c-b78b-ae35e825e64f"
+                id="word_commented_712020:6eb6f4d6-668a-457c-b78b-ae35e825e64f"
+                href="https://accelins.atlassian.net/secure/ViewProfile.jspa?accountId=712020%3A6eb6f4d6-668a-457c-b78b-ae35e825e64f">
+                    Gabriel Fuoco
+                </a>
+
+                                        <font size="-2">
+            [
+                <font color="#336699">13/Mar/26</font>
+
+                            ]
+            </font>
+
+        </td></tr>
+        <tr id="comment-body-2648449"><td bgcolor="#ffffff">
+            <p>Commit <font color="green">succeeded</font>: <a href="https://app.gearset.com/finished?deploymentId=c8624847-2521-461c-be6f-d9c7bda29572" class="external-link" rel="nofollow noreferrer">https://app.gearset.com/finished?deploymentId=c8624847-2521-461c-be6f-d9c7bda29572</a></p>
+
+<p>Commit notes: </p>
+
+<p>Source: Dev (gearsetintegration@accelins.com.sbxcmn)<br/>
+Target: accelins / Salesforce_Devops / SF-872/12-Create-Salesforce-Product-Reference-Data-Objects-To-Manage-RDM-Values-3</p>
+
+<div class='table-wrap'>
+<table class='confluenceTable'><tbody>
+<tr>
+<th class='confluenceTh'>Difference Type</th>
+<th class='confluenceTh'>Metadata Type</th>
+<th class='confluenceTh'>Name</th>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Layout</td>
+<td class='confluenceTd'>ASLOB&#95;&#95;c&#45;ASLOB Layout</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Layout</td>
+<td class='confluenceTd'>BEEGAP&#95;&#95;c&#45;BEEGAP Layout</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Layout</td>
+<td class='confluenceTd'>Classes&#95;of&#95;Business&#95;&#95;c&#45;Classes of Business Layout</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Layout</td>
+<td class='confluenceTd'>Line&#95;of&#95;Business&#95;&#95;c&#45;Line of Business Layout</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Layout</td>
+<td class='confluenceTd'>Member&#95;Product&#95;&#95;c&#45;Member Product Layout</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Layout</td>
+<td class='confluenceTd'>OSFI&#95;&#95;c&#45;OSFI Layout</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Layout</td>
+<td class='confluenceTd'>POG&#95;Product&#95;&#95;c&#45;POG Product Layout</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Layout</td>
+<td class='confluenceTd'>Product&#95;Map&#95;&#95;c&#45;Product Map Layout</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Layout</td>
+<td class='confluenceTd'>Solvency&#95;II&#95;&#95;c&#45;Solvency II Layout</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Layout</td>
+<td class='confluenceTd'>Sub&#95;Product&#95;&#95;c&#45;Sub Product Layout</td>
+</tr>
+</tbody></table>
+</div>
+
+        </td></tr>
+                <tr id="comment-header-2648452"><td bgcolor="#f0f0f0">
+            Comment by  
+                                                    
+                
+        
+            <a class="user-hover" rel="712020:6eb6f4d6-668a-457c-b78b-ae35e825e64f"
+                id="word_commented_712020:6eb6f4d6-668a-457c-b78b-ae35e825e64f"
+                href="https://accelins.atlassian.net/secure/ViewProfile.jspa?accountId=712020%3A6eb6f4d6-668a-457c-b78b-ae35e825e64f">
+                    Gabriel Fuoco
+                </a>
+
+                                        <font size="-2">
+            [
+                <font color="#336699">13/Mar/26</font>
+
+                            ]
+            </font>
+
+        </td></tr>
+        <tr id="comment-body-2648452"><td bgcolor="#ffffff">
+            <p><img class="emoticon" src="/images/icons/emoticons/check.png" height="16" width="16" align="absmiddle" alt="" border="0"/> Successfully merged <a href="https://github.com/accelins/Salesforce_Devops/pull/593" class="external-link" rel="nofollow noreferrer">PR #593</a> from <tt>gs&#45;pipeline/SF&#45;872/12&#45;Create&#45;Salesforce&#45;Product&#45;Reference&#45;Data&#45;Objects&#45;To&#45;Manage&#45;RDM&#45;Values&#45;3&#95;&#45;&#95;QA</tt> into <tt>QA</tt></p>
+        </td></tr>
+                <tr id="comment-header-2648458"><td bgcolor="#f0f0f0">
+            Comment by  
+                                                    
+                
+        
+            <a class="user-hover" rel="712020:6eb6f4d6-668a-457c-b78b-ae35e825e64f"
+                id="word_commented_712020:6eb6f4d6-668a-457c-b78b-ae35e825e64f"
+                href="https://accelins.atlassian.net/secure/ViewProfile.jspa?accountId=712020%3A6eb6f4d6-668a-457c-b78b-ae35e825e64f">
+                    Gabriel Fuoco
+                </a>
+
+                                        <font size="-2">
+            [
+                <font color="#336699">13/Mar/26</font>
+
+                            ]
+            </font>
+
+        </td></tr>
+        <tr id="comment-body-2648458"><td bgcolor="#ffffff">
+            <p>Commit <font color="green">succeeded</font>: <a href="https://app.gearset.com/finished?deploymentId=2005cd72-1bf7-4fe8-8875-3d672df701db" class="external-link" rel="nofollow noreferrer">https://app.gearset.com/finished?deploymentId=2005cd72-1bf7-4fe8-8875-3d672df701db</a></p>
+
+<p>Commit notes: </p>
+
+<p>Source: Dev (gearsetintegration@accelins.com.sbxcmn)<br/>
+Target: accelins / Salesforce_Devops / SF-872/12-Create-Salesforce-Product-Reference-Data-Objects-To-Manage-RDM-Values-4</p>
+
+<div class='table-wrap'>
+<table class='confluenceTable'><tbody>
+<tr>
+<th class='confluenceTh'>Difference Type</th>
+<th class='confluenceTh'>Metadata Type</th>
+<th class='confluenceTh'>Name</th>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Lightning page</td>
+<td class='confluenceTd'>ASLOB&#95;Record&#95;Page</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Lightning page</td>
+<td class='confluenceTd'>BEEGAP&#95;Record&#95;Page</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Lightning page</td>
+<td class='confluenceTd'>Classes&#95;of&#95;Business&#95;Record&#95;Page</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Lightning page</td>
+<td class='confluenceTd'>Line&#95;of&#95;Business&#95;Record&#95;Page</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Lightning page</td>
+<td class='confluenceTd'>Member&#95;Product&#95;Record&#95;Page</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Lightning page</td>
+<td class='confluenceTd'>OSFI&#95;Record&#95;Page</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Lightning page</td>
+<td class='confluenceTd'>POG&#95;Product&#95;Record&#95;Page</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Lightning page</td>
+<td class='confluenceTd'>Product&#95;Map&#95;Record&#95;Page</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Lightning page</td>
+<td class='confluenceTd'>Solvency&#95;II&#95;Record&#95;Page</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Lightning page</td>
+<td class='confluenceTd'>Sub&#95;Product&#95;Record&#95;Page</td>
+</tr>
+</tbody></table>
+</div>
+
+        </td></tr>
+                <tr id="comment-header-2648460"><td bgcolor="#f0f0f0">
+            Comment by  
+                                                    
+                
+        
+            <a class="user-hover" rel="712020:6eb6f4d6-668a-457c-b78b-ae35e825e64f"
+                id="word_commented_712020:6eb6f4d6-668a-457c-b78b-ae35e825e64f"
+                href="https://accelins.atlassian.net/secure/ViewProfile.jspa?accountId=712020%3A6eb6f4d6-668a-457c-b78b-ae35e825e64f">
+                    Gabriel Fuoco
+                </a>
+
+                                        <font size="-2">
+            [
+                <font color="#336699">13/Mar/26</font>
+
+                            ]
+            </font>
+
+        </td></tr>
+        <tr id="comment-body-2648460"><td bgcolor="#ffffff">
+            <p><img class="emoticon" src="/images/icons/emoticons/check.png" height="16" width="16" align="absmiddle" alt="" border="0"/> Successfully merged <a href="https://github.com/accelins/Salesforce_Devops/pull/595" class="external-link" rel="nofollow noreferrer">PR #595</a> from <tt>gs&#45;pipeline/SF&#45;872/12&#45;Create&#45;Salesforce&#45;Product&#45;Reference&#45;Data&#45;Objects&#45;To&#45;Manage&#45;RDM&#45;Values&#45;4&#95;&#45;&#95;QA</tt> into <tt>QA</tt></p>
+        </td></tr>
+                <tr id="comment-header-2648476"><td bgcolor="#f0f0f0">
+            Comment by  
+                                                    
+                
+        
+            <a class="user-hover" rel="712020:6eb6f4d6-668a-457c-b78b-ae35e825e64f"
+                id="word_commented_712020:6eb6f4d6-668a-457c-b78b-ae35e825e64f"
+                href="https://accelins.atlassian.net/secure/ViewProfile.jspa?accountId=712020%3A6eb6f4d6-668a-457c-b78b-ae35e825e64f">
+                    Gabriel Fuoco
+                </a>
+
+                                        <font size="-2">
+            [
+                <font color="#336699">13/Mar/26</font>
+
+                            ]
+            </font>
+
+        </td></tr>
+        <tr id="comment-body-2648476"><td bgcolor="#ffffff">
+            <p>Commit <font color="green">succeeded</font>: <a href="https://app.gearset.com/finished?deploymentId=2900d33c-1084-4a78-b29d-e56ba8ae378c" class="external-link" rel="nofollow noreferrer">https://app.gearset.com/finished?deploymentId=2900d33c-1084-4a78-b29d-e56ba8ae378c</a></p>
+
+<p>Commit notes: </p>
+
+<p>Source: Dev (gearsetintegration@accelins.com.sbxcmn)<br/>
+Target: accelins / Salesforce_Devops / SF-872/12-Create-Salesforce-Product-Reference-Data-Objects-To-Manage-RDM-Values-5</p>
+
+<div class='table-wrap'>
+<table class='confluenceTable'><tbody>
+<tr>
+<th class='confluenceTh'>Difference Type</th>
+<th class='confluenceTh'>Metadata Type</th>
+<th class='confluenceTh'>Name</th>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Custom object</td>
+<td class='confluenceTd'>BEEGAP</td>
+</tr>
+</tbody></table>
+</div>
+
+        </td></tr>
+                <tr id="comment-header-2648477"><td bgcolor="#f0f0f0">
+            Comment by  
+                                                    
+                
+        
+            <a class="user-hover" rel="712020:6eb6f4d6-668a-457c-b78b-ae35e825e64f"
+                id="word_commented_712020:6eb6f4d6-668a-457c-b78b-ae35e825e64f"
+                href="https://accelins.atlassian.net/secure/ViewProfile.jspa?accountId=712020%3A6eb6f4d6-668a-457c-b78b-ae35e825e64f">
+                    Gabriel Fuoco
+                </a>
+
+                                        <font size="-2">
+            [
+                <font color="#336699">13/Mar/26</font>
+
+                            ]
+            </font>
+
+        </td></tr>
+        <tr id="comment-body-2648477"><td bgcolor="#ffffff">
+            <p><img class="emoticon" src="/images/icons/emoticons/check.png" height="16" width="16" align="absmiddle" alt="" border="0"/> Successfully merged <a href="https://github.com/accelins/Salesforce_Devops/pull/597" class="external-link" rel="nofollow noreferrer">PR #597</a> from <tt>gs&#45;pipeline/SF&#45;872/12&#45;Create&#45;Salesforce&#45;Product&#45;Reference&#45;Data&#45;Objects&#45;To&#45;Manage&#45;RDM&#45;Values&#45;5&#95;&#45;&#95;QA</tt> into <tt>QA</tt></p>
+        </td></tr>
+                <tr id="comment-header-2650008"><td bgcolor="#f0f0f0">
+            Comment by  
+                                                    
+                
+        
+            <a class="user-hover" rel="712020:6eb6f4d6-668a-457c-b78b-ae35e825e64f"
+                id="word_commented_712020:6eb6f4d6-668a-457c-b78b-ae35e825e64f"
+                href="https://accelins.atlassian.net/secure/ViewProfile.jspa?accountId=712020%3A6eb6f4d6-668a-457c-b78b-ae35e825e64f">
+                    Gabriel Fuoco
+                </a>
+
+                                        <font size="-2">
+            [
+                <font color="#336699">16/Mar/26</font>
+
+                            ]
+            </font>
+
+        </td></tr>
+        <tr id="comment-body-2650008"><td bgcolor="#ffffff">
+            <p>Commit <font color="green">succeeded</font>: <a href="https://app.gearset.com/finished?deploymentId=8b11b9a3-73bd-454a-9016-b7c8908e2482" class="external-link" rel="nofollow noreferrer">https://app.gearset.com/finished?deploymentId=8b11b9a3-73bd-454a-9016-b7c8908e2482</a></p>
+
+<p>Commit notes: </p>
+
+<p>Source: Dev (gearsetintegration@accelins.com.sbxcmn)<br/>
+Target: accelins / Salesforce_Devops / SF-872/12-Create-Salesforce-Product-Reference-Data-Objects-To-Manage-RDM-Values-6</p>
+
+<div class='table-wrap'>
+<table class='confluenceTable'><tbody>
+<tr>
+<th class='confluenceTh'>Difference Type</th>
+<th class='confluenceTh'>Metadata Type</th>
+<th class='confluenceTh'>Name</th>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Custom object</td>
+<td class='confluenceTd'>ASLOB</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Custom object</td>
+<td class='confluenceTd'>BEEGAP</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Custom object</td>
+<td class='confluenceTd'>Classes&#95;of&#95;Business</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Custom object</td>
+<td class='confluenceTd'>Line&#95;of&#95;Business</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Custom object</td>
+<td class='confluenceTd'>Member&#95;Product</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Custom object</td>
+<td class='confluenceTd'>OSFI</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Custom object</td>
+<td class='confluenceTd'>POG&#95;Product</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Custom object</td>
+<td class='confluenceTd'>Product&#95;Map</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Custom object</td>
+<td class='confluenceTd'>Solvency&#95;II</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Custom object</td>
+<td class='confluenceTd'>Sub&#95;Product</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New (included by problem analyzer)</td>
+<td class='confluenceTd'>Custom object</td>
+<td class='confluenceTd'>Country</td>
+</tr>
+</tbody></table>
+</div>
+
+        </td></tr>
+                <tr id="comment-header-2650009"><td bgcolor="#f0f0f0">
+            Comment by  
+                                                    
+                
+        
+            <a class="user-hover" rel="712020:6eb6f4d6-668a-457c-b78b-ae35e825e64f"
+                id="word_commented_712020:6eb6f4d6-668a-457c-b78b-ae35e825e64f"
+                href="https://accelins.atlassian.net/secure/ViewProfile.jspa?accountId=712020%3A6eb6f4d6-668a-457c-b78b-ae35e825e64f">
+                    Gabriel Fuoco
+                </a>
+
+                                        <font size="-2">
+            [
+                <font color="#336699">16/Mar/26</font>
+
+                            ]
+            </font>
+
+        </td></tr>
+        <tr id="comment-body-2650009"><td bgcolor="#ffffff">
+            <p><img class="emoticon" src="/images/icons/emoticons/check.png" height="16" width="16" align="absmiddle" alt="" border="0"/> Successfully merged <a href="https://github.com/accelins/Salesforce_Devops/pull/599" class="external-link" rel="nofollow noreferrer">PR #599</a> from <tt>gs&#45;pipeline/SF&#45;872/12&#45;Create&#45;Salesforce&#45;Product&#45;Reference&#45;Data&#45;Objects&#45;To&#45;Manage&#45;RDM&#45;Values&#45;6&#95;&#45;&#95;QA</tt> into <tt>QA</tt></p>
+        </td></tr>
+                <tr id="comment-header-2653399"><td bgcolor="#f0f0f0">
+            Comment by  
+                                                    
+                
+        
+            <a class="user-hover" rel="712020:51998624-a399-42d9-bda9-bf91b0c4adf3"
+                id="word_commented_712020:51998624-a399-42d9-bda9-bf91b0c4adf3"
+                href="https://accelins.atlassian.net/secure/ViewProfile.jspa?accountId=712020%3A51998624-a399-42d9-bda9-bf91b0c4adf3">
+                    Ahemaiti Subate
+                </a>
+
+                                        <font size="-2">
+            [
+                <font color="#336699">18/Mar/26</font>
+
+                            ]
+            </font>
+
+        </td></tr>
+        <tr id="comment-body-2653399"><td bgcolor="#ffffff">
+            <p><div class="embeddedObject"><object classid="clsid:02BF25D5-8C17-4B23-BC80-D3488ABDDC6B" codebase="https://www.apple.com/qtactivex/qtplugin.cab" data="/rest/api/3/attachment/content/891464?stream=true" height="380" type="video/mp4" width="880" ><param name="data" value="/rest/api/3/attachment/content/891464?stream=true"/><param name="src" value="/rest/api/3/attachment/content/891464?stream=true"/><param name="type" value="video/mp4"/><embed height="380" pluginspage="https://www.apple.com/quicktime/download/" src="/rest/api/3/attachment/content/891464?stream=true" type="video/mp4" width="880" /></object></div></p>
+
+<p>Recording Attached.</p>
+        </td></tr>
+                <tr id="comment-header-2656278"><td bgcolor="#f0f0f0">
+            Comment by  
+                                                    
+                
+        
+            <a class="user-hover" rel="712020:ef6dc51c-ea62-4cfb-9a5c-4c879c9daa7a"
+                id="word_commented_712020:ef6dc51c-ea62-4cfb-9a5c-4c879c9daa7a"
+                href="https://accelins.atlassian.net/secure/ViewProfile.jspa?accountId=712020%3Aef6dc51c-ea62-4cfb-9a5c-4c879c9daa7a">
+                    Alan Slater
+                </a>
+
+                                        <font size="-2">
+            [
+                <font color="#336699">19/Mar/26</font>
+
+                            ]
+            </font>
+
+        </td></tr>
+        <tr id="comment-body-2656278"><td bgcolor="#ffffff">
+            <p>Abby noted multiple missing AC that are required, this story is blocked pending an additional AC. Removed from sprint after speaking to Lisa and Niraj as Abby needs to create a supporting story to unblock this. <a href="https://accelins.atlassian.net/secure/ViewProfile.jspa?accountId=712020%3Aa12e418b-2c1e-4b88-aea9-b64500f8f8f9" class="user-hover" rel="712020:a12e418b-2c1e-4b88-aea9-b64500f8f8f9" data-account-id="712020:a12e418b-2c1e-4b88-aea9-b64500f8f8f9" accountid="712020:a12e418b-2c1e-4b88-aea9-b64500f8f8f9" rel="noreferrer">Abby Parker</a> <a href="https://accelins.atlassian.net/secure/ViewProfile.jspa?accountId=712020%3Ab710f8ec-c074-4013-916b-e98b111f7e29" class="user-hover" rel="712020:b710f8ec-c074-4013-916b-e98b111f7e29" data-account-id="712020:b710f8ec-c074-4013-916b-e98b111f7e29" accountid="712020:b710f8ec-c074-4013-916b-e98b111f7e29" rel="noreferrer">Niraj Thakker</a> <a href="https://accelins.atlassian.net/secure/ViewProfile.jspa?accountId=712020%3A788133f5-d160-4a3f-a9e4-c5a8154abc43" class="user-hover" rel="712020:788133f5-d160-4a3f-a9e4-c5a8154abc43" data-account-id="712020:788133f5-d160-4a3f-a9e4-c5a8154abc43" accountid="712020:788133f5-d160-4a3f-a9e4-c5a8154abc43" rel="noreferrer">Lisa Hamilton</a> <a href="https://accelins.atlassian.net/secure/ViewProfile.jspa?accountId=712020%3A3d91f870-3d69-4083-95f8-1e92e1e20cf4" class="user-hover" rel="712020:3d91f870-3d69-4083-95f8-1e92e1e20cf4" data-account-id="712020:3d91f870-3d69-4083-95f8-1e92e1e20cf4" accountid="712020:3d91f870-3d69-4083-95f8-1e92e1e20cf4" rel="noreferrer">Raghavendra Dammalapati</a> <a href="https://accelins.atlassian.net/secure/ViewProfile.jspa?accountId=712020%3A51998624-a399-42d9-bda9-bf91b0c4adf3" class="user-hover" rel="712020:51998624-a399-42d9-bda9-bf91b0c4adf3" data-account-id="712020:51998624-a399-42d9-bda9-bf91b0c4adf3" accountid="712020:51998624-a399-42d9-bda9-bf91b0c4adf3" rel="noreferrer">Ahemaiti Subate</a> </p>
+        </td></tr>
+                <tr id="comment-header-2686731"><td bgcolor="#f0f0f0">
+            Comment by  
+                                                    
+                
+        
+            <a class="user-hover" rel="712020:6eb6f4d6-668a-457c-b78b-ae35e825e64f"
+                id="word_commented_712020:6eb6f4d6-668a-457c-b78b-ae35e825e64f"
+                href="https://accelins.atlassian.net/secure/ViewProfile.jspa?accountId=712020%3A6eb6f4d6-668a-457c-b78b-ae35e825e64f">
+                    Gabriel Fuoco
+                </a>
+
+                                        <font size="-2">
+            [
+                <font color="#336699">01/Apr/26</font>
+
+                            ]
+            </font>
+
+        </td></tr>
+        <tr id="comment-body-2686731"><td bgcolor="#ffffff">
+            <p>Commit <font color="green">succeeded</font>: <a href="https://app.gearset.com/finished?deploymentId=04f8e1a7-56f3-475f-9df8-8a61489e4999" class="external-link" rel="nofollow noreferrer">https://app.gearset.com/finished?deploymentId=04f8e1a7-56f3-475f-9df8-8a61489e4999</a></p>
+
+<p>Commit notes: </p>
+
+<p>Source: Dev (gearsetintegration@accelins.com.sbxcmn)<br/>
+Target: accelins / Salesforce_Devops / SF-872/12-Create-Salesforce-Product-Reference-Data-Objects-To-Manage-RDM-Values</p>
+
+<div class='table-wrap'>
+<table class='confluenceTable'><tbody>
+<tr>
+<th class='confluenceTh'>Difference Type</th>
+<th class='confluenceTh'>Metadata Type</th>
+<th class='confluenceTh'>Name</th>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Flow</td>
+<td class='confluenceTd'>Accelerant&#95;ASLOB&#95;Valid&#95;To&#95;to&#95;Todays&#95;Date&#95;if&#95;Status&#95;is&#95;Inactive</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Flow</td>
+<td class='confluenceTd'>Accelerant&#95;BEEGAPCOB&#95;Update&#95;Valid&#95;To&#95;to&#95;Todays&#95;date&#95;when&#95;status&#95;is&#95;inactive</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Flow</td>
+<td class='confluenceTd'>Accelerant&#95;Class&#95;of&#95;Business&#95;Update&#95;Valid&#95;To&#95;to&#95;todays&#95;date&#95;when&#95;Status&#95;is&#95;Inact</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Flow</td>
+<td class='confluenceTd'>Accelerant&#95;Insurance&#95;Product&#95;Update&#95;Valid&#95;To&#95;to&#95;Todays&#95;Date&#95;When&#95;Status&#95;is&#95;Inact</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Flow</td>
+<td class='confluenceTd'>Accelerant&#95;Line&#95;of&#95;Business&#95;Update&#95;Valid&#95;To&#95;to&#95;todays&#95;date&#95;when&#95;Status&#95;is&#95;Inacti</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Flow</td>
+<td class='confluenceTd'>Accelerant&#95;Member&#95;Prod&#95;Program&#95;Update&#95;Valid&#95;To&#95;to&#95;Todays&#95;date&#95;When&#95;status&#95;Is&#95;Ina</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Flow</td>
+<td class='confluenceTd'>Accelerant&#95;OSFI&#95;Update&#95;ValidTo&#95;to&#95;Todays&#95;Date&#95;When&#95;Status&#95;is&#95;Inactive</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Flow</td>
+<td class='confluenceTd'>Accelerant&#95;POG&#95;Product&#95;Update&#95;Valid&#95;To&#95;to&#95;Todays&#95;date&#95;when&#95;Status&#95;is&#95;Inactive</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Flow</td>
+<td class='confluenceTd'>Accelerant&#95;SolvencyII&#95;Update&#95;ValidTo&#95;to&#95;Todays&#95;Date&#95;When&#95;Status&#95;is&#95;set&#95;Inactive</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Flow</td>
+<td class='confluenceTd'>Accelerant&#95;Sub&#95;Product&#95;Update&#95;Valid&#95;To&#95;to&#95;todays&#95;date&#95;when&#95;Status&#95;is&#95;Inactive</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Duplicate rule</td>
+<td class='confluenceTd'>ASLOB&#95;&#95;c.ASLOB&#95;Prevent&#95;Duplicate</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Matching rule</td>
+<td class='confluenceTd'>ASLOB&#95;&#95;c.ASLOB&#95;Prevent&#95;Duplicate&#95;matching&#95;rule</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Duplicate rule</td>
+<td class='confluenceTd'>BEEGAP&#95;COB&#95;&#95;c.BEEG</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Matching rule</td>
+<td class='confluenceTd'>BEEGAP&#95;COB&#95;&#95;c.BEEGAP&#95;Prevent&#95;Duplicate&#95;matching&#95;rule</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Duplicate rule</td>
+<td class='confluenceTd'>Classes&#95;of&#95;Business&#95;&#95;c.COB&#95;Duplicate&#95;Rule</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Matching rule</td>
+<td class='confluenceTd'>Classes&#95;of&#95;Business&#95;&#95;c.COB&#95;Duplicate&#95;Rule&#95;matching&#95;rule</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Custom object</td>
+<td class='confluenceTd'>Insurance&#95;Product</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Duplicate rule</td>
+<td class='confluenceTd'>Insurance&#95;Product&#95;&#95;c.Prevent&#95;Duplicate&#95;Name&#95;On&#95;Insurance&#95;Product</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Matching rule</td>
+<td class='confluenceTd'>Insurance&#95;Product&#95;&#95;c.Prevent&#95;Duplicate&#95;Name&#95;On&#95;Insurance&#95;Product&#95;matching&#95;rule</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Duplicate rule</td>
+<td class='confluenceTd'>Line&#95;of&#95;Business&#95;&#95;c.Line&#95;Of&#95;Business&#95;Prevent&#95;Duplicate</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Matching rule</td>
+<td class='confluenceTd'>Line&#95;of&#95;Business&#95;&#95;c.Line&#95;Of&#95;Business&#95;Prevent&#95;Duplicate&#95;matching&#95;rule</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Duplicate rule</td>
+<td class='confluenceTd'>Member&#95;Product&#95;and&#95;Program&#95;&#95;c.Member&#95;Products&#95;Duplicate&#95;Rule</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Matching rule</td>
+<td class='confluenceTd'>Member&#95;Product&#95;and&#95;Program&#95;&#95;c.Member&#95;Products&#95;Duplicate&#95;Rule&#95;matching&#95;rule</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Duplicate rule</td>
+<td class='confluenceTd'>OSFI&#95;&#95;c.OSFI&#95;Prevent&#95;Duplicate</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Matching rule</td>
+<td class='confluenceTd'>OSFI&#95;&#95;c.OSFI&#95;Prevent&#95;Duplicate&#95;matching&#95;rule</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Duplicate rule</td>
+<td class='confluenceTd'>POG&#95;Product&#95;&#95;c.POG&#95;Prevent&#95;Duplicate</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Matching rule</td>
+<td class='confluenceTd'>POG&#95;Product&#95;&#95;c.POG&#95;Prevent&#95;Duplicate&#95;matching&#95;rule</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Duplicate rule</td>
+<td class='confluenceTd'>Solvency&#95;II&#95;&#95;c.Solvency&#95;II&#95;Prevent&#95;Name&#95;Duplicate</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Matching rule</td>
+<td class='confluenceTd'>Solvency&#95;II&#95;&#95;c.Solvency&#95;II&#95;Prevent&#95;Name&#95;Duplicate&#95;matching&#95;rule</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Flow</td>
+<td class='confluenceTd'>Solvency&#95;II&#95;RT&#95;On&#95;Create&#95;Publish&#95;Event</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Flow</td>
+<td class='confluenceTd'>Solvency&#95;II&#95;RT&#95;On&#95;Update&#95;Publish&#95;Event</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Duplicate rule</td>
+<td class='confluenceTd'>Sub&#95;Product&#95;&#95;c.Sub&#95;Product&#95;Duplicate&#95;Rule</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Matching rule</td>
+<td class='confluenceTd'>Sub&#95;Product&#95;&#95;c.Sub&#95;Product&#95;Duplicate&#95;Rule&#95;matching&#95;rule</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New (included by problem analyzer)</td>
+<td class='confluenceTd'>Custom object</td>
+<td class='confluenceTd'>ASLOB</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New (included by problem analyzer)</td>
+<td class='confluenceTd'>Custom object</td>
+<td class='confluenceTd'>BEEGAP&#95;COB</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New (included by problem analyzer)</td>
+<td class='confluenceTd'>Custom object</td>
+<td class='confluenceTd'>Classes&#95;of&#95;Business</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New (included by problem analyzer)</td>
+<td class='confluenceTd'>Custom object</td>
+<td class='confluenceTd'>Line&#95;of&#95;Business</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New (included by problem analyzer)</td>
+<td class='confluenceTd'>Custom object</td>
+<td class='confluenceTd'>Member&#95;Product&#95;and&#95;Program</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New (included by problem analyzer)</td>
+<td class='confluenceTd'>Custom object</td>
+<td class='confluenceTd'>OSFI</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New (included by problem analyzer)</td>
+<td class='confluenceTd'>Custom object</td>
+<td class='confluenceTd'>POG&#95;Product</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New (included by problem analyzer)</td>
+<td class='confluenceTd'>Custom object</td>
+<td class='confluenceTd'>Solvency&#95;II</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New (included by problem analyzer)</td>
+<td class='confluenceTd'>Custom object</td>
+<td class='confluenceTd'>Sub&#95;Product</td>
+</tr>
+</tbody></table>
+</div>
+
+        </td></tr>
+                <tr id="comment-header-2686741"><td bgcolor="#f0f0f0">
+            Comment by  
+                                                    
+                
+        
+            <a class="user-hover" rel="712020:6eb6f4d6-668a-457c-b78b-ae35e825e64f"
+                id="word_commented_712020:6eb6f4d6-668a-457c-b78b-ae35e825e64f"
+                href="https://accelins.atlassian.net/secure/ViewProfile.jspa?accountId=712020%3A6eb6f4d6-668a-457c-b78b-ae35e825e64f">
+                    Gabriel Fuoco
+                </a>
+
+                                        <font size="-2">
+            [
+                <font color="#336699">01/Apr/26</font>
+
+                            ]
+            </font>
+
+        </td></tr>
+        <tr id="comment-body-2686741"><td bgcolor="#ffffff">
+            <p>Commit <font color="green">succeeded</font>: <a href="https://app.gearset.com/finished?deploymentId=82b1c8c0-e374-45c8-8614-1bda55a1dc67" class="external-link" rel="nofollow noreferrer">https://app.gearset.com/finished?deploymentId=82b1c8c0-e374-45c8-8614-1bda55a1dc67</a></p>
+
+<p>Commit notes: </p>
+
+<p>Source: Dev (gearsetintegration@accelins.com.sbxcmn)<br/>
+Target: accelins / Salesforce_Devops / SF-872/12-Create-Salesforce-Product-Reference-Data-Objects-To-Manage-RDM-Values</p>
+
+<div class='table-wrap'>
+<table class='confluenceTable'><tbody>
+<tr>
+<th class='confluenceTh'>Difference Type</th>
+<th class='confluenceTh'>Metadata Type</th>
+<th class='confluenceTh'>Name</th>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Lightning page</td>
+<td class='confluenceTd'>ASLOB&#95;Record&#95;Page</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Lightning page</td>
+<td class='confluenceTd'>BEEGAP&#95;Record&#95;Page</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Lightning page</td>
+<td class='confluenceTd'>Classes&#95;of&#95;Business&#95;Record&#95;Page</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Lightning page</td>
+<td class='confluenceTd'>Insurance&#95;Product&#95;Record&#95;Page</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Lightning page</td>
+<td class='confluenceTd'>Line&#95;of&#95;Business&#95;Record&#95;Page</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Lightning page</td>
+<td class='confluenceTd'>Member&#95;Product&#95;Record&#95;Page</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Lightning page</td>
+<td class='confluenceTd'>OSFI&#95;Record&#95;Page</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Lightning page</td>
+<td class='confluenceTd'>POG&#95;Product&#95;Record&#95;Page</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Lightning page</td>
+<td class='confluenceTd'>Solvency&#95;II&#95;Record&#95;Page</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Lightning page</td>
+<td class='confluenceTd'>Sub&#95;Product&#95;Record&#95;Page</td>
+</tr>
+</tbody></table>
+</div>
+
+        </td></tr>
+                <tr id="comment-header-2686743"><td bgcolor="#f0f0f0">
+            Comment by  
+                                                    
+                
+        
+            <a class="user-hover" rel="712020:6eb6f4d6-668a-457c-b78b-ae35e825e64f"
+                id="word_commented_712020:6eb6f4d6-668a-457c-b78b-ae35e825e64f"
+                href="https://accelins.atlassian.net/secure/ViewProfile.jspa?accountId=712020%3A6eb6f4d6-668a-457c-b78b-ae35e825e64f">
+                    Gabriel Fuoco
+                </a>
+
+                                        <font size="-2">
+            [
+                <font color="#336699">01/Apr/26</font>
+
+                            ]
+            </font>
+
+        </td></tr>
+        <tr id="comment-body-2686743"><td bgcolor="#ffffff">
+            <p>Commit <font color="green">succeeded</font>: <a href="https://app.gearset.com/finished?deploymentId=44793a6b-a4f4-4ccc-b2c1-7826913de867" class="external-link" rel="nofollow noreferrer">https://app.gearset.com/finished?deploymentId=44793a6b-a4f4-4ccc-b2c1-7826913de867</a></p>
+
+<p>Commit notes: </p>
+
+<p>Source: Dev (gearsetintegration@accelins.com.sbxcmn)<br/>
+Target: accelins / Salesforce_Devops / SF-872/12-Create-Salesforce-Product-Reference-Data-Objects-To-Manage-RDM-Values</p>
+
+<div class='table-wrap'>
+<table class='confluenceTable'><tbody>
+<tr>
+<th class='confluenceTh'>Difference Type</th>
+<th class='confluenceTh'>Metadata Type</th>
+<th class='confluenceTh'>Name</th>
+</tr>
+<tr>
+<td class='confluenceTd'>Different</td>
+<td class='confluenceTd'>Duplicate rule</td>
+<td class='confluenceTd'>ASLOB&#95;&#95;c.ASLOB&#95;Prevent&#95;Duplicate</td>
+</tr>
+<tr>
+<td class='confluenceTd'>Different</td>
+<td class='confluenceTd'>Duplicate rule</td>
+<td class='confluenceTd'>BEEGAP&#95;COB&#95;&#95;c.BEEG</td>
+</tr>
+<tr>
+<td class='confluenceTd'>Different</td>
+<td class='confluenceTd'>Duplicate rule</td>
+<td class='confluenceTd'>Sub&#95;Product&#95;&#95;c.Sub&#95;Product&#95;Duplicate&#95;Rule</td>
+</tr>
+</tbody></table>
+</div>
+
+        </td></tr>
+                <tr id="comment-header-2688113"><td bgcolor="#f0f0f0">
+            Comment by  
+                                                    
+                
+        
+            <a class="user-hover" rel="712020:51998624-a399-42d9-bda9-bf91b0c4adf3"
+                id="word_commented_712020:51998624-a399-42d9-bda9-bf91b0c4adf3"
+                href="https://accelins.atlassian.net/secure/ViewProfile.jspa?accountId=712020%3A51998624-a399-42d9-bda9-bf91b0c4adf3">
+                    Ahemaiti Subate
+                </a>
+
+                                        <font size="-2">
+            [
+                <font color="#336699">06/Apr/26</font>
+
+                            ]
+            </font>
+
+        </td></tr>
+        <tr id="comment-body-2688113"><td bgcolor="#ffffff">
+            <p><a href="https://accelins.atlassian.net/secure/ViewProfile.jspa?accountId=712020%3Aa12e418b-2c1e-4b88-aea9-b64500f8f8f9" class="user-hover" rel="712020:a12e418b-2c1e-4b88-aea9-b64500f8f8f9" data-account-id="712020:a12e418b-2c1e-4b88-aea9-b64500f8f8f9" accountid="712020:a12e418b-2c1e-4b88-aea9-b64500f8f8f9" rel="noreferrer">Abby Parker</a> <a href="https://accelins.atlassian.net/secure/ViewProfile.jspa?accountId=712020%3Aecbcec11-f098-4810-8f24-650664eabec1" class="user-hover" rel="712020:ecbcec11-f098-4810-8f24-650664eabec1" data-account-id="712020:ecbcec11-f098-4810-8f24-650664eabec1" accountid="712020:ecbcec11-f098-4810-8f24-650664eabec1" rel="noreferrer">Ahmed Al-Raweshidy</a> <a href="https://accelins.atlassian.net/secure/ViewProfile.jspa?accountId=712020%3A0d055962-1974-4273-b8d7-7a97dd766aa8" class="user-hover" rel="712020:0d055962-1974-4273-b8d7-7a97dd766aa8" data-account-id="712020:0d055962-1974-4273-b8d7-7a97dd766aa8" accountid="712020:0d055962-1974-4273-b8d7-7a97dd766aa8" rel="noreferrer">Ken Reynolds</a> <a href="https://accelins.atlassian.net/secure/ViewProfile.jspa?accountId=712020%3Aef6dc51c-ea62-4cfb-9a5c-4c879c9daa7a" class="user-hover" rel="712020:ef6dc51c-ea62-4cfb-9a5c-4c879c9daa7a" data-account-id="712020:ef6dc51c-ea62-4cfb-9a5c-4c879c9daa7a" accountid="712020:ef6dc51c-ea62-4cfb-9a5c-4c879c9daa7a" rel="noreferrer">Alan Slater</a> <a href="https://accelins.atlassian.net/secure/ViewProfile.jspa?accountId=712020%3A6eb6f4d6-668a-457c-b78b-ae35e825e64f" class="user-hover" rel="712020:6eb6f4d6-668a-457c-b78b-ae35e825e64f" data-account-id="712020:6eb6f4d6-668a-457c-b78b-ae35e825e64f" accountid="712020:6eb6f4d6-668a-457c-b78b-ae35e825e64f" rel="noreferrer">Gabriel Fuoco</a> </p>
+
+<p>Regarding security on the above list of objects, as per our understanding, we are following the steps below:</p>
+
+<ol>
+	<li>PSG_DataGovernance_User, for this particular permission set group, we are giving create/read/edit permission for the list of above objects.</li>
+	<li>Need more clarification on which permission set groups or profiles should have only read access? Then I can give read-only access to the respective permission set groups or profiles, and the rest of them I will provide no access.</li>
+</ol>
+
+        </td></tr>
+                <tr id="comment-header-2688447"><td bgcolor="#f0f0f0">
+            Comment by  
+                                                    
+                
+        
+            <a class="user-hover" rel="712020:a12e418b-2c1e-4b88-aea9-b64500f8f8f9"
+                id="word_commented_712020:a12e418b-2c1e-4b88-aea9-b64500f8f8f9"
+                href="https://accelins.atlassian.net/secure/ViewProfile.jspa?accountId=712020%3Aa12e418b-2c1e-4b88-aea9-b64500f8f8f9">
+                    Abby Parker
+                </a>
+
+                                        <font size="-2">
+            [
+                <font color="#336699">07/Apr/26</font>
+
+                            ]
+            </font>
+
+        </td></tr>
+        <tr id="comment-body-2688447"><td bgcolor="#ffffff">
+            <p>Hi<a href="https://accelins.atlassian.net/secure/ViewProfile.jspa?accountId=712020%3A51998624-a399-42d9-bda9-bf91b0c4adf3" class="user-hover" rel="712020:51998624-a399-42d9-bda9-bf91b0c4adf3" data-account-id="712020:51998624-a399-42d9-bda9-bf91b0c4adf3" accountid="712020:51998624-a399-42d9-bda9-bf91b0c4adf3" rel="noreferrer">Ahemaiti Subate</a>, for other permission set groups they should all have read access - we don’t need to block any of them from not seeing these records </p>
+        </td></tr>
+                <tr id="comment-header-2688853"><td bgcolor="#f0f0f0">
+            Comment by  
+                                                    
+                
+        
+            <a class="user-hover" rel="712020:6eb6f4d6-668a-457c-b78b-ae35e825e64f"
+                id="word_commented_712020:6eb6f4d6-668a-457c-b78b-ae35e825e64f"
+                href="https://accelins.atlassian.net/secure/ViewProfile.jspa?accountId=712020%3A6eb6f4d6-668a-457c-b78b-ae35e825e64f">
+                    Gabriel Fuoco
+                </a>
+
+                                        <font size="-2">
+            [
+                <font color="#336699">07/Apr/26</font>
+
+                            ]
+            </font>
+
+        </td></tr>
+        <tr id="comment-body-2688853"><td bgcolor="#ffffff">
+            <p>Commit <font color="green">succeeded</font>: <a href="https://app.gearset.com/finished?deploymentId=e3fcde42-fb50-47d7-94f4-3671f29fcc35" class="external-link" rel="nofollow noreferrer">https://app.gearset.com/finished?deploymentId=e3fcde42-fb50-47d7-94f4-3671f29fcc35</a></p>
+
+<p>Commit notes: </p>
+
+<p>Source: Dev (gearsetintegration@accelins.com.sbxcmn)<br/>
+Target: accelins / Salesforce_Devops / SF-872/12-Create-Salesforce-Product-Reference-Data-Objects-To-Manage-RDM-Values</p>
+
+<div class='table-wrap'>
+<table class='confluenceTable'><tbody>
+<tr>
+<th class='confluenceTh'>Difference Type</th>
+<th class='confluenceTh'>Metadata Type</th>
+<th class='confluenceTh'>Name</th>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Permission set group</td>
+<td class='confluenceTd'>Accel&#95;Actuary&#95;PSG</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Permission set group</td>
+<td class='confluenceTd'>Accel&#95;Exposure&#95;PSG</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Permission set group</td>
+<td class='confluenceTd'>Accel&#95;Finance&#95;PSG</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Permission set group</td>
+<td class='confluenceTd'>Accel&#95;Head&#95;of&#95;Operations&#95;PSG</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Permission set group</td>
+<td class='confluenceTd'>Accel&#95;Operations&#95;Manager&#95;PSG</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Permission set group</td>
+<td class='confluenceTd'>Accel&#95;Underwriter&#95;PSG</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Permission set group</td>
+<td class='confluenceTd'>Accelerant&#95;Distribution&#95;Team&#95;Member</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Permission set group</td>
+<td class='confluenceTd'>PSG&#95;MRD&#95;User</td>
+</tr>
+<tr>
+<td class='confluenceTd'>New</td>
+<td class='confluenceTd'>Permission set</td>
+<td class='confluenceTd'>PS&#95;ProductRelatedObj&#95;ReadOnly</td>
+</tr>
+</tbody></table>
+</div>
+
+        </td></tr>
+                <tr id="comment-header-2688857"><td bgcolor="#f0f0f0">
+            Comment by  
+                                                    
+                
+        
+            <a class="user-hover" rel="712020:6eb6f4d6-668a-457c-b78b-ae35e825e64f"
+                id="word_commented_712020:6eb6f4d6-668a-457c-b78b-ae35e825e64f"
+                href="https://accelins.atlassian.net/secure/ViewProfile.jspa?accountId=712020%3A6eb6f4d6-668a-457c-b78b-ae35e825e64f">
+                    Gabriel Fuoco
+                </a>
+
+                                        <font size="-2">
+            [
+                <font color="#336699">07/Apr/26</font>
+
+                            ]
+            </font>
+
+        </td></tr>
+        <tr id="comment-body-2688857"><td bgcolor="#ffffff">
+            <p><img class="emoticon" src="/images/icons/emoticons/check.png" height="16" width="16" align="absmiddle" alt="" border="0"/> Successfully merged <a href="https://github.com/accelins/Salesforce_Devops/pull/782" class="external-link" rel="nofollow noreferrer">PR #782</a> from <tt>gs&#45;pipeline/SF&#45;872/12&#45;Create&#45;Salesforce&#45;Product&#45;Reference&#45;Data&#45;Objects&#45;To&#45;Manage&#45;RDM&#45;Values&#95;&#45;&#95;QA</tt> into <tt>QA</tt></p>
+        </td></tr>
+            </table>
+Generated at Wed Apr 08 17:32:16 UTC 2026 by Ravindranath Vazhenkhat using Jira 1001.0.0-SNAPSHOT#100291-rev:3b9a479e32a91e6b609b20067d09b2c03f3d28ef.
+
+</body>
+</html>

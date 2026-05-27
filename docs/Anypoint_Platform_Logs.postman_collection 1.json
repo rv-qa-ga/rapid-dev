@@ -1,0 +1,174 @@
+{
+  "info": {
+    "name": "Anypoint Platform Logs",
+    "description": "Pull application logs from Anypoint Platform via the public APIs. Walks through OAuth client_credentials, environment/deployment/spec discovery, log search with filters, cursor-based pagination, and raw log file download. Mirrors the steps in 'How to get application logs using the Anypoint Platform APIs.docx'.\n\nUsage:\n1. Open the collection's Variables tab and fill client_id, client_secret, organization_id, and host.\n2. Run '1 - Get access token' first; the test script auto-populates {{access_token}}.\n3. Run the discovery requests (2, 3, 4) and copy each returned id into the matching collection variable.\n4. Set startTime/endTime (epoch ms, UTC) on the search request, then run it. For pagination, copy the last record's docId into the afterDocId param of '7 - Search logs (next page)'.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1 - Get access token",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// Auto-capture the access token into the collection variable so subsequent",
+              "// requests can reference {{access_token}} without manual copy/paste.",
+              "if (pm.response.code === 200) {",
+              "    const json = pm.response.json();",
+              "    if (json && json.access_token) {",
+              "        pm.collectionVariables.set('access_token', json.access_token);",
+              "        console.log('access_token set; expires_in=' + json.expires_in);",
+              "    }",
+              "}"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"grant_type\": \"client_credentials\",\n  \"client_id\": \"{{client_id}}\",\n  \"client_secret\": \"{{client_secret}}\"\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "url": {
+          "raw": "https://{{host}}/accounts/api/v2/oauth2/token",
+          "protocol": "https",
+          "host": ["{{host}}"],
+          "path": ["accounts", "api", "v2", "oauth2", "token"]
+        },
+        "description": "OAuth 2.0 client_credentials grant. Returns an access_token valid for ~1 hour. The Tests tab auto-stores the token in the {{access_token}} collection variable."
+      }
+    },
+    {
+      "name": "2 - List environments",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{access_token}}" }
+        ],
+        "url": {
+          "raw": "https://{{host}}/accounts/api/organizations/{{organization_id}}/environments",
+          "protocol": "https",
+          "host": ["{{host}}"],
+          "path": ["accounts", "api", "organizations", "{{organization_id}}", "environments"]
+        },
+        "description": "Lists every environment in the org. Copy the id of the target environment into the {{environment_id}} collection variable."
+      }
+    },
+    {
+      "name": "3 - List deployments (find application)",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{access_token}}" }
+        ],
+        "url": {
+          "raw": "https://{{host}}/amc/application-manager/api/v2/organizations/{{organization_id}}/environments/{{environment_id}}/deployments",
+          "protocol": "https",
+          "host": ["{{host}}"],
+          "path": ["amc", "application-manager", "api", "v2", "organizations", "{{organization_id}}", "environments", "{{environment_id}}", "deployments"]
+        },
+        "description": "Lists deployments (running applications) in the chosen environment. Copy the id of the target application into the {{deployment_id}} collection variable."
+      }
+    },
+    {
+      "name": "4 - Get deployment (find spec id)",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{access_token}}" }
+        ],
+        "url": {
+          "raw": "https://{{host}}/amc/application-manager/api/v2/organizations/{{organization_id}}/environments/{{environment_id}}/deployments/{{deployment_id}}",
+          "protocol": "https",
+          "host": ["{{host}}"],
+          "path": ["amc", "application-manager", "api", "v2", "organizations", "{{organization_id}}", "environments", "{{environment_id}}", "deployments", "{{deployment_id}}"]
+        },
+        "description": "Returns deployment details including the replicas array. Each replica reports the spec it is running. Copy replicas[0].specId into the {{spec_id}} collection variable."
+      }
+    },
+    {
+      "name": "5 - Search logs (first page)",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{access_token}}" }
+        ],
+        "url": {
+          "raw": "https://{{host}}/amc/application-manager/api/v2/organizations/{{organization_id}}/environments/{{environment_id}}/deployments/{{deployment_id}}/specs/{{spec_id}}/logs?length=1000&startTime=1777677167000&endTime=1777680767000&descending=false&logLevel=INFO&logLevel=WARN&logLevel=ERROR",
+          "protocol": "https",
+          "host": ["{{host}}"],
+          "path": ["amc", "application-manager", "api", "v2", "organizations", "{{organization_id}}", "environments", "{{environment_id}}", "deployments", "{{deployment_id}}", "specs", "{{spec_id}}", "logs"],
+          "query": [
+            { "key": "length", "value": "1000", "description": "Page size, max 1000. Default is 10, so always set this explicitly." },
+            { "key": "startTime", "value": "1777677167000", "description": "Inclusive start of time window, epoch milliseconds UTC (13 digits)." },
+            { "key": "endTime", "value": "1777680767000", "description": "Inclusive end of time window, epoch milliseconds UTC (13 digits)." },
+            { "key": "descending", "value": "false", "description": "false = oldest first; recommended when paginating forward." },
+            { "key": "logLevel", "value": "INFO", "description": "Repeat for multiple levels. Valid: DEBUG, INFO, WARN, ERROR." },
+            { "key": "logLevel", "value": "WARN" },
+            { "key": "logLevel", "value": "ERROR" }
+          ]
+        },
+        "description": "Paginated log search. Each filter MUST be its own query parameter — do NOT pack them into a JSON object inside ?search=... (that parameter is free-text only and would silently cap results to 10). Replace the example startTime/endTime with your own epoch-ms values."
+      }
+    },
+    {
+      "name": "6 - Search logs (next page, with afterDocId)",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{access_token}}" }
+        ],
+        "url": {
+          "raw": "https://{{host}}/amc/application-manager/api/v2/organizations/{{organization_id}}/environments/{{environment_id}}/deployments/{{deployment_id}}/specs/{{spec_id}}/logs?length=1000&startTime=1777677167000&endTime=1777680767000&descending=false&logLevel=INFO&logLevel=WARN&logLevel=ERROR&afterDocId=PASTE_LAST_DOCID_HERE",
+          "protocol": "https",
+          "host": ["{{host}}"],
+          "path": ["amc", "application-manager", "api", "v2", "organizations", "{{organization_id}}", "environments", "{{environment_id}}", "deployments", "{{deployment_id}}", "specs", "{{spec_id}}", "logs"],
+          "query": [
+            { "key": "length", "value": "1000" },
+            { "key": "startTime", "value": "1777677167000" },
+            { "key": "endTime", "value": "1777680767000" },
+            { "key": "descending", "value": "false" },
+            { "key": "logLevel", "value": "INFO" },
+            { "key": "logLevel", "value": "WARN" },
+            { "key": "logLevel", "value": "ERROR" },
+            { "key": "afterDocId", "value": "PASTE_LAST_DOCID_HERE", "description": "docId of the last record in the previous page. Repeat until a page returns fewer than 1000 records." }
+          ]
+        },
+        "description": "Same query as the first-page request, plus afterDocId set to the docId of the last record from the prior page. Repeat until a response has strictly fewer than {{length}} records — that is the safe end-of-stream signal."
+      }
+    },
+    {
+      "name": "7 - Download raw log file",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{access_token}}" }
+        ],
+        "url": {
+          "raw": "https://{{host}}/amc/application-manager/api/v2/organizations/{{organization_id}}/environments/{{environment_id}}/deployments/{{deployment_id}}/specs/{{spec_id}}/logs/file",
+          "protocol": "https",
+          "host": ["{{host}}"],
+          "path": ["amc", "application-manager", "api", "v2", "organizations", "{{organization_id}}", "environments", "{{environment_id}}", "deployments", "{{deployment_id}}", "specs", "{{spec_id}}", "logs", "file"]
+        },
+        "description": "Plaintext download of the raw log file the runtime wrote (every level, every line). To persist locally: in Postman use Save Response > Save to a file."
+      }
+    }
+  ],
+  "variable": [
+    { "key": "host", "value": "eu1.anypoint.mulesoft.com", "description": "Anypoint control-plane host. EU=eu1.anypoint.mulesoft.com, US=anypoint.mulesoft.com. Tokens are region-bound." },
+    { "key": "client_id", "value": "", "description": "Connected App Client ID (from your Anypoint admin)." },
+    { "key": "client_secret", "value": "", "description": "Connected App Client Secret (from your Anypoint admin). Treat as a password." },
+    { "key": "organization_id", "value": "", "description": "Business Group UUID." },
+    { "key": "access_token", "value": "", "description": "Filled automatically by '1 - Get access token' (its Tests script). Lifetime ~1 hour." },
+    { "key": "environment_id", "value": "", "description": "Environment UUID; populate from '2 - List environments'." },
+    { "key": "deployment_id", "value": "", "description": "Deployment (application) UUID; populate from '3 - List deployments'." },
+    { "key": "spec_id", "value": "", "description": "Spec UUID for the running revision; populate from '4 - Get deployment'." }
+  ]
+}

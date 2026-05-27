@@ -1,0 +1,350 @@
+{
+	"info": {
+		"_postman_id": "sf-550-api-tests",
+		"name": "SF-550 - Add TPA Group as an Account Type - API Tests",
+		"description": "Postman collection for SF-550 API tests. Tests for adding TPA Group as an Account Type picklist value.\n\n## Setup Instructions:\n1. Import this collection into Postman\n2. Create a new environment (or use existing Salesforce QA environment)\n3. Set the following environment variables:\n   - `sf_base_url`: https://arx--qa.sandbox.my.salesforce.com\n   - `sf_api_version`: v60.0\n   - `sf_access_token`: Your Salesforce access token (get via OAuth or JWT)\n   - `sf_instance_url`: Your Salesforce instance URL\n\n## Authentication:\nThis collection uses Bearer Token authentication. Obtain an access token via:\n- OAuth 2.0 flow\n- JWT Bearer Token flow\n- Username/Password flow\n\n## Test Scenarios:\n- Verify Type field exists\n- Create Account with TPA Group\n- Query Account by TPA Group\n- Reject invalid Type values",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{sf_access_token}}",
+				"type": "string"
+			}
+		]
+	},
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "{{sf_base_url}}",
+			"type": "string"
+		},
+		{
+			"key": "api_version",
+			"value": "{{sf_api_version}}",
+			"type": "string"
+		},
+		{
+			"key": "account_id",
+			"value": "",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "SF-550-API-001 - Verify Type field exists",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Type field exists\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.fields).to.be.an('array');",
+							"    var typeField = jsonData.fields.find(f => f.name === 'Type');",
+							"    pm.expect(typeField).to.not.be.undefined;",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Account/describe",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"services",
+						"data",
+						"{{api_version}}",
+						"sobjects",
+						"Account",
+						"describe"
+					]
+				},
+				"description": "API - Verify Type field exists on Account\n\n**Test ID:** SF-550-API-001\n**Priority:** p1\n**Tags:** @smoke @field-exists"
+			},
+			"response": []
+		},
+		{
+			"name": "SF-550-API-002 - Create Account with TPA Group",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"pm.test(\"Response contains Account ID\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property('id');",
+							"    pm.expect(jsonData.id).to.not.be.empty;",
+							"    pm.collectionVariables.set('account_id', jsonData.id);",
+							"});",
+							"",
+							"pm.test(\"Account created successfully\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.success).to.be.true;",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"Name\": \"API Test Account - TPA Group\",\n  \"Type\": \"TPA Group\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Account/",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"services",
+						"data",
+						"{{api_version}}",
+						"sobjects",
+						"Account",
+						""
+					]
+				},
+				"description": "API - Create Account with TPA Group\n\n**Test ID:** SF-550-API-002\n**Priority:** p1\n**Tags:** @api-create\n\n**Request Body:**\n- Name: API Test Account - TPA Group\n- Type: TPA Group"
+			},
+			"response": []
+		},
+		{
+			"name": "SF-550-API-003 - Create Account with TPA Group Type",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"pm.test(\"Response contains Account ID\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property('id');",
+							"    pm.expect(jsonData.id).to.not.be.empty;",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"Name\": \"API Test Account TPA Group\",\n  \"Type\": \"TPA Group\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Account/",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"services",
+						"data",
+						"{{api_version}}",
+						"sobjects",
+						"Account",
+						""
+					]
+				},
+				"description": "API - Create Account with TPA Group Type\n\n**Test ID:** SF-550-API-003\n**Priority:** p1\n**Tags:** @api-update\n\n**Note:** Account Type cannot be changed once set (Salesforce validation rule), so we create the account with TPA Group from the start."
+			},
+			"response": []
+		},
+		{
+			"name": "SF-550-API-004 - Query Account by TPA Group",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response contains records\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property('records');",
+							"    pm.expect(jsonData.records).to.be.an('array');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/services/data/{{api_version}}/query/?q=SELECT Id, Name, Type FROM Account WHERE Type = 'TPA Group' LIMIT 10",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"services",
+						"data",
+						"{{api_version}}",
+						"query",
+						""
+					],
+					"query": [
+						{
+							"key": "q",
+							"value": "SELECT Id, Name, Type FROM Account WHERE Type = 'TPA Group' LIMIT 10"
+						}
+					]
+				},
+				"description": "API - Query Account by TPA Group\n\n**Test ID:** SF-550-API-004\n**Priority:** p2\n**Tags:** @api-query\n\n**SOQL Query:**\nSELECT Id, Name, Type FROM Account WHERE Type = 'TPA Group' LIMIT 10"
+			},
+			"response": []
+		},
+		{
+			"name": "SF-550-API-005 - Reject invalid Type value",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code indicates error\", function () {",
+							"    pm.expect(pm.response.code).to.be.oneOf([400, 422]);",
+							"});",
+							"",
+							"pm.test(\"Error response mentions Type\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    var errorText = JSON.stringify(jsonData);",
+							"    pm.expect(errorText.toLowerCase()).to.include('type');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"Name\": \"Invalid Test Account\",\n  \"Type\": \"INVALID_VALUE_###\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Account/",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"services",
+						"data",
+						"{{api_version}}",
+						"sobjects",
+						"Account",
+						""
+					]
+				},
+				"description": "API - Reject invalid Type value\n\n**Test ID:** SF-550-API-005\n**Priority:** p2\n**Tags:** @negative @invalid-value\n\n**Expected:** API should reject invalid Type value and return error mentioning \"Type\""
+			},
+			"response": []
+		},
+		{
+			"name": "SF-550-API-006 - Query Account with Agency Type",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Type equals Agency\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    if (jsonData.records && jsonData.records.length > 0) {",
+							"        pm.expect(jsonData.records[0].Type).to.equal('Agency');",
+							"    }",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/services/data/{{api_version}}/query/?q=SELECT Id, Name, Type FROM Account WHERE Type = 'Agency' LIMIT 1",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"services",
+						"data",
+						"{{api_version}}",
+						"query",
+						""
+					],
+					"query": [
+						{
+							"key": "q",
+							"value": "SELECT Id, Name, Type FROM Account WHERE Type = 'Agency' LIMIT 1"
+						}
+					]
+				},
+				"description": "API - Handle Account with Type other than TPA Group\n\n**Test ID:** SF-550-API-006\n**Priority:** p2\n**Tags:** @negative @null-value\n\n**Prerequisite:** Requires a test Account created via API with Type \"Agency\""
+			},
+			"response": []
+		}
+	]
+}
+

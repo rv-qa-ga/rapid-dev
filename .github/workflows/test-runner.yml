@@ -1,0 +1,63 @@
+name: Test Self-Hosted Runner
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test-runner:
+    runs-on: self-hosted
+    timeout-minutes: 5
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Test Node.js
+        run: |
+          echo "Node.js version:"
+          node --version
+          echo "npm version:"
+          npm --version
+      
+      - name: Test System Info
+        run: |
+          echo "System information:"
+          uname -a
+          echo ""
+          echo "Disk space:"
+          df -h
+          echo ""
+          echo "Memory:"
+          free -h
+          echo ""
+          echo "Current user:"
+          whoami
+          echo ""
+          echo "Current directory:"
+          pwd
+      
+      - name: Test File System
+        run: |
+          echo "Creating test file..."
+          echo "Runner test successful!" > test-runner.txt
+          cat test-runner.txt
+          ls -la test-runner.txt
+      
+      - name: Test Git
+        run: |
+          echo "Git version:"
+          git --version
+          echo ""
+          echo "Git config:"
+          git config --list | head -5
+      
+      - name: Test Summary
+        run: |
+          echo "## ✅ Runner Test Summary" >> $GITHUB_STEP_SUMMARY
+          echo "- **Node.js**: $(node --version)" >> $GITHUB_STEP_SUMMARY
+          echo "- **npm**: $(npm --version)" >> $GITHUB_STEP_SUMMARY
+          echo "- **System**: $(uname -s) $(uname -r)" >> $GITHUB_STEP_SUMMARY
+          echo "- **User**: $(whoami)" >> $GITHUB_STEP_SUMMARY
+          echo "- **Runner**: Self-hosted on vm-p-qat-ukw-01" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "All basic tests passed! 🎉" >> $GITHUB_STEP_SUMMARY

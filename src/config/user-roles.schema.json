@@ -1,0 +1,195 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "User Role Definition Schema",
+  "description": "Schema for defining Salesforce user roles with profiles, permission sets, sharing rules, and FLS",
+  "type": "object",
+  "properties": {
+    "version": {
+      "type": "string",
+      "description": "Schema version"
+    },
+    "lastUpdated": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Last update timestamp"
+    },
+    "roles": {
+      "type": "array",
+      "description": "Array of role definitions",
+      "items": {
+        "$ref": "#/definitions/role"
+      }
+    }
+  },
+  "definitions": {
+    "role": {
+      "type": "object",
+      "required": ["id", "name", "displayName"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique role identifier (e.g., 'mrd', 'member-operations')"
+        },
+        "name": {
+          "type": "string",
+          "description": "Salesforce role name (e.g., 'QA MRD User')"
+        },
+        "displayName": {
+          "type": "string",
+          "description": "Human-readable name (e.g., 'Member Relationship Director')"
+        },
+        "description": {
+          "type": "string",
+          "description": "Role description"
+        },
+        "profile": {
+          "type": "string",
+          "description": "Salesforce profile name"
+        },
+        "permissionSets": {
+          "type": "array",
+          "description": "List of permission set names",
+          "items": {
+            "type": "string"
+          }
+        },
+        "hierarchy": {
+          "type": "object",
+          "description": "Role hierarchy information",
+          "properties": {
+            "parentRole": {
+              "type": "string",
+              "description": "Parent role ID"
+            },
+            "childRoles": {
+              "type": "array",
+              "description": "Child role IDs",
+              "items": {
+                "type": "string"
+              }
+            },
+            "level": {
+              "type": "integer",
+              "description": "Hierarchy level (1 = top level)"
+            }
+          }
+        },
+        "objectPermissions": {
+          "type": "object",
+          "description": "Object-level permissions (CRUD)",
+          "patternProperties": {
+            "^[A-Za-z0-9_]+$": {
+              "type": "object",
+              "properties": {
+                "create": { "type": "boolean" },
+                "read": { "type": "boolean" },
+                "update": { "type": "boolean" },
+                "delete": { "type": "boolean" },
+                "viewAll": { "type": "boolean" },
+                "modifyAll": { "type": "boolean" }
+              }
+            }
+          }
+        },
+        "fieldLevelSecurity": {
+          "type": "object",
+          "description": "Field-level security matrix",
+          "patternProperties": {
+            "^[A-Za-z0-9_.]+$": {
+              "type": "object",
+              "properties": {
+                "object": {
+                  "type": "string",
+                  "description": "Object API name"
+                },
+                "field": {
+                  "type": "string",
+                  "description": "Field API name"
+                },
+                "readable": {
+                  "type": "boolean",
+                  "description": "Field is readable"
+                },
+                "editable": {
+                  "type": "boolean",
+                  "description": "Field is editable"
+                },
+                "required": {
+                  "type": "boolean",
+                  "description": "Field is required"
+                },
+                "sensitiveDataClassification": {
+                  "type": "array",
+                  "description": "Sensitive data tags (PII, Financial, Compliance)",
+                  "items": {
+                    "type": "string",
+                    "enum": ["PII", "Financial", "Compliance", "Confidential"]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "sharingRules": {
+          "type": "object",
+          "description": "Sharing and visibility rules",
+          "patternProperties": {
+            "^[A-Za-z0-9_]+$": {
+              "type": "object",
+              "properties": {
+                "object": {
+                  "type": "string",
+                  "description": "Object API name"
+                },
+                "defaultAccess": {
+                  "type": "string",
+                  "enum": ["Private", "Public Read Only", "Public Read/Write"],
+                  "description": "Default sharing access"
+                },
+                "canSeeOwnRecords": {
+                  "type": "boolean",
+                  "description": "Can see records owned by self"
+                },
+                "canSeeTeamRecords": {
+                  "type": "boolean",
+                  "description": "Can see records owned by team members"
+                },
+                "canSeeAllRecords": {
+                  "type": "boolean",
+                  "description": "Can see all records (viewAll permission)"
+                },
+                "hierarchyAccess": {
+                  "type": "boolean",
+                  "description": "Can see records from hierarchy (parent/child roles)"
+                }
+              }
+            }
+          }
+        },
+        "testData": {
+          "type": "object",
+          "description": "Role-specific test data configuration",
+          "properties": {
+            "canCreateRecords": {
+              "type": "boolean",
+              "description": "Can create test records as this role"
+            },
+            "defaultRecordOwner": {
+              "type": "string",
+              "enum": ["self", "admin", "specified"],
+              "description": "Default owner for records created by this role"
+            },
+            "allowedObjectTypes": {
+              "type": "array",
+              "description": "Object types this role can create",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+

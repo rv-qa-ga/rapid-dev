@@ -1,0 +1,713 @@
+/*
+    =============================================================================================================================
+    Revision History:
+    Date			Who					Reference ID		Change Description	
+    -----------		------------------	--------------		------------------------------------------------------------------------
+    22/10/2024      SUSHIL BAGHEL      #36531         		TDS | Data Product - TP, AFF & BU for PRM, COM, COI, TAX
+	07/01/2025      Raj Mahajan		   #36531         		Refactor thw code as well as add logic for Fees
+	20/01/2025      Raj Mahajan		   #42376         		Address issue with non-consolidated members displaying Insurer lines, 
+															add D365 accounts as well as add Fronting changes
+	20/01/2025		Raj Mahajan        #42536				Modify the logic to pick the correct CAB account for the model type 'UEP'
+	29/01/2025		Raj Mahajan        #42907				Modify the logic to take out the Contract Management create and modified dates
+															to remove duplication of data only differing on these dates
+	29/01/2025		Raj Mahajan        #46168				Correct the Agency Business Unit logic for Fees to account for N/A Insurer Branch
+	08/04/2025		Raj Mahajan        #45123				Changes to return N/A values for member group name, trading partner value & trading partner.
+															Also, default the VTX sub ledger posting accounts to VTX-000002 for Entity = Insurer & Account Type = VEND, 
+															and filter out any tax lines where it's not payable by insurer or the amount is 0.
+	24/04/2025		Raj Mahajan        #47167				Default the VTX transaction type descriptiion to "Tax Payable"
+	24/04/2025		Raj Mahajan        #47262				Default the VTX trading partner to blank, affiliiation to NON and change the DimensionDisplayValue accordingly.
+															Also, add an ELSE to all the CASE statements.
+	27/11/2025		Dave Cornwell      #47382				Refactor to JOIN on PTYMasterID's rather than names/descriptions				
+	=============================================================================================================================
+*/
+
+CREATE VIEW [dbo].[vwDataProduct_TP_BU_AFF]
+AS
+WITH tpl AS
+(
+	SELECT tpl.ID, tpl.Entity_Type, tpl.Transaction_Type, UPPER(COALESCE(tpl.Account_type, at.Account_Type)) AS Account_Type, tpl.Fronting, CASE WHEN tpl.Trading_Partner_Value = '' THEN 'N/A' ELSE tpl.Trading_Partner_Value END AS Trading_Partner_Value
+	FROM master.tTradingPartnerLookup tpl
+	CROSS JOIN
+	(
+		SELECT 'CUST' AS Account_Type
+		UNION
+		SELECT 'VEND' AS Account_Type
+	) AS at
+	WHERE COALESCE(tpl.Account_type, at.Account_Type) = at.Account_Type
+),
+vendAccLkup AS
+(
+    --SELECT DATAAREAID, CASE WHEN VENDORORGANIZATIONNAME LIKE '%Branch' THEN CONCAT(LEFT(VENDORORGANIZATIONNAME, 32), ' - ', SUBSTRING(VENDORORGANIZATIONNAME, 38, 20)) ELSE VENDORORGANIZATIONNAME END AS VENDORORGANIZATIONNAME, VENDORACCOUNTNUMBER
+	SELECT DATAAREAID, VENDORORGANIZATIONNAME, VENDORACCOUNTNUMBER
+	FROM [D365Lake].[ods].[VendVendorV2Staging]
+	WHERE VENDORGROUPID = 'INS'
+),
+custCmgAccLkup AS
+(
+    SELECT DATAAREAID, ORGANIZATIONNAME, CUSTOMERACCOUNT
+	FROM [D365Lake].[ods].[CustCustomerV3Staging]
+	WHERE CUSTOMERGROUPID = 'MGA'
+),
+custCagAccLkup AS
+(
+    SELECT DATAAREAID, ORGANIZATIONNAME, CUSTOMERACCOUNT, CUSTOMERGROUPID
+	FROM [D365Lake].[ods].[CustCustomerV3Staging]
+	WHERE CUSTOMERGROUPID IN ('AGC', 'INA')
+),
+Main AS
+(
+	SELECT DISTINCT
+
+	cm.ContractReference,
+	cm.Model, 
+
+    ptyMemberName.PartyMasterID AS Member_PartyMasterID,
+    ptyMemberName.PartyAlias AS Member_Code,
+    cm.MemberName AS Member_Name,
+	CASE ptyMemberName.AffiliateStatus
+		WHEN  'AFL' THEN
+			'AFF'
+		WHEN  'NAF' THEN
+			'NON'
+		ELSE
+			ptyMemberName.AffiliateStatus
+	END AS Member_AffiliateStatus,
+
+    COALESCE(ptyAgenyCode.PartyMasterID, ptyAgencyName.PartyMasterID) AS Agency_PartyMasterID,
+    COALESCE(ptyAgenyCode.PartyAlias, ptyAgencyName.PartyAlias) AS Agency_Code,
+	COALESCE(ptyAgenyCode.PartyName, cm.AgencyName) AS Agency_Name,
+	CASE COALESCE(ptyAgenyCode.AffiliateStatus, ptyAgencyName.AffiliateStatus)
+		WHEN  'AFL' THEN
+			'AFF'
+		WHEN  'NAF' THEN
+			'NON'
+		ELSE
+			COALESCE(ptyAgenyCode.AffiliateStatus, ptyAgencyName.AffiliateStatus)
+	END AS Agency_AffiliateStatus,
+
+    COALESCE(ptyInsurerName.PartyMasterID, ptyInsurerFinanceName.PartyMasterID) AS Insurer_PartyMasterID,
+    COALESCE(ptyInsurerName.PartyAlias, ptyInsurerFinanceName.PartyAlias) AS Insurer_Code,
+    COALESCE(ptyInsurerName.PartyName, ptyInsurerFinanceName.PartyName) AS Insurer_Name,
+	ptyInsurerName.PartyName AS ptyInsurerName_PartyName,
+	ptyInsurerFinanceName.PartyName AS  ptyInsurerFinanceName_PartyName,
+	CASE COALESCE(ptyInsurerName.AffiliateStatus, ptyInsurerFinanceName.AffiliateStatus)
+		WHEN  'AFL' THEN
+			'AFF'
+		WHEN  'NAF' THEN
+			'NON'
+		ELSE
+			COALESCE(ptyInsurerName.AffiliateStatus, ptyInsurerFinanceName.AffiliateStatus)
+	END AS Insurer_AffiliateStatus,
+
+    CASE WHEN cm.InsurerBranchCode IS NOT NULL THEN ptyInsurerBranchCode.PartyMasterID ELSE '-1' END AS InsurerBranch_PartyMasterID,
+    CASE WHEN cm.InsurerBranchCode IS NOT NULL THEN cm.InsurerBranchCode ELSE 'N/A' END AS InsurerBranch_Code, -- Derived from ContractManagement
+	CASE WHEN cm.InsurerBranchCode IS NOT NULL THEN ptyInsurerBranchCode.PartyName ELSE 'N/A' END AS InsurerBranch_Name,
+	CASE WHEN cm.InsurerBranchCode IS NOT NULL THEN 
+		CASE ptyInsurerBranchCode.AffiliateStatus
+			WHEN  'AFL' THEN
+				'AFF'
+			WHEN  'NAF' THEN
+				'NON'
+			ELSE
+				ptyInsurerBranchCode.AffiliateStatus
+		END
+	ELSE
+		'N/A'
+	END AS InsurerBranch_AffiliateStatus,
+
+	CASE WHEN cm.FrontingCompany IS NOT NULL THEN ptyFrontingName.PartyMasterID ELSE '-1' END AS Fronting_PartyMasterID,
+	CASE WHEN cm.FrontingCompany IS NOT NULL THEN ptyFrontingName.PartyAlias ELSE 'N/A' END AS Fronting_Code,
+	CASE WHEN cm.FrontingCompany IS NOT NULL THEN ptyFrontingName.PartyName ELSE 'N/A' END AS Fronting_Name,
+	CASE WHEN cm.FrontingCompany IS NOT NULL THEN 
+		CASE ptyFrontingName.AffiliateStatus
+			WHEN  'AFL' THEN
+				'AFF'
+			WHEN  'NAF' THEN
+				'NON'
+			ELSE
+				ptyFrontingName.AffiliateStatus
+		END
+	ELSE
+		'N/A'
+	END AS Fronting_AffiliateStatus,
+
+    CASE
+        WHEN ISNULL(ptyMemberName.AffiliateStatus, '') IN ( 'Affiliate', 'AFFL' )
+    AND ISNULL(cm.GroupName, '') = 'Mission Underwriters'
+    AND ISNULL(cm.TypeofInsurance, 'Direct') = 'Direct' THEN
+            'Direct (Mission Affiliate)'
+        WHEN ISNULL(ptyMemberName.AffiliateStatus, '') IN ( 'Affiliate', 'AFFL' )
+    AND ISNULL(cm.GroupName, '') <> 'Mission Underwriters'
+    AND ISNULL(cm.TypeofInsurance, 'Direct') = 'Direct' THEN
+            'Direct (Non-Mission Affiliate)'
+        WHEN ISNULL(ptyMemberName.AffiliateStatus, '') NOT IN ( 'Affiliate', 'AFFL' )
+    AND ISNULL(cm.TypeofInsurance, 'Direct') = 'Direct' THEN
+            'Direct (Non-Affiliate)'
+        WHEN ISNULL(ptyMemberName.AffiliateStatus, '') NOT IN ( 'Affiliate', 'AFFL' )
+    AND ISNULL(cm.TypeofInsurance, 'Direct') <> 'Direct' THEN
+            'Non-Direct (Non-Affiliate)'
+        ELSE
+            '*****INVALID COMBINATION******'
+    END AS BusinessTypeCombination,
+    cm.GroupName AS MemberGroupName,
+    fsmga.DIMENSIONVALUE AS D365BYODMGACode,
+    ISNULL(cm.TypeofInsurance, 'Direct') AS DirectOrAssumed,
+    cm.ManagedAccounting,
+    CASE
+        WHEN cm.GroupName = 'Mission Underwriters' THEN
+            1
+        ELSE
+            0
+    END AS MissionMember,
+    ISNULL(cm.FrontingCompany, 'N/A') AS FrontingCompany,
+	CASE WHEN ISNULL(cm.FrontingCompany, '') = '' THEN 'N' ELSE 'Y' END AS Fronting,
+    bulu.AgencyBusinessUnit,
+    bulu.InsurerBusinessUnit,
+    CASE
+        WHEN ptyInsurerName.PartyMasterID IS NOT NULL THEN
+            CASE
+                WHEN ptyInsurerName.PartyName LIKE '%Accelerant%' THEN
+                    'M'
+                ELSE
+                    'C'
+            END
+        ELSE
+            'C'
+    END MainOrCoInsurer,
+	cm.ManagedAccounting AS InsurerType,
+	cm.AgencyBranchCode,
+	cm.TaxPayableBy,
+	cm.TaxPayable
+    FROM master.ContractManagement AS cm
+    LEFT OUTER JOIN master.Party AS ptyMemberName
+    ON cm.MemberPartyMasterID = ptyMemberName.PartyMasterID
+    AND ptyMemberName.PartyTypeName = 'Member'
+    LEFT OUTER JOIN master.Party AS ptyInsurerName
+    ON cm.InsurerPartyMasterID = ptyInsurerName.PartyMasterID
+    AND ptyInsurerName.PartyTypeName = 'Insurer'
+    LEFT OUTER JOIN master.Party AS ptyInsurerFinanceName
+    ON ptyInsurerFinanceName.FinanceName = cm.InsurerName
+	AND ptyInsurerFinanceName.PartyTypeName = 'Insurer'
+	LEFT OUTER JOIN master.Party AS ptyAgenyCode
+    ON cm.AgencyBranchCode = ptyAgenyCode.PartyAlias
+    AND ptyAgenyCode.PartyTypeName IN ('Agency', 'Agency Branch')
+    LEFT OUTER JOIN master.Party AS ptyAgencyName
+    ON cm.AgencyPartyMasterID = ptyAgencyName.PartyMasterID
+    AND ptyAgencyName.PartyTypeName IN ('Agency', 'Agency Branch')
+LEFT OUTER JOIN master.Party AS ptyInsurerBranchCode
+    ON cm.InsurerBranchCode = ptyInsurerBranchCode.PartyAlias
+    AND ptyInsurerBranchCode.PartyTypeName = 'Insurer Branch'
+    LEFT OUTER JOIN master.Party AS ptyFrontingName
+    ON ptyFrontingName.PartyMasterID = cm.FrontingCompanyPartyMasterID
+	AND ptyFrontingName.PartyTypeName = 'Insurer'
+	LEFT OUTER JOIN master.BusinessUnitLookup AS bulu
+    ON cm.TypeofInsurance = bulu.TypeOfInsurance
+    AND ptyInsurerName.AffiliateStatus = bulu.InsurerAffiliation
+    AND bulu.ManagedAccounting = CASE WHEN cm.ManagedAccounting = 'Managed' THEN 'Managed' ELSE 'Not Managed' END
+    AND bulu.Fronting = CASE WHEN ISNULL(cm.FrontingCompany, '') = '' THEN 'N' ELSE 'Y' END
+	AND bulu.AccelerantInsurer = CASE WHEN cm.InsurerName LIKE '%Accelerant%' THEN 'Y' ELSE 'N' END
+    LEFT OUTER JOIN d365lake.ods.FinancialDimensionValueEntityStaging AS fsmga
+	ON fsmga.DIMENSIONVALUE = cm.MemberPartyMasterID
+    AND fsmga.FINANCIALDIMENSION IN ('MGA', 'AMGA')
+    WHERE cm.InsurerName NOT LIKE 'HDI%'
+	AND bulu.AgencyBusinessUnit <> 'INVALID'
+    AND bulu.InsurerBusinessUnit <> 'INVALID'
+),
+NonFee AS
+(
+	SELECT DISTINCT --m.Fronting, m.AgencyBusinessUnit, m.InsurerBranch_PartyMasterID AS A, m.Insurer_PartyMasterID AS B, m.InsurerFinance_PartyMasterID AS C,InsurerFinance_PartyMasterID AS D, REPLACE(COALESCE(m.InsurerBranch_PartyMasterID, m.Insurer_Party, m.InsurerFinance_PartyMasterID), 'PTY-', '.') AS E,
+		m.ContractReference,
+		m.Model,
+		CASE tpl.Entity_Type
+			WHEN 'Insurer' THEN
+				CASE m.Fronting WHEN 'N' THEN 'Insurer' ELSE 'Reinsurer' END
+			ELSE
+				tpl.Entity_Type
+		END AS Entity,
+		CASE tpl.Entity_Type
+			WHEN 'Agency' THEN
+				m.AgencyBranchCode
+			WHEN 'Insurer' THEN
+				CASE WHEN ISNULL(m.InsurerBranch_Code, 'N/A') = 'N/A' THEN m.Insurer_Code ELSE m.InsurerBranch_Code END
+			ELSE
+				'N/A'
+		END AS EntityCode,
+		tpl.Account_Type AS AccountType,
+		tpl.Transaction_Type AS TransactionType,
+		CASE WHEN tpl.Account_Type = 'VEND' AND tpl.Entity_Type = 'Insurer' AND spal.Sub_Ledger_Posting_Account = 'VTX' THEN -- Default the VTX transaction type description to Tax Payable for Entity = Insurer & Account Type = VEND
+			'Tax Payable'
+		ELSE
+			tt.Transaction_Desc
+		END AS TransactionTypeDescription,
+		spal.Sub_Ledger_Posting_Account AS SubLedgerPostingAccountType,
+		CASE tpl.Account_Type
+			WHEN 'VEND' THEN
+				CASE WHEN  tpl.Entity_Type = 'Insurer' AND spal.Sub_Ledger_Posting_Account = 'VTX' THEN -- Default the VTX sub ledger posting accounts to VTX-000002 for Entity = Insurer & Account Type = VEND
+					'VTX-000002'
+				ELSE
+					vendAccLkup.VENDORACCOUNTNUMBER
+				END
+			WHEN 'CUST' THEN
+				CASE spal.Sub_Ledger_Posting_Account
+					WHEN 'CMG' THEN
+						custCmgAccLkup.CUSTOMERACCOUNT
+					WHEN 'CAG' THEN
+						custCagAccLkup.CUSTOMERACCOUNT
+					ELSE
+						'N/A'
+				END
+			ELSE
+				'N/A'
+		END AS SubLedgerPostingAccount,
+
+
+		CASE tpl.Account_Type
+			WHEN 'VEND' THEN
+				'For Account_Type = VEND, Returns vendAccLkup.VENDORACCOUNTNUMBER for vendAccLkup.DATAAREAID = ' + m.Agency_Code + '(Based on "Agency_Code")' + ', vendAccLkup.VENDORORGANIZATIONNAME = '
+				+
+				CASE
+					WHEN m.Model = 'UEP' THEN m.Fronting_Name + '(For Model = UEP, Based on "Fronting_Name")'
+					WHEN m.DirectOrAssumed <> 'Assumed' THEN
+						CASE WHEN ISNULL(m.InsurerBranch_Name, 'N/A') = 'N/A' THEN m.Insurer_name + '(For Model <> UEP, DirectOrAssumed <> Assumed, Based on "Insurer_name")' ELSE m.InsurerBranch_Name + '(Model <> UEP, DirectOrAssumed <> Assumed, Based on "InsurerBranch_Name")' END
+					ELSE
+						CASE WHEN ISNULL(m.InsurerBranch_Code, 'N/A') = 'N/A' THEN m.Insurer_Code + '(For Model <> UEP, DirectOrAssumed = Assumed, Based on "Insurer_Code | OBO | Fronting_Name")' ELSE m.InsurerBranch_Code END + ' | OBO | ' + m.Fronting_Name + '(Model <> UEP, DirectOrAssumed = Assumed, Based on InsurerBranch_Code | OBO | Fronting_Name)'
+				END
+			WHEN 'CUST' THEN
+				'For Account_Type = CUST, '
+				+
+				CASE spal.Sub_Ledger_Posting_Account
+					WHEN 'CMG' THEN
+						'Sub_Ledger_Posting_Account = CMG, Returns custCmgAccLkup.CUSTOMERACCOUNT for custCmgAccLkup.DATAAREAID = ' + m.Agency_Code + '(Based on "Agency_Code"), custCmgAccLkup.ORGANIZATIONNAME = ' + m.Member_Name + '(Based on "Member_Name")'
+					WHEN 'CAG' THEN
+						'Sub_Ledger_Posting_Account = CAG, Returns custCagAccLkup.CUSTOMERACCOUNT for custCagAccLkup.DATAAREAID = ' 
+						+ 
+						CASE WHEN ISNULL(m.InsurerBranch_Code, 'N/A') = 'N/A' THEN m.Insurer_Code + '(Based on "Insurer_Code")' ELSE m.InsurerBranch_Code  + '(Based on "InsurerBranch_Code")' END
+						+
+						', custCagAccLkup.CUSTOMERGROUPID = ' 
+						+
+						CASE WHEN m.Model = 'UEP' THEN 'INA(For "Model = UEP")' ELSE 'AGC(For "Model <> UEP")' END
+						+
+						', custCagAccLkup.ORGANIZATIONNAME = ' + m.Member_Name + '(Based on "Member_Name")'
+						+
+						CASE
+							WHEN m.Model = 'UEP' THEN m.Fronting_Name + '(For Model = UEP, Based on "Fronting_Name")'
+							WHEN m.DirectOrAssumed <> 'Assumed' THEN
+								m.Agency_Name + '(For Model <> UEP, DirectOrAssumed <> Assumed, Based on "Agency_Name")'
+							ELSE
+								m.Agency_Code + ' | OBO | ' + m.Fronting_Name + '(For Model <> UEP, DirectOrAssumed = Assumed, Based on "Agency_Code | OBO | Fronting_Name")'
+						END
+					ELSE
+						'N/A'
+				END
+			ELSE
+				'N/A'
+		END AS SubLedgerPostingAccountBasis,
+
+
+	    tpl.Trading_Partner_Value AS TradingPartnerValue,
+		m.Member_PartyMasterID AS MemberPartyMasterID,
+		m.Member_Name AS MemberName,
+		m.Member_Code AS MemberCode,
+		m.Member_AffiliateStatus AS MemberAffiliation, 
+		CASE m.Fronting
+			WHEN 'N' THEN
+				m.Insurer_PartyMasterID
+			ELSE
+				m.Fronting_PartyMasterID
+		END AS InsurerPartyMasterID,
+		CASE m.Fronting
+			WHEN 'N' THEN
+				m.Insurer_Name
+			ELSE
+				m.Fronting_Name
+		END AS InsurerName,
+		CASE m.Fronting
+			WHEN 'N' THEN
+				m.Insurer_Code
+			ELSE
+				m.Fronting_Code
+		END AS InsurerCode,
+		CASE m.Fronting
+			WHEN 'N' THEN
+				m.Insurer_AffiliateStatus
+			ELSE
+				m.Fronting_AffiliateStatus
+		END AS InsurerAffiliation,
+		m.Agency_PartyMasterID AS AgencyPartyMasterID,
+		m.Agency_Name AS AgencyName,
+		m.Agency_Code AS AgencyCode,
+		m.Agency_AffiliateStatus AS AgencyAffiliation, 
+		CASE m.Fronting
+			WHEN 'N' THEN
+				m.InsurerBranch_PartyMasterID
+			ELSE
+				'-1'
+		END AS InsurerBranchPartyMasterID,
+		CASE m.Fronting
+			WHEN 'N' THEN
+				m.InsurerBranch_Name
+			ELSE
+				'N/A'
+		END AS InsurerBranchName,
+		CASE m.Fronting
+			WHEN 'N' THEN
+				m.InsurerBranch_Code
+			ELSE
+				'N/A'
+		END AS InsurerBranchCode,
+		CASE m.Fronting
+			WHEN 'N' THEN
+				m.InsurerBranch_AffiliateStatus
+			ELSE
+				'N/A'
+		END AS InsurerBranchAffiliation,
+		CASE m.Fronting
+			WHEN 'Y' THEN
+				CASE WHEN m.InsurerBranch_PartyMasterID <> '-1' THEN
+					m.InsurerBranch_PartyMasterID
+				ELSE
+					m.Insurer_PartyMasterID
+				END
+			ELSE
+				'-1'
+		END AS ReinsurerPartyMasterID,
+		CASE m.Fronting
+			WHEN 'Y' THEN
+				CASE WHEN m.InsurerBranch_Name <> 'N/A' THEN
+					m.InsurerBranch_Name
+				ELSE
+					m.Insurer_Name
+				END
+			ELSE
+				'N/A'
+		END AS ReinsurerName,
+		CASE m.Fronting
+			WHEN 'Y' THEN
+				CASE WHEN m.InsurerBranch_Code <> 'N/A' THEN
+					m.InsurerBranch_Code
+				ELSE
+					m.Insurer_Code
+				END
+			ELSE
+				'N/A'
+		END AS ReinsurerCode,
+		CASE m.Fronting
+			WHEN 'Y' THEN
+				CASE WHEN m.InsurerBranch_AffiliateStatus <> 'N/A' THEN
+					m.InsurerBranch_AffiliateStatus
+				ELSE
+					m.Insurer_AffiliateStatus
+				END
+			ELSE
+				'N/A'
+		END AS ReinsurerAffiliation,
+		ISNULL(m.MemberGroupName, 'N/A') AS MemberGroupName,
+		m.DirectOrAssumed AS TypeOfInsurance,
+		CASE tpl.Entity_Type
+			WHEN 'Agency' THEN
+				CASE
+					WHEN m.Fronting = 'Y' THEN
+						CONCAT(m.AgencyBusinessUnit, REPLACE(m.Fronting_PartyMasterID, 'PTY-', '.'))
+					ELSE
+						CONCAT(m.AgencyBusinessUnit, REPLACE((CASE WHEN ISNULL(m.InsurerBranch_PartyMasterID, '-1') = '-1' THEN m.Insurer_PartyMasterID ELSE m.InsurerBranch_PartyMasterID END), 'PTY-', '.'))
+			   END
+			WHEN 'Insurer' THEN
+				m.InsurerBusinessUnit
+			ELSE
+				'N/A'
+		END AS BusinessUnit,
+		CASE WHEN tpl.Account_Type = 'VEND' AND tpl.Entity_Type = 'Insurer' AND spal.Sub_Ledger_Posting_Account = 'VTX' THEN -- Default the VTX trading partner to blank for Entity = Insurer & Account Type = VEND
+			''
+		ELSE
+			CASE tpl.Trading_Partner_Value
+				WHEN 'MEMBER_GROUP' THEN
+					CASE
+						WHEN ptyMemberCode.AffiliateStatus IN ( 'AFL', 'AFF' ) THEN
+							CASE
+								WHEN m.MemberGroupName IS NOT NULL THEN
+									ptyMemberGroupName.PartyAlias --bring back groupCode if part of group otherwise Member Code
+								ELSE
+									ptyMemberCode.PartyAlias
+							END
+
+						ELSE
+							-- #40666 - If the Member Affiliation is Not Affiliated
+							ptyMemberCode.PartyAlias
+					END
+				WHEN 'INSURER' THEN
+					CASE tpl.Entity_Type
+						WHEN 'Agency' THEN
+							CASE WHEN ISNULL(m.InsurerBranch_Code, 'N/A') = 'N/A' THEN m.Insurer_Code ELSE m.InsurerBranch_Code END
+						WHEN 'Insurer' THEN
+							m.Insurer_Code
+						ELSE
+							'N/A'
+					END
+				WHEN 'INSURER_FRONTING' THEN
+					m.Fronting_Code
+				WHEN 'AGENCY' THEN
+					m.Agency_Code
+				ELSE
+					'N/A'
+			END
+		END AS TradingPartner,
+		CASE WHEN tpl.Account_Type = 'VEND' AND tpl.Entity_Type = 'Insurer' AND spal.Sub_Ledger_Posting_Account = 'VTX' THEN -- Default the VTX affiliation to NON for Entity = Insurer & Account Type = VEND
+			'NON'
+		ELSE
+			CASE tpl.Trading_Partner_Value
+				WHEN 'MEMBER_GROUP' THEN
+					CASE ptyMemberCode.AffiliateStatus
+						WHEN 'AFL' THEN
+							'AFF'
+						WHEN 'NAF' THEN
+							'NON'
+						ELSE
+							ptyMemberCode.AffiliateStatus
+					END
+				WHEN 'INSURER' THEN
+					CASE m.Insurer_AffiliateStatus
+						WHEN  'AFL' THEN
+							'AFF'
+						WHEN  'NAF' THEN
+							'NON'
+						ELSE
+							m.Insurer_AffiliateStatus
+					END
+				WHEN 'INSURER_FRONTING' THEN
+					CASE m.Fronting_AffiliateStatus
+						WHEN 'AFL' THEN
+							'AFF'
+						WHEN 'NAF' THEN
+							'NON'
+						ELSE
+							m.Fronting_AffiliateStatus
+					END
+				WHEN 'AGENCY' THEN
+					'AFF'
+				ELSE
+					'N/A'
+			END
+		END AS Affiliation,
+		m.InsurerType
+	FROM Main m
+    LEFT OUTER JOIN tpl
+    ON tpl.Fronting = m.Fronting
+	LEFT OUTER JOIN master.SubLedgerPostingAccountLookup spal
+	ON spal.Entity_Type = tpl.Entity_Type
+	AND spal.Account_type = tpl.Account_Type
+	AND spal.Posting_Type_New = tpl.Transaction_Type
+    LEFT OUTER JOIN master.Accounting_TransactionType tt
+	ON tt.Entity = tpl.Entity_Type
+	AND tt.Transaction_Type = tpl.Transaction_Type
+    LEFT OUTER JOIN master.Party AS ptyMemberGroupName
+    ON ptyMemberGroupName.PartyName = m.MemberGroupName
+	AND ptyMemberGroupName.PartyTypeName = 'Group'
+    LEFT OUTER JOIN master.Party AS ptyMemberCode
+    ON ptyMemberCode.PartyMasterID = m.D365BYODMGACode
+	AND ptyMemberCode.PartyTypeName = 'Member'
+	LEFT OUTER JOIN vendAccLkup
+	ON vendAccLkup.VENDORORGANIZATIONNAME = 
+		CASE
+			WHEN m.Model = 'UEP' THEN m.Fronting_Name
+			WHEN m.DirectOrAssumed <> 'Assumed' THEN
+				CASE WHEN ISNULL(m.InsurerBranch_Name, 'N/A') = 'N/A' THEN m.Insurer_name ELSE m.InsurerBranch_Name END
+			ELSE
+				CASE WHEN ISNULL(m.InsurerBranch_Code, 'N/A') = 'N/A' THEN m.Insurer_Code ELSE m.InsurerBranch_Code END + ' | OBO | ' + m.Fronting_Name
+		END
+	AND vendAccLkup.DATAAREAID = m.Agency_Code
+    LEFT OUTER JOIN custCmgAccLkup
+	ON custCmgAccLkup.ORGANIZATIONNAME = m.Member_Name
+    AND custCmgAccLkup.DATAAREAID = m.Agency_Code
+    LEFT OUTER JOIN custCagAccLkup
+	ON custCagAccLkup.ORGANIZATIONNAME = 
+		CASE
+			WHEN m.Model = 'UEP' THEN m.Fronting_Name
+			WHEN m.DirectOrAssumed <> 'Assumed' THEN
+				m.Agency_Name
+			ELSE
+				m.Agency_Code + ' | OBO | ' + m.Fronting_Name
+		END
+    AND custCagAccLkup.DATAAREAID = CASE WHEN ISNULL(m.InsurerBranch_Code, 'N/A') = 'N/A' THEN m.Insurer_Code ELSE m.InsurerBranch_Code END
+	AND custCagAccLkup.CUSTOMERGROUPID = CASE WHEN m.Model = 'UEP' THEN 'INA' ELSE 'AGC' END
+	WHERE spal.Posting_Type_New <> 'FEE'
+	AND
+	(
+		spal.Posting_Type_New <> 'TAX'
+		OR
+		(
+			spal.Posting_Type_New = 'TAX'
+			AND ISNULL(m.TaxPayableBy, '') = 'Insurer'
+			AND ISNULL(m.TaxPayable, 0) <> 0
+		)
+	)
+),
+Fee AS
+(
+	SELECT DISTINCT 
+		m.ContractReference,
+		m.Model,
+		CASE ftm.PayableBy
+			WHEN 'Insurer' THEN
+				CASE m.Fronting WHEN 'N' THEN 'Insurer' ELSE 'Reinsurer' END
+			ELSE
+				ftm.PayableBy
+		END AS Entity,
+		CASE ftm.PayableBy
+			WHEN 'Agency' THEN
+				m.AgencyBranchCode
+			WHEN 'Insurer' THEN
+				CASE WHEN ISNULL(m.InsurerBranch_Code, 'N/A') = 'N/A' THEN m.Insurer_Code ELSE m.InsurerBranch_Code END
+			ELSE
+				'N/A'
+		END AS EntityCode,
+		ftm.AccountType,
+		ftm.PostingType AS TransactionType,
+		ftm.SourceFieldMapping AS TransactionTypeDescription,
+		spal.Sub_Ledger_Posting_Account AS SubLedgerPostingAccountType,
+		ftm.DefaultAccount AS SubLedgerPostingAccount,
+
+		'Based on FeeTypeMapping.DefaultAccount' AS SubLedgerPostingAccountBasis,
+
+	    'FEE_TYPE_MAPPING' AS TradingPartnerValue,
+		m.Member_PartyMasterID AS MemberPartyMasterID,
+		m.Member_Name AS MemberName,
+		m.Member_Code AS MemberCode,
+		m.Member_AffiliateStatus AS MemberAffiliation, 
+		CASE m.Fronting
+			WHEN 'N' THEN
+				m.Insurer_PartyMasterID
+			ELSE
+				m.Fronting_PartyMasterID
+		END AS InsurerPartyMasterID,
+		CASE m.Fronting
+			WHEN 'N' THEN
+				m.Insurer_Name
+			ELSE
+				m.Fronting_Name
+		END AS InsurerName,
+		CASE m.Fronting
+			WHEN 'N' THEN
+				m.Insurer_Code
+			ELSE
+				m.Fronting_Code
+		END AS InsurerCode,
+		CASE m.Fronting
+			WHEN 'N' THEN
+				m.Insurer_AffiliateStatus
+			ELSE
+				m.Fronting_AffiliateStatus
+		END AS InsurerAffiliation,
+		m.Agency_PartyMasterID AS AgencyPartyMasterID,
+		m.Agency_Name AS AgencyName,
+		m.Agency_Code AS AgencyCode,
+		m.Agency_AffiliateStatus AS AgencyAffiliation, 
+		CASE m.Fronting
+			WHEN 'N' THEN
+				m.InsurerBranch_PartyMasterID
+			ELSE
+				'-1'
+		END AS InsurerBranchPartyMasterID,
+		CASE m.Fronting
+			WHEN 'N' THEN
+				m.InsurerBranch_Name
+			ELSE
+				'N/A'
+		END AS InsurerBranchName,
+		CASE m.Fronting
+			WHEN 'N' THEN
+				m.InsurerBranch_Code
+			ELSE
+				'N/A'
+		END AS InsurerBranchCode,
+		CASE m.Fronting
+			WHEN 'N' THEN
+				m.InsurerBranch_AffiliateStatus
+			ELSE
+				'N/A'
+		END AS InsurerBranchAffiliation,
+		CASE m.Fronting
+			WHEN 'Y' THEN
+				CASE WHEN m.InsurerBranch_PartyMasterID <> '-1' THEN
+					m.InsurerBranch_PartyMasterID
+				ELSE
+					m.Insurer_PartyMasterID
+				END
+			ELSE
+				'-1'
+		END AS ReinsurerPartyMasterID,
+		CASE m.Fronting
+			WHEN 'Y' THEN
+				CASE WHEN m.InsurerBranch_Name <> 'N/A' THEN
+					m.InsurerBranch_Name
+				ELSE
+					m.Insurer_Name
+				END
+			ELSE
+				'N/A'
+		END AS ReinsurerName,
+		CASE m.Fronting
+			WHEN 'Y' THEN
+				CASE WHEN m.InsurerBranch_Code <> 'N/A' THEN
+					m.InsurerBranch_Code
+				ELSE
+					m.Insurer_Code
+				END
+			ELSE
+				'N/A'
+		END AS ReinsurerCode,
+		CASE m.Fronting
+			WHEN 'Y' THEN
+				CASE WHEN m.InsurerBranch_AffiliateStatus <> 'N/A' THEN
+					m.InsurerBranch_AffiliateStatus
+				ELSE
+					m.Insurer_AffiliateStatus
+				END
+			ELSE
+				'N/A'
+		END AS ReinsurerAffiliation,
+		m.MemberGroupName,
+		m.DirectOrAssumed AS TypeOfInsurance,
+		CASE ftm.PayableBy
+			WHEN 'Agency' THEN
+				CASE
+					WHEN m.Fronting = 'Y' THEN
+						CONCAT(m.AgencyBusinessUnit, REPLACE(m.Fronting_PartyMasterID, 'PTY-', '.'))
+					ELSE
+						CONCAT(m.AgencyBusinessUnit, REPLACE((CASE WHEN ISNULL(m.InsurerBranch_PartyMasterID, '-1') = '-1' THEN m.Insurer_PartyMasterID ELSE m.InsurerBranch_PartyMasterID END), 'PTY-', '.'))
+			   END
+			WHEN 'Insurer' THEN
+				m.InsurerBusinessUnit
+			ELSE
+				'N/A'
+		END AS BusinessUnit,
+		ftm.OffsetAccountTradingPartner AS TradingPartner,
+		CASE ftm.OffsetAccountTradingPartnerAFF
+			WHEN 'AFL' THEN
+				'AFF'
+			WHEN 'NAF' THEN
+				'NON'
+			ELSE
+				ftm.OffsetAccountTradingPartnerAFF
+		END AS Affiliation,
+		m.InsurerType
+		
+	FROM Main m
+	LEFT OUTER JOIN master.FeeTypeMapping ftm
+	ON m.Member_PartyMasterID = ftm.MemberPartyMasterID
+	AND CASE WHEN ftm.ContractReference = 'ALL' THEN '1' ELSE m.ContractReference END = CASE WHEN ftm.ContractReference = 'ALL' THEN '1' ELSE ftm.ContractReference END
+	LEFT OUTER JOIN master.SubLedgerPostingAccountLookup spal
+	ON spal.Entity_Type = ftm.PayableBy
+	AND spal.Account_type = ftm.AccountType
+	AND spal.Posting_Type_New = ftm.PostingTypeNew
+	WHERE spal.Posting_Type_New = 'FEE'
+)
+SELECT *, CONCAT('~~~~', MemberPartyMasterID, '~~', TradingPartner, '~~~~~', Affiliation, '~', BusinessUnit) AS DimensionDisplayValue -- ~~~~PTY-000362~~1099~~~~~NON~A0004.000006
+FROM NonFee
+WHERE NonFee.BusinessUnit <> 'NO VALUE' -- Take out any Insurer / Agency dataset that's not required
+
+UNION
+
+SELECT *, CONCAT('~~~~', MemberPartyMasterID, '~~', TradingPartner, '~~~~~', Affiliation, '~', BusinessUnit) AS DimensionDisplayValue
+FROM Fee
+WHERE Fee.BusinessUnit <> 'NO VALUE';  -- Take out any Insurer / Agency dataset that's not required
+GO

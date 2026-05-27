@@ -1,0 +1,129 @@
+# Dependencies
+node_modules/
+# package-lock.json - Keep this file committed for consistent builds
+
+# Environment variables (never commit secrets)
+.env
+.env.local
+.env.*.local
+src/config/env/.env.*
+src/config/.env.*
+.env.*
+
+# Build outputs
+dist/
+build/
+
+# Test results and reports
+reports/
+test-results/
+playwright-report/
+playwright/.auth/
+
+# Logs
+*.log
+logs/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
+*.localbak
+
+# Certificates and private keys (keep README.md)
+certs/*.key
+certs/*.pem
+certs/*.crt
+certs/*.p12
+certs/*.pfx
+# Root-level certificate files
+server.key
+server.crt
+*.key
+*.crt
+*.pem
+*.p12
+*.pfx
+
+# Excel files (may contain sensitive test data)
+*.xlsx
+*.xls
+
+# Ignore all markdown files
+*.md
+
+# POC landing page
+!README.md
+
+# Keep framework-documentation.md tracked
+!docs/framework-documentation.md
+!framework-documentation.md
+# Contribution / review process (single source of truth)
+!docs/process/CODE_REVIEW_AND_CONTRIBUTION.md
+!docs/process/GIT_SYNC_WITH_MAIN.md
+!docs/process/CODE_REVIEW_AND_BRANCHING_DIAGRAMS.md
+!docs/process/CURSOR_PROJECT_SKILLS_SKILLMD_GUIDE.md
+# GitHub PR template
+!.github/pull_request_template.md
+# Keep MuleSoft setup doc tracked
+!docs/setup/MULESOFT_ACCESS_REQUIREMENTS.md
+!docs/setup/TEAM_SECRETS_AND_ONBOARDING.md
+# Lloyd's Row-1 sanity test — committed knowledge + runbook + permissions ticket draft
+!docs/lloyds/SKILL.md
+!docs/lloyds/LLOYDS_QA_PROGRESS.md
+!docs/lloyds/LLOYDS_STAGE1_SANITY_TEAM_GUIDE.md
+!docs/lloyds/LLOYDS_TEST_STRATEGY.md
+!docs/lloyds/LLOYDS_E2E_SINGLE_REPO_AND_HTML.md
+!docs/servicenow-ticket-lloyds-spn-permissions.md
+# CLM go-live migration / integration test plan + QA progress (Confluence source)
+!docs/clm/CLM_GO_LIVE_MIGRATION_INTEGRATION_TEST_PLAN.md
+!docs/clm/CLM_MIGRATION_QA_PROGRESS.md
+!docs/clm/CLM_MIGRATION_QA_PROGRESS_DETAIL.md
+!docs/clm/CLM_MIGRATION_SCOPE_MATRIX.md
+!src/features/lloyds/README.md
+# Keep Feature Generator QA tool README tracked
+!tools/README-Feature-Generator.md
+# Keep the Remotion video-presentation sub-project README tracked
+!video/README.md
+
+# Ignore example/template configuration files (not actual configs)
+src/config/*.example.json
+
+# Keep certs README.md tracked
+!certs/README.md
+
+# Python (utility scripts under scripts/)
+__pycache__/
+*.pyc
+
+# Generated Lloyds XML payloads (produced by lloyds:sb:send-xml-generation)
+docs/lloyds/XMLs/
+
+# POC / local artifacts (do not publish)
+.vs/
+outputs/
+scripts/cursor-backup-*/
+scripts/qa-ui-scan-results/
+engineering/
+inputs/
+data/excel/
+data/draft-user-feature-files/
+data/*-manual-*.json
+data/sf*-*.json
+*.har
+*.mp4
+*.docx
+*.vsidx
+*.vscdb
+*.vscdb.backup
+

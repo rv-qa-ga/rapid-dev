@@ -1,0 +1,37 @@
+{
+  "_description": "Contact test data - JSON format for version control",
+  "_columns": ["TestCaseID", "FirstName", "LastName", "Email", "Phone", "AccountName", "Title", "Tags"],
+  "data": [
+    {
+      "TestCaseID": "CON-001",
+      "FirstName": "John",
+      "LastName": "TestContact",
+      "Email": "john.test@example.com",
+      "Phone": "555-0100",
+      "AccountName": "Test Account - Active",
+      "Title": "Director",
+      "Tags": "smoke,positive"
+    },
+    {
+      "TestCaseID": "CON-002",
+      "FirstName": "Jane",
+      "LastName": "TestContact",
+      "Email": "jane.test@example.com",
+      "Phone": "555-0101",
+      "AccountName": "Test Account - New",
+      "Title": "Manager",
+      "Tags": "regression"
+    },
+    {
+      "TestCaseID": "CON-NEGATIVE-001",
+      "FirstName": "",
+      "LastName": "",
+      "Email": "invalid-email",
+      "Phone": "",
+      "AccountName": "",
+      "Title": "",
+      "Tags": "negative"
+    }
+  ]
+}
+

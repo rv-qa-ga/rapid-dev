@@ -1,0 +1,560 @@
+{
+  "work_item_id": 58714,
+  "executive_summary": "Improve performance of [D365].[SPCreatetFXAmount] - User Story",
+  "affected_objects": [],
+  "assumptions_conflicts": [],
+  "test_cases": [
+    {
+      "id": "WI-58714-TC-01",
+      "title": "Validate dbo.SPCreatetFXAmount procedure exists",
+      "purpose": "Verify procedure dbo.SPCreatetFXAmount exists and can be executed",
+      "preconditions": "Database connection available",
+      "steps": [
+        "SELECT OBJECT_SCHEMA_NAME(OBJECT_ID('dbo.SPCreatetFXAmount')) AS SchemaName,",
+        "       OBJECT_NAME(OBJECT_ID('dbo.SPCreatetFXAmount')) AS ObjectName",
+        "IF OBJECT_ID('dbo.SPCreatetFXAmount', 'P') IS NULL",
+        "  THROW 50000, 'procedure dbo.SPCreatetFXAmount does not exist', 1"
+      ],
+      "expected_result": "procedure exists and is accessible",
+      "test_data": "",
+      "priority": "High",
+      "type": "Unit",
+      "complexity": "Simple",
+      "cleanup": "",
+      "automation_notes": "Can be automated with OBJECT_ID checks. For execution tests, use tSQLt or parameterized test data",
+      "source_references": [
+        {
+          "file": "work-item-58714",
+          "line_range": "1-100",
+          "url": "work-item-58714"
+        }
+      ],
+      "category": "Stored Procedure / Function"
+    },
+    {
+      "id": "WI-58714-TC-02",
+      "title": "Validate dbo.SPCreatetFXAmount executes successfully with valid input",
+      "purpose": "Verify procedure dbo.SPCreatetFXAmount executes without errors when provided valid parameters",
+      "preconditions": "procedure dbo.SPCreatetFXAmount exists. Valid test data available.",
+      "steps": [
+        "-- Execute procedure with valid parameters",
+        "-- Example: EXEC dbo.SPCreatetFXAmount @param1 = 'value1', @param2 = 'value2'",
+        "-- Verify execution completes without errors",
+        "-- Verify expected results are returned"
+      ],
+      "expected_result": "procedure executes successfully and returns expected results",
+      "test_data": "Valid test parameters based on procedure signature",
+      "priority": "High",
+      "type": "Unit",
+      "complexity": "Moderate",
+      "cleanup": "Clean up any test data created by procedure execution",
+      "automation_notes": "Can be automated with tSQLt or direct EXEC calls with assertions",
+      "source_references": [],
+      "category": "Stored Procedure / Function"
+    },
+    {
+      "id": "WI-58714-TC-03",
+      "title": "Validate dbo.SPCreatetFXAmount handles NULL parameters correctly",
+      "purpose": "Verify procedure dbo.SPCreatetFXAmount handles NULL input parameters appropriately",
+      "preconditions": "procedure dbo.SPCreatetFXAmount exists",
+      "steps": [
+        "-- Execute procedure with NULL parameters",
+        "-- Verify either: procedure handles NULL gracefully OR returns appropriate error",
+        "-- Example: EXEC dbo.SPCreatetFXAmount @param1 = NULL"
+      ],
+      "expected_result": "Procedure either handles NULL gracefully or returns clear error message",
+      "test_data": "",
+      "priority": "Medium",
+      "type": "Unit",
+      "complexity": "Moderate",
+      "cleanup": "",
+      "automation_notes": "Requires testing with NULL values and error handling validation",
+      "source_references": [],
+      "category": "Stored Procedure / Function"
+    },
+    {
+      "id": "WI-58714-TC-04",
+      "title": "Validate dbo.SPCreatetFXAmount rejects invalid input parameters",
+      "purpose": "Verify procedure dbo.SPCreatetFXAmount validates input and rejects invalid data",
+      "preconditions": "procedure dbo.SPCreatetFXAmount exists",
+      "steps": [
+        "-- Execute procedure with invalid parameters (wrong type, out of range, etc.)",
+        "-- Example: EXEC dbo.SPCreatetFXAmount @param1 = 'invalid', @param2 = -1",
+        "-- Verify procedure returns appropriate validation error"
+      ],
+      "expected_result": "Invalid parameters are rejected with clear error message",
+      "test_data": "Invalid test parameters (wrong types, out of range values)",
+      "priority": "Medium",
+      "type": "Unit",
+      "complexity": "Moderate",
+      "cleanup": "",
+      "automation_notes": "Requires testing with various invalid inputs",
+      "source_references": [],
+      "category": "Stored Procedure / Function"
+    },
+    {
+      "id": "WI-58714-TC-05",
+      "title": "Validate dbo.SPCreatetFXAmount performance improvement",
+      "purpose": "Verify procedure dbo.SPCreatetFXAmount executes within acceptable performance thresholds",
+      "preconditions": "procedure dbo.SPCreatetFXAmount exists. Performance baseline established.",
+      "steps": [
+        "-- Execute procedure and measure execution time",
+        "-- Compare with performance baseline",
+        "-- Verify execution time meets performance requirements"
+      ],
+      "expected_result": "Procedure execution time is within acceptable limits",
+      "test_data": "",
+      "priority": "High",
+      "type": "Performance",
+      "complexity": "Complex",
+      "cleanup": "",
+      "automation_notes": "Requires performance measurement tools and baseline comparison",
+      "source_references": [],
+      "category": "Index & Performance"
+    },
+    {
+      "id": "WI-58714-TC-06",
+      "title": "Validate dbo.D365 procedure exists",
+      "purpose": "Verify procedure dbo.D365 exists and can be executed",
+      "preconditions": "Database connection available",
+      "steps": [
+        "SELECT OBJECT_SCHEMA_NAME(OBJECT_ID('dbo.D365')) AS SchemaName,",
+        "       OBJECT_NAME(OBJECT_ID('dbo.D365')) AS ObjectName",
+        "IF OBJECT_ID('dbo.D365', 'P') IS NULL",
+        "  THROW 50000, 'procedure dbo.D365 does not exist', 1"
+      ],
+      "expected_result": "procedure exists and is accessible",
+      "test_data": "",
+      "priority": "High",
+      "type": "Unit",
+      "complexity": "Simple",
+      "cleanup": "",
+      "automation_notes": "Can be automated with OBJECT_ID checks. For execution tests, use tSQLt or parameterized test data",
+      "source_references": [
+        {
+          "file": "work-item-58714",
+          "line_range": "1-100",
+          "url": "work-item-58714"
+        }
+      ],
+      "category": "Stored Procedure / Function"
+    },
+    {
+      "id": "WI-58714-TC-07",
+      "title": "Validate dbo.D365 executes successfully with valid input",
+      "purpose": "Verify procedure dbo.D365 executes without errors when provided valid parameters",
+      "preconditions": "procedure dbo.D365 exists. Valid test data available.",
+      "steps": [
+        "-- Execute procedure with valid parameters",
+        "-- Example: EXEC dbo.D365 @param1 = 'value1', @param2 = 'value2'",
+        "-- Verify execution completes without errors",
+        "-- Verify expected results are returned"
+      ],
+      "expected_result": "procedure executes successfully and returns expected results",
+      "test_data": "Valid test parameters based on procedure signature",
+      "priority": "High",
+      "type": "Unit",
+      "complexity": "Moderate",
+      "cleanup": "Clean up any test data created by procedure execution",
+      "automation_notes": "Can be automated with tSQLt or direct EXEC calls with assertions",
+      "source_references": [],
+      "category": "Stored Procedure / Function"
+    },
+    {
+      "id": "WI-58714-TC-08",
+      "title": "Validate dbo.D365 handles NULL parameters correctly",
+      "purpose": "Verify procedure dbo.D365 handles NULL input parameters appropriately",
+      "preconditions": "procedure dbo.D365 exists",
+      "steps": [
+        "-- Execute procedure with NULL parameters",
+        "-- Verify either: procedure handles NULL gracefully OR returns appropriate error",
+        "-- Example: EXEC dbo.D365 @param1 = NULL"
+      ],
+      "expected_result": "Procedure either handles NULL gracefully or returns clear error message",
+      "test_data": "",
+      "priority": "Medium",
+      "type": "Unit",
+      "complexity": "Moderate",
+      "cleanup": "",
+      "automation_notes": "Requires testing with NULL values and error handling validation",
+      "source_references": [],
+      "category": "Stored Procedure / Function"
+    },
+    {
+      "id": "WI-58714-TC-09",
+      "title": "Validate dbo.D365 rejects invalid input parameters",
+      "purpose": "Verify procedure dbo.D365 validates input and rejects invalid data",
+      "preconditions": "procedure dbo.D365 exists",
+      "steps": [
+        "-- Execute procedure with invalid parameters (wrong type, out of range, etc.)",
+        "-- Example: EXEC dbo.D365 @param1 = 'invalid', @param2 = -1",
+        "-- Verify procedure returns appropriate validation error"
+      ],
+      "expected_result": "Invalid parameters are rejected with clear error message",
+      "test_data": "Invalid test parameters (wrong types, out of range values)",
+      "priority": "Medium",
+      "type": "Unit",
+      "complexity": "Moderate",
+      "cleanup": "",
+      "automation_notes": "Requires testing with various invalid inputs",
+      "source_references": [],
+      "category": "Stored Procedure / Function"
+    },
+    {
+      "id": "WI-58714-TC-10",
+      "title": "Validate dbo.D365 performance improvement",
+      "purpose": "Verify procedure dbo.D365 executes within acceptable performance thresholds",
+      "preconditions": "procedure dbo.D365 exists. Performance baseline established.",
+      "steps": [
+        "-- Execute procedure and measure execution time",
+        "-- Compare with performance baseline",
+        "-- Verify execution time meets performance requirements"
+      ],
+      "expected_result": "Procedure execution time is within acceptable limits",
+      "test_data": "",
+      "priority": "High",
+      "type": "Performance",
+      "complexity": "Complex",
+      "cleanup": "",
+      "automation_notes": "Requires performance measurement tools and baseline comparison",
+      "source_references": [],
+      "category": "Index & Performance"
+    },
+    {
+      "id": "WI-58714-TC-11",
+      "title": "Validate dbo.createtfxamount procedure exists",
+      "purpose": "Verify procedure dbo.createtfxamount exists and can be executed",
+      "preconditions": "Database connection available",
+      "steps": [
+        "SELECT OBJECT_SCHEMA_NAME(OBJECT_ID('dbo.createtfxamount')) AS SchemaName,",
+        "       OBJECT_NAME(OBJECT_ID('dbo.createtfxamount')) AS ObjectName",
+        "IF OBJECT_ID('dbo.createtfxamount', 'P') IS NULL",
+        "  THROW 50000, 'procedure dbo.createtfxamount does not exist', 1"
+      ],
+      "expected_result": "procedure exists and is accessible",
+      "test_data": "",
+      "priority": "High",
+      "type": "Unit",
+      "complexity": "Simple",
+      "cleanup": "",
+      "automation_notes": "Can be automated with OBJECT_ID checks. For execution tests, use tSQLt or parameterized test data",
+      "source_references": [
+        {
+          "file": "work-item-58714",
+          "line_range": "1-100",
+          "url": "work-item-58714"
+        }
+      ],
+      "category": "Stored Procedure / Function"
+    },
+    {
+      "id": "WI-58714-TC-12",
+      "title": "Validate dbo.createtfxamount executes successfully with valid input",
+      "purpose": "Verify procedure dbo.createtfxamount executes without errors when provided valid parameters",
+      "preconditions": "procedure dbo.createtfxamount exists. Valid test data available.",
+      "steps": [
+        "-- Execute procedure with valid parameters",
+        "-- Example: EXEC dbo.createtfxamount @param1 = 'value1', @param2 = 'value2'",
+        "-- Verify execution completes without errors",
+        "-- Verify expected results are returned"
+      ],
+      "expected_result": "procedure executes successfully and returns expected results",
+      "test_data": "Valid test parameters based on procedure signature",
+      "priority": "High",
+      "type": "Unit",
+      "complexity": "Moderate",
+      "cleanup": "Clean up any test data created by procedure execution",
+      "automation_notes": "Can be automated with tSQLt or direct EXEC calls with assertions",
+      "source_references": [],
+      "category": "Stored Procedure / Function"
+    },
+    {
+      "id": "WI-58714-TC-13",
+      "title": "Validate dbo.createtfxamount handles NULL parameters correctly",
+      "purpose": "Verify procedure dbo.createtfxamount handles NULL input parameters appropriately",
+      "preconditions": "procedure dbo.createtfxamount exists",
+      "steps": [
+        "-- Execute procedure with NULL parameters",
+        "-- Verify either: procedure handles NULL gracefully OR returns appropriate error",
+        "-- Example: EXEC dbo.createtfxamount @param1 = NULL"
+      ],
+      "expected_result": "Procedure either handles NULL gracefully or returns clear error message",
+      "test_data": "",
+      "priority": "Medium",
+      "type": "Unit",
+      "complexity": "Moderate",
+      "cleanup": "",
+      "automation_notes": "Requires testing with NULL values and error handling validation",
+      "source_references": [],
+      "category": "Stored Procedure / Function"
+    },
+    {
+      "id": "WI-58714-TC-14",
+      "title": "Validate dbo.createtfxamount rejects invalid input parameters",
+      "purpose": "Verify procedure dbo.createtfxamount validates input and rejects invalid data",
+      "preconditions": "procedure dbo.createtfxamount exists",
+      "steps": [
+        "-- Execute procedure with invalid parameters (wrong type, out of range, etc.)",
+        "-- Example: EXEC dbo.createtfxamount @param1 = 'invalid', @param2 = -1",
+        "-- Verify procedure returns appropriate validation error"
+      ],
+      "expected_result": "Invalid parameters are rejected with clear error message",
+      "test_data": "Invalid test parameters (wrong types, out of range values)",
+      "priority": "Medium",
+      "type": "Unit",
+      "complexity": "Moderate",
+      "cleanup": "",
+      "automation_notes": "Requires testing with various invalid inputs",
+      "source_references": [],
+      "category": "Stored Procedure / Function"
+    },
+    {
+      "id": "WI-58714-TC-15",
+      "title": "Validate dbo.createtfxamount performance improvement",
+      "purpose": "Verify procedure dbo.createtfxamount executes within acceptable performance thresholds",
+      "preconditions": "procedure dbo.createtfxamount exists. Performance baseline established.",
+      "steps": [
+        "-- Execute procedure and measure execution time",
+        "-- Compare with performance baseline",
+        "-- Verify execution time meets performance requirements"
+      ],
+      "expected_result": "Procedure execution time is within acceptable limits",
+      "test_data": "",
+      "priority": "High",
+      "type": "Performance",
+      "complexity": "Complex",
+      "cleanup": "",
+      "automation_notes": "Requires performance measurement tools and baseline comparison",
+      "source_references": [],
+      "category": "Index & Performance"
+    },
+    {
+      "id": "WI-58714-TC-16",
+      "title": "Validate index exists and is used: SPCreatetFXAmount",
+      "purpose": "Verify index SPCreatetFXAmount exists and improves query performance",
+      "preconditions": "Table exists. Index should be created.",
+      "steps": [
+        "SELECT i.name AS IndexName, i.type_desc AS IndexType",
+        "FROM sys.indexes i",
+        "INNER JOIN sys.tables t ON i.object_id = t.object_id",
+        "WHERE t.name = 'TableName' AND i.name = 'SPCreatetFXAmount'",
+        "IF @@ROWCOUNT = 0 THROW 50000, 'Index SPCreatetFXAmount does not exist', 1",
+        "-- Check index usage in execution plan for related queries"
+      ],
+      "expected_result": "Index exists and is used in query execution plans",
+      "test_data": "",
+      "priority": "Medium",
+      "type": "Performance",
+      "complexity": "Moderate",
+      "cleanup": "",
+      "automation_notes": "Can check index existence with sys.indexes. Performance validation requires execution plan analysis",
+      "source_references": [
+        {
+          "file": "work-item-58714",
+          "line_range": "1-100",
+          "url": ""
+        }
+      ],
+      "category": "Index & Performance"
+    },
+    {
+      "id": "WI-58714-TC-17",
+      "title": "Validate index exists and is used: D365",
+      "purpose": "Verify index D365 exists and improves query performance",
+      "preconditions": "Table exists. Index should be created.",
+      "steps": [
+        "SELECT i.name AS IndexName, i.type_desc AS IndexType",
+        "FROM sys.indexes i",
+        "INNER JOIN sys.tables t ON i.object_id = t.object_id",
+        "WHERE t.name = 'TableName' AND i.name = 'D365'",
+        "IF @@ROWCOUNT = 0 THROW 50000, 'Index D365 does not exist', 1",
+        "-- Check index usage in execution plan for related queries"
+      ],
+      "expected_result": "Index exists and is used in query execution plans",
+      "test_data": "",
+      "priority": "Medium",
+      "type": "Performance",
+      "complexity": "Moderate",
+      "cleanup": "",
+      "automation_notes": "Can check index existence with sys.indexes. Performance validation requires execution plan analysis",
+      "source_references": [
+        {
+          "file": "work-item-58714",
+          "line_range": "1-100",
+          "url": ""
+        }
+      ],
+      "category": "Index & Performance"
+    },
+    {
+      "id": "WI-58714-TC-18",
+      "title": "Validate index exists and is used: createtfxamount",
+      "purpose": "Verify index createtfxamount exists and improves query performance",
+      "preconditions": "Table exists. Index should be created.",
+      "steps": [
+        "SELECT i.name AS IndexName, i.type_desc AS IndexType",
+        "FROM sys.indexes i",
+        "INNER JOIN sys.tables t ON i.object_id = t.object_id",
+        "WHERE t.name = 'TableName' AND i.name = 'createtfxamount'",
+        "IF @@ROWCOUNT = 0 THROW 50000, 'Index createtfxamount does not exist', 1",
+        "-- Check index usage in execution plan for related queries"
+      ],
+      "expected_result": "Index exists and is used in query execution plans",
+      "test_data": "",
+      "priority": "Medium",
+      "type": "Performance",
+      "complexity": "Moderate",
+      "cleanup": "",
+      "automation_notes": "Can check index existence with sys.indexes. Performance validation requires execution plan analysis",
+      "source_references": [
+        {
+          "file": "work-item-58714",
+          "line_range": "1-100",
+          "url": ""
+        }
+      ],
+      "category": "Index & Performance"
+    },
+    {
+      "id": "WI-58714-TC-19",
+      "title": "Validate permissions on dbo.SPCreatetFXAmount",
+      "purpose": "Verify only authorized roles can access dbo.SPCreatetFXAmount",
+      "preconditions": "Object dbo.SPCreatetFXAmount exists. Test user with limited permissions available.",
+      "steps": [
+        "-- Test with different user roles",
+        "EXECUTE AS USER = 'TestUser'",
+        "-- Attempt to SELECT/INSERT/UPDATE/DELETE",
+        "REVERT"
+      ],
+      "expected_result": "Only authorized roles can perform allowed operations",
+      "test_data": "",
+      "priority": "Medium",
+      "type": "Security",
+      "complexity": "Moderate",
+      "cleanup": "",
+      "automation_notes": "Can be automated with EXECUTE AS and permission checks",
+      "source_references": [],
+      "category": "Security & Permissions"
+    },
+    {
+      "id": "WI-58714-TC-20",
+      "title": "Validate permissions on dbo.D365",
+      "purpose": "Verify only authorized roles can access dbo.D365",
+      "preconditions": "Object dbo.D365 exists. Test user with limited permissions available.",
+      "steps": [
+        "-- Test with different user roles",
+        "EXECUTE AS USER = 'TestUser'",
+        "-- Attempt to SELECT/INSERT/UPDATE/DELETE",
+        "REVERT"
+      ],
+      "expected_result": "Only authorized roles can perform allowed operations",
+      "test_data": "",
+      "priority": "Medium",
+      "type": "Security",
+      "complexity": "Moderate",
+      "cleanup": "",
+      "automation_notes": "Can be automated with EXECUTE AS and permission checks",
+      "source_references": [],
+      "category": "Security & Permissions"
+    },
+    {
+      "id": "WI-58714-TC-21",
+      "title": "Validate permissions on dbo.createtfxamount",
+      "purpose": "Verify only authorized roles can access dbo.createtfxamount",
+      "preconditions": "Object dbo.createtfxamount exists. Test user with limited permissions available.",
+      "steps": [
+        "-- Test with different user roles",
+        "EXECUTE AS USER = 'TestUser'",
+        "-- Attempt to SELECT/INSERT/UPDATE/DELETE",
+        "REVERT"
+      ],
+      "expected_result": "Only authorized roles can perform allowed operations",
+      "test_data": "",
+      "priority": "Medium",
+      "type": "Security",
+      "complexity": "Moderate",
+      "cleanup": "",
+      "automation_notes": "Can be automated with EXECUTE AS and permission checks",
+      "source_references": [],
+      "category": "Security & Permissions"
+    },
+    {
+      "id": "WI-58714-TC-22",
+      "title": "Validate rollback script exists and is tested",
+      "purpose": "Verify that changes can be safely rolled back if needed",
+      "preconditions": "Rollback script available",
+      "steps": [
+        "-- Verify rollback script exists",
+        "-- Test rollback script in test environment",
+        "-- Verify database returns to previous state"
+      ],
+      "expected_result": "Rollback script successfully reverts all changes",
+      "test_data": "",
+      "priority": "High",
+      "type": "Rollback",
+      "complexity": "Complex",
+      "cleanup": "",
+      "automation_notes": "Requires rollback script execution and state verification",
+      "source_references": [],
+      "category": "Rollback & Upgrade safety"
+    }
+  ],
+  "test_data_matrix": {
+    "WI-58714-TC-02": "Valid test parameters based on procedure signature",
+    "WI-58714-TC-04": "Invalid test parameters (wrong types, out of range values)",
+    "WI-58714-TC-07": "Valid test parameters based on procedure signature",
+    "WI-58714-TC-09": "Invalid test parameters (wrong types, out of range values)",
+    "WI-58714-TC-12": "Valid test parameters based on procedure signature",
+    "WI-58714-TC-14": "Invalid test parameters (wrong types, out of range values)"
+  },
+  "sql_test_scripts": {
+    "WI-58714-TC-01": "-- ============================================================================\n-- Test Script: WI-58714-TC-01\n-- Title: Validate dbo.SPCreatetFXAmount procedure exists\n-- Purpose: Verify procedure dbo.SPCreatetFXAmount exists and can be executed\n-- Category: Stored Procedure / Function\n-- Priority: High | Type: Unit | Complexity: Simple\n-- ============================================================================\n-- Generated for comprehensive test case analysis\n-- Work Item: 58714\n-- ============================================================================\n\n-- PRECONDITIONS\n-- Database connection available\n\n-- SETUP\n-- Setup: Configure test environment as needed\n\n-- TEST EXECUTION\nSELECT OBJECT_SCHEMA_NAME(OBJECT_ID('dbo.SPCreatetFXAmount')) AS SchemaName,\n\n       OBJECT_NAME(OBJECT_ID('dbo.SPCreatetFXAmount')) AS ObjectName\n\nIF OBJECT_ID('dbo.SPCreatetFXAmount', 'P') IS NULL\n\n  THROW 50000, 'procedure dbo.SPCreatetFXAmount does not exist', 1\n\n-- EXPECTED RESULT\n-- procedure exists and is accessible\n\n-- VERIFICATION\n-- Add assertions here based on expected result\n-- Example:\n-- IF NOT EXISTS (SELECT 1 FROM ... WHERE ...)\n--     THROW 50000, 'Test failed: Expected condition not met', 1\n\n-- CLEANUP\n-- No cleanup required for this test\n\n-- ============================================================================\n-- Automation Notes: Can be automated with OBJECT_ID checks. For execution tests, use tSQLt or parameterized test data\n-- ============================================================================\n",
+    "WI-58714-TC-02": "-- ============================================================================\n-- Test Script: WI-58714-TC-02\n-- Title: Validate dbo.SPCreatetFXAmount executes successfully with valid input\n-- Purpose: Verify procedure dbo.SPCreatetFXAmount executes without errors when provided valid parameters\n-- Category: Stored Procedure / Function\n-- Priority: High | Type: Unit | Complexity: Moderate\n-- ============================================================================\n-- Generated for comprehensive test case analysis\n-- Work Item: 58714\n-- ============================================================================\n\n-- PRECONDITIONS\n-- procedure dbo.SPCreatetFXAmount exists. Valid test data available.\n\n-- SETUP\n-- Setup test data\nValid test parameters based on procedure signature\n\n-- TEST EXECUTION\n-- Execute procedure with valid parameters\n\n-- Example: EXEC dbo.SPCreatetFXAmount @param1 = 'value1', @param2 = 'value2'\n\n-- Verify execution completes without errors\n\n-- Verify expected results are returned\n\n-- EXPECTED RESULT\n-- procedure executes successfully and returns expected results\n\n-- VERIFICATION\n-- Add assertions here based on expected result\n-- Example:\n-- IF NOT EXISTS (SELECT 1 FROM ... WHERE ...)\n--     THROW 50000, 'Test failed: Expected condition not met', 1\n\n-- CLEANUP\nClean up any test data created by procedure execution\n\n-- ============================================================================\n-- Automation Notes: Can be automated with tSQLt or direct EXEC calls with assertions\n-- ============================================================================\n",
+    "WI-58714-TC-03": "-- ============================================================================\n-- Test Script: WI-58714-TC-03\n-- Title: Validate dbo.SPCreatetFXAmount handles NULL parameters correctly\n-- Purpose: Verify procedure dbo.SPCreatetFXAmount handles NULL input parameters appropriately\n-- Category: Stored Procedure / Function\n-- Priority: Medium | Type: Unit | Complexity: Moderate\n-- ============================================================================\n-- Generated for comprehensive test case analysis\n-- Work Item: 58714\n-- ============================================================================\n\n-- PRECONDITIONS\n-- procedure dbo.SPCreatetFXAmount exists\n\n-- SETUP\n-- Setup: Configure test environment as needed\n\n-- TEST EXECUTION\n-- Execute procedure with NULL parameters\n\n-- Verify either: procedure handles NULL gracefully OR returns appropriate error\n\n-- Example: EXEC dbo.SPCreatetFXAmount @param1 = NULL\n\n-- EXPECTED RESULT\n-- Procedure either handles NULL gracefully or returns clear error message\n\n-- VERIFICATION\n-- Add assertions here based on expected result\n-- Example:\n-- IF NOT EXISTS (SELECT 1 FROM ... WHERE ...)\n--     THROW 50000, 'Test failed: Expected condition not met', 1\n\n-- CLEANUP\n-- No cleanup required for this test\n\n-- ============================================================================\n-- Automation Notes: Requires testing with NULL values and error handling validation\n-- ============================================================================\n",
+    "WI-58714-TC-04": "-- ============================================================================\n-- Test Script: WI-58714-TC-04\n-- Title: Validate dbo.SPCreatetFXAmount rejects invalid input parameters\n-- Purpose: Verify procedure dbo.SPCreatetFXAmount validates input and rejects invalid data\n-- Category: Stored Procedure / Function\n-- Priority: Medium | Type: Unit | Complexity: Moderate\n-- ============================================================================\n-- Generated for comprehensive test case analysis\n-- Work Item: 58714\n-- ============================================================================\n\n-- PRECONDITIONS\n-- procedure dbo.SPCreatetFXAmount exists\n\n-- SETUP\n-- Setup test data\nInvalid test parameters (wrong types, out of range values)\n\n-- TEST EXECUTION\n-- Execute procedure with invalid parameters (wrong type, out of range, etc.)\n\n-- Example: EXEC dbo.SPCreatetFXAmount @param1 = 'invalid', @param2 = -1\n\n-- Verify procedure returns appropriate validation error\n\n-- EXPECTED RESULT\n-- Invalid parameters are rejected with clear error message\n\n-- VERIFICATION\n-- Add assertions here based on expected result\n-- Example:\n-- IF NOT EXISTS (SELECT 1 FROM ... WHERE ...)\n--     THROW 50000, 'Test failed: Expected condition not met', 1\n\n-- CLEANUP\n-- Cleanup: Remove test data\n-- ROLLBACK TRANSACTION (if using transaction)\n-- Or DELETE FROM test tables WHERE test_flag = 1\n\n-- ============================================================================\n-- Automation Notes: Requires testing with various invalid inputs\n-- ============================================================================\n",
+    "WI-58714-TC-05": "-- ============================================================================\n-- Test Script: WI-58714-TC-05\n-- Title: Validate dbo.SPCreatetFXAmount performance improvement\n-- Purpose: Verify procedure dbo.SPCreatetFXAmount executes within acceptable performance thresholds\n-- Category: Index & Performance\n-- Priority: High | Type: Performance | Complexity: Complex\n-- ============================================================================\n-- Generated for comprehensive test case analysis\n-- Work Item: 58714\n-- ============================================================================\n\n-- PRECONDITIONS\n-- procedure dbo.SPCreatetFXAmount exists. Performance baseline established.\n\n-- SETUP\n-- Setup: Configure test environment as needed\n\n-- TEST EXECUTION\n-- Execute procedure and measure execution time\n\n-- Compare with performance baseline\n\n-- Verify execution time meets performance requirements\n\n-- EXPECTED RESULT\n-- Procedure execution time is within acceptable limits\n\n-- VERIFICATION\n-- Add assertions here based on expected result\n-- Example:\n-- IF NOT EXISTS (SELECT 1 FROM ... WHERE ...)\n--     THROW 50000, 'Test failed: Expected condition not met', 1\n\n-- CLEANUP\n-- No cleanup required for this test\n\n-- ============================================================================\n-- Automation Notes: Requires performance measurement tools and baseline comparison\n-- ============================================================================\n",
+    "WI-58714-TC-06": "-- ============================================================================\n-- Test Script: WI-58714-TC-06\n-- Title: Validate dbo.D365 procedure exists\n-- Purpose: Verify procedure dbo.D365 exists and can be executed\n-- Category: Stored Procedure / Function\n-- Priority: High | Type: Unit | Complexity: Simple\n-- ============================================================================\n-- Generated for comprehensive test case analysis\n-- Work Item: 58714\n-- ============================================================================\n\n-- PRECONDITIONS\n-- Database connection available\n\n-- SETUP\n-- Setup: Configure test environment as needed\n\n-- TEST EXECUTION\nSELECT OBJECT_SCHEMA_NAME(OBJECT_ID('dbo.D365')) AS SchemaName,\n\n       OBJECT_NAME(OBJECT_ID('dbo.D365')) AS ObjectName\n\nIF OBJECT_ID('dbo.D365', 'P') IS NULL\n\n  THROW 50000, 'procedure dbo.D365 does not exist', 1\n\n-- EXPECTED RESULT\n-- procedure exists and is accessible\n\n-- VERIFICATION\n-- Add assertions here based on expected result\n-- Example:\n-- IF NOT EXISTS (SELECT 1 FROM ... WHERE ...)\n--     THROW 50000, 'Test failed: Expected condition not met', 1\n\n-- CLEANUP\n-- No cleanup required for this test\n\n-- ============================================================================\n-- Automation Notes: Can be automated with OBJECT_ID checks. For execution tests, use tSQLt or parameterized test data\n-- ============================================================================\n",
+    "WI-58714-TC-07": "-- ============================================================================\n-- Test Script: WI-58714-TC-07\n-- Title: Validate dbo.D365 executes successfully with valid input\n-- Purpose: Verify procedure dbo.D365 executes without errors when provided valid parameters\n-- Category: Stored Procedure / Function\n-- Priority: High | Type: Unit | Complexity: Moderate\n-- ============================================================================\n-- Generated for comprehensive test case analysis\n-- Work Item: 58714\n-- ============================================================================\n\n-- PRECONDITIONS\n-- procedure dbo.D365 exists. Valid test data available.\n\n-- SETUP\n-- Setup test data\nValid test parameters based on procedure signature\n\n-- TEST EXECUTION\n-- Execute procedure with valid parameters\n\n-- Example: EXEC dbo.D365 @param1 = 'value1', @param2 = 'value2'\n\n-- Verify execution completes without errors\n\n-- Verify expected results are returned\n\n-- EXPECTED RESULT\n-- procedure executes successfully and returns expected results\n\n-- VERIFICATION\n-- Add assertions here based on expected result\n-- Example:\n-- IF NOT EXISTS (SELECT 1 FROM ... WHERE ...)\n--     THROW 50000, 'Test failed: Expected condition not met', 1\n\n-- CLEANUP\nClean up any test data created by procedure execution\n\n-- ============================================================================\n-- Automation Notes: Can be automated with tSQLt or direct EXEC calls with assertions\n-- ============================================================================\n",
+    "WI-58714-TC-08": "-- ============================================================================\n-- Test Script: WI-58714-TC-08\n-- Title: Validate dbo.D365 handles NULL parameters correctly\n-- Purpose: Verify procedure dbo.D365 handles NULL input parameters appropriately\n-- Category: Stored Procedure / Function\n-- Priority: Medium | Type: Unit | Complexity: Moderate\n-- ============================================================================\n-- Generated for comprehensive test case analysis\n-- Work Item: 58714\n-- ============================================================================\n\n-- PRECONDITIONS\n-- procedure dbo.D365 exists\n\n-- SETUP\n-- Setup: Configure test environment as needed\n\n-- TEST EXECUTION\n-- Execute procedure with NULL parameters\n\n-- Verify either: procedure handles NULL gracefully OR returns appropriate error\n\n-- Example: EXEC dbo.D365 @param1 = NULL\n\n-- EXPECTED RESULT\n-- Procedure either handles NULL gracefully or returns clear error message\n\n-- VERIFICATION\n-- Add assertions here based on expected result\n-- Example:\n-- IF NOT EXISTS (SELECT 1 FROM ... WHERE ...)\n--     THROW 50000, 'Test failed: Expected condition not met', 1\n\n-- CLEANUP\n-- No cleanup required for this test\n\n-- ============================================================================\n-- Automation Notes: Requires testing with NULL values and error handling validation\n-- ============================================================================\n",
+    "WI-58714-TC-09": "-- ============================================================================\n-- Test Script: WI-58714-TC-09\n-- Title: Validate dbo.D365 rejects invalid input parameters\n-- Purpose: Verify procedure dbo.D365 validates input and rejects invalid data\n-- Category: Stored Procedure / Function\n-- Priority: Medium | Type: Unit | Complexity: Moderate\n-- ============================================================================\n-- Generated for comprehensive test case analysis\n-- Work Item: 58714\n-- ============================================================================\n\n-- PRECONDITIONS\n-- procedure dbo.D365 exists\n\n-- SETUP\n-- Setup test data\nInvalid test parameters (wrong types, out of range values)\n\n-- TEST EXECUTION\n-- Execute procedure with invalid parameters (wrong type, out of range, etc.)\n\n-- Example: EXEC dbo.D365 @param1 = 'invalid', @param2 = -1\n\n-- Verify procedure returns appropriate validation error\n\n-- EXPECTED RESULT\n-- Invalid parameters are rejected with clear error message\n\n-- VERIFICATION\n-- Add assertions here based on expected result\n-- Example:\n-- IF NOT EXISTS (SELECT 1 FROM ... WHERE ...)\n--     THROW 50000, 'Test failed: Expected condition not met', 1\n\n-- CLEANUP\n-- Cleanup: Remove test data\n-- ROLLBACK TRANSACTION (if using transaction)\n-- Or DELETE FROM test tables WHERE test_flag = 1\n\n-- ============================================================================\n-- Automation Notes: Requires testing with various invalid inputs\n-- ============================================================================\n",
+    "WI-58714-TC-10": "-- ============================================================================\n-- Test Script: WI-58714-TC-10\n-- Title: Validate dbo.D365 performance improvement\n-- Purpose: Verify procedure dbo.D365 executes within acceptable performance thresholds\n-- Category: Index & Performance\n-- Priority: High | Type: Performance | Complexity: Complex\n-- ============================================================================\n-- Generated for comprehensive test case analysis\n-- Work Item: 58714\n-- ============================================================================\n\n-- PRECONDITIONS\n-- procedure dbo.D365 exists. Performance baseline established.\n\n-- SETUP\n-- Setup: Configure test environment as needed\n\n-- TEST EXECUTION\n-- Execute procedure and measure execution time\n\n-- Compare with performance baseline\n\n-- Verify execution time meets performance requirements\n\n-- EXPECTED RESULT\n-- Procedure execution time is within acceptable limits\n\n-- VERIFICATION\n-- Add assertions here based on expected result\n-- Example:\n-- IF NOT EXISTS (SELECT 1 FROM ... WHERE ...)\n--     THROW 50000, 'Test failed: Expected condition not met', 1\n\n-- CLEANUP\n-- No cleanup required for this test\n\n-- ============================================================================\n-- Automation Notes: Requires performance measurement tools and baseline comparison\n-- ============================================================================\n",
+    "WI-58714-TC-11": "-- ============================================================================\n-- Test Script: WI-58714-TC-11\n-- Title: Validate dbo.createtfxamount procedure exists\n-- Purpose: Verify procedure dbo.createtfxamount exists and can be executed\n-- Category: Stored Procedure / Function\n-- Priority: High | Type: Unit | Complexity: Simple\n-- ============================================================================\n-- Generated for comprehensive test case analysis\n-- Work Item: 58714\n-- ============================================================================\n\n-- PRECONDITIONS\n-- Database connection available\n\n-- SETUP\n-- Setup: Configure test environment as needed\n\n-- TEST EXECUTION\nSELECT OBJECT_SCHEMA_NAME(OBJECT_ID('dbo.createtfxamount')) AS SchemaName,\n\n       OBJECT_NAME(OBJECT_ID('dbo.createtfxamount')) AS ObjectName\n\nIF OBJECT_ID('dbo.createtfxamount', 'P') IS NULL\n\n  THROW 50000, 'procedure dbo.createtfxamount does not exist', 1\n\n-- EXPECTED RESULT\n-- procedure exists and is accessible\n\n-- VERIFICATION\n-- Add assertions here based on expected result\n-- Example:\n-- IF NOT EXISTS (SELECT 1 FROM ... WHERE ...)\n--     THROW 50000, 'Test failed: Expected condition not met', 1\n\n-- CLEANUP\n-- No cleanup required for this test\n\n-- ============================================================================\n-- Automation Notes: Can be automated with OBJECT_ID checks. For execution tests, use tSQLt or parameterized test data\n-- ============================================================================\n",
+    "WI-58714-TC-12": "-- ============================================================================\n-- Test Script: WI-58714-TC-12\n-- Title: Validate dbo.createtfxamount executes successfully with valid input\n-- Purpose: Verify procedure dbo.createtfxamount executes without errors when provided valid parameters\n-- Category: Stored Procedure / Function\n-- Priority: High | Type: Unit | Complexity: Moderate\n-- ============================================================================\n-- Generated for comprehensive test case analysis\n-- Work Item: 58714\n-- ============================================================================\n\n-- PRECONDITIONS\n-- procedure dbo.createtfxamount exists. Valid test data available.\n\n-- SETUP\n-- Setup test data\nValid test parameters based on procedure signature\n\n-- TEST EXECUTION\n-- Execute procedure with valid parameters\n\n-- Example: EXEC dbo.createtfxamount @param1 = 'value1', @param2 = 'value2'\n\n-- Verify execution completes without errors\n\n-- Verify expected results are returned\n\n-- EXPECTED RESULT\n-- procedure executes successfully and returns expected results\n\n-- VERIFICATION\n-- Add assertions here based on expected result\n-- Example:\n-- IF NOT EXISTS (SELECT 1 FROM ... WHERE ...)\n--     THROW 50000, 'Test failed: Expected condition not met', 1\n\n-- CLEANUP\nClean up any test data created by procedure execution\n\n-- ============================================================================\n-- Automation Notes: Can be automated with tSQLt or direct EXEC calls with assertions\n-- ============================================================================\n",
+    "WI-58714-TC-13": "-- ============================================================================\n-- Test Script: WI-58714-TC-13\n-- Title: Validate dbo.createtfxamount handles NULL parameters correctly\n-- Purpose: Verify procedure dbo.createtfxamount handles NULL input parameters appropriately\n-- Category: Stored Procedure / Function\n-- Priority: Medium | Type: Unit | Complexity: Moderate\n-- ============================================================================\n-- Generated for comprehensive test case analysis\n-- Work Item: 58714\n-- ============================================================================\n\n-- PRECONDITIONS\n-- procedure dbo.createtfxamount exists\n\n-- SETUP\n-- Setup: Configure test environment as needed\n\n-- TEST EXECUTION\n-- Execute procedure with NULL parameters\n\n-- Verify either: procedure handles NULL gracefully OR returns appropriate error\n\n-- Example: EXEC dbo.createtfxamount @param1 = NULL\n\n-- EXPECTED RESULT\n-- Procedure either handles NULL gracefully or returns clear error message\n\n-- VERIFICATION\n-- Add assertions here based on expected result\n-- Example:\n-- IF NOT EXISTS (SELECT 1 FROM ... WHERE ...)\n--     THROW 50000, 'Test failed: Expected condition not met', 1\n\n-- CLEANUP\n-- No cleanup required for this test\n\n-- ============================================================================\n-- Automation Notes: Requires testing with NULL values and error handling validation\n-- ============================================================================\n",
+    "WI-58714-TC-14": "-- ============================================================================\n-- Test Script: WI-58714-TC-14\n-- Title: Validate dbo.createtfxamount rejects invalid input parameters\n-- Purpose: Verify procedure dbo.createtfxamount validates input and rejects invalid data\n-- Category: Stored Procedure / Function\n-- Priority: Medium | Type: Unit | Complexity: Moderate\n-- ============================================================================\n-- Generated for comprehensive test case analysis\n-- Work Item: 58714\n-- ============================================================================\n\n-- PRECONDITIONS\n-- procedure dbo.createtfxamount exists\n\n-- SETUP\n-- Setup test data\nInvalid test parameters (wrong types, out of range values)\n\n-- TEST EXECUTION\n-- Execute procedure with invalid parameters (wrong type, out of range, etc.)\n\n-- Example: EXEC dbo.createtfxamount @param1 = 'invalid', @param2 = -1\n\n-- Verify procedure returns appropriate validation error\n\n-- EXPECTED RESULT\n-- Invalid parameters are rejected with clear error message\n\n-- VERIFICATION\n-- Add assertions here based on expected result\n-- Example:\n-- IF NOT EXISTS (SELECT 1 FROM ... WHERE ...)\n--     THROW 50000, 'Test failed: Expected condition not met', 1\n\n-- CLEANUP\n-- Cleanup: Remove test data\n-- ROLLBACK TRANSACTION (if using transaction)\n-- Or DELETE FROM test tables WHERE test_flag = 1\n\n-- ============================================================================\n-- Automation Notes: Requires testing with various invalid inputs\n-- ============================================================================\n",
+    "WI-58714-TC-15": "-- ============================================================================\n-- Test Script: WI-58714-TC-15\n-- Title: Validate dbo.createtfxamount performance improvement\n-- Purpose: Verify procedure dbo.createtfxamount executes within acceptable performance thresholds\n-- Category: Index & Performance\n-- Priority: High | Type: Performance | Complexity: Complex\n-- ============================================================================\n-- Generated for comprehensive test case analysis\n-- Work Item: 58714\n-- ============================================================================\n\n-- PRECONDITIONS\n-- procedure dbo.createtfxamount exists. Performance baseline established.\n\n-- SETUP\n-- Setup: Configure test environment as needed\n\n-- TEST EXECUTION\n-- Execute procedure and measure execution time\n\n-- Compare with performance baseline\n\n-- Verify execution time meets performance requirements\n\n-- EXPECTED RESULT\n-- Procedure execution time is within acceptable limits\n\n-- VERIFICATION\n-- Add assertions here based on expected result\n-- Example:\n-- IF NOT EXISTS (SELECT 1 FROM ... WHERE ...)\n--     THROW 50000, 'Test failed: Expected condition not met', 1\n\n-- CLEANUP\n-- No cleanup required for this test\n\n-- ============================================================================\n-- Automation Notes: Requires performance measurement tools and baseline comparison\n-- ============================================================================\n",
+    "WI-58714-TC-16": "-- ============================================================================\n-- Test Script: WI-58714-TC-16\n-- Title: Validate index exists and is used: SPCreatetFXAmount\n-- Purpose: Verify index SPCreatetFXAmount exists and improves query performance\n-- Category: Index & Performance\n-- Priority: Medium | Type: Performance | Complexity: Moderate\n-- ============================================================================\n-- Generated for comprehensive test case analysis\n-- Work Item: 58714\n-- ============================================================================\n\n-- PRECONDITIONS\n-- Table exists. Index should be created.\n\n-- SETUP\n-- Setup: Configure test environment as needed\n\n-- TEST EXECUTION\nSELECT i.name AS IndexName, i.type_desc AS IndexType\n\nFROM sys.indexes i\n\nINNER JOIN sys.tables t ON i.object_id = t.object_id\n\nWHERE t.name = 'TableName' AND i.name = 'SPCreatetFXAmount'\n\nIF @@ROWCOUNT = 0 THROW 50000, 'Index SPCreatetFXAmount does not exist', 1\n\n-- Check index usage in execution plan for related queries\n\n-- EXPECTED RESULT\n-- Index exists and is used in query execution plans\n\n-- VERIFICATION\n-- Add assertions here based on expected result\n-- Example:\n-- IF NOT EXISTS (SELECT 1 FROM ... WHERE ...)\n--     THROW 50000, 'Test failed: Expected condition not met', 1\n\n-- CLEANUP\n-- No cleanup required for this test\n\n-- ============================================================================\n-- Automation Notes: Can check index existence with sys.indexes. Performance validation requires execution plan analysis\n-- ============================================================================\n",
+    "WI-58714-TC-17": "-- ============================================================================\n-- Test Script: WI-58714-TC-17\n-- Title: Validate index exists and is used: D365\n-- Purpose: Verify index D365 exists and improves query performance\n-- Category: Index & Performance\n-- Priority: Medium | Type: Performance | Complexity: Moderate\n-- ============================================================================\n-- Generated for comprehensive test case analysis\n-- Work Item: 58714\n-- ============================================================================\n\n-- PRECONDITIONS\n-- Table exists. Index should be created.\n\n-- SETUP\n-- Setup: Configure test environment as needed\n\n-- TEST EXECUTION\nSELECT i.name AS IndexName, i.type_desc AS IndexType\n\nFROM sys.indexes i\n\nINNER JOIN sys.tables t ON i.object_id = t.object_id\n\nWHERE t.name = 'TableName' AND i.name = 'D365'\n\nIF @@ROWCOUNT = 0 THROW 50000, 'Index D365 does not exist', 1\n\n-- Check index usage in execution plan for related queries\n\n-- EXPECTED RESULT\n-- Index exists and is used in query execution plans\n\n-- VERIFICATION\n-- Add assertions here based on expected result\n-- Example:\n-- IF NOT EXISTS (SELECT 1 FROM ... WHERE ...)\n--     THROW 50000, 'Test failed: Expected condition not met', 1\n\n-- CLEANUP\n-- No cleanup required for this test\n\n-- ============================================================================\n-- Automation Notes: Can check index existence with sys.indexes. Performance validation requires execution plan analysis\n-- ============================================================================\n",
+    "WI-58714-TC-18": "-- ============================================================================\n-- Test Script: WI-58714-TC-18\n-- Title: Validate index exists and is used: createtfxamount\n-- Purpose: Verify index createtfxamount exists and improves query performance\n-- Category: Index & Performance\n-- Priority: Medium | Type: Performance | Complexity: Moderate\n-- ============================================================================\n-- Generated for comprehensive test case analysis\n-- Work Item: 58714\n-- ============================================================================\n\n-- PRECONDITIONS\n-- Table exists. Index should be created.\n\n-- SETUP\n-- Setup: Configure test environment as needed\n\n-- TEST EXECUTION\nSELECT i.name AS IndexName, i.type_desc AS IndexType\n\nFROM sys.indexes i\n\nINNER JOIN sys.tables t ON i.object_id = t.object_id\n\nWHERE t.name = 'TableName' AND i.name = 'createtfxamount'\n\nIF @@ROWCOUNT = 0 THROW 50000, 'Index createtfxamount does not exist', 1\n\n-- Check index usage in execution plan for related queries\n\n-- EXPECTED RESULT\n-- Index exists and is used in query execution plans\n\n-- VERIFICATION\n-- Add assertions here based on expected result\n-- Example:\n-- IF NOT EXISTS (SELECT 1 FROM ... WHERE ...)\n--     THROW 50000, 'Test failed: Expected condition not met', 1\n\n-- CLEANUP\n-- No cleanup required for this test\n\n-- ============================================================================\n-- Automation Notes: Can check index existence with sys.indexes. Performance validation requires execution plan analysis\n-- ============================================================================\n",
+    "WI-58714-TC-19": "-- ============================================================================\n-- Test Script: WI-58714-TC-19\n-- Title: Validate permissions on dbo.SPCreatetFXAmount\n-- Purpose: Verify only authorized roles can access dbo.SPCreatetFXAmount\n-- Category: Security & Permissions\n-- Priority: Medium | Type: Security | Complexity: Moderate\n-- ============================================================================\n-- Generated for comprehensive test case analysis\n-- Work Item: 58714\n-- ============================================================================\n\n-- PRECONDITIONS\n-- Object dbo.SPCreatetFXAmount exists. Test user with limited permissions available.\n\n-- SETUP\n-- Setup: Configure test environment as needed\n\n-- TEST EXECUTION\n-- Test with different user roles\n\nEXECUTE AS USER = 'TestUser'\n\n-- Attempt to SELECT/INSERT/UPDATE/DELETE\n\nREVERT\n\n-- EXPECTED RESULT\n-- Only authorized roles can perform allowed operations\n\n-- VERIFICATION\n-- Add assertions here based on expected result\n-- Example:\n-- IF NOT EXISTS (SELECT 1 FROM ... WHERE ...)\n--     THROW 50000, 'Test failed: Expected condition not met', 1\n\n-- CLEANUP\n-- No cleanup required for this test\n\n-- ============================================================================\n-- Automation Notes: Can be automated with EXECUTE AS and permission checks\n-- ============================================================================\n",
+    "WI-58714-TC-20": "-- ============================================================================\n-- Test Script: WI-58714-TC-20\n-- Title: Validate permissions on dbo.D365\n-- Purpose: Verify only authorized roles can access dbo.D365\n-- Category: Security & Permissions\n-- Priority: Medium | Type: Security | Complexity: Moderate\n-- ============================================================================\n-- Generated for comprehensive test case analysis\n-- Work Item: 58714\n-- ============================================================================\n\n-- PRECONDITIONS\n-- Object dbo.D365 exists. Test user with limited permissions available.\n\n-- SETUP\n-- Setup: Configure test environment as needed\n\n-- TEST EXECUTION\n-- Test with different user roles\n\nEXECUTE AS USER = 'TestUser'\n\n-- Attempt to SELECT/INSERT/UPDATE/DELETE\n\nREVERT\n\n-- EXPECTED RESULT\n-- Only authorized roles can perform allowed operations\n\n-- VERIFICATION\n-- Add assertions here based on expected result\n-- Example:\n-- IF NOT EXISTS (SELECT 1 FROM ... WHERE ...)\n--     THROW 50000, 'Test failed: Expected condition not met', 1\n\n-- CLEANUP\n-- No cleanup required for this test\n\n-- ============================================================================\n-- Automation Notes: Can be automated with EXECUTE AS and permission checks\n-- ============================================================================\n",
+    "WI-58714-TC-21": "-- ============================================================================\n-- Test Script: WI-58714-TC-21\n-- Title: Validate permissions on dbo.createtfxamount\n-- Purpose: Verify only authorized roles can access dbo.createtfxamount\n-- Category: Security & Permissions\n-- Priority: Medium | Type: Security | Complexity: Moderate\n-- ============================================================================\n-- Generated for comprehensive test case analysis\n-- Work Item: 58714\n-- ============================================================================\n\n-- PRECONDITIONS\n-- Object dbo.createtfxamount exists. Test user with limited permissions available.\n\n-- SETUP\n-- Setup: Configure test environment as needed\n\n-- TEST EXECUTION\n-- Test with different user roles\n\nEXECUTE AS USER = 'TestUser'\n\n-- Attempt to SELECT/INSERT/UPDATE/DELETE\n\nREVERT\n\n-- EXPECTED RESULT\n-- Only authorized roles can perform allowed operations\n\n-- VERIFICATION\n-- Add assertions here based on expected result\n-- Example:\n-- IF NOT EXISTS (SELECT 1 FROM ... WHERE ...)\n--     THROW 50000, 'Test failed: Expected condition not met', 1\n\n-- CLEANUP\n-- No cleanup required for this test\n\n-- ============================================================================\n-- Automation Notes: Can be automated with EXECUTE AS and permission checks\n-- ============================================================================\n",
+    "WI-58714-TC-22": "-- ============================================================================\n-- Test Script: WI-58714-TC-22\n-- Title: Validate rollback script exists and is tested\n-- Purpose: Verify that changes can be safely rolled back if needed\n-- Category: Rollback & Upgrade safety\n-- Priority: High | Type: Rollback | Complexity: Complex\n-- ============================================================================\n-- Generated for comprehensive test case analysis\n-- Work Item: 58714\n-- ============================================================================\n\n-- PRECONDITIONS\n-- Rollback script available\n\n-- SETUP\n-- Setup: Configure test environment as needed\n\n-- TEST EXECUTION\n-- Verify rollback script exists\n\n-- Test rollback script in test environment\n\n-- Verify database returns to previous state\n\n-- EXPECTED RESULT\n-- Rollback script successfully reverts all changes\n\n-- VERIFICATION\n-- Add assertions here based on expected result\n-- Example:\n-- IF NOT EXISTS (SELECT 1 FROM ... WHERE ...)\n--     THROW 50000, 'Test failed: Expected condition not met', 1\n\n-- CLEANUP\n-- No cleanup required for this test\n\n-- ============================================================================\n-- Automation Notes: Requires rollback script execution and state verification\n-- ============================================================================\n"
+  },
+  "acceptance_criteria_mapping": [],
+  "risk_assessment": [],
+  "automation_plan": {
+    "priority_tests": [
+      "WI-58714-TC-01",
+      "WI-58714-TC-06",
+      "WI-58714-TC-11"
+    ],
+    "tools": [
+      "tSQLt",
+      "Azure Pipelines",
+      "dbatools",
+      "SQL Server Agent"
+    ],
+    "ci_gates": [
+      "Run unit tests on PR creation",
+      "Run integration tests on merge to main",
+      "Require all high-priority tests to pass"
+    ]
+  },
+  "release_checklist": [
+    "All high-priority test cases executed and passed",
+    "Database backup created before deployment",
+    "Rollback plan tested and documented",
+    "Performance baseline established (if applicable)"
+  ]
+}

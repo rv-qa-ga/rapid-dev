@@ -1,0 +1,47 @@
+{
+  "key": "SF-479",
+  "summary": "Delete Legal_Entity__c from Lead only; ensure no impact to other objects or systems",
+  "type": "Story",
+  "status": "In QA",
+  "priority": "Medium",
+  "description": {
+    "raw": "User Story: As a Product Owner / Business Analyst I want the custom field Legal_Entity__c removed from the Lead object only So that lead deduplication logic is simplified and maintenance is reduced, while ensuring no other Salesforce object, automation, integration, report, scheduled job or managed package is negatively affected Description / Scope: Remove Legal_Entity__c only from the Lead object. Do NOT remove or alter Legal_Entity__c if the same API name exists on other objects. Before deletion, perform an org-wide and external-systems impact analysis and remediate any references that rely on the Lead field. Validate deletion in sandbox with full regression, integration and deduplication testing. Acceptance Criteria (GIVEN / WHEN / THEN): Lead-only deletion GIVEN the change is deployed WHEN I inspect object schemas across the org THEN Legal_Entity__c is removed from the Lead object only and any fields with the same API name on other objects remain unchanged Org-wide metadata & cross-object reference check GIVEN a full metadata and cross-object scan (Apex, Flows, Process Builder, Validation Rules, Formula Fields, Workflow Rules, Duplicate Rules, Assignment Rules, Page Layouts, List Views, Compact/Search Layouts, Permission Sets, Profiles, Lightning Components, Custom Settings/Metadata, Roll-ups) WHEN I search for references to Lead.Legal_Entity__c THEN there are no unresolved references; any reference found is remediated and unit-tested so no runtime errors occur Reports, dashboards & BI validation GIVEN reports, dashboards and BI jobs that referenced Lead. Legal_Entity__c are identified WHEN owners update or remove those references and run tests THEN scheduled and ad-hoc reports and BI jobs run without errors after deletion Deduplication preserved GIVEN lead deduplication rules and code WHEN the field is removed THEN deduplication behaves as expected for existing and new Leads and any dedupe rule referencing the field is updated or replaced and tested Scheduled jobs & batch processes GIVEN all scheduled jobs and batch processes that touch Leads are identified WHEN they run after deletion THEN none fail with field-not-found or other exceptions",
+    "parsed": {
+      "sentences": [
+        "User Story: As a Product Owner / Business Analyst I want the custom field Legal_Entity__c removed from the Lead object only So that lead deduplication logic is simplified and maintenance is reduced, while ensuring no other Salesforce object, automation, integration, report, scheduled job or managed package is negatively affected Description / Scope: Remove Legal_Entity__c only from the Lead object",
+        "Do NOT remove or alter Legal_Entity__c if the same API name exists on other objects",
+        "Before deletion, perform an org-wide and external-systems impact analysis and remediate any references that rely on the Lead field",
+        "Validate deletion in sandbox with full regression, integration and deduplication testing",
+        "Acceptance Criteria (GIVEN / WHEN / THEN): Lead-only deletion GIVEN the change is deployed WHEN I inspect object schemas across the org THEN Legal_Entity__c is removed from the Lead object only and any fields with the same API name on other objects remain unchanged Org-wide metadata & cross-object reference check GIVEN a full metadata and cross-object scan (Apex, Flows, Process Builder, Validation Rules, Formula Fields, Workflow Rules, Duplicate Rules, Assignment Rules, Page Layouts, List Views, Compact/Search Layouts, Permission Sets, Profiles, Lightning Components, Custom Settings/Metadata, Roll-ups) WHEN I search for references to Lead.Legal_Entity__c THEN there are no unresolved references; any reference found is remediated and unit-tested so no runtime errors occur Reports, dashboards & BI validation GIVEN reports, dashboards and BI jobs that referenced Lead",
+        "Legal_Entity__c are identified WHEN owners update or remove those references and run tests THEN scheduled and ad-hoc reports and BI jobs run without errors after deletion Deduplication preserved GIVEN lead deduplication rules and code WHEN the field is removed THEN deduplication behaves as expected for existing and new Leads and any dedupe rule referencing the field is updated or replaced and tested Scheduled jobs & batch processes GIVEN all scheduled jobs and batch processes that touch Leads are identified WHEN they run after deletion THEN none fail with field-not-found or other exceptions"
+      ],
+      "entities": [
+        "Lead",
+        "Product"
+      ],
+      "fields": [
+        "Legal_Entity__c"
+      ],
+      "actions": [
+        "validate",
+        "update"
+      ]
+    }
+  },
+  "acceptanceCriteria": [],
+  "comments": [],
+  "relatedIssues": [],
+  "fieldDefinitions": {
+    "Legal_Entity__c": {
+      "type": "Custom",
+      "required": false,
+      "description": "Field: Legal_Entity__c"
+    }
+  },
+  "generatedFeatures": {
+    "ui": "src/features/ui/SF/SF-479.feature",
+    "api": "src/features/api/SF/SF-479.feature"
+  },
+  "qaReviewedFeatures": {},
+  "extractedAt": "2025-12-17T18:40:43.178Z"
+}

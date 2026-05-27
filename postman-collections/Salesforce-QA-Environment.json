@@ -1,0 +1,86 @@
+{
+	"id": "salesforce-qa-environment",
+	"name": "Salesforce QA Environment",
+	"values": [
+		{
+			"key": "sf_base_url",
+			"value": "https://arx--qa.sandbox.my.salesforce.com",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "sf_api_version",
+			"value": "v60.0",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "sf_access_token",
+			"value": "",
+			"type": "secret",
+			"enabled": true
+		},
+		{
+			"key": "sf_instance_url",
+			"value": "https://arx--qa.sandbox.my.salesforce.com",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "sf_client_id",
+			"value": "",
+			"type": "secret",
+			"enabled": true
+		},
+		{
+			"key": "sf_client_secret",
+			"value": "",
+			"type": "secret",
+			"enabled": true
+		},
+		{
+			"key": "sf_username",
+			"value": "",
+			"type": "secret",
+			"enabled": true
+		},
+		{
+			"key": "sf_password",
+			"value": "",
+			"type": "secret",
+			"enabled": true
+		},
+		{
+			"key": "sf_security_token",
+			"value": "",
+			"type": "secret",
+			"enabled": true
+		},
+		{
+			"key": "sf_jwt_assertion",
+			"value": "",
+			"type": "secret",
+			"enabled": true
+		},
+		{
+			"key": "account_id",
+			"value": "",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "lead_id",
+			"value": "",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "contact_id",
+			"value": "",
+			"type": "default",
+			"enabled": true
+		}
+	],
+	"_postman_variable_scope": "environment"
+}
+

@@ -1,0 +1,235 @@
+name: Regression Tests
+
+on:
+  # Run nightly at 2 AM UTC (adjust timezone as needed)
+  schedule:
+    - cron: '0 2 * * *'  # Daily at 2 AM UTC
+  # Allow manual trigger
+  workflow_dispatch:
+    inputs:
+      work_item:
+        description: 'Jira work item for regression (default: SF-655)'
+        required: false
+        type: string
+        default: 'SF-655'
+      cycle_name:
+        description: 'Zephyr test cycle name (e.g., Regression)'
+        required: false
+        type: string
+        default: 'Regression'
+      environment:
+        description: 'Environment (dev, qa, uat)'
+        required: false
+        default: 'qa'
+        type: choice
+        options:
+          - dev
+          - qa
+          - uat
+      branch:
+        description: 'Branch to checkout (defaults to main)'
+        required: false
+        type: string
+        default: 'main'
+
+# Concurrency control: Only one regression run at a time
+concurrency:
+  group: regression-tests
+  cancel-in-progress: false  # Queue instead of cancel
+
+jobs:
+  regression:
+    runs-on: self-hosted
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.branch || 'main' }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libnss3 libatk-bridge2.0-0 libdrm2 libxkbcommon0 libxcomposite1 libxdamage1 libxfixes3 libxrandr2 libgbm1 libasound2
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Copy .env.qa file if available
+        # Copy .env.qa from persistent location on VM (if it exists)
+        # This allows keeping credentials on the VM without committing them
+        # Security: File is hidden (starts with .) and has restrictive permissions (600)
+        run: |
+          ENV_FILE="/home/github-runner/.env.qa"
+          TARGET_DIR="src/config/env"
+          
+          if [ -f "$ENV_FILE" ]; then
+            echo "📁 Found .env.qa on VM, copying to workspace..."
+            mkdir -p "$TARGET_DIR"
+            cp "$ENV_FILE" "$TARGET_DIR/.env.qa"
+            # Set restrictive permissions: owner read/write only (600 = rw-------)
+            chmod 600 "$TARGET_DIR/.env.qa"
+            # Verify permissions
+            ls -la "$TARGET_DIR/.env.qa" | awk '{print "✅ File permissions: " $1 " (owner: " $3 ":" $4 ")"}'
+            echo "✅ .env.qa copied securely"
+          else
+            echo "ℹ️  No .env.qa found at $ENV_FILE"
+            echo "   Using GitHub Secrets and JSON config only"
+          fi
+        continue-on-error: true
+        # Don't show command output that might expose file contents
+        shell: bash
+
+      - name: Copy certificates if available
+        # Copy certificates from persistent location on VM (if they exist)
+        run: |
+          CERTS_DIR="/home/github-runner/certs"
+          TARGET_DIR="certs"
+          
+          if [ -d "$CERTS_DIR" ]; then
+            echo "📁 Found certificates on VM, copying to workspace..."
+            mkdir -p "$TARGET_DIR"
+            cp -r "$CERTS_DIR"/* "$TARGET_DIR/" || true
+            # Set restrictive permissions on certificate files
+            find "$TARGET_DIR" -type f -exec chmod 600 {} \;
+            echo "✅ Certificates copied securely"
+          else
+            echo "ℹ️  No certificates found at $CERTS_DIR"
+          fi
+        continue-on-error: true
+        shell: bash
+
+      - name: Set regression work item
+        id: set-work-item
+        run: |
+          if [ -n "${{ github.event.inputs.work_item }}" ]; then
+            echo "work_item=${{ github.event.inputs.work_item }}" >> $GITHUB_OUTPUT
+          else
+            # Default regression work item: SF-655 (Regression)
+            echo "work_item=SF-655" >> $GITHUB_OUTPUT
+            echo "✅ Using regression work item: SF-655"
+          fi
+
+      - name: Validate Zephyr credentials
+        run: |
+          echo "🔍 Validating Zephyr credentials..."
+          
+          # Check if .env.qa file exists (copied from VM)
+          if [ -f "src/config/env/.env.qa" ]; then
+            echo "✅ Found .env.qa file"
+            # Check if ZEPHYR_API_TOKEN is in the file (without exposing the value)
+            if grep -q "ZEPHYR_API_TOKEN" "src/config/env/.env.qa"; then
+              echo "✅ ZEPHYR_API_TOKEN found in .env.qa file"
+            else
+              echo "⚠️  ZEPHYR_API_TOKEN not found in .env.qa file"
+            fi
+          else
+            echo "ℹ️  .env.qa file not found (will use GitHub Secrets)"
+          fi
+          
+          # Check GitHub Secrets (without exposing values)
+          if [ -n "${{ secrets.ZEPHYR_API_TOKEN }}" ]; then
+            echo "✅ ZEPHYR_API_TOKEN GitHub secret is configured"
+          else
+            echo "❌ ZEPHYR_API_TOKEN GitHub secret is NOT configured or empty"
+            echo "   Please configure the secret in: Settings > Secrets and variables > Actions"
+          fi
+          
+          if [ -n "${{ secrets.ZEPHYR_BASE_URL }}" ]; then
+            echo "✅ ZEPHYR_BASE_URL GitHub secret is configured"
+          else
+            echo "⚠️  ZEPHYR_BASE_URL GitHub secret is not configured"
+          fi
+          
+          if [ -n "${{ secrets.ZEPHYR_PROJECT_KEY }}" ]; then
+            echo "✅ ZEPHYR_PROJECT_KEY GitHub secret is configured"
+          else
+            echo "⚠️  ZEPHYR_PROJECT_KEY GitHub secret is not configured"
+          fi
+          
+          # Final check: At least one source must have the token
+          if [ -z "${{ secrets.ZEPHYR_API_TOKEN }}" ] && [ ! -f "src/config/env/.env.qa" ]; then
+            echo ""
+            echo "❌ ERROR: ZEPHYR_API_TOKEN is required but not found!"
+            echo "   Solutions:"
+            echo "   1. Configure ZEPHYR_API_TOKEN in GitHub Secrets (Settings > Secrets > Actions)"
+            echo "   2. OR place .env.qa file at /home/github-runner/.env.qa on the VM"
+            echo "   3. Ensure the secret is available for the 'main' branch"
+            exit 1
+          fi
+
+      - name: Run regression tests
+        env:
+          ENV: ${{ github.event.inputs.environment || 'qa' }}
+          HEADLESS: true
+          CI: true
+          TAKE_SCREENSHOTS: true
+          CAPTURE_EVIDENCE: true
+          # Atlassian credentials
+          ATLASSIAN_EMAIL: ${{ secrets.ATLASSIAN_EMAIL }}
+          ATLASSIAN_API_TOKEN: ${{ secrets.ATLASSIAN_API_TOKEN }}
+          JIRA_BASE_URL: ${{ secrets.JIRA_BASE_URL }}
+          # Zephyr credentials
+          ZEPHYR_BASE_URL: ${{ secrets.ZEPHYR_BASE_URL }}
+          ZEPHYR_PROJECT_KEY: ${{ secrets.ZEPHYR_PROJECT_KEY }}
+          ZEPHYR_API_TOKEN: ${{ secrets.ZEPHYR_API_TOKEN }}
+        run: |
+          CYCLE_NAME="${{ github.event.inputs.cycle_name || 'Regression' }}"
+          WORK_ITEM="${{ steps.set-work-item.outputs.work_item }}"
+          
+          echo "🚀 Running regression tests"
+          echo "   Cycle: ${CYCLE_NAME}"
+          if [ -n "${WORK_ITEM}" ]; then
+            echo "   Work Item: ${WORK_ITEM}"
+          fi
+          echo "   Environment: ${ENV}"
+          echo "   Branch: ${{ github.ref_name }}"
+          
+          # Run from test cycle (primary method) - gets test cases directly from cycle
+          # Optionally include work item for result tracking
+          if [ -n "${WORK_ITEM}" ]; then
+            npm run test:regression -- \
+              --cycle "${CYCLE_NAME}" \
+              --work-item "${WORK_ITEM}" \
+              --environment "${ENV}"
+          else
+            npm run test:regression -- \
+              --cycle "${CYCLE_NAME}" \
+              --environment "${ENV}"
+          fi
+
+      - name: Upload test artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: regression-test-results-${{ github.run_number }}
+          path: |
+            reports/**/*
+            artifacts/**/*
+          retention-days: 30
+
+      - name: Publish test summary
+        if: always()
+        run: |
+          echo "📊 Checking for test reports..."
+          if [ -f reports/json/cucumber-report.json ]; then
+            echo "✅ Test results found: reports/json/cucumber-report.json"
+            echo "   Results will be uploaded to Zephyr Scale"
+          elif [ -f reports/cucumber-report.json ]; then
+            echo "✅ Test results found: reports/cucumber-report.json"
+            echo "   Results will be uploaded to Zephyr Scale"
+          else
+            echo "⚠️  No test report generated"
+            echo "   Expected location: reports/json/cucumber-report.json or reports/cucumber-report.json"
+            echo "   Available files in reports/:"
+            find reports/ -name "*.json" -type f 2>/dev/null | head -10 || echo "   (reports directory may not exist)"
+          fi

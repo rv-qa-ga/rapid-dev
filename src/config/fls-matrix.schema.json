@@ -1,0 +1,110 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "FLS Matrix Schema",
+  "description": "Field-Level Security matrix exported from SharePoint. Per-object with role-based View/Edit permissions.",
+  "type": "object",
+  "properties": {
+    "version": {
+      "type": "string",
+      "description": "Schema version"
+    },
+    "lastUpdated": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Last update timestamp"
+    },
+    "source": {
+      "type": "string",
+      "description": "Source of FLS matrix (SharePoint URL)"
+    },
+    "objects": {
+      "type": "object",
+      "description": "Per-object FLS matrix",
+      "patternProperties": {
+        "^[A-Za-z0-9_]+$": {
+          "$ref": "#/definitions/objectFLS"
+        }
+      }
+    }
+  },
+  "definitions": {
+    "objectFLS": {
+      "type": "object",
+      "description": "FLS matrix for a specific object (e.g., Account, Lead, Contact)",
+      "properties": {
+        "objectName": {
+          "type": "string",
+          "description": "Object API name (e.g., 'Account', 'Lead')"
+        },
+        "fields": {
+          "type": "array",
+          "description": "Array of field-level security definitions",
+          "items": {
+            "$ref": "#/definitions/fieldFLS"
+          }
+        }
+      },
+      "required": ["objectName", "fields"]
+    },
+    "fieldFLS": {
+      "type": "object",
+      "description": "Field-level security for a specific field",
+      "properties": {
+        "fieldName": {
+          "type": "string",
+          "description": "Field API name (e.g., 'Name', 'AnnualRevenue__c')"
+        },
+        "fieldLabel": {
+          "type": "string",
+          "description": "Field label (human-readable)"
+        },
+        "fieldType": {
+          "type": "string",
+          "description": "Field type (e.g., 'Text', 'Number', 'Currency')"
+        },
+        "rolePermissions": {
+          "type": "object",
+          "description": "Role-based permissions (View/Edit)",
+          "patternProperties": {
+            "^[A-Za-z0-9_-]+$": {
+              "$ref": "#/definitions/rolePermission"
+            }
+          }
+        },
+        "sensitiveDataClassification": {
+          "type": "array",
+          "description": "Sensitive data tags (PII, Financial, Compliance)",
+          "items": {
+            "type": "string",
+            "enum": ["PII", "Financial", "Compliance", "Confidential"]
+          }
+        },
+        "notes": {
+          "type": "string",
+          "description": "Additional notes or comments"
+        }
+      },
+      "required": ["fieldName", "rolePermissions"]
+    },
+    "rolePermission": {
+      "type": "object",
+      "description": "View and Edit permissions for a specific role",
+      "properties": {
+        "view": {
+          "type": "boolean",
+          "description": "Role can view this field"
+        },
+        "edit": {
+          "type": "boolean",
+          "description": "Role can edit this field"
+        },
+        "required": {
+          "type": "boolean",
+          "description": "Field is required for this role"
+        }
+      },
+      "required": ["view", "edit"]
+    }
+  }
+}
+

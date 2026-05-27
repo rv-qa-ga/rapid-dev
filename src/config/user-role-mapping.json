@@ -1,0 +1,117 @@
+{
+  "description": "Maps user roles mentioned in Jira acceptance criteria to actual Salesforce user role names used in step definitions",
+  "version": "1.0.0",
+  "mappings": [
+    {
+      "jiraMention": "MRD",
+      "sfUserRole": "QA MRD User",
+      "description": "Member Relationship Director - maps to QA MRD User"
+    },
+    {
+      "jiraMention": "Member Relationship Director",
+      "sfUserRole": "QA MRD User",
+      "description": "Member Relationship Director (full name) - maps to QA MRD User"
+    },
+    {
+      "jiraMention": "MRD User",
+      "sfUserRole": "QA MRD User",
+      "description": "QA MRD User - direct mapping"
+    },
+    {
+      "jiraMention": "Salesforce System Administrator",
+      "sfUserRole": "QA Automation User",
+      "description": "QA Salesforce System Administrator user"
+    },
+    {
+      "jiraMention": "Accelerant - System administrator",
+      "sfUserRole": "QA Automation User",
+      "description": "Default system administrator profile - used when no role is specified in test scenario"
+    },
+    {
+      "jiraMention": "System administrator",
+      "sfUserRole": "QA Automation User",
+      "description": "System administrator (alternative name)"
+    },
+    {
+      "jiraMention": "System Administrator",
+      "sfUserRole": "QA Automation User",
+      "description": "System Administrator (capitalized)"
+    },
+    {
+      "jiraMention": "Salesforce Admin",
+      "sfUserRole": "QA Automation User",
+      "description": "Salesforce Admin from user story persona"
+    },
+    {
+      "jiraMention": "MRD or Salesforce Admin",
+      "sfUserRole": "QA MRD User",
+      "description": "User story persona: either MRD or Salesforce Admin"
+    },
+    {
+      "jiraMention": "admin user",
+      "sfUserRole": "Admin",
+      "description": "Administrator user"
+    },
+    {
+      "jiraMention": "administrator",
+      "sfUserRole": "Admin",
+      "description": "Administrator (alternative name)"
+    },
+    {
+      "jiraMention": "admin",
+      "sfUserRole": "Admin",
+      "description": "Admin (short form)"
+    },
+    {
+      "jiraMention": "standard user",
+      "sfUserRole": "Standard User",
+      "description": "Standard (non-admin) user"
+    },
+    {
+      "jiraMention": "standard user",
+      "sfUserRole": "Standard User",
+      "description": "Standard user (short form)"
+    },
+    {
+      "jiraMention": "non-admin user",
+      "sfUserRole": "Non-Admin User",
+      "description": "Non-admin user"
+    },
+    {
+      "jiraMention": "non-admin",
+      "sfUserRole": "Non-Admin User",
+      "description": "Non-admin (short form)"
+    },
+    {
+      "jiraMention": "read-only user",
+      "sfUserRole": "Read-Only User",
+      "description": "Read-only user"
+    },
+    {
+      "jiraMention": "read-only",
+      "sfUserRole": "Read-Only User",
+      "description": "Read-only (short form)"
+    },
+    {
+      "jiraMention": "readonly",
+      "sfUserRole": "Read-Only User",
+      "description": "Readonly (alternative spelling)"
+    },
+    {
+      "jiraMention": "Data Governance",
+      "sfUserRole": "Data Governance User",
+      "description": "SF-872 reference-data governance persona; credentials SF_DATAGOVERNANCEUSER_*"
+    },
+    {
+      "jiraMention": "Data Governance user",
+      "sfUserRole": "Data Governance User",
+      "description": "Data Governance user (phrase form)"
+    },
+    {
+      "jiraMention": "data steward",
+      "sfUserRole": "Data Governance User",
+      "description": "Story synonym for Data Governance where applicable"
+    }
+  ]
+}
+

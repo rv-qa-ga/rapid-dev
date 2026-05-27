@@ -1,0 +1,47 @@
+{
+  "key": "SF-485",
+  "summary": "Make Functional_Currency__c mandatory for Insurer, Insurer Branch and Reinsurer",
+  "type": "Story",
+  "status": "In QA",
+  "priority": "Medium",
+  "description": {
+    "raw": "User Story: As a Product Owner / Data Owner I want the Functional_Currency__c field to be mandatory for Insurer, Insurer Branch and Reinsurer records So that every Insurer, Insurer Branch and Reinsurer record has a defined functional currency for reporting, accounting and downstream processing, and no record of those types can be created or saved without a valid value Description / Scope: Enforce that Functional_Currency__c contains a non-empty, valid value for all records classified as Insurer, Insurer Branch or Reinsurer. The enforcement must work for UI, API, integrations and automated processes. The change applies to the objects or record types used in the org to represent Insurer, Insurer Branch and Reinsurer. Acceptance Criteria (GIVEN / WHEN / THEN): UI: new record (create) GIVEN a user attempts to create a new Insurer, Insurer Branch or Reinsurer record (via UI) WHEN Functional_Currency__c is blank on save THEN the save is blocked and a clear error message is shown: \"Functional Currency is required for this record type.\"    - happy with this? UI: edit existing record GIVEN a user opens an existing Insurer, Insurer Branch or Reinsurer record that has Functional_Currency__c populated WHEN they attempt to clear or blank Functional_Currency__c and save THEN the save is blocked with the same error message.",
+    "parsed": {
+      "sentences": [
+        "User Story: As a Product Owner / Data Owner I want the Functional_Currency__c field to be mandatory for Insurer, Insurer Branch and Reinsurer records So that every Insurer, Insurer Branch and Reinsurer record has a defined functional currency for reporting, accounting and downstream processing, and no record of those types can be created or saved without a valid value Description / Scope: Enforce that Functional_Currency__c contains a non-empty, valid value for all records classified as Insurer, Insurer Branch or Reinsurer",
+        "The enforcement must work for UI, API, integrations and automated processes",
+        "The change applies to the objects or record types used in the org to represent Insurer, Insurer Branch and Reinsurer",
+        "Acceptance Criteria (GIVEN / WHEN / THEN): UI: new record (create) GIVEN a user attempts to create a new Insurer, Insurer Branch or Reinsurer record (via UI) WHEN Functional_Currency__c is blank on save THEN the save is blocked and a clear error message is shown: \"Functional Currency is required for this record type.\"    - happy with this",
+        "UI: edit existing record GIVEN a user opens an existing Insurer, Insurer Branch or Reinsurer record that has Functional_Currency__c populated WHEN they attempt to clear or blank Functional_Currency__c and save THEN the save is blocked with the same error message."
+      ],
+      "entities": [
+        "Account",
+        "Product"
+      ],
+      "fields": [
+        "Functional_Currency__c"
+      ],
+      "actions": [
+        "show",
+        "create",
+        "populate"
+      ]
+    }
+  },
+  "acceptanceCriteria": [],
+  "comments": [],
+  "relatedIssues": [],
+  "fieldDefinitions": {
+    "Functional_Currency__c": {
+      "type": "Custom",
+      "required": false,
+      "description": "Field: Functional_Currency__c"
+    }
+  },
+  "generatedFeatures": {
+    "ui": "src/features/ui/SF/SF-485.feature",
+    "api": "src/features/api/SF/SF-485.feature"
+  },
+  "qaReviewedFeatures": {},
+  "extractedAt": "2025-12-17T18:40:33.773Z"
+}

@@ -1,0 +1,31 @@
+{
+  "name": "int",
+  "description": "Salesforce INT sandbox + Dynamics preprod (CLM go-live)",
+  "salesforce": {
+    "baseUrl": "https://arx--int.sandbox.my.salesforce.com/",
+    "apiVersion": "v60.0",
+    "loginUrl": "https://arx--int.sandbox.my.salesforce.com/"
+  },
+  "dynamics": {
+    "baseUrl": "https://accelinspreprod.crm11.dynamics.com",
+    "webApiBaseUrl": "https://accelinspreprod.crm11.dynamics.com/api/data/v9.2/",
+    "apiVersion": "v9.2"
+  },
+  "mulesoft": {
+    "baseUrl": "https://eu1.anypoint.mulesoft.com",
+    "apiBaseUrl": "https://eu1.anypoint.mulesoft.com/amc/application-manager/api/v2"
+  },
+  "jira": {
+    "baseUrl": "https://accelins.atlassian.net/",
+    "projectKey": "SF"
+  },
+  "zephyr": {
+    "baseUrl": "https://accelins.atlassian.net/",
+    "projectKey": "SF"
+  },
+  "timeouts": {
+    "navigation": 30000,
+    "element": 10000,
+    "api": 30000
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "name": "e2e-automation-framework-video",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Remotion video presentation for the E2E Automation Framework",
+  "scripts": {
+    "studio": "remotion studio src/index.ts",
+    "render": "remotion render src/index.ts Main out/e2e-automation-framework.mp4 --concurrency=12 --jpeg-quality=85",
+    "voiceover": "python scripts/generate-voiceover.py",
+    "bgm": "python scripts/generate-bgm.py",
+    "audio": "npm run voiceover && npm run bgm",
+    "py:install": "python -m pip install -r requirements.txt",
+    "build": "npm run audio && npm run render"
+  },
+  "dependencies": {
+    "@remotion/bundler": "4.0.380",
+    "@remotion/cli": "4.0.380",
+    "@remotion/transitions": "4.0.380",
+    "react": "19.0.0",
+    "react-dom": "19.0.0",
+    "remotion": "4.0.380"
+  },
+  "devDependencies": {
+    "@types/node": "22.10.2",
+    "@types/react": "19.0.2",
+    "@types/react-dom": "19.0.2",
+    "typescript": "5.7.2"
+  }
+}

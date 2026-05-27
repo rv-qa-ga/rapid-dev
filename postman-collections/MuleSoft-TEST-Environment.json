@@ -1,0 +1,67 @@
+{
+	"id": "mulesoft-test-environment",
+	"name": "MuleSoft TEST Environment",
+	"values": [
+		{
+			"key": "mulesoft_base_url",
+			"value": "https://eu1.anypoint.mulesoft.com",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "mulesoft_api_base_url",
+			"value": "https://eu1.anypoint.mulesoft.com/amc/application-manager/api/v2",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "mulesoft_organization_id",
+			"value": "7fac6f25-f41f-4050-8828-42443645bc0c",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "mulesoft_environment_id",
+			"value": "b12f7f66-7ae4-49d4-976a-f5da33976bc1",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "mulesoft_client_id",
+			"value": "",
+			"type": "secret",
+			"enabled": true
+		},
+		{
+			"key": "mulesoft_client_secret",
+			"value": "",
+			"type": "secret",
+			"enabled": true
+		},
+		{
+			"key": "mulesoft_access_token",
+			"value": "",
+			"type": "secret",
+			"enabled": true
+		},
+		{
+			"key": "mulesoft_token_expires_in",
+			"value": "",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "search_text",
+			"value": "",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "mulesoft_sapi_spec_id",
+			"value": "",
+			"type": "default",
+			"enabled": true
+		}
+	],
+	"_postman_variable_scope": "environment"
+}

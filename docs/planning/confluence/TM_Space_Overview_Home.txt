@@ -1,0 +1,63 @@
+h1. Test Management (TM) – Space home
+
+This space is the *central place for test management*: strategy, environments, automation, planning, system knowledge, and templates. Structure follows a *QA Guild–style* pillar layout so you can find the right artifact quickly.
+
+*All primary content in this space lives under TM. Lloyd’s program documentation remains here.*
+
+
+h2. Pillar index (Guild-style)
+
+|| Pillar || What you will find here ||
+| *QA ways of working* | Strategy, team and roles, shared language |
+| *Test environments & test data* | Data flow, environment inventory and usage |
+| *Test automation* | End-to-end automation strategy, framework workflow, tooling |
+| *Test plans & delivery* | Multi-quarter planning, month-end / E2E tracks, Lloyd’s program |
+| *Knowledge base (systems)* | Per-system automation and integration knowledge |
+| *Templates & governance* | Standard templates for decisions, meetings, plans |
+
+
+h2. QA ways of working
+
+* [Testing Strategy]
+* [Team , Roles and Responsibilities]
+* [Glossary]
+
+
+h2. Test environments & test data
+
+* [Data Flow]
+* [Test Environments]
+
+
+h2. Test automation
+
+* [Automation Testing Strategy for End-to-End Workflow|https://accelins.atlassian.net/wiki/spaces/TM/pages/1982333036/Automation+Testing+Strategy+for+End-to-End+Workflow]
+* [QA Automation Framework – Complete Workflow Guide|https://accelins.atlassian.net/wiki/spaces/TM/pages/2692710418/QA+Automation+Framework+-+Complete+Workflow+Guide]
+
+
+h2. Test plans & delivery
+
+* [BSGQA Next-Version Planning Hub Overview]
+* [Month-End Process]
+* [End-to-End Process]
+* [Automation Testing]
+* [Lloyd's of London]
+
+
+h2. Knowledge base (systems & integrations)
+
+* [Knowledge Base — Test & integration automation]
+
+
+h2. Templates & governance
+
+* [Appendix]
+
+
+h2. Reference – ADP QA Guild (read-only, other space)
+
+For *cross-team* QA Guild practices (ways of working, Zephyr, AI in QA, etc.), see: [QA Guild|https://accelins.atlassian.net/wiki/spaces/PT1/pages/1686044732/QA+Guild] — *TM automation does not modify the PT1 space; this is a reader link only.*
+
+
+---
+*Last updated: April 2026*

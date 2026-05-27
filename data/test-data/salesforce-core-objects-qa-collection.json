@@ -1,0 +1,480 @@
+{
+	"info": {
+		"name": "SF Func Collection",
+		"description": "Postman collection for testing CRUD operations on Salesforce core objects (Account, Lead, Opportunity, Contact) using OAuth 2.0 - QA Environment (arx--qa.sandbox)",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Generate OAuth Token",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/x-www-form-urlencoded"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "grant_type",
+									"value": "password",
+									"type": "text"
+								},
+								{
+									"key": "client_id",
+									"value": "{{client_id}}",
+									"type": "text"
+								},
+								{
+									"key": "client_secret",
+									"value": "{{client_secret}}",
+									"type": "text"
+								},
+								{
+									"key": "username",
+									"value": "{{username}}",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "{{password}}",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{auth_base_url}}/services/oauth2/token",
+							"host": [
+								"{{auth_base_url}}"
+							],
+							"path": [
+								"services",
+								"oauth2",
+								"token"
+							]
+						}
+					},
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Debug: Log what we're sending (without exposing full password)",
+									"const username = pm.collectionVariables.get(\"username\");",
+									"const password = pm.collectionVariables.get(\"password\");",
+									"const clientId = pm.collectionVariables.get(\"client_id\");",
+									"const clientSecret = pm.collectionVariables.get(\"client_secret\");",
+									"const authBaseUrl = pm.collectionVariables.get(\"auth_base_url\");",
+									"",
+									"console.log(\"🔍 Pre-Request Debug Info:\");",
+									"console.log(\"Auth Base URL: \" + authBaseUrl);",
+									"console.log(\"Username: \" + username);",
+									"console.log(\"Password length: \" + (password ? password.length : 0) + \" characters\");",
+									"console.log(\"Password starts with: \" + (password ? password.substring(0, 3) + \"...\" : \"EMPTY\"));",
+									"console.log(\"Password ends with: \" + (password && password.length > 3 ? \"...\" + password.substring(password.length - 3) : \"N/A\"));",
+									"console.log(\"Client ID: \" + (clientId ? clientId.substring(0, 10) + \"...\" : \"EMPTY\"));",
+									"console.log(\"Client Secret length: \" + (clientSecret ? clientSecret.length + \" characters\" : \"EMPTY\"));",
+									"console.log(\"Client Secret starts with: \" + (clientSecret ? clientSecret.substring(0, 3) + \"...\" : \"EMPTY\"));",
+									"",
+									"if (!username || !password || !clientId || !clientSecret) {",
+									"    console.error(\"❌ ERROR: Missing required variables!\");",
+									"    if (!username) console.error(\"  - username is empty\");",
+									"    if (!password) console.error(\"  - password is empty\");",
+									"    if (!clientId) console.error(\"  - client_id is empty\");",
+									"    if (!clientSecret) console.error(\"  - client_secret is empty\");",
+									"}",
+									"",
+									"// Check for common issues",
+									"if (password) {",
+									"    if (password.includes(\" \")) {",
+									"        console.error(\"⚠️  WARNING: Password contains spaces! Should be [password][token] with NO space.\");",
+									"    }",
+									"    if (password.length < 8) {",
+									"        console.warn(\"⚠️  WARNING: Password seems too short (\" + password.length + \" chars). Make sure token is appended.\");",
+									"    }",
+									"    ",
+									"    // Check for special characters that might cause issues",
+									"    const specialChars = /[!@#$%^&*()+=\\[\\]{};':\"\\\\|,.<>\\/?]/g;",
+									"    const specialCharMatches = password.match(specialChars);",
+									"    if (specialCharMatches && specialCharMatches.length > 0) {",
+									"        console.log(\"ℹ️  Password contains special characters: \" + [...new Set(specialCharMatches)].join(\", \"));",
+									"        console.log(\"ℹ️  Postman will URL-encode these automatically in form-urlencoded mode.\");",
+									"    }",
+									"    ",
+									"    // Show character breakdown (helpful for debugging)",
+									"    console.log(\"ℹ️  Password character count: \" + password.length);",
+									"    console.log(\"ℹ️  Password first 5 chars: \" + password.substring(0, 5) + \"...\");",
+									"    console.log(\"ℹ️  Password last 5 chars: \" + \"...\" + password.substring(password.length - 5));",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"",
+									"if (jsonData.error) {",
+									"    console.error(\"❌ OAuth Error: \" + jsonData.error);",
+									"    console.error(\"Error Description: \" + jsonData.error_description);",
+									"    ",
+									"    if (jsonData.error_description === \"authentication failure\") {",
+									"        console.error(\"\");",
+									"        console.error(\"🔧 Detailed Troubleshooting for 'authentication failure':\");",
+									"        console.error(\"\");",
+									"        console.error(\"1. TEST BROWSER LOGIN FIRST:\");",
+									"        console.error(\"   - Go to: https://arx--qa.sandbox.my.salesforce.com/\");",
+									"        console.error(\"   - Username: \" + pm.collectionVariables.get(\"username\"));",
+									"        console.error(\"   - Password: [YourPassword][YourToken] (same format as Postman)\");",
+									"        console.error(\"   - If browser login FAILS, fix password/token first\");",
+									"        console.error(\"\");",
+									"        console.error(\"2. VERIFY PASSWORD FORMAT (SPECIAL CHARACTERS):\");",
+									"        console.error(\"   - Format: [password][token] with NO space\");",
+									"        console.error(\"   - Example: If password='Rav@123' and token='T890', use 'Rav@123T890'\");",
+									"        console.error(\"   - Current password length: \" + (pm.collectionVariables.get(\"password\") ? pm.collectionVariables.get(\"password\").length : 0) + \" chars\");",
+									"        console.error(\"   - If password has special chars (@, #, $, etc.), they're auto-encoded by Postman\");",
+									"        console.error(\"   - Verify password from .env.qa file matches exactly\");",
+									"        console.error(\"   - Verify token from email is copied exactly (case-sensitive)\");",
+									"        console.error(\"\");",
+									"        console.error(\"3. RESET SECURITY TOKEN:\");",
+									"        console.error(\"   - Login to Salesforce → Profile → Settings\");",
+									"        console.error(\"   - My Personal Information → Reset My Security Token\");",
+									"        console.error(\"   - Check email for NEW token\");",
+									"        console.error(\"   - Update Postman password variable with NEW token\");",
+									"        console.error(\"\");",
+									"        console.error(\"4. VERIFY CONSUMER SECRET:\");",
+									"        console.error(\"   - External Client App → Settings tab\");",
+									"        console.error(\"   - Click 'Click to reveal' for Consumer Secret\");",
+									"        console.error(\"   - Copy EXACTLY (no extra spaces)\");",
+									"        console.error(\"   - Update Postman client_secret variable\");",
+									"        console.error(\"\");",
+									"        console.error(\"5. CHECK USER AUTHORIZATION:\");",
+									"        console.error(\"   - User profile must match External Client App profile\");",
+									"        console.error(\"   - Your profile: Accelerant - System Administrator\");",
+									"        console.error(\"   - App profile: Accelerant - System Administrator ✓\");",
+									"    }",
+									"}",
+									"",
+									"pm.test(\"Salesforce token OK\", function () {",
+									"    pm.response.to.have.status(200);",
+									"    pm.expect(jsonData).to.have.property(\"access_token\");",
+									"    ",
+									"    if (jsonData.access_token) {",
+									"        pm.collectionVariables.set(\"access_token\", jsonData.access_token);",
+									"        console.log(\"✅ Access token stored: \" + jsonData.access_token.substring(0, 20) + \"...\");",
+									"    }",
+									"    ",
+									"    if (jsonData.instance_url) {",
+									"        pm.collectionVariables.set(\"instance_url\", jsonData.instance_url);",
+									"        console.log(\"✅ Instance URL stored: \" + jsonData.instance_url);",
+									"    }",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "SObject Operations",
+			"item": [
+				{
+					"name": "List Records for SObject",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{instance_url}}/services/data/{{api_version}}/query?q=SELECT+Id,Name+FROM+{{sobjectName}}+LIMIT+{{defaultLimit}}",
+							"host": [
+								"{{instance_url}}"
+							],
+							"path": [
+								"services",
+								"data",
+								"{{api_version}}",
+								"query"
+							],
+							"query": [
+								{
+									"key": "q",
+									"value": "SELECT Id,Name FROM {{sobjectName}} LIMIT {{defaultLimit}}"
+								}
+							]
+						}
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				},
+				{
+					"name": "Describe SObject (Object Manager Details)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{instance_url}}/services/data/{{api_version}}/sobjects/{{sobjectName}}/describe",
+							"host": [
+								"{{instance_url}}"
+							],
+							"path": [
+								"services",
+								"data",
+								"{{api_version}}",
+								"sobjects",
+								"{{sobjectName}}",
+								"describe"
+							]
+						}
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				},
+				{
+					"name": "Get Record by Id",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{instance_url}}/services/data/{{api_version}}/sobjects/{{sobjectName}}/{{recordId}}",
+							"host": [
+								"{{instance_url}}"
+							],
+							"path": [
+								"services",
+								"data",
+								"{{api_version}}",
+								"sobjects",
+								"{{sobjectName}}",
+								"{{recordId}}"
+							]
+						}
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				},
+				{
+					"name": "Update Record by Id",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"Name\": \"Updated Name Example\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{instance_url}}/services/data/{{api_version}}/sobjects/{{sobjectName}}/{{recordId}}",
+							"host": [
+								"{{instance_url}}"
+							],
+							"path": [
+								"services",
+								"data",
+								"{{api_version}}",
+								"sobjects",
+								"{{sobjectName}}",
+								"{{recordId}}"
+							]
+						}
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 204\", function () {",
+									"    pm.response.to.have.status(204);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				},
+				{
+					"name": "Delete Record by Id",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{instance_url}}/services/data/{{api_version}}/sobjects/{{sobjectName}}/{{recordId}}",
+							"host": [
+								"{{instance_url}}"
+							],
+							"path": [
+								"services",
+								"data",
+								"{{api_version}}",
+								"sobjects",
+								"{{sobjectName}}",
+								"{{recordId}}"
+							]
+						}
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 204\", function () {",
+									"    pm.response.to.have.status(204);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "auth_base_url",
+			"value": "https://arx--qa.sandbox.my.salesforce.com",
+			"type": "string",
+			"description": "Salesforce OAuth base URL - Using arx--qa sandbox base URL from qa.json"
+		},
+		{
+			"key": "client_id",
+			"value": "",
+			"type": "string",
+			"description": "Salesforce Connected App Consumer Key - Get from your .env.qa file (SF_JWT_CLIENT_ID or create a Connected App for OAuth username-password flow)"
+		},
+		{
+			"key": "client_secret",
+			"value": "",
+			"type": "string",
+			"description": "Salesforce Connected App Consumer Secret - Get from your .env.qa file or Connected App settings"
+		},
+		{
+			"key": "username",
+			"value": "",
+			"type": "string",
+			"description": "Salesforce username (full email) - Get from your .env.qa file (SF_USERNAME or SF_JWT_USERNAME)"
+		},
+		{
+			"key": "password",
+			"value": "",
+			"type": "string",
+			"description": "Salesforce password + security token concatenated (no space) - Format: [password][token]. Get SF_PASSWORD and SF_SECURITY_TOKEN from .env.qa and concatenate them"
+		},
+		{
+			"key": "api_version",
+			"value": "v60.0",
+			"type": "string",
+			"description": "Salesforce REST API version - Set to v60.0 based on qa.json configuration"
+		},
+		{
+			"key": "instance_url",
+			"value": "",
+			"type": "string",
+			"description": "Will be set automatically from OAuth response - Should be https://arx--qa.sandbox.my.salesforce.com"
+		},
+		{
+			"key": "access_token",
+			"value": "",
+			"type": "string",
+			"description": "Will be set automatically from OAuth response"
+		},
+		{
+			"key": "sobjectName",
+			"value": "Account",
+			"type": "string",
+			"description": "Salesforce object name (Account, Lead, Opportunity, Contact, etc.)"
+		},
+		{
+			"key": "recordId",
+			"value": "",
+			"type": "string",
+			"description": "Salesforce record Id for GET/UPDATE/DELETE operations"
+		},
+		{
+			"key": "defaultLimit",
+			"value": "10",
+			"type": "string",
+			"description": "Default number of records to retrieve in list query"
+		}
+	]
+}

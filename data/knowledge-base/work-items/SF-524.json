@@ -1,0 +1,42 @@
+{
+  "key": "SF-524",
+  "summary": "Configure Admission Status Field on Account",
+  "type": "Story",
+  "status": "In QA",
+  "priority": "Medium",
+  "description": {
+    "raw": "As a Data Governance owner I want the  Admission Status  field on the Account to be visible and mandatory only for Insurer account types So that the correct admission status is always captured for Insurers and defaulted appropriately for other account types to support integration requirements. Scenario 1: Admission Status field visible and mandatory for Insurers   Given an Account with an Account Type = \"Insurer\"   When the user views or edits the record   Then the field \"Admission_Status__c\" must be visible   And it must be mandatory before the record can be saved   And the picklist must contain only the values:     | Admitted |     | Non-Admitted |     | Not Applicable | Scenario 2: Admission Status hidden for all non-Insurer account types   Given an Account where Account Type ≠ \"Insurer\"   When the user views or edits the record   Then the field \"Admission_Status__c\" must not be visible on the page layout Scenario 3: Default value for non-Insurer account types   Given an Account where Account Type ≠ \"Insurer\"   When the record is created   Then \"Admission_Status__c\" must default to \"Not Applicable\"   And the value must be stored for integration purposes even though the field is hidden Scenario 4: Validation for Insurer accounts   Given an Account where Account Type = \"Insurer\"   When the user attempts to save the record without selecting a value in Admission_Status__c   Then the save must be blocked   And an error message must display: \"Admission Status is required for Insurer accounts.\"",
+    "parsed": {
+      "sentences": [
+        "As a Data Governance owner I want the  Admission Status  field on the Account to be visible and mandatory only for Insurer account types So that the correct admission status is always captured for Insurers and defaulted appropriately for other account types to support integration requirements",
+        "Scenario 1: Admission Status field visible and mandatory for Insurers   Given an Account with an Account Type = \"Insurer\"   When the user views or edits the record   Then the field \"Admission_Status__c\" must be visible   And it must be mandatory before the record can be saved   And the picklist must contain only the values:     | Admitted |     | Non-Admitted |     | Not Applicable | Scenario 2: Admission Status hidden for all non-Insurer account types   Given an Account where Account Type ≠ \"Insurer\"   When the user views or edits the record   Then the field \"Admission_Status__c\" must not be visible on the page layout Scenario 3: Default value for non-Insurer account types   Given an Account where Account Type ≠ \"Insurer\"   When the record is created   Then \"Admission_Status__c\" must default to \"Not Applicable\"   And the value must be stored for integration purposes even though the field is hidden Scenario 4: Validation for Insurer accounts   Given an Account where Account Type = \"Insurer\"   When the user attempts to save the record without selecting a value in Admission_Status__c   Then the save must be blocked   And an error message must display: \"Admission Status is required for Insurer accounts.\""
+      ],
+      "entities": [
+        "Account"
+      ],
+      "fields": [
+        "Admission_Status__c"
+      ],
+      "actions": [
+        "display",
+        "create"
+      ]
+    }
+  },
+  "acceptanceCriteria": [],
+  "comments": [],
+  "relatedIssues": [],
+  "fieldDefinitions": {
+    "Admission_Status__c": {
+      "type": "Picklist",
+      "required": false,
+      "description": "Field: Admission_Status__c"
+    }
+  },
+  "generatedFeatures": {
+    "ui": "src/features/ui/SF/SF-524.feature",
+    "api": "src/features/api/SF/SF-524.feature"
+  },
+  "qaReviewedFeatures": {},
+  "extractedAt": "2025-12-17T18:40:40.679Z"
+}

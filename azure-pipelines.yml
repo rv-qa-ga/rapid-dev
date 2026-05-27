@@ -1,0 +1,90 @@
+# Azure DevOps Pipeline for E2E Automation Framework
+# Requires: Variable Group named "E2E-Automation-Secrets" with all required secrets
+
+trigger:
+  branches:
+    include:
+      - main
+      - develop
+  paths:
+    exclude:
+      - README.md
+      - docs/*
+
+pr:
+  branches:
+    include:
+      - main
+
+schedules:
+  - cron: "0 2 * * *"  # Nightly at 2 AM UTC
+    displayName: Nightly Regression Tests
+    branches:
+      include:
+        - main
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  - group: 'E2E-Automation-Secrets'  # Variable group with all secrets
+  - name: nodeVersion
+    value: '20.x'
+  - name: testEnvironment
+    value: 'qa'
+
+stages:
+  - stage: Test
+    displayName: 'Run E2E Tests'
+    jobs:
+      - job: RunTests
+        displayName: 'Execute Test Suite'
+        timeoutInMinutes: 90
+        steps:
+          - task: NodeTool@0
+            displayName: 'Setup Node.js'
+            inputs:
+              versionSpec: '$(nodeVersion)'
+          
+          - task: Npm@1
+            displayName: 'Install dependencies'
+            inputs:
+              command: 'ci'
+          
+          - script: |
+              npx playwright install --with-deps chromium
+            displayName: 'Install Playwright browsers'
+          
+          - script: |
+              npm run test:all
+            displayName: 'Run E2E tests'
+            env:
+              ENV: $(testEnvironment)
+              HEADLESS: 'true'
+              CI: 'true'
+              TAKE_SCREENSHOTS: 'true'
+              CAPTURE_EVIDENCE: 'true'
+          
+          - script: |
+              npm run zephyr:UploadResult
+            displayName: 'Upload results to Zephyr'
+            condition: always()
+            env:
+              ENV: $(testEnvironment)
+          
+          - task: PublishTestResults@2
+            displayName: 'Publish test results'
+            condition: always()
+            inputs:
+              testResultsFormat: 'JUnit'
+              testResultsFiles: 'reports/json/**/*.json'
+              failTaskOnFailedTests: false
+          
+          - task: PublishBuildArtifacts@1
+            displayName: 'Publish test artifacts'
+            condition: always()
+            inputs:
+              pathToPublish: '$(System.DefaultWorkingDirectory)/reports'
+              artifactName: 'test-reports-$(Build.BuildNumber)'
+              publishLocation: 'Container'
+

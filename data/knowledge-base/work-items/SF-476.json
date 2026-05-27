@@ -1,0 +1,49 @@
+{
+  "key": "SF-476",
+  "summary": "Hide Annual_GWP_Estimate_Year_1__c from Account records for non-admin users",
+  "type": "Story",
+  "status": "In QA",
+  "priority": "Medium",
+  "description": {
+    "raw": "As a  Salesforce System Administrator / Product Owner I want  the As a Salesforce System Administrator / Product Owner I want the Annual_GWP_Estimate_Year_1__c field on the Account object hidden from non-admin users So that standard users don’t see or interact with irrelevant GWP estimate information and we avoid confusion or incorrect use. Description / Scope Hide the custom field Annual_GWP_Estimate_Year_1__c from Account record pages and UI surfaces for all non-admin users while keeping it visible to System Administrators (and any other support roles that require it). This was part of   ‘s review and alignment of Hipten’s work  Consolidation and Review of Artefacts - Salesforce CLM - Confluence Acceptance Criteria  Account detail page GIVEN a non-admin user WHEN they open any Account record  THEN Annual_GWP_Estimate_Year_1__c is not visible anywhere on the page (detail, related lists, quick actions, inline edit) and cannot be added via page personalization. Lightning Record Page / Dynamic Forms GIVEN the Account Lightning record page uses Dynamic Forms or custom components WHEN a non-admin user views the page THEN the field is not rendered on the Lightning record page. Search & Compact Layouts GIVEN a non-admin user performs a global search or views an Account in a list/compact view WHEN results or compact fields are shown THEN Annual_GWP_Estimate_Year_1__c is not displayed or searchable for that user. Reports & Dashboards GIVEN a non-admin user opens the Report Builder or views a report WHEN they try to add or view Annual_GWP_Estimate_Year_1__c THEN the field is not available in the field picker and does not appear in report results for that user.  API / Integration access GIVEN a non-admin user or integration running under a non-admin profile WHEN it queries the Account object via the API THEN the field is not returned or accessible (i.e., FLS applies).",
+    "parsed": {
+      "sentences": [
+        "As a  Salesforce System Administrator / Product Owner I want  the As a Salesforce System Administrator / Product Owner I want the Annual_GWP_Estimate_Year_1__c field on the Account object hidden from non-admin users So that standard users don’t see or interact with irrelevant GWP estimate information and we avoid confusion or incorrect use",
+        "Description / Scope Hide the custom field Annual_GWP_Estimate_Year_1__c from Account record pages and UI surfaces for all non-admin users while keeping it visible to System Administrators (and any other support roles that require it)",
+        "This was part of   ‘s review and alignment of Hipten’s work  Consolidation and Review of Artefacts - Salesforce CLM - Confluence Acceptance Criteria  Account detail page GIVEN a non-admin user WHEN they open any Account record  THEN Annual_GWP_Estimate_Year_1__c is not visible anywhere on the page (detail, related lists, quick actions, inline edit) and cannot be added via page personalization",
+        "Lightning Record Page / Dynamic Forms GIVEN the Account Lightning record page uses Dynamic Forms or custom components WHEN a non-admin user views the page THEN the field is not rendered on the Lightning record page",
+        "Search & Compact Layouts GIVEN a non-admin user performs a global search or views an Account in a list/compact view WHEN results or compact fields are shown THEN Annual_GWP_Estimate_Year_1__c is not displayed or searchable for that user",
+        "Reports & Dashboards GIVEN a non-admin user opens the Report Builder or views a report WHEN they try to add or view Annual_GWP_Estimate_Year_1__c THEN the field is not available in the field picker and does not appear in report results for that user",
+        "API / Integration access GIVEN a non-admin user or integration running under a non-admin profile WHEN it queries the Account object via the API THEN the field is not returned or accessible (i.e., FLS applies)."
+      ],
+      "entities": [
+        "Account",
+        "Product"
+      ],
+      "fields": [
+        "Annual_GWP_Estimate_Year_1__c"
+      ],
+      "actions": [
+        "display",
+        "show",
+        "hide"
+      ]
+    }
+  },
+  "acceptanceCriteria": [],
+  "comments": [],
+  "relatedIssues": [],
+  "fieldDefinitions": {
+    "Annual_GWP_Estimate_Year_1__c": {
+      "type": "Custom",
+      "required": false,
+      "description": "Field: Annual_GWP_Estimate_Year_1__c"
+    }
+  },
+  "generatedFeatures": {
+    "ui": "src/features/ui/SF/SF-476.feature",
+    "api": "src/features/api/SF/SF-476.feature"
+  },
+  "qaReviewedFeatures": {},
+  "extractedAt": "2025-12-17T18:40:35.935Z"
+}

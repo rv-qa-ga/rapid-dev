@@ -1,0 +1,39 @@
+{
+  "key": "SF-482",
+  "summary": "Hide Target Insured Industry field on Account",
+  "type": "Story",
+  "status": "Not Started",
+  "priority": "Medium",
+  "description": {
+    "raw": "User Story: As a Product Owner / Business Analyst I want the Target Insured Industry field on the Account object hidden from non-admin users So that standard users do not see or interact with this field while System Administrators and approved support roles retain visibility for troubleshooting and reporting Description / Scope: Hide the Target Insured Industry field on Account record pages and all UI surfaces for non-admin users while keeping it visible to System Administrators and any explicitly approved support profiles. This is a visibility change only — do not delete or change field data or business logic that depends on the field. Validate that hiding the field does not break automations, integrations, formulas, validation rules or reports that depend on the field for admin/system users. Acceptance Criteria (GIVEN / WHEN / THEN): Account detail page (UI) GIVEN a non-admin user WHEN they open any Account record  THEN Target Insured Industry is not visible anywhere on the page (detail region, dynamic form sections, related components, inline edit, or quick actions) and cannot be added through personalisation GIVEN a System Administrator or approved support role WHEN they open any Account record THEN Target Insured Industry remains visible Search, Compact Layout & List Views GIVEN a non-admin user performs a global search or views lists/compact views WHEN results or compact/list fields are shown THEN Target Insured Industry does not appear in search results, highlights, compact layouts or shared list views for non-admin users Reports & Dashboards GIVEN a non-admin user builds or views reports & dashboards WHEN they try to add or view Target Insured Industry THEN the field is not available in the field picker and does not appear in report results for that user; admins can still report on the field",
+    "parsed": {
+      "sentences": [
+        "User Story: As a Product Owner / Business Analyst I want the Target Insured Industry field on the Account object hidden from non-admin users So that standard users do not see or interact with this field while System Administrators and approved support roles retain visibility for troubleshooting and reporting Description / Scope: Hide the Target Insured Industry field on Account record pages and all UI surfaces for non-admin users while keeping it visible to System Administrators and any explicitly approved support profiles",
+        "This is a visibility change only — do not delete or change field data or business logic that depends on the field",
+        "Validate that hiding the field does not break automations, integrations, formulas, validation rules or reports that depend on the field for admin/system users",
+        "Acceptance Criteria (GIVEN / WHEN / THEN): Account detail page (UI) GIVEN a non-admin user WHEN they open any Account record  THEN Target Insured Industry is not visible anywhere on the page (detail region, dynamic form sections, related components, inline edit, or quick actions) and cannot be added through personalisation GIVEN a System Administrator or approved support role WHEN they open any Account record THEN Target Insured Industry remains visible Search, Compact Layout & List Views GIVEN a non-admin user performs a global search or views lists/compact views WHEN results or compact/list fields are shown THEN Target Insured Industry does not appear in search results, highlights, compact layouts or shared list views for non-admin users Reports & Dashboards GIVEN a non-admin user builds or views reports & dashboards WHEN they try to add or view Target Insured Industry THEN the field is not available in the field picker and does not appear in report results for that user; admins can still report on the field"
+      ],
+      "entities": [
+        "Account",
+        "Product"
+      ],
+      "fields": [],
+      "actions": [
+        "validate",
+        "show",
+        "hide",
+        "delete"
+      ]
+    }
+  },
+  "acceptanceCriteria": [],
+  "comments": [],
+  "relatedIssues": [],
+  "fieldDefinitions": {},
+  "generatedFeatures": {
+    "ui": "src/features/ui/SF/SF-482.feature",
+    "api": "src/features/api/SF/SF-482.feature"
+  },
+  "qaReviewedFeatures": {},
+  "extractedAt": "2025-12-17T18:40:35.058Z"
+}

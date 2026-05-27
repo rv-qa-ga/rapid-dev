@@ -1,0 +1,37 @@
+h4. 11.10.1 Jira Sync Utilities
+
+Comprehensive utilities for synchronizing work between Jira, Zephyr Scale, and the automation framework. Includes test case generation, upload, linking, and management tools.
+
+[Jira Sync Utilities|Jira Sync Utilities]
+
+*Key Utilities:*
+* *Test Case Generation* - Generate BDD feature files from Jira work items
+* *Work Item Tracking* - Find missing work items ready for QA
+* *Test Case Upload* - Upload test cases to Zephyr Scale
+* *Upload and Link* - Combined upload and linking workflow
+* *Link Test Cases* - Link existing test cases to Jira work items
+* *Duplicate Management* - Diagnose and remove duplicate test cases
+
+*Quick Start:*
+{code}
+# Generate test cases from Jira
+npm run jira:generate -- SF-570
+
+# Upload and link test cases
+npm run zephyr:UploadAndLink -- --work-item SF-570
+
+# Link existing test cases
+npm run zephyr:LinkToJira -- --work-item SF-570
+
+# Find missing work items
+npm run jira:find-missing
+{code}
+
+*Features:*
+* Comprehensive Jira integration for test case lifecycle management
+* Scalable utilities handling 1000+ test cases efficiently
+* Automated workflows for upload, linking, and duplicate management
+* Diagnostic tools for troubleshooting and maintenance
+
+For complete documentation, see: [Jira Sync Utilities|Jira Sync Utilities]
+

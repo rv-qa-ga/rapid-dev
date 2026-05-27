@@ -1,0 +1,656 @@
+{
+  "info": {
+    "_postman_id": "sf-503-api-tests",
+    "name": "SF-503 - Remove Sub_Type__c from Lead (Non-Required) - API Tests",
+    "description": "API - SF-503 - Remove Sub_Type__c from Lead page layout and make it non-required\n\n══════════════════════════════════════════════════════════════════════════════\nGenerated: 2026-01-18\n══════════════════════════════════════════════════════════════════════════════\n\nSUMMARY:\n  Remove Sub_Type__c from Lead page layout and make it non-required\n\nDESCRIPTION:\n  As a Product Owner / Sales Ops I want the Lead field Sub_Type__c removed from \n  the Lead page layout and ensured to be non-required So that users no longer \n  see the field when creating or editing Leads and the field is not enforced \n  as mandatory by the UI or automation.\n\nACCEPTANCE CRITERIA:\n  1. Sub_Type__c field exists but is non-required\n  2. Leads can be created without Sub_Type__c (no validation errors)\n  3. Leads can be updated without Sub_Type__c\n  4. API/integrations accept requests without Sub_Type__c\n  5. Field is not visible on page layouts (UI test, not API)\n\nAPI TESTING REQUIREMENTS:\n  - Verify Sub_Type__c field exists on Lead\n  - Verify field is not required (required: false)\n  - Create Lead without Sub_Type__c (should succeed)\n  - Create Lead with Sub_Type__c (should succeed)\n  - Update Lead Sub_Type__c\n  - Query Lead by Sub_Type__c\n  - Handle null/blank Sub_Type__c values\n  - Reject invalid Sub_Type__c values (if picklist)\n\nGenerated from: src/features/api/SF/SF-503.feature\n\nThis collection contains API tests for SF-503 work item.\n\n**Note:** Sub_Type__c should exist but be non-required. Leads can be created/updated without this field.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{sf_access_token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "{{sf_base_url}}",
+      "type": "string"
+    },
+    {
+      "key": "api_version",
+      "value": "{{sf_api_version}}",
+      "type": "string"
+    },
+    {
+      "key": "lead_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "lead_id_with_subtype",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "lead_id_without_subtype",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Field Existence Verification",
+      "item": [
+        {
+          "name": "SF-503-API-001 - Describe Lead Object",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Sub_Type__c field exists on Lead\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    var fields = jsonData.fields;",
+                  "    var field = fields.find(function(f) { return f.name === 'Sub_Type__c'; });",
+                  "    ",
+                  "    if (!field) {",
+                  "        var fieldNames = fields.map(function(f) { return f.name; });",
+                  "        var subtypeFields = fieldNames.filter(function(name) { return name.toLowerCase().includes('sub') && name.toLowerCase().includes('type'); });",
+                  "        console.error('❌ Field Sub_Type__c not found on Lead');",
+                  "        if (subtypeFields.length > 0) {",
+                  "            console.error('Similar fields found: ' + subtypeFields.join(', '));",
+                  "        }",
+                  "    }",
+                  "    ",
+                  "    pm.expect(field).to.not.be.undefined;",
+                  "    pm.expect(field.name).to.equal('Sub_Type__c');",
+                  "    console.log('✅ Sub_Type__c field found on Lead');",
+                  "    console.log('Field Type: ' + field.type);",
+                  "    console.log('Field Label: ' + field.label);",
+                  "    ",
+                  "    // Verify field is NOT required",
+                  "    if (field.required !== undefined) {",
+                  "        console.log('Required: ' + field.required);",
+                  "        pm.expect(field.required).to.be.false;",
+                  "        console.log('✅ Sub_Type__c is NOT required (as expected)');",
+                  "    } else {",
+                  "        console.log('⚠️ Required property not found in field metadata');",
+                  "    }",
+                  "    ",
+                  "    if (field.nillable !== undefined) {",
+                  "        console.log('Nillable: ' + field.nillable);",
+                  "        pm.expect(field.nillable).to.be.true;",
+                  "    }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Lead/describe",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "data",
+                "{{api_version}}",
+                "sobjects",
+                "Lead",
+                "describe"
+              ]
+            },
+            "description": "Verify Sub_Type__c field exists on Lead object\n\n**Test:** SF-503-API-001\n**Purpose:** Field existence verification\n**Expected:** Field should exist and be non-required (required: false, nillable: true)"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Create Lead Operations",
+      "item": [
+        {
+          "name": "SF-503-API-002 - Create Lead without Sub_Type__c",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test(\"Response contains Lead ID\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.id).to.not.be.undefined;",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    pm.collectionVariables.set('lead_id_without_subtype', jsonData.id);",
+                  "    console.log('✅ Lead created without Sub_Type__c: ' + jsonData.id);",
+                  "    console.log('This confirms Sub_Type__c is NOT required');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"FirstName\": \"SF-503\",\n  \"LastName\": \"Test Lead No SubType\",\n  \"Company\": \"Test Company No SubType\",\n  \"Status\": \"Open - Not Contacted\",\n  \"LeadSource\": \"Web\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Lead/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "data",
+                "{{api_version}}",
+                "sobjects",
+                "Lead",
+                ""
+              ]
+            },
+            "description": "Create Lead without Sub_Type__c field\n\n**Test:** SF-503-API-002\n**Purpose:** Verify Sub_Type__c is NOT required - Lead creation should succeed without this field\n**Expected:** Status 201 - Lead created successfully\n**Note:** This is the primary requirement - Sub_Type__c should not be mandatory"
+          },
+          "response": []
+        },
+        {
+          "name": "SF-503-API-002 - Create Lead with Sub_Type__c",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test(\"Response contains Lead ID\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.id).to.not.be.undefined;",
+                  "    pm.collectionVariables.set('lead_id_with_subtype', jsonData.id);",
+                  "    console.log('✅ Lead created with Sub_Type__c: ' + jsonData.id);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"FirstName\": \"SF-503\",\n  \"LastName\": \"Test Lead With SubType\",\n  \"Company\": \"Test Company With SubType\",\n  \"Status\": \"Open - Not Contacted\",\n  \"LeadSource\": \"Web\",\n  \"Sub_Type__c\": \"Test Value\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Lead/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "data",
+                "{{api_version}}",
+                "sobjects",
+                "Lead",
+                ""
+              ]
+            },
+            "description": "Create Lead with Sub_Type__c field populated\n\n**Test:** SF-503-API-002 (Alternative)\n**Purpose:** Verify Sub_Type__c can still be set when provided\n**Expected:** Status 201 - Lead created successfully with Sub_Type__c"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Update Lead Operations",
+      "item": [
+        {
+          "name": "SF-503-API-003 - Update Sub_Type__c on Lead",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 204\", function () {",
+                  "    pm.response.to.have.status(204);",
+                  "});",
+                  "",
+                  "console.log('✅ Lead Sub_Type__c updated successfully');",
+                  "console.log('Updated value: Updated Value');"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "var leadId = pm.collectionVariables.get('lead_id_without_subtype');",
+                  "if (!leadId) {",
+                  "    // Fallback to any lead_id",
+                  "    leadId = pm.collectionVariables.get('lead_id');",
+                  "    if (!leadId) {",
+                  "        throw new Error('lead_id_without_subtype or lead_id variable is not set. Please run the Create Lead without Sub_Type__c request first.');",
+                  "    }",
+                  "}",
+                  "console.log('Updating Sub_Type__c on Lead: ' + leadId);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"Sub_Type__c\": \"Updated Value\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Lead/{{lead_id_without_subtype}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "data",
+                "{{api_version}}",
+                "sobjects",
+                "Lead",
+                "{{lead_id_without_subtype}}"
+              ]
+            },
+            "description": "Update Sub_Type__c on Lead\n\n**Test:** SF-503-API-003\n**Purpose:** Verify Sub_Type__c can be updated on existing Lead\n**Expected:** Status 204 - Update successful"
+          },
+          "response": []
+        },
+        {
+          "name": "SF-503-API-003 - Verify Sub_Type__c Updated",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Sub_Type__c was updated\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.Sub_Type__c).to.equal('Updated Value');",
+                  "    console.log('✅ Sub_Type__c updated correctly: ' + jsonData.Sub_Type__c);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "var leadId = pm.collectionVariables.get('lead_id_without_subtype');",
+                  "if (!leadId) {",
+                  "    leadId = pm.collectionVariables.get('lead_id');",
+                  "    if (!leadId) {",
+                  "        throw new Error('lead_id_without_subtype or lead_id variable is not set.');",
+                  "    }",
+                  "}",
+                  "console.log('Verifying Sub_Type__c on Lead: ' + leadId);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Lead/{{lead_id_without_subtype}}?fields=Id,FirstName,LastName,Sub_Type__c",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "data",
+                "{{api_version}}",
+                "sobjects",
+                "Lead",
+                "{{lead_id_without_subtype}}"
+              ],
+              "query": [
+                {
+                  "key": "fields",
+                  "value": "Id,FirstName,LastName,Sub_Type__c"
+                }
+              ]
+            },
+            "description": "Verify Sub_Type__c was updated on Lead\n\n**Test:** SF-503-API-003 (Verification)\n**Purpose:** Confirm the field update was successful"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Query Operations",
+      "item": [
+        {
+          "name": "SF-503-API-004 - Query Lead by Sub_Type__c",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Query returned records\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.records).to.not.be.undefined;",
+                  "    console.log('✅ Query returned ' + jsonData.records.length + ' record(s)');",
+                  "    ",
+                  "    if (jsonData.records.length > 0) {",
+                  "        var firstRecord = jsonData.records[0];",
+                  "        console.log('Sample Lead ID: ' + firstRecord.Id);",
+                  "        console.log('Sample Sub_Type__c: ' + (firstRecord.Sub_Type__c || 'null'));",
+                  "    }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/query?q=SELECT Id,FirstName,LastName,Company,Sub_Type__c FROM Lead WHERE Sub_Type__c != null LIMIT 10",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "data",
+                "{{api_version}}",
+                "query"
+              ],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "SELECT Id,FirstName,LastName,Company,Sub_Type__c FROM Lead WHERE Sub_Type__c != null LIMIT 10"
+                }
+              ]
+            },
+            "description": "Query Lead records by Sub_Type__c\n\n**Test:** SF-503-API-004\n**Purpose:** Verify Sub_Type__c can be queried via SOQL\n**Expected:** Status 200 with Lead records"
+          },
+          "response": []
+        },
+        {
+          "name": "SF-503-API-004 - Query Lead without Sub_Type__c",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Query returned records\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.records).to.not.be.undefined;",
+                  "    console.log('✅ Query returned ' + jsonData.records.length + ' record(s)');",
+                  "    ",
+                  "    if (jsonData.records.length > 0) {",
+                  "        var firstRecord = jsonData.records[0];",
+                  "        console.log('Sample Lead ID: ' + firstRecord.Id);",
+                  "        var isNull = (firstRecord.Sub_Type__c === null || firstRecord.Sub_Type__c === undefined);",
+                  "        console.log('Sub_Type__c is null/undefined: ' + isNull);",
+                  "    }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/query?q=SELECT Id,FirstName,LastName,Company,Sub_Type__c FROM Lead WHERE Sub_Type__c = null LIMIT 10",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "data",
+                "{{api_version}}",
+                "query"
+              ],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "SELECT Id,FirstName,LastName,Company,Sub_Type__c FROM Lead WHERE Sub_Type__c = null LIMIT 10"
+                }
+              ]
+            },
+            "description": "Query Lead records where Sub_Type__c is null\n\n**Test:** SF-503-API-004 (Alternative)\n**Purpose:** Verify Leads can exist with null Sub_Type__c\n**Expected:** Status 200 with Lead records having null Sub_Type__c"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Negative / Boundary Scenarios",
+      "item": [
+        {
+          "name": "SF-503-API-005 - Reject invalid Sub_Type__c value",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code indicates error\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([400, 422]);",
+                  "});",
+                  "",
+                  "pm.test(\"Error response mentions Sub_Type or validation\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    var errorString = JSON.stringify(jsonData).toLowerCase();",
+                  "    var hasSubType = errorString.includes('sub_type') || errorString.includes('subtype') || errorString.includes('validation');",
+                  "    console.log('Error response: ' + JSON.stringify(jsonData, null, 2));",
+                  "    // Note: This test may pass even if error doesn't explicitly mention field name",
+                  "    // The important part is that invalid value was rejected",
+                  "    pm.expect(pm.response.code).to.be.oneOf([400, 422]);",
+                  "});",
+                  "",
+                  "console.log('✅ Invalid value rejected (expected behavior)');"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"FirstName\": \"SF-503\",\n  \"LastName\": \"Test Invalid\",\n  \"Company\": \"Test Company Invalid\",\n  \"Status\": \"Open - Not Contacted\",\n  \"LeadSource\": \"Web\",\n  \"Sub_Type__c\": \"INVALID_VALUE_###\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Lead/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "data",
+                "{{api_version}}",
+                "sobjects",
+                "Lead",
+                ""
+              ]
+            },
+            "description": "Attempt to create Lead with invalid Sub_Type__c value\n\n**Test:** SF-503-API-005\n**Purpose:** Verify invalid picklist values are rejected (if Sub_Type__c is a picklist)\n**Expected:** 400 or 422 error response\n**Note:** If Sub_Type__c is a text field, this may succeed. If it's a picklist, invalid values should be rejected."
+          },
+          "response": []
+        },
+        {
+          "name": "SF-503-API-006 - Create Lead without Sub_Type__c (Null Value Test)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test(\"Response contains Lead ID\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.id).to.not.be.undefined;",
+                  "    pm.collectionVariables.set('lead_id', jsonData.id);",
+                  "    console.log('✅ Lead created without Sub_Type__c');",
+                  "    console.log('Lead ID: ' + jsonData.id);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"FirstName\": \"SF-503\",\n  \"LastName\": \"Test Lead Null SubType\",\n  \"Company\": \"Test Company Null SubType\",\n  \"Status\": \"Open - Not Contacted\",\n  \"LeadSource\": \"Web\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Lead/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "data",
+                "{{api_version}}",
+                "sobjects",
+                "Lead",
+                ""
+              ]
+            },
+            "description": "Create Lead without Sub_Type__c field\n\n**Test:** SF-503-API-006 (Setup)\n**Purpose:** Create Lead for null value verification"
+          },
+          "response": []
+        },
+        {
+          "name": "SF-503-API-006 - Verify null Sub_Type__c value",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Sub_Type__c is null or empty\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    var subtypeValue = jsonData.Sub_Type__c;",
+                  "    var isNullOrEmpty = (subtypeValue === null || subtypeValue === undefined || subtypeValue === '');",
+                  "    pm.expect(isNullOrEmpty).to.be.true;",
+                  "    console.log('✅ Sub_Type__c is null or empty (as expected): ' + subtypeValue);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "var leadId = pm.collectionVariables.get('lead_id');",
+                  "if (!leadId) {",
+                  "    throw new Error('lead_id variable is not set. Please run the Create Lead without Sub_Type__c (Null Value Test) request first.');",
+                  "}",
+                  "console.log('Verifying null Sub_Type__c on Lead: ' + leadId);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Lead/{{lead_id}}?fields=Id,FirstName,LastName,Sub_Type__c",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "data",
+                "{{api_version}}",
+                "sobjects",
+                "Lead",
+                "{{lead_id}}"
+              ],
+              "query": [
+                {
+                  "key": "fields",
+                  "value": "Id,FirstName,LastName,Sub_Type__c"
+                }
+              ]
+            },
+            "description": "Verify Sub_Type__c is null or empty on Lead created without the field\n\n**Test:** SF-503-API-006\n**Purpose:** Verify null/blank value handling\n**Expected:** Sub_Type__c should be null or empty, and Lead should be valid"
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

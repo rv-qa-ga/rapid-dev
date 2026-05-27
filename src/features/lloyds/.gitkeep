@@ -1,0 +1,3 @@
+# Placeholder for Lloyd's feature files
+# Add .feature files here and tag with @lloyds (and optionally @lloyds-wbx, @lloyds-xml, @lloyds-ods).
+# See docs/lloyds/LLOYDS_TEST_STRATEGY.md and src/features/lloyds/README.md.

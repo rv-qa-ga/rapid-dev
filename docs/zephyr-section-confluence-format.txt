@@ -1,0 +1,206 @@
+<h2>Zephyr Scale Integration</h2>
+
+<p>Sync test cases and upload execution results to Zephyr Scale for test management and traceability.</p>
+
+<h3>Test Case Upload</h3>
+
+<p>Upload test cases from feature files to Zephyr Scale:</p>
+
+<ac:structured-macro ac:name="code" ac:schema-version="1">
+  <ac:parameter ac:name="language">bash</ac:parameter>
+  <ac:plain-text-body><![CDATA[# Upload all test cases for a work item
+npm run zephyr:UploadTestCase -- --work-item SF-520
+
+# Upload a specific test case
+npm run zephyr:UploadTestCase -- --test-case SF-520-UI-001
+
+# Upload multiple work items (from file)
+npm run zephyr:UploadTestCase -- --file inputs/jira-work-items.txt]]></ac:plain-text-body>
+</ac:structured-macro>
+
+<h3>Test Case Linking to Jira</h3>
+
+<p>Link Zephyr test cases to Jira work items for traceability:</p>
+
+<ac:structured-macro ac:name="code" ac:schema-version="1">
+  <ac:parameter ac:name="language">bash</ac:parameter>
+  <ac:plain-text-body><![CDATA[# Link all test cases for a work item
+npm run zephyr:LinkToJira -- --work-item SF-520
+
+# Link a specific test case
+npm run zephyr:LinkToJira -- --work-item SF-520 --test-case SF-520-UI-001
+
+# Link using Zephyr key
+npm run zephyr:LinkToJira -- --work-item SF-520 --test-case SF-T199
+
+# Dry run (preview without making changes)
+npm run zephyr:LinkToJira -- --work-item SF-520 --dry-run]]></ac:plain-text-body>
+</ac:structured-macro>
+
+<h3>Combined Upload and Link (Recommended)</h3>
+
+<p>The <strong>Upload and Link</strong> utility streamlines the workflow by uploading test cases and linking them to Jira in one operation:</p>
+
+<h4>Single Work Item</h4>
+
+<ac:structured-macro ac:name="code" ac:schema-version="1">
+  <ac:parameter ac:name="language">bash</ac:parameter>
+  <ac:plain-text-body><![CDATA[# Upload and link all test cases for one work item
+npm run zephyr:UploadAndLink -- --work-item SF-520
+
+# Upload and link a specific test case
+npm run zephyr:UploadAndLink -- --test-case SF-520-UI-001
+
+# Upload only (skip linking)
+npm run zephyr:UploadAndLink -- --work-item SF-520 --skip-link]]></ac:plain-text-body>
+</ac:structured-macro>
+
+<h4>Multiple Work Items</h4>
+
+<ac:structured-macro ac:name="code" ac:schema-version="1">
+  <ac:parameter ac:name="language">bash</ac:parameter>
+  <ac:plain-text-body><![CDATA[# Upload and link for multiple work items
+npm run zephyr:UploadAndLink -- --work-item SF-520 --work-item SF-521 --work-item SF-522
+
+# Upload and link from file (one work item per line)
+npm run zephyr:UploadAndLink -- --file inputs/jira-work-items.txt]]></ac:plain-text-body>
+</ac:structured-macro>
+
+<p><strong>File Format</strong> (<code>inputs/jira-work-items.txt</code>):</p>
+
+<ac:structured-macro ac:name="code" ac:schema-version="1">
+  <ac:parameter ac:name="language">text</ac:parameter>
+  <ac:plain-text-body><![CDATA[SF-520
+SF-521
+SF-522
+# Comments are supported
+SF-523]]></ac:plain-text-body>
+</ac:structured-macro>
+
+<h3>Upload Execution Results</h3>
+
+<p>Upload test execution results to Zephyr test cycles:</p>
+
+<ac:structured-macro ac:name="code" ac:schema-version="1">
+  <ac:parameter ac:name="language">bash</ac:parameter>
+  <ac:plain-text-body><![CDATA[# Upload results for a work item
+npm run zephyr:UploadResult -- --work-item SF-520
+
+# Upload results for a specific test case
+npm run zephyr:UploadResult -- --test-case SF-520-UI-001 --cycle "Sprint-93-QA"
+
+# Upload results with attachments
+npm run zephyr:UploadWithAttachments -- --work-item SF-520]]></ac:plain-text-body>
+</ac:structured-macro>
+
+<h3>Features</h3>
+
+<table class="wrapped confluenceTable">
+  <colgroup><col /><col /></colgroup>
+  <thead>
+    <tr>
+      <th style="background-color:#0052cc;color:white;">Feature</th>
+      <th style="background-color:#0052cc;color:white;">Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Test Case Sync</strong></td>
+      <td>Creates/updates test cases in Zephyr Scale</td>
+    </tr>
+    <tr>
+      <td><strong>Test Script Upload</strong></td>
+      <td>Uploads Gherkin steps to Test Script tab (BDD-Gherkin format)</td>
+    </tr>
+    <tr>
+      <td><strong>Jira Linking</strong></td>
+      <td>Automatically links test cases to Jira work items via remote issue links</td>
+    </tr>
+    <tr>
+      <td><strong>Execution Results</strong></td>
+      <td>Maps Pass/Fail/Skipped to Zephyr statuses</td>
+    </tr>
+    <tr>
+      <td><strong>Test Cycle Management</strong></td>
+      <td>Creates or uses existing test cycles</td>
+    </tr>
+    <tr>
+      <td><strong>Batch Operations</strong></td>
+      <td>Support for multiple work items via command line or file input</td>
+    </tr>
+    <tr>
+      <td><strong>Dry Run Mode</strong></td>
+      <td>Preview changes without making updates</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>Workflow Examples</h3>
+
+<p><strong>Complete Workflow for Single Work Item:</strong></p>
+
+<ac:structured-macro ac:name="code" ac:schema-version="1">
+  <ac:parameter ac:name="language">bash</ac:parameter>
+  <ac:plain-text-body><![CDATA[# Step 1: Generate test cases from Jira
+npm run jira:generate -- SF-520
+
+# Step 2: Review and refine test cases (manual QA review)
+
+# Step 3: Upload to Zephyr and link to Jira (one command)
+npm run zephyr:UploadAndLink -- --work-item SF-520
+
+# Step 4: Run tests
+npm run test:all
+
+# Step 5: Upload results
+npm run zephyr:UploadResult -- --work-item SF-520]]></ac:plain-text-body>
+</ac:structured-macro>
+
+<p><strong>Batch Processing Multiple Work Items:</strong></p>
+
+<ac:structured-macro ac:name="code" ac:schema-version="1">
+  <ac:parameter ac:name="language">bash</ac:parameter>
+  <ac:plain-text-body><![CDATA[# Create a file with work items
+echo "SF-520" > inputs/jira-work-items.txt
+echo "SF-521" >> inputs/jira-work-items.txt
+echo "SF-522" >> inputs/jira-work-items.txt
+
+# Upload and link all at once
+npm run zephyr:UploadAndLink -- --file inputs/jira-work-items.txt]]></ac:plain-text-body>
+</ac:structured-macro>
+
+<h3>Output and Reporting</h3>
+
+<p>The utilities provide comprehensive reporting:</p>
+
+<ul>
+  <li><strong>Upload Summary</strong>: Shows created, updated, skipped, and failed test cases</li>
+  <li><strong>Link Summary</strong>: Shows successfully linked, already linked, and failed links</li>
+  <li><strong>Error Details</strong>: Clear error messages for troubleshooting</li>
+  <li><strong>Zephyr Keys</strong>: Displays Zephyr test case keys (e.g., SF-T199) for reference</li>
+</ul>
+
+<p><strong>Example Output:</strong></p>
+
+<ac:structured-macro ac:name="code" ac:schema-version="1">
+  <ac:parameter ac:name="language">text</ac:parameter>
+  <ac:plain-text-body><![CDATA[📊 UPLOAD AND LINK REPORT
+═══════════════════════════════════════════════════════════
+
+Work Item: SF-520
+
+📤 UPLOAD SUMMARY:
+   Total Test Cases: 5
+   ✅ Created: 3
+   🔄 Updated: 2
+   ⏭️  Skipped: 0
+   ❌ Failed: 0
+
+🔗 LINK SUMMARY:
+   ✅ Linked: 5
+   ⏭️  Already Linked (Skipped): 0
+   ❌ Failed: 0
+
+✅ ALL OPERATIONS COMPLETED SUCCESSFULLY]]></ac:plain-text-body>
+</ac:structured-macro>
+

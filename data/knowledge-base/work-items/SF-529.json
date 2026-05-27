@@ -1,0 +1,49 @@
+{
+  "key": "SF-529",
+  "summary": "Types on the Account Object",
+  "type": "Story",
+  "status": "In QA",
+  "priority": "Medium",
+  "description": {
+    "raw": "As a Data Steward I want the  Type  field on the Account object to contain a standardised list of approved picklist values So that Account records are classified consistently across all systems and integrations. Scenario 1: Account Type field contains approved picklist values   Given the Account object has a field named \"Type\"   When users view or edit the field   Then the picklist must contain only the following values:     | Acquisition Company     |     | Agency                  |     | Agency Branch           |     | Distribution Partner    |     | Group                   |     | Insurer                 |     | Insurer Branch          |     | Legal Entity            |     | Member                  |     | Non - Member MGA          |     | Placing Broker          |     | Reinsurance Broker      |     | Reinsurer               |     | Reinsurer Branch        |     | Service Company         |     | Third Party Administrator | Scenario 2: Restrict values to approved list   Given the Type field contains a defined list of picklist values   When a user attempts to select or import a value not in the approved list   Then the system must prevent the save   And display an error message indicating the value is not valid Scenario 3: Account Type cannot be changed after initial save   Given an Account record has a value populated in the Type field   When a user attempts to change or update the Type value   Then the system must prevent the change   And display an error message: \"Account Type cannot be changed once set.\" Scenario 4: New Account creation allows initial Type selection   Given a user is creating a new Account record   When selecting a Type value for the first time   Then the user must be able to choose one of the approved values   And once the record is saved, the Type field becomes read-only Scenario 5: Consistency across automation and integrations   Given the Type field is locked after initial save   When updates occur through automation or integration   Then the Account Type value must not be modified by any process   And any attempted change must be rejected or ignored Scenario 6: Consistency across automation and integrations   Given the Type field is locked after initial save   When updates occur through automation or integration   Then the Account Type value must not be modified by any process   And any attempted change must be rejected or ignored",
+    "parsed": {
+      "sentences": [
+        "As a Data Steward I want the  Type  field on the Account object to contain a standardised list of approved picklist values So that Account records are classified consistently across all systems and integrations",
+        "Scenario 1: Account Type field contains approved picklist values   Given the Account object has a field named \"Type\"   When users view or edit the field   Then the picklist must contain only the following values:     | Acquisition Company     |     | Agency                  |     | Agency Branch           |     | Distribution Partner    |     | Group                   |     | Insurer                 |     | Insurer Branch          |     | Legal Entity            |     | Member                  |     | Non - Member MGA          |     | Placing Broker          |     | Reinsurance Broker      |     | Reinsurer               |     | Reinsurer Branch        |     | Service Company         |     | Third Party Administrator | Scenario 2: Restrict values to approved list   Given the Type field contains a defined list of picklist values   When a user attempts to select or import a value not in the approved list   Then the system must prevent the save   And display an error message indicating the value is not valid Scenario 3: Account Type cannot be changed after initial save   Given an Account record has a value populated in the Type field   When a user attempts to change or update the Type value   Then the system must prevent the change   And display an error message: \"Account Type cannot be changed once set.\" Scenario 4: New Account creation allows initial Type selection   Given a user is creating a new Account record   When selecting a Type value for the first time   Then the user must be able to choose one of the approved values   And once the record is saved, the Type field becomes read-only Scenario 5: Consistency across automation and integrations   Given the Type field is locked after initial save   When updates occur through automation or integration   Then the Account Type value must not be modified by any process   And any attempted change must be rejected or ignored Scenario 6: Consistency across automation and integrations   Given the Type field is locked after initial save   When updates occur through automation or integration   Then the Account Type value must not be modified by any process   And any attempted change must be rejected or ignored"
+      ],
+      "entities": [
+        "Account"
+      ],
+      "fields": [
+        "Then",
+        "When"
+      ],
+      "actions": [
+        "display",
+        "update",
+        "populate"
+      ]
+    }
+  },
+  "acceptanceCriteria": [],
+  "comments": [],
+  "relatedIssues": [],
+  "fieldDefinitions": {
+    "Then": {
+      "type": "Text",
+      "required": false,
+      "description": "Field: Then"
+    },
+    "When": {
+      "type": "Text",
+      "required": false,
+      "description": "Field: When"
+    }
+  },
+  "generatedFeatures": {
+    "ui": "src/features/ui/SF/SF-529.feature",
+    "api": "src/features/api/SF/SF-529.feature"
+  },
+  "qaReviewedFeatures": {},
+  "extractedAt": "2025-12-17T18:40:27.314Z"
+}

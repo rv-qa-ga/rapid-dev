@@ -1,0 +1,2525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Automation Framework | Mission Control</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Orbitron:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #00d4ff;
+            --primary-glow: rgba(0, 212, 255, 0.4);
+            --secondary: #ff6b35;
+            --accent: #a855f7;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg-dark: #1a1f2e;
+            --bg-card: rgba(30, 40, 60, 0.85);
+            --bg-card-hover: rgba(40, 55, 80, 0.9);
+            --border: rgba(0, 212, 255, 0.3);
+            --border-bright: rgba(0, 212, 255, 0.6);
+            --text: #e4e4e7;
+            --text-dim: #9ca3af;
+            --text-bright: #ffffff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Exo 2', sans-serif;
+            background: var(--bg-dark);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Animated Grid Background */
+        .grid-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #1a1f2e 0%, #2d3748 50%, #1a1f2e 100%);
+            background-image: 
+                linear-gradient(rgba(0, 212, 255, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 212, 255, 0.05) 1px, transparent 1px);
+            background-size: 50px 50px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .grid-bg::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(ellipse at 50% 0%, rgba(0, 212, 255, 0.15) 0%, transparent 60%);
+        }
+
+        /* Scanline Effect */
+        .scanlines {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 2px,
+                rgba(0, 0, 0, 0.05) 2px,
+                rgba(0, 0, 0, 0.05) 4px
+            );
+            pointer-events: none;
+            z-index: 1000;
+            opacity: 0.2;
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 1rem 2rem;
+            background: linear-gradient(180deg, rgba(26, 31, 46, 0.95) 0%, transparent 100%);
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            border: 2px solid var(--primary);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            animation: pulse-glow 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 10px var(--primary-glow); }
+            50% { box-shadow: 0 0 25px var(--primary-glow), 0 0 50px rgba(0, 212, 255, 0.2); }
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-dim);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary);
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-badge {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            margin-bottom: 1.5rem;
+            padding: 0.5rem 1.5rem;
+            border: 1px solid var(--border);
+            border-radius: 100px;
+            background: rgba(0, 212, 255, 0.05);
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .hero h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(2.5rem, 8vw, 5rem);
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, var(--text-bright) 0%, var(--primary) 50%, var(--accent) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-subtitle {
+            font-size: 1.25rem;
+            color: var(--text-dim);
+            max-width: 600px;
+            margin-bottom: 3rem;
+            line-height: 1.7;
+        }
+
+        .hero-stats {
+            display: flex;
+            gap: 3rem;
+            margin-bottom: 3rem;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .cta-group {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn {
+            font-family: 'Exo 2', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 600;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, #0099cc 100%);
+            color: var(--bg-dark);
+            box-shadow: 0 0 30px var(--primary-glow);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 50px var(--primary-glow), 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: rgba(0, 212, 255, 0.05);
+        }
+
+        /* Section Styles */
+        section {
+            padding: 6rem 2rem;
+            position: relative;
+            z-index: 1;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+
+        section.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        section.fade-out {
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: opacity 0.4s ease-in, transform 0.4s ease-in;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .section-badge {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.65rem;
+            font-weight: 600;
+            color: var(--secondary);
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .section-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(1.75rem, 4vw, 2.5rem);
+            font-weight: 700;
+            color: var(--text-bright);
+            margin-bottom: 1rem;
+        }
+
+        .section-desc {
+            color: var(--text-dim);
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.7;
+        }
+
+        /* Architecture Diagram */
+        .architecture {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .arch-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .arch-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .arch-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, var(--primary), transparent);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .arch-card:hover {
+            background: var(--bg-card-hover);
+            border-color: var(--border-bright);
+            transform: translateY(-5px);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4), 0 0 30px var(--primary-glow);
+        }
+
+        .arch-card:hover::before {
+            opacity: 1;
+        }
+
+        .arch-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .arch-card.core .arch-icon { background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); }
+        .arch-card.integration .arch-icon { background: linear-gradient(135deg, #10b981 0%, #059669 100%); }
+        .arch-card.source .arch-icon { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); }
+        .arch-card.data .arch-icon { background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); }
+        .arch-card.storage .arch-icon { background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); }
+        .arch-card.foundation .arch-icon { background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); }
+        
+        .arch-card.foundation {
+            border: 2px solid var(--primary);
+            box-shadow: 0 0 30px var(--primary-glow);
+            position: relative;
+        }
+        
+        .arch-card.foundation::after {
+            content: 'Data Warehouse Layer';
+            position: absolute;
+            bottom: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.7rem;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: 600;
+        }
+
+        /* Downstream Systems */
+        .downstream-systems {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .downstream-card {
+            background: var(--bg-card);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            border-radius: 12px;
+            padding: 1.25rem;
+            min-width: 180px;
+            max-width: 220px;
+            transition: all 0.3s ease;
+            position: relative;
+            opacity: 0.8;
+        }
+
+        .downstream-card:hover {
+            background: var(--bg-card-hover);
+            border-color: rgba(245, 158, 11, 0.5);
+            transform: translateY(-3px);
+            opacity: 1;
+        }
+
+        .downstream-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            margin-bottom: 0.75rem;
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.2) 0%, rgba(217, 119, 6, 0.2) 100%);
+        }
+
+        .downstream-card h4 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-bright);
+            margin-bottom: 0.5rem;
+        }
+
+        .downstream-card p {
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            line-height: 1.5;
+            margin-bottom: 0.75rem;
+        }
+
+        .downstream-badge {
+            font-size: 0.65rem;
+            padding: 0.25rem 0.6rem;
+            border-radius: 100px;
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: inline-block;
+        }
+
+        .arch-card h3 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-bright);
+            margin-bottom: 0.5rem;
+        }
+
+        .arch-card p {
+            font-size: 0.85rem;
+            color: var(--text-dim);
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .arch-tag {
+            font-size: 0.7rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 100px;
+            background: rgba(0, 212, 255, 0.1);
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Workflow Section */
+        .workflow {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .workflow-timeline {
+            position: relative;
+            padding-left: 3rem;
+        }
+
+        .workflow-timeline::before {
+            content: '';
+            position: absolute;
+            left: 15px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(180deg, var(--primary), var(--accent), var(--secondary));
+        }
+
+        .workflow-step {
+            position: relative;
+            margin-bottom: 2.5rem;
+            padding: 2rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            transition: all 0.4s ease;
+            animation: slideIn 0.6s ease forwards;
+            opacity: 0;
+            transform: translateX(-20px);
+        }
+
+        .workflow-step:nth-child(1) { animation-delay: 0.1s; }
+        .workflow-step:nth-child(2) { animation-delay: 0.2s; }
+        .workflow-step:nth-child(3) { animation-delay: 0.3s; }
+        .workflow-step:nth-child(4) { animation-delay: 0.4s; }
+        .workflow-step:nth-child(5) { animation-delay: 0.5s; }
+        .workflow-step:nth-child(6) { animation-delay: 0.6s; }
+        .workflow-step:nth-child(7) { animation-delay: 0.7s; }
+        .workflow-step:nth-child(8) { animation-delay: 0.8s; }
+
+        @keyframes slideIn {
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .workflow-step:hover {
+            background: var(--bg-card-hover);
+            border-color: var(--border-bright);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .workflow-number {
+            position: absolute;
+            left: -3rem;
+            top: 2rem;
+            width: 30px;
+            height: 30px;
+            background: var(--bg-dark);
+            border: 2px solid var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--primary);
+            z-index: 1;
+        }
+
+        .workflow-step.active .workflow-number {
+            background: var(--primary);
+            color: var(--bg-dark);
+            box-shadow: 0 0 20px var(--primary-glow);
+        }
+
+        .workflow-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .workflow-icon {
+            font-size: 1.5rem;
+        }
+
+        .workflow-step h3 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-bright);
+        }
+
+        .workflow-step p {
+            color: var(--text-dim);
+            font-size: 0.9rem;
+            line-height: 1.7;
+            margin-bottom: 1rem;
+        }
+
+        .workflow-output {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            color: var(--success);
+        }
+
+        /* Terminal Section */
+        .terminal-section {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .terminal {
+            background: #1e293b;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+        }
+
+        .terminal-header {
+            background: linear-gradient(180deg, #334155 0%, #1e293b 100%);
+            padding: 1rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .terminal-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .terminal-dot.red { background: #ff5f56; }
+        .terminal-dot.yellow { background: #ffbd2e; }
+        .terminal-dot.green { background: #27ca40; }
+
+        .terminal-title {
+            flex: 1;
+            text-align: center;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            color: var(--text-dim);
+        }
+
+        .terminal-body {
+            padding: 1.5rem;
+            min-height: 400px;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .terminal-line {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            line-height: 1.8;
+            margin-bottom: 0.25rem;
+        }
+
+        .terminal-prompt {
+            color: var(--primary);
+        }
+
+        .terminal-command {
+            color: var(--text-bright);
+        }
+
+        .terminal-output {
+            color: var(--text-dim);
+        }
+
+        .terminal-success {
+            color: var(--success);
+        }
+
+        .terminal-warning {
+            color: var(--warning);
+        }
+
+        .terminal-error {
+            color: var(--danger);
+        }
+
+        .terminal-info {
+            color: var(--accent);
+        }
+
+        .terminal-cursor {
+            display: inline-block;
+            width: 10px;
+            height: 18px;
+            background: var(--primary);
+            animation: blink 1s step-end infinite;
+            vertical-align: text-bottom;
+        }
+
+        @keyframes blink {
+            50% { opacity: 0; }
+        }
+
+        .demo-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-top: 2rem;
+            justify-content: center;
+        }
+
+        .demo-btn {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            padding: 0.75rem 1.25rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .demo-btn:hover {
+            background: var(--bg-card-hover);
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .demo-btn.active {
+            background: rgba(0, 212, 255, 0.1);
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        /* Phases Section */
+        .phases {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .phases-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .phase-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s ease;
+        }
+
+        .phase-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--primary);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .phase-card:hover {
+            background: var(--bg-card-hover);
+            transform: translateX(5px);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .phase-card:hover::before {
+            opacity: 1;
+        }
+
+        .phase-number {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 3rem;
+            font-weight: 800;
+            color: rgba(0, 212, 255, 0.1);
+            position: absolute;
+            top: 1rem;
+            right: 1.5rem;
+        }
+
+        .phase-card h3 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-bright);
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .phase-card p {
+            font-size: 0.85rem;
+            color: var(--text-dim);
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .phase-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.75rem;
+            padding: 0.35rem 0.75rem;
+            border-radius: 100px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .phase-status.automated {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .phase-status.planned {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+
+        /* Improvement Timeline */
+        .improvement-timeline {
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .improvement-timeline::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: linear-gradient(180deg, var(--primary), var(--accent), var(--success));
+            transform: translateX(-50%);
+        }
+
+        .improvement-item {
+            position: relative;
+            margin-bottom: 3rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .improvement-item:nth-child(odd) {
+            flex-direction: row;
+        }
+
+        .improvement-item:nth-child(even) {
+            flex-direction: row-reverse;
+        }
+
+        .improvement-content {
+            flex: 1;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem;
+            transition: all 0.4s ease;
+            position: relative;
+        }
+
+        .improvement-item:nth-child(odd) .improvement-content {
+            margin-right: 2rem;
+        }
+
+        .improvement-item:nth-child(even) .improvement-content {
+            margin-left: 2rem;
+        }
+
+        .improvement-content:hover {
+            background: var(--bg-card-hover);
+            border-color: var(--border-bright);
+            transform: translateY(-5px);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4), 0 0 30px var(--primary-glow);
+        }
+
+        .improvement-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 4px solid var(--bg-dark);
+            z-index: 2;
+            box-shadow: 0 0 20px var(--primary-glow);
+        }
+
+        .improvement-content h3 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-bright);
+            margin-bottom: 0.5rem;
+        }
+
+        .improvement-content p {
+            font-size: 0.9rem;
+            color: var(--text-dim);
+            line-height: 1.7;
+            margin-bottom: 1rem;
+        }
+
+        .improvement-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.75rem;
+            padding: 0.35rem 0.75rem;
+            border-radius: 100px;
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        @media (max-width: 768px) {
+            .improvement-timeline::before {
+                left: 30px;
+            }
+
+            .improvement-item {
+                flex-direction: row !important;
+            }
+
+            .improvement-content {
+                margin-left: 4rem !important;
+                margin-right: 0 !important;
+            }
+
+            .improvement-icon {
+                left: 30px;
+                transform: translateX(-50%);
+            }
+        }
+
+        /* Tech Stack */
+        .tech-stack {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .tech-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .tech-item {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .tech-item:hover {
+            background: var(--bg-card-hover);
+            border-color: var(--border-bright);
+            transform: translateY(-3px);
+        }
+
+        .tech-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .tech-item h4 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-bright);
+            margin-bottom: 0.25rem;
+        }
+
+        .tech-item p {
+            font-size: 0.75rem;
+            color: var(--text-dim);
+        }
+
+        /* Commands Reference */
+        .commands {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .command-group {
+            margin-bottom: 2rem;
+        }
+
+        .command-group h3 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .command-list {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .command-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--border);
+            transition: background 0.3s ease;
+        }
+
+        .command-item:last-child {
+            border-bottom: none;
+        }
+
+        .command-item:hover {
+            background: var(--bg-card-hover);
+        }
+
+        .command-code {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            color: var(--success);
+        }
+
+        .command-desc {
+            font-size: 0.8rem;
+            color: var(--text-dim);
+        }
+
+        /* Copy Button */
+        .copy-btn {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-dim);
+            padding: 0.4rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+            font-family: 'Exo 2', sans-serif;
+            white-space: nowrap;
+        }
+
+        .copy-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: rgba(0, 212, 255, 0.1);
+        }
+
+        .copy-btn.copied {
+            border-color: var(--success);
+            color: var(--success);
+            background: rgba(16, 185, 129, 0.1);
+        }
+
+        .command-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--border);
+            transition: background 0.3s ease;
+            gap: 1rem;
+        }
+
+        .command-content {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+            flex: 1;
+            min-width: 0;
+        }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--bg-card);
+            border: 1px solid var(--success);
+            color: var(--success);
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            z-index: 1001;
+            opacity: 0;
+            transition: all 0.4s ease;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4), 0 0 20px rgba(16, 185, 129, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        .toast-icon {
+            font-size: 1.25rem;
+        }
+
+        /* Live Demo Banner */
+        .live-demo-banner {
+            background: linear-gradient(135deg, rgba(168, 85, 247, 0.1) 0%, rgba(0, 212, 255, 0.1) 100%);
+            border: 1px solid var(--accent);
+            border-radius: 12px;
+            padding: 1.5rem 2rem;
+            margin-top: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1.5rem;
+        }
+
+        .live-demo-text {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .live-demo-text h4 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1rem;
+            color: var(--text-bright);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .live-demo-text p {
+            font-size: 0.85rem;
+            color: var(--text-dim);
+        }
+
+        .btn-live {
+            background: linear-gradient(135deg, var(--accent) 0%, #7c3aed 100%);
+            color: white;
+            box-shadow: 0 0 30px rgba(168, 85, 247, 0.3);
+        }
+
+        .btn-live:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 50px rgba(168, 85, 247, 0.4), 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Footer */
+        footer {
+            padding: 4rem 2rem;
+            text-align: center;
+            border-top: 1px solid var(--border);
+            position: relative;
+            z-index: 1;
+        }
+
+        .footer-logo {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+
+        .footer-text {
+            font-size: 0.85rem;
+            color: var(--text-dim);
+            margin-bottom: 2rem;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+        }
+
+        .footer-links a {
+            color: var(--text-dim);
+            text-decoration: none;
+            font-size: 0.85rem;
+            transition: color 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: var(--primary);
+        }
+
+        /* Presenter Controls */
+        .presenter-controls {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            display: flex;
+            gap: 0.5rem;
+            z-index: 200;
+        }
+
+        .presenter-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            color: var(--text);
+            font-size: 1.25rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .presenter-btn:hover {
+            background: var(--primary);
+            color: var(--bg-dark);
+            border-color: var(--primary);
+            box-shadow: 0 0 30px var(--primary-glow);
+        }
+
+        /* Slide Counter */
+        .slide-counter {
+            position: fixed;
+            bottom: 2rem;
+            left: 2rem;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            z-index: 200;
+        }
+
+        /* Robot Animation */
+        .robot-container {
+            position: fixed;
+            bottom: 100px;
+            right: 30px;
+            z-index: 50;
+            opacity: 0.9;
+            transition: opacity 0.3s ease;
+        }
+
+        .robot-container:hover {
+            opacity: 1;
+        }
+
+        .robot-greeting {
+            position: absolute;
+            bottom: 90px;
+            right: 0;
+            background: var(--bg-card);
+            border: 1px solid var(--border-bright);
+            border-radius: 12px;
+            padding: 0.75rem 1rem;
+            font-size: 0.75rem;
+            color: var(--text-bright);
+            white-space: nowrap;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3), 0 0 20px var(--primary-glow);
+            animation: greetingPulse 2s ease-in-out infinite;
+            opacity: 0;
+            transform: translateY(10px);
+            pointer-events: none;
+        }
+
+        .robot-greeting::before {
+            content: '';
+            position: absolute;
+            bottom: -6px;
+            right: 20px;
+            width: 12px;
+            height: 12px;
+            background: var(--bg-card);
+            border-right: 1px solid var(--border-bright);
+            border-bottom: 1px solid var(--border-bright);
+            transform: rotate(45deg);
+        }
+
+        .robot-greeting.show {
+            opacity: 1;
+            transform: translateY(0);
+            animation: greetingPulse 2s ease-in-out infinite, greetingShow 0.5s ease-out;
+        }
+
+        @keyframes greetingShow {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes greetingPulse {
+            0%, 100% {
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3), 0 0 20px var(--primary-glow);
+            }
+            50% {
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3), 0 0 30px var(--primary-glow);
+            }
+        }
+
+        .robot {
+            width: 60px;
+            height: 80px;
+            position: relative;
+        }
+
+        .robot-head {
+            width: 40px;
+            height: 30px;
+            background: linear-gradient(135deg, #4a5568 0%, #2d3748 100%);
+            border: 2px solid var(--primary);
+            border-radius: 8px;
+            margin: 0 auto 5px;
+            position: relative;
+            animation: robot-bob 2s ease-in-out infinite;
+        }
+
+        @keyframes robot-bob {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        .robot-eye {
+            width: 8px;
+            height: 8px;
+            background: var(--primary);
+            border-radius: 50%;
+            position: absolute;
+            top: 10px;
+            animation: robot-blink 3s ease-in-out infinite;
+        }
+
+        .robot-eye.left { left: 8px; }
+        .robot-eye.right { right: 8px; }
+
+        @keyframes robot-blink {
+            0%, 90%, 100% { transform: scaleY(1); }
+            95% { transform: scaleY(0.1); }
+        }
+
+        .robot-body {
+            width: 50px;
+            height: 40px;
+            background: linear-gradient(135deg, #4a5568 0%, #2d3748 100%);
+            border: 2px solid var(--primary);
+            border-radius: 8px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .robot-core {
+            width: 20px;
+            height: 20px;
+            background: var(--primary);
+            border-radius: 50%;
+            animation: pulse-core 1.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse-core {
+            0%, 100% { opacity: 0.5; box-shadow: 0 0 10px var(--primary); }
+            50% { opacity: 1; box-shadow: 0 0 25px var(--primary); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            nav {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .nav-links {
+                gap: 1rem;
+            }
+
+            .hero-stats {
+                flex-direction: column;
+                gap: 1.5rem;
+            }
+
+            .cta-group {
+                flex-direction: column;
+            }
+
+            .workflow-timeline {
+                padding-left: 2rem;
+            }
+
+            .workflow-number {
+                left: -2rem;
+            }
+
+            .presenter-controls {
+                bottom: 1rem;
+                right: 1rem;
+            }
+
+            .robot-container {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="grid-bg"></div>
+    <div class="scanlines"></div>
+
+    <!-- Navigation -->
+    <nav>
+        <div class="logo">
+            <div class="logo-icon">⚡</div>
+            <span>E2E Automation</span>
+        </div>
+        <ul class="nav-links">
+            <li><a href="#hero">Home</a></li>
+            <li><a href="#architecture">Architecture</a></li>
+            <li><a href="#workflow">Workflow</a></li>
+            <li><a href="#terminal">Live Demo</a></li>
+            <li><a href="#phases">Phases</a></li>
+            <li><a href="#improvement">Improvement</a></li>
+            <li><a href="#commands">Commands</a></li>
+        </ul>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero" id="hero">
+        <div class="hero-badge">🤖 QA Automation Framework v2.0</div>
+        <h1>QA TEST<br>AUTOMATION FRAMEWORK</h1>
+        <p class="hero-subtitle">
+            Unified E2E testing platform for the Accelerant ecosystem. 
+            Automated test generation, execution, and evidence capture across 
+            Salesforce, MuleSoft, and downstream systems.
+        </p>
+        <div class="hero-stats">
+            <div class="stat">
+                <span class="stat-value">6</span>
+                <span class="stat-label">Automated Phases</span>
+            </div>
+            <div class="stat">
+                <span class="stat-value">50+</span>
+                <span class="stat-label">Feature Files</span>
+            </div>
+            <div class="stat">
+                <span class="stat-value">900+</span>
+                <span class="stat-label">Test Cases Created & Uploaded to Jira</span>
+            </div>
+            <div class="stat">
+                <span class="stat-value">3</span>
+                <span class="stat-label">Systems Covered</span>
+            </div>
+        </div>
+        <p style="font-size: 0.85rem; color: var(--text-dim); text-align: center; font-style: italic; margin-top: 0.5rem; margin-bottom: 2rem;">*Numbers as of today • Growing daily • More systems planned</p>
+        <div class="cta-group">
+            <a href="#terminal" class="btn btn-primary">
+                <span>▶</span> Watch Demo
+            </a>
+            <a href="#workflow" class="btn btn-secondary">
+                View Workflow
+            </a>
+        </div>
+    </section>
+
+    <!-- Architecture Section -->
+    <section id="architecture">
+        <div class="section-header">
+            <span class="section-badge">System Integration</span>
+            <h2 class="section-title">CLM Ecosystem Architecture</h2>
+            <p class="section-desc">
+                Testing coverage across the entire Contract Lifecycle Management ecosystem
+            </p>
+        </div>
+        <div class="architecture">
+            <div class="arch-grid" style="margin-bottom: 3rem;">
+                <div class="arch-card core">
+                    <div class="arch-icon">🔵</div>
+                    <h3>Salesforce CRM</h3>
+                    <p>Primary CRM platform with one-way data flow to Data Cloud. Full UI + API testing coverage.</p>
+                    <span class="arch-tag">Core Platform</span>
+                </div>
+                <div class="arch-card integration">
+                    <div class="arch-icon">🟢</div>
+                    <h3>MuleSoft</h3>
+                    <p>Integration layer with bidirectional communication. API contract testing enabled.</p>
+                    <span class="arch-tag" style="background: rgba(245, 158, 11, 0.1); color: var(--warning);">📋 Planned</span>
+                </div>
+                <div class="arch-card source">
+                    <div class="arch-icon">⚙️</div>
+                    <h3>Microsoft Dynamics</h3>
+                    <p>Business process automation, Reference Data Management (RDM), and Configuration Management Tool (CMT). UI + API testing coverage across all Dynamics apps.</p>
+                    <span class="arch-tag">Target System</span>
+                </div>
+            </div>
+            <div style="margin-bottom: 2rem;">
+                <div class="arch-grid" style="margin-bottom: 2rem;">
+                    <div class="arch-card data">
+                        <div class="arch-icon">💙</div>
+                        <h3>Data Cloud</h3>
+                        <p>Data platform receiving data from Salesforce. API integration testing enabled.</p>
+                        <span class="arch-tag" style="background: rgba(245, 158, 11, 0.1); color: var(--warning);">📋 Planned</span>
+                    </div>
+                    <div class="arch-card data">
+                        <div class="arch-icon">❄️</div>
+                        <h3>Snowflake</h3>
+                        <p>Data warehouse receiving pipeline from source systems via Fivetran integration.</p>
+                        <span class="arch-tag" style="background: rgba(245, 158, 11, 0.1); color: var(--warning);">📋 Planned</span>
+                    </div>
+                </div>
+            </div>
+            <div style="max-width: 400px; margin: 0 auto; position: relative; margin-bottom: 3rem;">
+                <div class="arch-card foundation" style="padding-bottom: 2.5rem;">
+                    <div class="arch-icon">🗄️</div>
+                    <h3>ODS / TDS (MS SQL Server)</h3>
+                    <p>Foundation data layer supporting all systems above. Operational and Transactional Data Store validation. Cross-system data integrity testing.</p>
+                    <span class="arch-tag" style="background: rgba(99, 102, 241, 0.2); color: #818cf8; border-color: rgba(99, 102, 241, 0.4);">Data Warehouse Layer</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Workflow Section -->
+    <section id="workflow">
+        <div class="section-header">
+            <span class="section-badge">Process Flow</span>
+            <h2 class="section-title">Complete Automation Workflow</h2>
+            <p class="section-desc">
+                From work item to deployment validation - every step automated with human oversight
+            </p>
+        </div>
+        <div class="workflow">
+            <div class="workflow-timeline">
+                <div class="workflow-step active">
+                    <div class="workflow-number">1</div>
+                    <div class="workflow-header">
+                        <span class="workflow-icon">📥</span>
+                        <h3>Get Work Item</h3>
+                    </div>
+                    <p>Add Jira work item to jira-work-items.txt. Review requirements, acceptance criteria, and field definitions in Jira.</p>
+                    <div class="workflow-output">→ Work item identified: SF-520</div>
+                </div>
+                <div class="workflow-step">
+                    <div class="workflow-number">2</div>
+                    <div class="workflow-header">
+                        <span class="workflow-icon">📝</span>
+                        <h3>Create Test Cases</h3>
+                    </div>
+                    <p>Generate comprehensive Gherkin test cases from Jira. Review scenarios, validate step definitions.</p>
+                    <div class="workflow-output">→ Feature files: SF-520-UI-001, SF-520-API-001</div>
+                </div>
+                <div class="workflow-step">
+                    <div class="workflow-number">3</div>
+                    <div class="workflow-header">
+                        <span class="workflow-icon">⚙️</span>
+                        <h3>Create Scripts</h3>
+                    </div>
+                    <p>Identify missing steps, create step definitions using Page Object Model and Field Registry. Test locally.</p>
+                    <div class="workflow-output">→ Step definitions validated ✓</div>
+                </div>
+                <div class="workflow-step">
+                    <div class="workflow-number">4</div>
+                    <div class="workflow-header">
+                        <span class="workflow-icon">📤</span>
+                        <h3>Upload to Jira-Zephyr</h3>
+                    </div>
+                    <p>Upload test cases to Zephyr Scale. Link test cases to Jira work items for traceability.</p>
+                    <div class="workflow-output">→ Test cases uploaded: TC-4521, TC-4522</div>
+                </div>
+                <div class="workflow-step">
+                    <div class="workflow-number">5</div>
+                    <div class="workflow-header">
+                        <span class="workflow-icon">📊</span>
+                        <h3>Create Test Data</h3>
+                    </div>
+                    <p>Test Data Factory auto-creates Accounts, Contacts, Opportunities with 24+ fields. Auto-cleanup after execution.</p>
+                    <div class="workflow-output">→ Test data ready: ACC-20241218-001</div>
+                </div>
+                <div class="workflow-step">
+                    <div class="workflow-number">6</div>
+                    <div class="workflow-header">
+                        <span class="workflow-icon">▶️</span>
+                        <h3>Execute Tests</h3>
+                    </div>
+                    <p>Run UI tests (Playwright) and API tests (REST/JWT) across all integrated systems. Generate test reports.</p>
+                    <div class="workflow-output">→ 15 tests passed, 0 failed</div>
+                </div>
+                <div class="workflow-step">
+                    <div class="workflow-number">7</div>
+                    <div class="workflow-header">
+                        <span class="workflow-icon">📤</span>
+                        <h3>Commit to GitHub</h3>
+                    </div>
+                    <p>Create feature branch, stage changes, commit with descriptive message, push to remote, create Pull Request.</p>
+                    <div class="workflow-output">→ PR #142: feature/SF-520-test-cases</div>
+                </div>
+                <div class="workflow-step">
+                    <div class="workflow-number">8</div>
+                    <div class="workflow-header">
+                        <span class="workflow-icon">🖥️</span>
+                        <h3>Run Tests in VM</h3>
+                    </div>
+                    <p>GitHub Actions triggered. Tests execute on Linux VM (GitHub Runner). Results generated and uploaded to Zephyr.</p>
+                    <div class="workflow-output" style="color: var(--warning);">→ 📋 Planned for future</div>
+                </div>
+                <div class="workflow-step">
+                    <div class="workflow-number">9</div>
+                    <div class="workflow-header">
+                        <span class="workflow-icon">🔒</span>
+                        <h3>Gearset Validation</h3>
+                    </div>
+                    <p>Gearset detects PR, deploys to QA Sandbox, triggers tests, evaluates results. Blocks/allows deployment based on test outcome.</p>
+                    <div class="workflow-output" style="color: var(--warning);">→ 📋 Planned for future</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Terminal Demo Section -->
+    <section id="terminal">
+        <div class="section-header">
+            <span class="section-badge">Live Demo</span>
+            <h2 class="section-title">Interactive Command Center</h2>
+            <p class="section-desc">
+                Watch the framework in action - click a demo to see the commands execute
+            </p>
+        </div>
+        <div class="terminal-section">
+            <div class="terminal">
+                <div class="terminal-header">
+                    <div class="terminal-dot red"></div>
+                    <div class="terminal-dot yellow"></div>
+                    <div class="terminal-dot green"></div>
+                    <div class="terminal-title">CLM Automation Terminal — bash</div>
+                </div>
+                <div class="terminal-body" id="terminal-body">
+                    <div class="terminal-line">
+                        <span class="terminal-prompt">clm@automation</span>:<span class="terminal-info">~/E2EAutomation</span>$ <span class="terminal-cursor"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="demo-buttons">
+                <button class="demo-btn" data-demo="get-workitem">📥 Get Work Item</button>
+                <button class="demo-btn" data-demo="generate">📝 Create Test Cases</button>
+                <button class="demo-btn" data-demo="create-scripts">⚙️ Create Scripts</button>
+                <button class="demo-btn" data-demo="upload">📤 Upload to Jira-Zephyr</button>
+                <button class="demo-btn" data-demo="test-data">📊 Create Test Data</button>
+                <button class="demo-btn" data-demo="execute">▶️ Execute Tests</button>
+                <button class="demo-btn" data-demo="full">🚀 Full Workflow</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Phases Section -->
+    <section id="phases">
+        <div class="section-header">
+            <span class="section-badge">Automation Coverage</span>
+            <h2 class="section-title">6 QA Lifecycle Phases</h2>
+            <p class="section-desc">
+                Each phase automated with human review at critical checkpoints
+            </p>
+        </div>
+        <div class="phases">
+            <div class="phases-grid">
+                <div class="phase-card">
+                    <div class="phase-number">01</div>
+                    <h3>🔍 Requirement Analysis</h3>
+                    <p>Extracts acceptance criteria, field definitions, and business rules from Jira work items via API. <strong style="color: var(--primary);">Manual review</strong> of requirements before proceeding.</p>
+                    <span class="phase-status automated">✓ Automated + Manual Review</span>
+                </div>
+                <div class="phase-card">
+                    <div class="phase-number">02</div>
+                    <h3>📝 Test Case Design</h3>
+                    <p>Generates comprehensive Gherkin (BDD) feature files with positive, negative, and edge case scenarios. <strong style="color: var(--primary);">Manual review</strong> of test scenarios required.</p>
+                    <span class="phase-status automated">✓ Automated + Manual Review</span>
+                </div>
+                <div class="phase-card">
+                    <div class="phase-number">03</div>
+                    <h3>📊 Test Data Setup</h3>
+                    <p>Creates test data records via Salesforce API with 24+ fields populated. Auto-cleanup included. <strong style="color: var(--primary);">Manual review</strong> of test data quality.</p>
+                    <span class="phase-status automated">✓ Automated + Manual Review</span>
+                </div>
+                <div class="phase-card">
+                    <div class="phase-number">04</div>
+                    <h3>▶️ Test Execution</h3>
+                    <p>Executes UI tests (Playwright) and API tests (REST/JWT) across all integrated systems. <strong style="color: var(--primary);">Manual review</strong> of test results and failures.</p>
+                    <span class="phase-status automated">✓ Automated + Manual Review</span>
+                </div>
+                <div class="phase-card">
+                    <div class="phase-number">05</div>
+                    <h3>📸 Evidence Generation</h3>
+                    <p>Captures screenshots, generates HTML/JSON reports, uploads evidence to Confluence automatically. <strong style="color: var(--primary);">Manual review</strong> of evidence quality.</p>
+                    <span class="phase-status automated">✓ Automated + Manual Review</span>
+                </div>
+                <div class="phase-card">
+                    <div class="phase-number">06</div>
+                    <h3>🐛 Bug Creation</h3>
+                    <p>Automatically creates Jira bugs for failed tests with reproduction steps and evidence links. <strong style="color: var(--primary);">Manual review</strong> of bug details before creation.</p>
+                    <span class="phase-status planned">📋 Planned</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Constant Improvement Section -->
+    <section id="improvement">
+        <div class="section-header">
+            <span class="section-badge">Evolution</span>
+            <h2 class="section-title">Constant Improvement Journey</h2>
+            <p class="section-desc">
+                From manual QA processes to an intelligent, self-improving automation framework
+            </p>
+        </div>
+        <div class="improvement-timeline">
+            <div class="improvement-item">
+                <div class="improvement-icon">📝</div>
+                <div class="improvement-content">
+                    <h3>V2: Manual QA Processes</h3>
+                    <p>Started with manual test case creation, manual execution, and manual reporting. Time-consuming and error-prone processes that required significant QA resources.</p>
+                    <span class="improvement-badge">✓ Foundation</span>
+                </div>
+            </div>
+            <div class="improvement-item">
+                <div class="improvement-icon">🤖</div>
+                <div class="improvement-content">
+                    <h3>Automated Test Generation</h3>
+                    <p>Developed AI-powered test case generation from Jira work items. Automated Gherkin feature file creation with positive, negative, and edge case scenarios.</p>
+                    <span class="improvement-badge">✓ Automated</span>
+                </div>
+            </div>
+            <div class="improvement-item">
+                <div class="improvement-icon">📚</div>
+                <div class="improvement-content">
+                    <h3>Knowledge Base Integration</h3>
+                    <p>Built comprehensive knowledge base capturing domain expertise, field definitions, validation rules, and best practices. Enables consistent, accurate test generation.</p>
+                    <span class="improvement-badge">✓ Knowledge-Driven</span>
+                </div>
+            </div>
+            <div class="improvement-item">
+                <div class="improvement-icon">🔧</div>
+                <div class="improvement-content">
+                    <h3>Better Features & Patterns</h3>
+                    <p>Implemented Page Object Model, Field Registry, Test Data Factory, and reusable step definitions. Continuous refinement based on feedback and lessons learned.</p>
+                    <span class="improvement-badge">✓ Enhanced</span>
+                </div>
+            </div>
+            <div class="improvement-item">
+                <div class="improvement-icon">🔗</div>
+                <div class="improvement-content">
+                    <h3>Seamless Integrations</h3>
+                    <p>Integrated with Jira, Zephyr Scale, Confluence, and GitHub. Automated test case upload, result reporting, and evidence capture. Full traceability achieved.</p>
+                    <span class="improvement-badge">✓ Integrated</span>
+                </div>
+            </div>
+            <div class="improvement-item">
+                <div class="improvement-icon">🚀</div>
+                <div class="improvement-content">
+                    <h3>Future: Self-Learning Framework</h3>
+                    <p>Planned enhancements include ML-based test optimization, predictive failure analysis, automated test maintenance, and intelligent test data generation.</p>
+                    <span class="improvement-badge" style="background: rgba(245, 158, 11, 0.1); color: var(--warning); border-color: rgba(245, 158, 11, 0.3);">📋 Planned</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Tech Stack Section -->
+    <section id="tech">
+        <div class="section-header">
+            <span class="section-badge">Technology</span>
+            <h2 class="section-title">Technology Stack</h2>
+            <p class="section-desc">
+                Modern, battle-tested tools for reliable automation
+            </p>
+        </div>
+        <div class="tech-stack">
+            <div class="tech-grid">
+                <div class="tech-item">
+                    <div class="tech-icon">🥒</div>
+                    <h4>Cucumber.js</h4>
+                    <p>BDD Test Runner</p>
+                </div>
+                <div class="tech-item">
+                    <div class="tech-icon">🎭</div>
+                    <h4>Playwright</h4>
+                    <p>Browser Automation</p>
+                </div>
+                <div class="tech-item">
+                    <div class="tech-icon">📡</div>
+                    <h4>Axios + JWT</h4>
+                    <p>API Testing</p>
+                </div>
+                <div class="tech-item">
+                    <div class="tech-icon">💎</div>
+                    <h4>TypeScript</h4>
+                    <p>Type-Safe Code</p>
+                </div>
+                <div class="tech-item">
+                    <div class="tech-icon">📊</div>
+                    <h4>Custom Reports</h4>
+                    <p>HTML/JSON Reports</p>
+                </div>
+                <div class="tech-item">
+                    <div class="tech-icon">🐙</div>
+                    <h4>GitHub Actions</h4>
+                    <p style="color: var(--warning);">📋 Planned</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Commands Reference -->
+    <section id="commands">
+        <div class="section-header">
+            <span class="section-badge">Reference</span>
+            <h2 class="section-title">Command Quick Reference</h2>
+            <p class="section-desc">
+                Essential commands for the complete automation workflow
+            </p>
+        </div>
+        <div class="commands">
+            <div class="command-group">
+                <h3>Test Generation</h3>
+                <div class="command-list">
+                    <div class="command-item">
+                        <div class="command-content">
+                            <code class="command-code">npm run jira:generate -- --work-item SF-520</code>
+                            <span class="command-desc">Generate UI + API tests</span>
+                        </div>
+                        <button class="copy-btn" onclick="copyCommand(this)">📋 Copy</button>
+                    </div>
+                    <div class="command-item">
+                        <div class="command-content">
+                            <code class="command-code">npm run jira:generate -- --work-item SF-520 --type ui</code>
+                            <span class="command-desc">Generate UI tests only</span>
+                        </div>
+                        <button class="copy-btn" onclick="copyCommand(this)">📋 Copy</button>
+                    </div>
+                </div>
+            </div>
+            <div class="command-group">
+                <h3>Test Execution</h3>
+                <div class="command-list">
+                    <div class="command-item">
+                        <div class="command-content">
+                            <code class="command-code">npm run test:feature -- --tags "@SF-520"</code>
+                            <span class="command-desc">Run all tests for work item</span>
+                        </div>
+                        <button class="copy-btn" onclick="copyCommand(this)">📋 Copy</button>
+                    </div>
+                    <div class="command-item">
+                        <div class="command-content">
+                            <code class="command-code">npm run test:interactive</code>
+                            <span class="command-desc">Run with Playwright Inspector</span>
+                        </div>
+                        <button class="copy-btn" onclick="copyCommand(this)">📋 Copy</button>
+                    </div>
+                </div>
+            </div>
+            <div class="command-group">
+                <h3>Zephyr Integration</h3>
+                <div class="command-list">
+                    <div class="command-item">
+                        <div class="command-content">
+                            <code class="command-code">npm run zephyr:UploadTestCase -- --work-item SF-520</code>
+                            <span class="command-desc">Upload test cases</span>
+                        </div>
+                        <button class="copy-btn" onclick="copyCommand(this)">📋 Copy</button>
+                    </div>
+                    <div class="command-item">
+                        <div class="command-content">
+                            <code class="command-code">npm run zephyr:UploadResult -- --work-item SF-520</code>
+                            <span class="command-desc">Upload test results</span>
+                        </div>
+                        <button class="copy-btn" onclick="copyCommand(this)">📋 Copy</button>
+                    </div>
+                </div>
+            </div>
+            <div class="command-group">
+                <h3>Validation & Cleanup</h3>
+                <div class="command-list">
+                    <div class="command-item">
+                        <div class="command-content">
+                            <code class="command-code">npm run validate:steps -- --work-item SF-520</code>
+                            <span class="command-desc">Validate step definitions</span>
+                        </div>
+                        <button class="copy-btn" onclick="copyCommand(this)">📋 Copy</button>
+                    </div>
+                    <div class="command-item">
+                        <div class="command-content">
+                            <code class="command-code">npm run cleanup:accounts</code>
+                            <span class="command-desc">Clean up test data</span>
+                        </div>
+                        <button class="copy-btn" onclick="copyCommand(this)">📋 Copy</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Live Demo Banner -->
+            <div class="live-demo-banner">
+                <div class="live-demo-text">
+                    <h4>🎬 Want to run a REAL demo?</h4>
+                    <p>Run the interactive demo script in your terminal alongside this presentation</p>
+                </div>
+                <button class="btn btn-live" onclick="copyCommand(this, 'npm run demo:live')">
+                    📋 Copy: npm run demo:live
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-logo">⚡ END TO END AUTOMATION</div>
+        <p class="footer-text">
+            QA Automation Team | December 2024<br>
+            Unified E2E Testing for Contract Lifecycle Management
+        </p>
+        <div class="footer-links">
+            <a href="https://accelins.atlassian.net/wiki/spaces/TM/pages/2692710418" target="_blank">📄 Confluence</a>
+            <a href="#" target="_blank">📚 Documentation</a>
+            <a href="#" target="_blank">💬 Support</a>
+        </div>
+    </footer>
+
+    <!-- Presenter Controls -->
+    <div class="presenter-controls">
+        <button class="presenter-btn" onclick="scrollToSection(-1)" title="Previous Section">↑</button>
+        <button class="presenter-btn" onclick="scrollToSection(1)" title="Next Section">↓</button>
+    </div>
+
+    <div class="slide-counter">
+        <span id="current-section">1</span> / <span id="total-sections">8</span>
+    </div>
+
+    <!-- Robot -->
+    <div class="robot-container">
+        <div class="robot-greeting" id="robot-greeting">
+            👋 Hello! I'm your automation assistant!
+        </div>
+        <div class="robot">
+            <div class="robot-head">
+                <div class="robot-eye left"></div>
+                <div class="robot-eye right"></div>
+            </div>
+            <div class="robot-body">
+                <div class="robot-core"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast">
+        <span class="toast-icon">✓</span>
+        <span id="toast-message">Command copied!</span>
+    </div>
+
+    <script>
+        // Copy to Clipboard Function
+        async function copyCommand(button, customText = null) {
+            const commandText = customText || button.parentElement.querySelector('.command-code').textContent;
+            
+            try {
+                await navigator.clipboard.writeText(commandText);
+                
+                // Update button
+                const originalText = button.innerHTML;
+                button.innerHTML = '✓ Copied!';
+                button.classList.add('copied');
+                
+                // Show toast
+                showToast(`Copied: ${commandText.substring(0, 40)}${commandText.length > 40 ? '...' : ''}`);
+                
+                // Reset button after 2s
+                setTimeout(() => {
+                    button.innerHTML = originalText;
+                    button.classList.remove('copied');
+                }, 2000);
+            } catch (err) {
+                showToast('Failed to copy - try manually', true);
+            }
+        }
+
+        function showToast(message, isError = false) {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toast-message');
+            const toastIcon = toast.querySelector('.toast-icon');
+            
+            toastMessage.textContent = message;
+            toastIcon.textContent = isError ? '✗' : '✓';
+            toast.style.borderColor = isError ? 'var(--danger)' : 'var(--success)';
+            toast.style.color = isError ? 'var(--danger)' : 'var(--success)';
+            
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Sections for navigation
+        const sections = ['hero', 'architecture', 'workflow', 'terminal', 'phases', 'improvement', 'tech', 'commands'];
+        let currentSectionIndex = 0;
+
+        // Terminal Demo Data
+        const demos = {
+            'get-workitem': {
+                commands: [
+                    { type: 'command', text: '# Step 1: Get Work Item from Jira' },
+                    { type: 'output', text: '' },
+                    { type: 'info', text: '📥 Adding work item SF-520 to jira-work-items.txt...' },
+                    { type: 'success', text: '✓ Work item added: SF-520' },
+                    { type: 'output', text: '' },
+                    { type: 'info', text: '🔍 Fetching work item details from Jira API...' },
+                    { type: 'success', text: '✓ Work item retrieved: "Account Status Field Validation"' },
+                    { type: 'output', text: '   - Summary: Validate Account Status field behavior' },
+                    { type: 'output', text: '   - Acceptance Criteria: 5 items found' },
+                    { type: 'output', text: '   - Fields: Account Status, Account Type' },
+                    { type: 'output', text: '' },
+                    { type: 'success', text: '✨ Work item ready for test generation!' }
+                ]
+            },
+            generate: {
+                commands: [
+                    { type: 'command', text: 'npm run jira:generate -- --work-item SF-520 --type ui' },
+                    { type: 'output', text: '' },
+                    { type: 'info', text: '🔍 Fetching work item SF-520 from Jira...' },
+                    { type: 'success', text: '✓ Work item retrieved: "Account Status Field Validation"' },
+                    { type: 'output', text: '' },
+                    { type: 'info', text: '📝 Analyzing acceptance criteria...' },
+                    { type: 'output', text: '   - Found 5 acceptance criteria' },
+                    { type: 'output', text: '   - Identified 3 field validations' },
+                    { type: 'output', text: '   - Detected edge cases: 2' },
+                    { type: 'output', text: '' },
+                    { type: 'info', text: '⚙️  Generating Gherkin scenarios...' },
+                    { type: 'success', text: '✓ Generated 8 test scenarios' },
+                    { type: 'output', text: '' },
+                    { type: 'success', text: '📁 Created: src/features/ui/SF/SF-520.feature' },
+                    { type: 'output', text: '' },
+                    { type: 'success', text: '✨ Test generation complete!' }
+                ]
+            },
+            'create-scripts': {
+                commands: [
+                    { type: 'command', text: 'npm run validate:steps -- --work-item SF-520' },
+                    { type: 'output', text: '' },
+                    { type: 'info', text: '🔍 Scanning feature files for SF-520...' },
+                    { type: 'output', text: '   - UI: src/features/ui/SF/SF-520.feature' },
+                    { type: 'output', text: '   - API: src/features/api/SF/SF-520.feature' },
+                    { type: 'output', text: '' },
+                    { type: 'info', text: '📋 Validating step definitions...' },
+                    { type: 'success', text: '✓ Given I am logged in as {string} - MATCHED' },
+                    { type: 'success', text: '✓ When I navigate to Account - MATCHED' },
+                    { type: 'warning', text: '⚠ When I set Account Status to {string} - MISSING' },
+                    { type: 'output', text: '' },
+                    { type: 'info', text: '⚙️  Creating missing step definition...' },
+                    { type: 'success', text: '✓ Created: src/step-definitions/ui/salesforce/account.steps.ts' },
+                    { type: 'output', text: '   - Using Page Object Model pattern' },
+                    { type: 'output', text: '   - Field Registry lookup: Account.Status' },
+                    { type: 'output', text: '' },
+                    { type: 'success', text: '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━' },
+                    { type: 'success', text: '✅ All 24 steps validated successfully!' },
+                    { type: 'success', text: '   Coverage: 100%' },
+                    { type: 'success', text: '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━' }
+                ]
+            },
+            'test-data': {
+                commands: [
+                    { type: 'command', text: 'npm run test:feature -- --tags "@SF-520" --dry-run' },
+                    { type: 'output', text: '' },
+                    { type: 'info', text: '📊 Test Data Factory: Creating test data...' },
+                    { type: 'output', text: '   - Account: 24+ fields populated' },
+                    { type: 'output', text: '   - Contact: Linked to Account' },
+                    { type: 'output', text: '   - Opportunity: Linked to Account' },
+                    { type: 'output', text: '' },
+                    { type: 'success', text: '✓ Account created: ACC-20241218-142356' },
+                    { type: 'success', text: '✓ Contact created: CON-20241218-142357' },
+                    { type: 'success', text: '✓ Opportunity created: OPP-20241218-142358' },
+                    { type: 'output', text: '' },
+                    { type: 'info', text: '📝 Test data ready for execution' },
+                    { type: 'output', text: '   - Auto-cleanup scheduled after test run' },
+                    { type: 'output', text: '' },
+                    { type: 'success', text: '✨ Test data setup complete!' }
+                ]
+            },
+            validate: {
+                commands: [
+                    { type: 'command', text: 'npm run validate:steps -- --work-item SF-520' },
+                    { type: 'output', text: '' },
+                    { type: 'info', text: '🔍 Scanning feature files for SF-520...' },
+                    { type: 'output', text: '   - UI: src/features/ui/SF/SF-520.feature' },
+                    { type: 'output', text: '   - API: src/features/api/SF/SF-520.feature' },
+                    { type: 'output', text: '' },
+                    { type: 'info', text: '📋 Validating step definitions...' },
+                    { type: 'success', text: '✓ Given I am logged in as {string} - MATCHED' },
+                    { type: 'success', text: '✓ When I navigate to Account - MATCHED' },
+                    { type: 'success', text: '✓ Then I should see {string} field - MATCHED' },
+                    { type: 'success', text: '✓ When I set Account Status to {string} - MATCHED' },
+                    { type: 'output', text: '' },
+                    { type: 'success', text: '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━' },
+                    { type: 'success', text: '✅ All 24 steps validated successfully!' },
+                    { type: 'success', text: '   Coverage: 100%' },
+                    { type: 'success', text: '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━' }
+                ]
+            },
+            execute: {
+                commands: [
+                    { type: 'command', text: 'npm run test:feature -- --tags "@SF-520"' },
+                    { type: 'output', text: '' },
+                    { type: 'info', text: '🚀 Starting test execution...' },
+                    { type: 'output', text: '   Environment: QA' },
+                    { type: 'output', text: '   Browser: Chromium (headless)' },
+                    { type: 'output', text: '' },
+                    { type: 'info', text: '📊 Creating test data...' },
+                    { type: 'success', text: '✓ Account created: ACC-20241218-142356' },
+                    { type: 'output', text: '' },
+                    { type: 'info', text: '▶️  Running scenarios...' },
+                    { type: 'success', text: '✓ SF-520-UI-001: Verify Account Status picklist (2.3s)' },
+                    { type: 'success', text: '✓ SF-520-UI-002: Set Status to Contracted (1.8s)' },
+                    { type: 'success', text: '✓ SF-520-UI-003: Validate Status transitions (3.1s)' },
+                    { type: 'success', text: '✓ SF-520-API-001: API Status update (0.4s)' },
+                    { type: 'success', text: '✓ SF-520-API-002: API validation rules (0.3s)' },
+                    { type: 'output', text: '' },
+                    { type: 'info', text: '🧹 Cleaning up test data...' },
+                    { type: 'success', text: '✓ Test data removed' },
+                    { type: 'output', text: '' },
+                    { type: 'success', text: '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━' },
+                    { type: 'success', text: '✅ 5 scenarios passed | 0 failed | 7.9s total' },
+                    { type: 'success', text: '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━' }
+                ]
+            },
+            upload: {
+                commands: [
+                    { type: 'command', text: 'npm run zephyr:UploadTestCase -- --work-item SF-520' },
+                    { type: 'output', text: '' },
+                    { type: 'info', text: '🔗 Connecting to Zephyr Scale...' },
+                    { type: 'success', text: '✓ Authenticated successfully' },
+                    { type: 'output', text: '' },
+                    { type: 'info', text: '📤 Uploading test cases...' },
+                    { type: 'success', text: '✓ SF-520-UI-001 → Created (TC-4521)' },
+                    { type: 'success', text: '✓ SF-520-UI-002 → Created (TC-4522)' },
+                    { type: 'success', text: '✓ SF-520-UI-003 → Created (TC-4523)' },
+                    { type: 'success', text: '✓ SF-520-API-001 → Created (TC-4524)' },
+                    { type: 'success', text: '✓ SF-520-API-002 → Created (TC-4525)' },
+                    { type: 'output', text: '' },
+                    { type: 'info', text: '🔗 Linking to Jira work item SF-520...' },
+                    { type: 'success', text: '✓ 5 test cases linked' },
+                    { type: 'output', text: '' },
+                    { type: 'success', text: '✨ Upload complete!' },
+                    { type: 'output', text: '   View at: https://accelins.atlassian.net/projects/CLM?selectedItem=com.atlassian.plugins.atlassian-connect-plugin:com.kanoah.test-manager__main-project-page#!/testCase/TC-4521' }
+                ]
+            },
+            cleanup: {
+                commands: [
+                    { type: 'command', text: 'npm run cleanup:accounts' },
+                    { type: 'output', text: '' },
+                    { type: 'info', text: '🔍 Scanning for test accounts...' },
+                    { type: 'output', text: '   Pattern: "Test Account%"' },
+                    { type: 'output', text: '   Environment: QA' },
+                    { type: 'output', text: '' },
+                    { type: 'warning', text: '⚠️  Found 12 test accounts to delete' },
+                    { type: 'output', text: '' },
+                    { type: 'info', text: '🧹 Deleting test accounts...' },
+                    { type: 'success', text: '✓ Deleted: Test Account - 20241218-091234' },
+                    { type: 'success', text: '✓ Deleted: Test Account - 20241218-102345' },
+                    { type: 'success', text: '✓ Deleted: Test Account - 20241218-113456' },
+                    { type: 'output', text: '   ... (9 more)' },
+                    { type: 'output', text: '' },
+                    { type: 'success', text: '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━' },
+                    { type: 'success', text: '✅ Cleanup complete: 12 accounts deleted' },
+                    { type: 'success', text: '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━' }
+                ]
+            },
+            full: {
+                commands: [
+                    { type: 'command', text: '# Full E2E Automation Workflow Demo' },
+                    { type: 'output', text: '' },
+                    { type: 'info', text: '📥 Step 1: Get Work Item from Jira' },
+                    { type: 'success', text: '✓ Work item SF-520 retrieved' },
+                    { type: 'output', text: '' },
+                    { type: 'info', text: '📝 Step 2: Create Test Cases' },
+                    { type: 'command', text: 'npm run jira:generate -- --work-item SF-520' },
+                    { type: 'success', text: '✓ Generated 8 test scenarios → SF-520.feature' },
+                    { type: 'output', text: '' },
+                    { type: 'info', text: '⚙️  Step 3: Create Scripts' },
+                    { type: 'command', text: 'npm run validate:steps -- --work-item SF-520' },
+                    { type: 'success', text: '✓ All 24 steps validated (100% coverage)' },
+                    { type: 'output', text: '' },
+                    { type: 'info', text: '📤 Step 4: Upload to Jira-Zephyr' },
+                    { type: 'command', text: 'npm run zephyr:UploadTestCase -- --work-item SF-520' },
+                    { type: 'success', text: '✓ 5 test cases uploaded to Zephyr Scale' },
+                    { type: 'output', text: '' },
+                    { type: 'info', text: '📊 Step 5: Create Test Data' },
+                    { type: 'success', text: '✓ Test data ready: ACC-20241218-001' },
+                    { type: 'output', text: '' },
+                    { type: 'info', text: '▶️  Step 6: Execute Tests' },
+                    { type: 'command', text: 'npm run test:feature -- --tags "@SF-520"' },
+                    { type: 'success', text: '✓ All tests passed (5/5)' },
+                    { type: 'output', text: '' },
+                    { type: 'info', text: '📤 Step 7: Commit to GitHub' },
+                    { type: 'command', text: 'git checkout -b feature/SF-520-tests && git add . && git commit -m "Add SF-520 tests"' },
+                    { type: 'success', text: '✓ Branch created, changes committed' },
+                    { type: 'command', text: 'git push origin feature/SF-520-tests' },
+                    { type: 'success', text: '✓ Pushed to GitHub → PR #142 created' },
+                    { type: 'output', text: '' },
+                    { type: 'warning', text: '📋 Step 8: Run Tests in VM (Planned for future)' },
+                    { type: 'warning', text: '📋 Step 9: Gearset Validation (Planned for future)' },
+                    { type: 'output', text: '' },
+                    { type: 'success', text: '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━' },
+                    { type: 'success', text: '🎉 WORKFLOW COMPLETE - Ready for review!' },
+                    { type: 'success', text: '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━' }
+                ]
+            }
+        };
+
+        // Terminal Animation
+        const terminalBody = document.getElementById('terminal-body');
+        let isAnimating = false;
+
+        async function runDemo(demoName) {
+            if (isAnimating) return;
+            isAnimating = true;
+
+            // Clear terminal
+            terminalBody.innerHTML = '';
+            
+            const demo = demos[demoName];
+            if (!demo) return;
+
+            // Update active button
+            document.querySelectorAll('.demo-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelector(`[data-demo="${demoName}"]`).classList.add('active');
+
+            for (const line of demo.commands) {
+                await addTerminalLine(line);
+                await sleep(line.type === 'command' ? 800 : 150);
+            }
+
+            // Add final prompt
+            await addTerminalLine({ type: 'prompt', text: '' });
+            isAnimating = false;
+        }
+
+        function addTerminalLine(line) {
+            return new Promise(resolve => {
+                const div = document.createElement('div');
+                div.className = 'terminal-line';
+
+                if (line.type === 'command') {
+                    div.innerHTML = `<span class="terminal-prompt">clm@automation</span>:<span class="terminal-info">~/E2EAutomation</span>$ <span class="terminal-command">${line.text}</span>`;
+                } else if (line.type === 'prompt') {
+                    div.innerHTML = `<span class="terminal-prompt">clm@automation</span>:<span class="terminal-info">~/E2EAutomation</span>$ <span class="terminal-cursor"></span>`;
+                } else if (line.type === 'output') {
+                    div.innerHTML = `<span class="terminal-output">${line.text}</span>`;
+                } else if (line.type === 'success') {
+                    div.innerHTML = `<span class="terminal-success">${line.text}</span>`;
+                } else if (line.type === 'warning') {
+                    div.innerHTML = `<span class="terminal-warning">${line.text}</span>`;
+                } else if (line.type === 'error') {
+                    div.innerHTML = `<span class="terminal-error">${line.text}</span>`;
+                } else if (line.type === 'info') {
+                    div.innerHTML = `<span class="terminal-info">${line.text}</span>`;
+                }
+
+                terminalBody.appendChild(div);
+                terminalBody.scrollTop = terminalBody.scrollHeight;
+                resolve();
+            });
+        }
+
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        // Demo button click handlers
+        document.querySelectorAll('.demo-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                runDemo(btn.dataset.demo);
+            });
+        });
+
+        // Section Navigation with Animation
+        function scrollToSection(direction) {
+            const currentSection = document.getElementById(sections[currentSectionIndex]);
+            
+            // Fade out current section
+            if (currentSection) {
+                currentSection.classList.add('fade-out');
+            }
+            
+            // Update index
+            currentSectionIndex += direction;
+            if (currentSectionIndex < 0) currentSectionIndex = 0;
+            if (currentSectionIndex >= sections.length) currentSectionIndex = sections.length - 1;
+            
+            // Wait for fade out, then scroll and fade in
+            setTimeout(() => {
+                const nextSection = document.getElementById(sections[currentSectionIndex]);
+                if (nextSection) {
+                    nextSection.scrollIntoView({ behavior: 'smooth' });
+                    
+                    // Fade in new section
+                    setTimeout(() => {
+                        nextSection.classList.remove('fade-out');
+                        nextSection.classList.add('visible');
+                    }, 100);
+                }
+                
+                // Remove fade-out from previous section
+                if (currentSection) {
+                    currentSection.classList.remove('fade-out');
+                }
+                
+                updateSectionCounter();
+            }, 300);
+        }
+
+        function updateSectionCounter() {
+            document.getElementById('current-section').textContent = currentSectionIndex + 1;
+            document.getElementById('total-sections').textContent = sections.length;
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowDown' || e.key === 'PageDown' || e.key === ' ') {
+                e.preventDefault();
+                scrollToSection(1);
+            } else if (e.key === 'ArrowUp' || e.key === 'PageUp') {
+                e.preventDefault();
+                scrollToSection(-1);
+            } else if (e.key >= '1' && e.key <= '6') {
+                const targetIndex = parseInt(e.key) - 1;
+                if (targetIndex >= 0 && targetIndex < sections.length) {
+                    const currentSection = document.getElementById(sections[currentSectionIndex]);
+                    if (currentSection) {
+                        currentSection.classList.add('fade-out');
+                    }
+                    
+                    currentSectionIndex = targetIndex;
+                    
+                    setTimeout(() => {
+                        const nextSection = document.getElementById(sections[currentSectionIndex]);
+                        if (nextSection) {
+                            nextSection.scrollIntoView({ behavior: 'smooth' });
+                            setTimeout(() => {
+                                nextSection.classList.remove('fade-out');
+                                nextSection.classList.add('visible');
+                                if (currentSection) {
+                                    currentSection.classList.remove('fade-out');
+                                }
+                            }, 100);
+                        }
+                        updateSectionCounter();
+                    }, 300);
+                }
+            }
+        });
+
+        // Track current section on scroll with animation
+        let scrollTimeout;
+        window.addEventListener('scroll', () => {
+            clearTimeout(scrollTimeout);
+            scrollTimeout = setTimeout(() => {
+                const scrollPosition = window.scrollY + window.innerHeight / 2;
+                
+                sections.forEach((sectionId, index) => {
+                    const section = document.getElementById(sectionId);
+                    if (section) {
+                        const sectionTop = section.offsetTop;
+                        const sectionBottom = sectionTop + section.offsetHeight;
+                        
+                        if (scrollPosition >= sectionTop && scrollPosition < sectionBottom) {
+                            if (currentSectionIndex !== index) {
+                                // Fade out current
+                                const currentSection = document.getElementById(sections[currentSectionIndex]);
+                                if (currentSection) {
+                                    currentSection.classList.add('fade-out');
+                                }
+                                
+                                // Update index
+                                currentSectionIndex = index;
+                                
+                                // Fade in new
+                                setTimeout(() => {
+                                    section.classList.remove('fade-out');
+                                    section.classList.add('visible');
+                                    if (currentSection) {
+                                        currentSection.classList.remove('fade-out');
+                                    }
+                                }, 200);
+                            }
+                            updateSectionCounter();
+                        }
+                    }
+                });
+            }, 50);
+        });
+
+        // Initialize - Show first section
+        window.addEventListener('load', () => {
+            const firstSection = document.getElementById(sections[0]);
+            if (firstSection) {
+                setTimeout(() => {
+                    firstSection.classList.add('visible');
+                }, 300);
+            }
+            
+            // Show other sections as they come into view
+            const observerOptions = {
+                root: null,
+                rootMargin: '0px',
+                threshold: 0.2
+            };
+            
+            const sectionObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, observerOptions);
+            
+            sections.forEach(sectionId => {
+                const section = document.getElementById(sectionId);
+                if (section) {
+                    sectionObserver.observe(section);
+                }
+            });
+        });
+        
+        updateSectionCounter();
+        
+        // Robot Greeting
+        const robotGreeting = document.getElementById('robot-greeting');
+        const greetings = [
+            "👋 Hello! I'm your automation assistant!",
+            "🚀 Ready to automate your tests!",
+            "⚡ Let's build something amazing!",
+            "🤖 Automation at your service!",
+            "✨ Welcome to CLM Automation!"
+        ];
+        
+        function showRobotGreeting() {
+            const randomGreeting = greetings[Math.floor(Math.random() * greetings.length)];
+            robotGreeting.textContent = randomGreeting;
+            robotGreeting.classList.add('show');
+            
+            setTimeout(() => {
+                robotGreeting.classList.remove('show');
+            }, 4000);
+        }
+        
+        // Show greeting on page load
+        setTimeout(() => {
+            showRobotGreeting();
+        }, 1000);
+        
+        // Show greeting when robot is hovered
+        document.querySelector('.robot-container').addEventListener('mouseenter', () => {
+            showRobotGreeting();
+        });
+        
+        // Auto-run first demo after page load
+        setTimeout(() => {
+            runDemo('full');
+        }, 2000);
+    </script>
+</body>
+</html>
+

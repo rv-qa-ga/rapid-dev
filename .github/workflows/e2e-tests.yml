@@ -1,0 +1,318 @@
+name: E2E Automation Tests
+
+on:
+  # Automated triggers disabled until self-hosted runner is configured and tested
+  # Uncomment these after runner setup is complete and tested
+  # push:
+  #   branches: [ main, develop ]
+  # pull_request:
+  #   branches: [ main ]
+  # schedule:
+  #   # Run nightly at 2 AM UTC
+  #   - cron: '0 2 * * *'
+  workflow_dispatch:
+    inputs:
+      work_item:
+        description: 'Work item tag (e.g., SF-506) - runs tests tagged with @SF-506'
+        required: false
+        type: string
+      tags:
+        description: 'Cucumber tags (e.g., @smoke or @smoke,@regression) - runs tests with these tags'
+        required: false
+        type: string
+      feature_file:
+        description: 'Specific feature file path (e.g., src/features/ui/SF/SF-523.feature)'
+        required: false
+        type: string
+      test_type:
+        description: 'Test type to run'
+        required: false
+        default: 'all'
+        type: choice
+        options:
+          - all
+          - ui
+          - api
+          - salesforce
+          - dynamics
+          - sqlserver
+          - smoke
+          - regression
+      environment:
+        description: 'Environment (dev, qa, uat)'
+        required: false
+        default: 'qa'
+        type: choice
+        options:
+          - dev
+          - qa
+          - uat
+      branch:
+        description: 'Branch to checkout (defaults to branch where workflow is triggered)'
+        required: false
+        type: string
+        default: ''
+      cycle_name:
+        description: 'Zephyr test cycle name (e.g., Sprint-93-QA). If not provided, will auto-generate based on work item or date'
+        required: false
+        type: string
+
+# Concurrency control: Prevents duplicate runs for same work item
+# If same work_item triggered multiple times, subsequent runs wait in queue
+# Different work_items can run in parallel (if multiple runners available)
+concurrency:
+  group: e2e-tests-${{ github.event.inputs.work_item || github.run_id }}
+  cancel-in-progress: false  # Queue instead of cancel (prevents duplicate runs)
+
+jobs:
+  test:
+    # Self-hosted runner on Linux VM (UK South region)
+    # Runner should be configured with label: self-hosted
+    # See: docs/setup/SELF_HOSTED_RUNNER_SETUP_PLAN.md
+    runs-on: self-hosted
+    timeout-minutes: 90
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.branch || github.ref }}
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      
+      - name: Install system dependencies
+        # Install Playwright system dependencies (in case they're missing)
+        run: |
+          sudo DEBIAN_FRONTEND=noninteractive apt-get update
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y \
+            libnss3 \
+            libnspr4 \
+            libatk1.0-0 \
+            libatk-bridge2.0-0 \
+            libcups2 \
+            libdrm2 \
+            libdbus-1-3 \
+            libxkbcommon0 \
+            libxcomposite1 \
+            libxdamage1 \
+            libxfixes3 \
+            libxrandr2 \
+            libgbm1 \
+            libasound2 \
+            libpango-1.0-0 \
+            libcairo2 \
+            libxshmfence1 \
+            libxss1 \
+            libgconf-2-4 \
+            fonts-liberation \
+            libappindicator3-1 \
+            xdg-utils || true
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+      
+      - name: Copy .env.qa file if available
+        # Copy .env.qa from persistent location on VM (if it exists)
+        # This allows keeping credentials on the VM without committing them
+        # Security: File is hidden (starts with .) and has restrictive permissions (600)
+        run: |
+          ENV_FILE="/home/github-runner/.env.qa"
+          TARGET_DIR="src/config/env"
+          
+          if [ -f "$ENV_FILE" ]; then
+            echo "📁 Found .env.qa on VM, copying to workspace..."
+            mkdir -p "$TARGET_DIR"
+            cp "$ENV_FILE" "$TARGET_DIR/.env.qa"
+            # Set restrictive permissions: owner read/write only (600 = rw-------)
+            chmod 600 "$TARGET_DIR/.env.qa"
+            # Verify permissions
+            ls -la "$TARGET_DIR/.env.qa" | awk '{print "✅ File permissions: " $1 " (owner: " $3 ":" $4 ")"}'
+            echo "✅ .env.qa copied securely"
+          else
+            echo "ℹ️  No .env.qa found at $ENV_FILE"
+            echo "   Using GitHub Secrets and JSON config only"
+          fi
+        continue-on-error: true
+        # Don't show command output that might expose file contents
+        shell: bash
+      
+      - name: Copy certificates if available
+        # Copy certificates from persistent location on VM (if they exist)
+        # This allows keeping certificates on the VM without committing them
+        # Security: Certificates have restrictive permissions (600)
+        run: |
+          CERTS_DIR="/home/github-runner/certs"
+          TARGET_CERTS_DIR="certs"
+          
+          if [ -d "$CERTS_DIR" ]; then
+            echo "📁 Found certs directory on VM, copying to workspace..."
+            mkdir -p "$TARGET_CERTS_DIR"
+            # Copy all certificate files
+            cp -r "$CERTS_DIR"/* "$TARGET_CERTS_DIR/" 2>/dev/null || true
+            # Set restrictive permissions on all certificate files
+            find "$TARGET_CERTS_DIR" -type f -exec chmod 600 {} \;
+            echo "✅ Certificates copied securely"
+            # List files (without showing contents)
+            echo "📋 Certificate files available:"
+            ls -la "$TARGET_CERTS_DIR" | awk '{print "   " $9 " (" $1 ")"}'
+          else
+            echo "ℹ️  No certs directory found at $CERTS_DIR"
+            echo "   Will use SF_PRIVATE_KEY from .env.qa or GitHub Secrets if available"
+          fi
+        continue-on-error: true
+        shell: bash
+      
+      - name: Sync test cases to Automation cycle
+        if: always()
+        env:
+          ENV: ${{ github.event.inputs.environment || 'qa' }}
+          ATLASSIAN_EMAIL: ${{ secrets.ATLASSIAN_EMAIL }}
+          ATLASSIAN_API_TOKEN: ${{ secrets.ATLASSIAN_API_TOKEN }}
+          JIRA_BASE_URL: ${{ secrets.JIRA_BASE_URL }}
+          ZEPHYR_BASE_URL: ${{ secrets.ZEPHYR_BASE_URL }}
+          ZEPHYR_PROJECT_KEY: ${{ secrets.ZEPHYR_PROJECT_KEY }}
+          ZEPHYR_API_TOKEN: ${{ secrets.ZEPHYR_API_TOKEN }}
+        run: |
+          CYCLE_NAME="Automation"
+          
+          echo "🔄 Syncing test cases to cycle: ${CYCLE_NAME}"
+          
+          # Sync test cases based on input type
+          if [ -n "${{ github.event.inputs.work_item }}" ]; then
+            echo "   Syncing test cases for work item: ${{ github.event.inputs.work_item }}"
+            npm run zephyr:SyncToCycle -- \
+              --work-item "${{ github.event.inputs.work_item }}" \
+              --cycle "${CYCLE_NAME}" \
+              --environment "${ENV}" || echo "⚠️  Sync failed, continuing with test execution"
+          elif [ -n "${{ github.event.inputs.tags }}" ]; then
+            echo "   Syncing test cases for tags: ${{ github.event.inputs.tags }}"
+            npm run zephyr:SyncToCycle -- \
+              --tags "${{ github.event.inputs.tags }}" \
+              --cycle "${CYCLE_NAME}" \
+              --environment "${ENV}" || echo "⚠️  Sync failed, continuing with test execution"
+          elif [ -n "${{ github.event.inputs.feature_file }}" ]; then
+            echo "   Syncing test cases for feature file: ${{ github.event.inputs.feature_file }}"
+            npm run zephyr:SyncToCycle -- \
+              --feature "${{ github.event.inputs.feature_file }}" \
+              --cycle "${CYCLE_NAME}" \
+              --environment "${ENV}" || echo "⚠️  Sync failed, continuing with test execution"
+          else
+            echo "⚠️  No work item, tags, or feature file specified. Skipping cycle sync."
+            echo "   Test cases will be added when results are uploaded."
+          fi
+        continue-on-error: true
+
+      - name: Run tests
+        env:
+          ENV: ${{ github.event.inputs.environment || 'qa' }}
+          HEADLESS: true
+          CI: true
+          TAKE_SCREENSHOTS: true
+          CAPTURE_EVIDENCE: true
+          # Salesforce credentials
+          SF_JWT_CLIENT_ID: ${{ secrets.SF_JWT_CLIENT_ID }}
+          SF_JWT_USERNAME: ${{ secrets.SF_JWT_USERNAME }}
+          SF_PRIVATE_KEY: ${{ secrets.SF_PRIVATE_KEY }}
+          SF_BASE_URL: ${{ secrets.SF_BASE_URL }}
+          SF_LOGIN_URL: ${{ secrets.SF_LOGIN_URL }}
+          # Atlassian credentials
+          ATLASSIAN_EMAIL: ${{ secrets.ATLASSIAN_EMAIL }}
+          ATLASSIAN_API_TOKEN: ${{ secrets.ATLASSIAN_API_TOKEN }}
+          JIRA_BASE_URL: ${{ secrets.JIRA_BASE_URL }}
+          ZEPHYR_BASE_URL: ${{ secrets.ZEPHYR_BASE_URL }}
+          ZEPHYR_PROJECT_KEY: ${{ secrets.ZEPHYR_PROJECT_KEY }}
+          CONFLUENCE_BASE_URL: ${{ secrets.CONFLUENCE_BASE_URL }}
+          CONFLUENCE_SPACE_KEY: ${{ secrets.CONFLUENCE_SPACE_KEY }}
+          CONFLUENCE_PARENT_FOLDER_ID: ${{ secrets.CONFLUENCE_PARENT_FOLDER_ID }}
+        run: |
+          # Determine which tests to run based on inputs
+          if [ -n "${{ github.event.inputs.work_item }}" ]; then
+            echo "Running tests for work item: ${{ github.event.inputs.work_item }}"
+            npm run test:feature -- --tags "@${{ github.event.inputs.work_item }}"
+          elif [ -n "${{ github.event.inputs.tags }}" ]; then
+            echo "Running tests with tags: ${{ github.event.inputs.tags }}"
+            npm run test:feature -- --tags "${{ github.event.inputs.tags }}"
+          elif [ -n "${{ github.event.inputs.feature_file }}" ]; then
+            echo "Running feature file: ${{ github.event.inputs.feature_file }}"
+            npm run test:feature -- "${{ github.event.inputs.feature_file }}"
+          elif [ "${{ github.event.inputs.test_type }}" = "smoke" ]; then
+            echo "Running smoke tests"
+            npm run test:tag:smoke
+          elif [ "${{ github.event.inputs.test_type }}" = "regression" ]; then
+            echo "Running regression tests"
+            npm run test:tag:regression
+          elif [ "${{ github.event.inputs.test_type }}" = "ui" ]; then
+            echo "Running UI tests"
+            npm run test:ui
+          elif [ "${{ github.event.inputs.test_type }}" = "api" ]; then
+            echo "Running API tests"
+            npm run test:api
+          elif [ "${{ github.event.inputs.test_type }}" = "salesforce" ]; then
+            echo "Running Salesforce tests"
+            npm run test:salesforce
+          elif [ "${{ github.event.inputs.test_type }}" = "dynamics" ]; then
+            echo "Running Dynamics tests"
+            npm run test:dynamics
+          elif [ "${{ github.event.inputs.test_type }}" = "sqlserver" ]; then
+            echo "Running SQL Server tests"
+            npm run test:sqlserver
+          else
+            echo "Running all tests"
+            npm run test:all
+          fi
+      
+      - name: Upload results to Zephyr
+        if: always()
+        env:
+          ENV: ${{ github.event.inputs.environment || 'qa' }}
+          ATLASSIAN_EMAIL: ${{ secrets.ATLASSIAN_EMAIL }}
+          ATLASSIAN_API_TOKEN: ${{ secrets.ATLASSIAN_API_TOKEN }}
+          ZEPHYR_BASE_URL: ${{ secrets.ZEPHYR_BASE_URL }}
+          ZEPHYR_PROJECT_KEY: ${{ secrets.ZEPHYR_PROJECT_KEY }}
+          ZEPHYR_API_TOKEN: ${{ secrets.ZEPHYR_API_TOKEN }}
+        run: |
+          # Always use "Automation" cycle for E2E tests
+          CYCLE_NAME="Automation"
+          
+          echo "📊 Uploading results to cycle: ${CYCLE_NAME}"
+          
+          # Upload results with cycle name
+          if [ -n "${{ github.event.inputs.work_item }}" ]; then
+            npm run zephyr:UploadResult -- --work-item ${{ github.event.inputs.work_item }} --cycle "${CYCLE_NAME}"
+          elif [ -n "${{ github.event.inputs.feature_file }}" ]; then
+            npm run zephyr:UploadResult -- --feature "${{ github.event.inputs.feature_file }}" --cycle "${CYCLE_NAME}"
+          else
+            # Upload all results
+            npm run zephyr:UploadResult -- --cycle "${CYCLE_NAME}"
+          fi
+      
+      - name: Upload test artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-reports-${{ github.run_number }}
+          path: |
+            reports/
+            test-results/
+          retention-days: 30
+          compression-level: 6
+      
+      - name: Publish test summary
+        if: always()
+        run: |
+          echo "## Test Execution Summary" >> $GITHUB_STEP_SUMMARY
+          echo "- **Environment**: ${{ github.event.inputs.environment || 'qa' }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Test Type**: ${{ github.event.inputs.test_type || 'all' }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Work Item**: ${{ github.event.inputs.work_item || 'N/A' }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Tags**: ${{ github.event.inputs.tags || 'N/A' }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Feature File**: ${{ github.event.inputs.feature_file || 'N/A' }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Run Number**: ${{ github.run_number }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Artifacts**: Available in Actions tab" >> $GITHUB_STEP_SUMMARY
+

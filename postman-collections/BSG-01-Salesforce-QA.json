@@ -1,0 +1,84 @@
+{
+  "info": {
+    "_postman_id": "a1111111-1111-4111-8001-000000000001",
+    "name": "01 - Salesforce QA",
+    "description": "BSG workspace — Salesforce REST **read-first** samples.\n\n## Auth\nSet `sf_access_token` from **00 - Auth & Tokens** (JWT/OAuth) or paste a token for debugging.\n\n## Variables (environment)\n- `sf_base_url` — e.g. https://instance--qa.sandbox.my.salesforce.com\n- `sf_api_version` — e.g. v59.0\n- `sf_access_token` — Bearer token\n\n## Monitor policy\nFolders **1** and **2** are intended read-only smoke. Folder **3** runs SOQL (read-only).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [{ "key": "token", "value": "{{sf_access_token}}", "type": "string" }]
+  },
+  "variable": [
+    { "key": "sf_api_version", "value": "v59.0", "type": "string" }
+  ],
+  "item": [
+    {
+      "name": "1. Health & connectivity",
+      "description": "Lightweight calls to confirm token and API reachability.",
+      "item": [
+        {
+          "name": "GET API versions (root)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": "{{sf_base_url}}/services/data/"
+          },
+          "response": []
+        },
+        {
+          "name": "GET Organization limits",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": "{{sf_base_url}}/services/data/{{sf_api_version}}/limits"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "2. Read-only smoke",
+      "description": "Safe for scheduled monitors if token is valid and policy allows.",
+      "item": [
+        {
+          "name": "GET Global describe (sobjects)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": "{{sf_base_url}}/services/data/{{sf_api_version}}/sobjects/"
+          },
+          "response": []
+        },
+        {
+          "name": "GET Account describe",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": "{{sf_base_url}}/services/data/{{sf_api_version}}/sobjects/Account/describe"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "3. Query (SOQL) — read-only",
+      "item": [
+        {
+          "name": "GET Query — Account LIMIT 1",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": {
+              "raw": "{{sf_base_url}}/services/data/{{sf_api_version}}/query?q=SELECT+Id,Name+FROM+Account+LIMIT+1",
+              "host": ["{{sf_base_url}}"],
+              "path": ["services", "data", "{{sf_api_version}}", "query"],
+              "query": [{ "key": "q", "value": "SELECT Id,Name FROM Account LIMIT 1" }]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

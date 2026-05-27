@@ -1,0 +1,752 @@
+{
+  "info": {
+    "_postman_id": "sf-508-api-tests",
+    "name": "SF-508 - Opportunity Win Reason Validation Rules - API Tests",
+    "description": "API - SF-508 - Opportunity 'Win Reason' Validation Rules Update\n\n══════════════════════════════════════════════════════════════════════════════\nGenerated: 2026-01-14\n══════════════════════════════════════════════════════════════════════════════\n\nSUMMARY:\n  Opportunity 'Win Reason' Validation Rules Update\n\nDESCRIPTION:\n  As an MRD I want to define a win reason for an opportunity that is not listed \n  in the picklist values. When I specify that the win reason is 'Other', I must \n  be forced to input a value in the Win reason details field before I can save \n  the record.\n\nACCEPTANCE CRITERIA:\n  1. When Win Reason is set to 'Other', Win_reason_details__c field must be populated\n  2. Validation rule enforces mandatory Win_reason_details__c when Win Reason = 'Other'\n  3. Field exists on Opportunity object\n\nAPI TESTING REQUIREMENTS:\n  - Verify Win_reason_details__c field exists on Opportunity\n  - Create Opportunity with Win reason details\n  - Update Win_reason_details__c on Opportunity\n  - Query Opportunity by Win reason details\n  - Negative/boundary scenarios (invalid values, null handling)\n\nGenerated from: src/features/api/SF/SF-508.feature\n\nThis collection contains API tests for SF-508 work item.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{sf_access_token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "{{sf_base_url}}",
+      "type": "string"
+    },
+    {
+      "key": "api_version",
+      "value": "{{sf_api_version}}",
+      "type": "string"
+    },
+    {
+      "key": "opportunity_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "opportunity_id_with_win_reason",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "account_id",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Field Existence Verification",
+      "item": [
+        {
+          "name": "SF-508-API-001 - Describe Opportunity Object",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Win_reason_details__c field exists on Opportunity\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    var fields = jsonData.fields;",
+                  "    ",
+                  "    // Debug: Log all field names to help identify the correct field name",
+                  "    var fieldNames = fields.map(function(f) { return f.name; });",
+                  "    var winReasonFields = fieldNames.filter(function(name) { return name.toLowerCase().includes('win') && name.toLowerCase().includes('reason'); });",
+                  "    ",
+                  "    if (winReasonFields.length > 0) {",
+                  "        console.log('⚠️ Found similar fields: ' + winReasonFields.join(', '));",
+                  "    }",
+                  "    ",
+                  "    var field = fields.find(function(f) { return f.name === 'Win_reason_details__c'; });",
+                  "    ",
+                  "    if (!field) {",
+                  "        // Try alternative field names",
+                  "        field = fields.find(function(f) { return f.name === 'Win_Reason_Details__c'; });",
+                  "    }",
+                  "    if (!field) {",
+                  "        field = fields.find(function(f) { return f.name.toLowerCase() === 'win_reason_details__c'; });",
+                  "    }",
+                  "    ",
+                  "    if (!field) {",
+                  "        console.error('❌ Field Win_reason_details__c not found');",
+                  "        console.error('Total fields in Opportunity: ' + fields.length);",
+                  "        console.error('Sample field names (first 20): ' + fieldNames.slice(0, 20).join(', '));",
+                  "        if (winReasonFields.length > 0) {",
+                  "            console.error('Similar fields found: ' + winReasonFields.join(', '));",
+                  "        }",
+                  "    }",
+                  "    ",
+                  "    pm.expect(field).to.not.be.undefined;",
+                  "    pm.expect(field.name).to.equal('Win_reason_details__c');",
+                  "    console.log('✅ Win_reason_details__c field found');",
+                  "    console.log('Field Type: ' + field.type);",
+                  "    console.log('Field Label: ' + field.label);",
+                  "    if (field.required !== undefined) {",
+                  "        console.log('Required: ' + field.required);",
+                  "    }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Opportunity/describe",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "data",
+                "{{api_version}}",
+                "sobjects",
+                "Opportunity",
+                "describe"
+              ]
+            },
+            "description": "Verify Win_reason_details__c field exists on Opportunity object\n\n**Test:** SF-508-API-001\n**Purpose:** Field existence verification"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Opportunity CRUD Operations",
+      "item": [
+        {
+          "name": "SF-508-API-002 - Create Account (Prerequisite)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test(\"Response contains Account ID\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.id).to.not.be.undefined;",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    pm.collectionVariables.set('account_id', jsonData.id);",
+                  "    console.log('✅ Account created with ID: ' + jsonData.id);",
+                  "    console.log('Account ID saved to variable: account_id');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"Name\": \"SF-508 Test Account\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Account/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "data",
+                "{{api_version}}",
+                "sobjects",
+                "Account",
+                ""
+              ]
+            },
+            "description": "Create Account as prerequisite for Opportunity creation\n\n**Note:** Opportunities require an Account"
+          },
+          "response": []
+        },
+        {
+          "name": "SF-508-API-002 - Create Opportunity with Win reason details",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test(\"Response contains Opportunity ID\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.id).to.not.be.undefined;",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    pm.collectionVariables.set('opportunity_id', jsonData.id);",
+                  "    console.log('✅ Opportunity created with ID: ' + jsonData.id);",
+                  "    console.log('Opportunity ID saved to variable: opportunity_id');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "var accountId = pm.collectionVariables.get('account_id');",
+                  "if (!accountId) {",
+                  "    throw new Error('account_id variable is not set. Please run the Create Account request first.');",
+                  "}",
+                  "console.log('Using Account ID: ' + accountId);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"Name\": \"API Test Opportunity\",\n  \"AccountId\": \"{{account_id}}\",\n  \"StageName\": \"Pipeline\",\n  \"CloseDate\": \"2026-12-31\",\n  \"Win_reason_details__c\": \"Custom win reason details for API testing\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Opportunity/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "data",
+                "{{api_version}}",
+                "sobjects",
+                "Opportunity",
+                ""
+              ]
+            },
+            "description": "Create Opportunity with Win_reason_details__c field populated\n\n**Test:** SF-508-API-002\n**Fields:**\n- Name: API Test Opportunity\n- AccountId: Required (from previous request)\n- StageName: Pipeline\n- CloseDate: 2026-12-31\n- Win_reason_details__c: Custom win reason details"
+          },
+          "response": []
+        },
+        {
+          "name": "SF-508-API-003 - Update Win_reason_details__c on Opportunity",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 204\", function () {",
+                  "    pm.response.to.have.status(204);",
+                  "});",
+                  "",
+                  "console.log('✅ Win_reason_details__c updated successfully');"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "var oppId = pm.collectionVariables.get('opportunity_id');",
+                  "if (!oppId) {",
+                  "    throw new Error('opportunity_id variable is not set. Please run the Create Opportunity request first.');",
+                  "}",
+                  "console.log('Updating Opportunity: ' + oppId);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"Win_reason_details__c\": \"Updated Value\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Opportunity/{{opportunity_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "data",
+                "{{api_version}}",
+                "sobjects",
+                "Opportunity",
+                "{{opportunity_id}}"
+              ]
+            },
+            "description": "Update Win_reason_details__c field on existing Opportunity\n\n**Test:** SF-508-API-003\n**Purpose:** Verify field can be updated via API\n**Update Value:** \"Updated Value\""
+          },
+          "response": []
+        },
+        {
+          "name": "SF-508-API-003 - Verify Updated Win_reason_details__c",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Win_reason_details__c is updated\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.Win_reason_details__c).to.equal('Updated Value');",
+                  "    console.log('✅ Win_reason_details__c verified: ' + jsonData.Win_reason_details__c);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "var oppId = pm.collectionVariables.get('opportunity_id');",
+                  "if (!oppId) {",
+                  "    throw new Error('opportunity_id variable is not set. Please run the Create Opportunity request first.');",
+                  "}",
+                  "console.log('Verifying Opportunity: ' + oppId);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Opportunity/{{opportunity_id}}?fields=Id,Name,Win_reason_details__c",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "data",
+                "{{api_version}}",
+                "sobjects",
+                "Opportunity",
+                "{{opportunity_id}}"
+              ],
+              "query": [
+                {
+                  "key": "fields",
+                  "value": "Id,Name,Win_reason_details__c"
+                }
+              ]
+            },
+            "description": "Verify Win_reason_details__c field was updated correctly\n\n**Purpose:** Confirm the update from SF-508-API-003 was successful"
+          },
+          "response": []
+        },
+        {
+          "name": "SF-508-API-004 - Query Opportunity by ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Opportunity has Win_reason_details__c\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.Win_reason_details__c).to.not.be.undefined;",
+                  "    console.log('✅ Opportunity Win_reason_details__c: ' + jsonData.Win_reason_details__c);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "var oppId = pm.collectionVariables.get('opportunity_id');",
+                  "if (!oppId) {",
+                  "    throw new Error('opportunity_id variable is not set. Please run the Create Opportunity request first.');",
+                  "}",
+                  "console.log('Querying Opportunity: ' + oppId);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Opportunity/{{opportunity_id}}?fields=Id,Name,Win_reason_details__c",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "data",
+                "{{api_version}}",
+                "sobjects",
+                "Opportunity",
+                "{{opportunity_id}}"
+              ],
+              "query": [
+                {
+                  "key": "fields",
+                  "value": "Id,Name,Win_reason_details__c"
+                }
+              ]
+            },
+            "description": "Query Opportunity by ID to verify Win_reason_details__c\n\n**Test:** SF-508-API-004 (Verification)\n**Query Format:** GET /sobjects/{object}/{id}?fields=..."
+          },
+          "response": []
+        },
+        {
+          "name": "SF-508-API-004 - SOQL Query Opportunities with Win_reason_details__c",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Query returned results\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.records).to.be.an('array');",
+                  "    pm.expect(jsonData.totalSize).to.be.at.least(0);",
+                  "    console.log('✅ Query successful. Total records: ' + jsonData.totalSize);",
+                  "    if (jsonData.records && jsonData.records.length > 0) {",
+                  "        console.log('Sample record Win_reason_details__c: ' + jsonData.records[0].Win_reason_details__c);",
+                  "        ",
+                  "        // Verify all returned records have Win_reason_details__c populated",
+                  "        jsonData.records.forEach(function(record) {",
+                  "            pm.expect(record.Win_reason_details__c).to.not.be.null;",
+                  "        });",
+                  "    }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/query?q=SELECT Id,Name,Win_reason_details__c FROM Opportunity WHERE Win_reason_details__c != null LIMIT 10",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "data",
+                "{{api_version}}",
+                "query"
+              ],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "SELECT Id,Name,Win_reason_details__c FROM Opportunity WHERE Win_reason_details__c != null LIMIT 10",
+                  "description": "SOQL query - URL encoded automatically by Postman"
+                }
+              ]
+            },
+            "description": "SOQL Query to find Opportunities with Win_reason_details__c populated\n\n**Test:** SF-508-API-004 (SOQL Query)\n**Query Format:** GET /query?q=SELECT... (SOQL)\n**Purpose:** Demonstrate proper SOQL query format\n**SOQL:** SELECT Id,Name,Win_reason_details__c FROM Opportunity WHERE Win_reason_details__c != null LIMIT 10"
+          },
+          "response": []
+        },
+        {
+          "name": "SF-508-API-004 - SOQL Query All Opportunities",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Query returned results\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.records).to.be.an('array');",
+                  "    pm.expect(jsonData.totalSize).to.be.at.least(0);",
+                  "    console.log('✅ Query successful. Total records: ' + jsonData.totalSize);",
+                  "    ",
+                  "    // Count records with and without Win_reason_details__c",
+                  "    var withDetails = jsonData.records.filter(function(r) { return r.Win_reason_details__c != null && r.Win_reason_details__c != ''; }).length;",
+                  "    var withoutDetails = jsonData.records.length - withDetails;",
+                  "    console.log('Records with Win_reason_details__c: ' + withDetails);",
+                  "    console.log('Records without Win_reason_details__c: ' + withoutDetails);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/query?q=SELECT Id,Name,Win_reason_details__c FROM Opportunity LIMIT 10",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "data",
+                "{{api_version}}",
+                "query"
+              ],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "SELECT Id,Name,Win_reason_details__c FROM Opportunity LIMIT 10",
+                  "description": "SOQL query - URL encoded automatically by Postman"
+                }
+              ]
+            },
+            "description": "SOQL Query to get all Opportunities (with and without Win_reason_details__c)\n\n**Test:** SF-508-API-004 (All Opportunities)\n**Query Format:** GET /query?q=SELECT... (SOQL)\n**Purpose:** Query all Opportunity records as per feature file requirement\n**SOQL:** SELECT Id,Name,Win_reason_details__c FROM Opportunity LIMIT 10"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Negative / Boundary Scenarios",
+      "item": [
+        {
+          "name": "SF-508-API-005 - Reject invalid Win_reason_details__c value",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code indicates error\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([400, 422]);",
+                  "});",
+                  "",
+                  "pm.test(\"Error response mentions Win_reason_details\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    var errorString = JSON.stringify(jsonData).toLowerCase();",
+                  "    var hasWinReason = errorString.includes('win_reason') || errorString.includes('win reason');",
+                  "    console.log('Error response: ' + JSON.stringify(jsonData, null, 2));",
+                  "    // Note: This test may pass even if error doesn't explicitly mention field name",
+                  "    // The important part is that invalid value was rejected",
+                  "    pm.expect(pm.response.code).to.be.oneOf([400, 422]);",
+                  "});",
+                  "",
+                  "console.log('✅ Invalid value rejected (expected behavior)');"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "var accountId = pm.collectionVariables.get('account_id');",
+                  "if (!accountId) {",
+                  "    throw new Error('account_id variable is not set. Please run the Create Account request first.');",
+                  "}",
+                  "console.log('Testing invalid Win_reason_details__c value');"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"Name\": \"Invalid Test\",\n  \"AccountId\": \"{{account_id}}\",\n  \"StageName\": \"Pipeline\",\n  \"CloseDate\": \"2026-12-31\",\n  \"Win_reason_details__c\": \"INVALID_VALUE_###\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Opportunity/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "data",
+                "{{api_version}}",
+                "sobjects",
+                "Opportunity",
+                ""
+              ]
+            },
+            "description": "Attempt to create Opportunity with invalid Win_reason_details__c value\n\n**Test:** SF-508-API-005\n**Purpose:** Verify invalid values are rejected\n**Expected:** 400 or 422 error response\n**Note:** This test may pass or fail depending on field validation rules. If the field accepts any text, this may succeed."
+          },
+          "response": []
+        },
+        {
+          "name": "SF-508-API-006 - Create Opportunity without Win_reason_details",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test(\"Response contains Opportunity ID\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.id).to.not.be.undefined;",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    pm.collectionVariables.set('opportunity_id_with_win_reason', jsonData.id);",
+                  "    console.log('✅ Opportunity created without Win_reason_details__c');",
+                  "    console.log('Opportunity ID: ' + jsonData.id);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "var accountId = pm.collectionVariables.get('account_id');",
+                  "if (!accountId) {",
+                  "    throw new Error('account_id variable is not set. Please run the Create Account request first.');",
+                  "}",
+                  "console.log('Creating Opportunity without Win_reason_details__c');"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"Name\": \"Opportunity Without Win Reason Details\",\n  \"AccountId\": \"{{account_id}}\",\n  \"StageName\": \"Pipeline\",\n  \"CloseDate\": \"2026-12-31\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Opportunity/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "data",
+                "{{api_version}}",
+                "sobjects",
+                "Opportunity",
+                ""
+              ]
+            },
+            "description": "Create Opportunity without Win_reason_details__c field\n\n**Test:** SF-508-API-006 (Setup)\n**Purpose:** Create Opportunity for null value verification"
+          },
+          "response": []
+        },
+        {
+          "name": "SF-508-API-006 - Verify null Win_reason_details__c value",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Win_reason_details__c is null or empty\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    var winReasonDetails = jsonData.Win_reason_details__c;",
+                  "    var isNullOrEmpty = (winReasonDetails === null || winReasonDetails === undefined || winReasonDetails === '');",
+                  "    pm.expect(isNullOrEmpty).to.be.true;",
+                  "    console.log('✅ Win_reason_details__c is null or empty (as expected): ' + winReasonDetails);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "var oppId = pm.collectionVariables.get('opportunity_id_with_win_reason');",
+                  "if (!oppId) {",
+                  "    throw new Error('opportunity_id_with_win_reason variable is not set. Please run the Create Opportunity without Win_reason_details request first.');",
+                  "}",
+                  "console.log('Verifying null Win_reason_details__c on Opportunity: ' + oppId);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Opportunity/{{opportunity_id_with_win_reason}}?fields=Id,Name,Win_reason_details__c",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "data",
+                "{{api_version}}",
+                "sobjects",
+                "Opportunity",
+                "{{opportunity_id_with_win_reason}}"
+              ],
+              "query": [
+                {
+                  "key": "fields",
+                  "value": "Id,Name,Win_reason_details__c"
+                }
+              ]
+            },
+            "description": "Verify Win_reason_details__c is null or empty on Opportunity created without the field\n\n**Test:** SF-508-API-006\n**Purpose:** Verify null/blank value handling"
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

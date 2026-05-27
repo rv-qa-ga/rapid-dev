@@ -1,0 +1,99 @@
+{
+  "id": "bsg-qa-env-template",
+  "name": "BSG QA (template)",
+  "values": [
+    {
+      "key": "sf_base_url",
+      "value": "https://your-instance--qa.sandbox.my.salesforce.com",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "sf_api_version",
+      "value": "v59.0",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "sf_access_token",
+      "value": "",
+      "type": "secret",
+      "enabled": true
+    },
+    {
+      "key": "d365_tenant_id",
+      "value": "your-azure-tenant-guid",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "d365_client_id",
+      "value": "",
+      "type": "secret",
+      "enabled": true
+    },
+    {
+      "key": "d365_client_secret",
+      "value": "",
+      "type": "secret",
+      "enabled": true
+    },
+    {
+      "key": "d365_scope",
+      "value": "https://your-org.crm.dynamics.com/.default",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "d365_web_api_base_url",
+      "value": "https://your-org.crm.dynamics.com/api/data/v9.2",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "d365_access_token",
+      "value": "",
+      "type": "secret",
+      "enabled": true
+    },
+    {
+      "key": "mulesoft_base_url",
+      "value": "https://eu1.anypoint.mulesoft.com",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "mulesoft_api_base_url",
+      "value": "https://eu1.anypoint.mulesoft.com/amc/application-manager/api/v2",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "mulesoft_client_id",
+      "value": "",
+      "type": "secret",
+      "enabled": true
+    },
+    {
+      "key": "mulesoft_client_secret",
+      "value": "",
+      "type": "secret",
+      "enabled": true
+    },
+    {
+      "key": "mulesoft_access_token",
+      "value": "",
+      "type": "secret",
+      "enabled": true
+    },
+    {
+      "key": "mulesoft_organization_id",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    }
+  ],
+  "_postman_variable_scope": "environment",
+  "_postman_exported_at": "2026-03-24T00:00:00.000Z",
+  "_postman_exported_using": "Postman/Automation-template"
+}

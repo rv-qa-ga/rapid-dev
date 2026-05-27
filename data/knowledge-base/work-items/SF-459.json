@@ -1,0 +1,34 @@
+{
+  "key": "SF-459",
+  "summary": "Update Account field name labels",
+  "type": "Story",
+  "status": "Ready for QA",
+  "priority": "Medium",
+  "description": {
+    "raw": "As an MRD  I want clear field labels on the account page  So that risks of poor data being input is minimal Acceptance Criteria: The field label currently stated as ‘Employees' is updated to 'No. of Employees’ The field label currently stated as ‘Proposed Expiration Date’ is updated to  ‘Current Program Expiration Date’ The field label currently stated as Industry’ is updated to ‘Target Insured Industry’ The standard Salesforce Account Number needs to be hidden in all page layouts The field label currency stated as ‘Incumbent Carrier’ should be changed to ‘Prior/Incumbent’  Scenario 1: Update field labels to reduce data input errors Given  I am viewing the Account page as an MRD When  I review the field labels Then  The field label currently stated as  ‘Employees’  is updated to  ‘No. of Employees’ And  The field label currently stated as  ‘Proposed Expiration Date’  is updated to  ‘Current Program Expiration Date’ And  The field label currently stated as Industry’ is updated to ‘Target Insured Industry’ And  The standard Salesforce Account Number needs to be hidden in all page layouts And  the field label currently stated as  ‘Incumbent Carrier'  is updated to ' Prior/Incumbent ’",
+    "parsed": {
+      "sentences": [
+        "As an MRD  I want clear field labels on the account page  So that risks of poor data being input is minimal Acceptance Criteria: The field label currently stated as ‘Employees' is updated to 'No",
+        "of Employees’ The field label currently stated as ‘Proposed Expiration Date’ is updated to  ‘Current Program Expiration Date’ The field label currently stated as Industry’ is updated to ‘Target Insured Industry’ The standard Salesforce Account Number needs to be hidden in all page layouts The field label currency stated as ‘Incumbent Carrier’ should be changed to ‘Prior/Incumbent’  Scenario 1: Update field labels to reduce data input errors Given  I am viewing the Account page as an MRD When  I review the field labels Then  The field label currently stated as  ‘Employees’  is updated to  ‘No",
+        "of Employees’ And  The field label currently stated as  ‘Proposed Expiration Date’  is updated to  ‘Current Program Expiration Date’ And  The field label currently stated as Industry’ is updated to ‘Target Insured Industry’ And  The standard Salesforce Account Number needs to be hidden in all page layouts And  the field label currently stated as  ‘Incumbent Carrier'  is updated to ' Prior/Incumbent ’"
+      ],
+      "entities": [
+        "Account"
+      ],
+      "fields": [],
+      "actions": [
+        "update"
+      ]
+    }
+  },
+  "acceptanceCriteria": [],
+  "comments": [],
+  "relatedIssues": [],
+  "fieldDefinitions": {},
+  "generatedFeatures": {
+    "ui": "src/features/ui/SF/SF-459.feature",
+    "api": "src/features/api/SF/SF-459.feature"
+  },
+  "qaReviewedFeatures": {},
+  "extractedAt": "2025-12-17T18:40:39.089Z"
+}

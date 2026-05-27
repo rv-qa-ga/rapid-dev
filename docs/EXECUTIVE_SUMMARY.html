@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E2E Automation Framework - Executive Summary</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f5f5;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+
+        header {
+            background: linear-gradient(135deg, #1a1f2e 0%, #2d3748 100%);
+            color: white;
+            padding: 3rem 2rem;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+
+        header .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-bottom: 2rem;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            background: rgba(0, 212, 255, 0.2);
+            border: 1px solid rgba(0, 212, 255, 0.5);
+            border-radius: 20px;
+            font-size: 0.85rem;
+            margin-top: 1rem;
+        }
+
+        .content {
+            padding: 3rem 2rem;
+        }
+
+        section {
+            margin-bottom: 3rem;
+        }
+
+        h2 {
+            color: #1a1f2e;
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 3px solid #00d4ff;
+        }
+
+        h3 {
+            color: #2d3748;
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 1.5rem;
+            border-radius: 8px;
+            text-align: center;
+            border-left: 4px solid #00d4ff;
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #00d4ff;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: #6c757d;
+            margin-top: 0.5rem;
+        }
+
+        .benefits-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .benefit-card {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+            border-top: 3px solid #00d4ff;
+        }
+
+        .benefit-card h4 {
+            color: #1a1f2e;
+            margin-bottom: 0.5rem;
+        }
+
+        .benefit-card p {
+            color: #6c757d;
+            font-size: 0.95rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            background: white;
+        }
+
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        th {
+            background: #1a1f2e;
+            color: white;
+            font-weight: 600;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        .workflow-steps {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .workflow-step {
+            display: flex;
+            gap: 1.5rem;
+            padding: 1.5rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #00d4ff;
+        }
+
+        .step-number {
+            background: #00d4ff;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .step-content h4 {
+            color: #1a1f2e;
+            margin-bottom: 0.5rem;
+        }
+
+        .step-content p {
+            color: #6c757d;
+        }
+
+        .phase-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .phase-card {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+            border-left: 4px solid #10b981;
+        }
+
+        .phase-card.planned {
+            border-left-color: #f59e0b;
+        }
+
+        .phase-card h4 {
+            color: #1a1f2e;
+            margin-bottom: 0.5rem;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-top: 0.5rem;
+        }
+
+        .status-automated {
+            background: rgba(16, 185, 129, 0.1);
+            color: #059669;
+        }
+
+        .status-planned {
+            background: rgba(245, 158, 11, 0.1);
+            color: #d97706;
+        }
+
+        .tech-stack {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .tech-item {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid #dee2e6;
+        }
+
+        .tech-item strong {
+            color: #1a1f2e;
+            display: block;
+            margin-bottom: 0.25rem;
+        }
+
+        .tech-item span {
+            color: #6c757d;
+            font-size: 0.85rem;
+        }
+
+        .highlight-box {
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.1) 0%, rgba(168, 85, 247, 0.1) 100%);
+            border-left: 4px solid #00d4ff;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin: 2rem 0;
+        }
+
+        .highlight-box h4 {
+            color: #1a1f2e;
+            margin-bottom: 0.5rem;
+        }
+
+        footer {
+            background: #1a1f2e;
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        footer p {
+            opacity: 0.8;
+            margin-bottom: 0.5rem;
+        }
+
+        @media print {
+            body {
+                background: white;
+            }
+            .container {
+                box-shadow: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 1.8rem;
+            }
+            .stats-grid, .benefits-grid, .phase-grid {
+                grid-template-columns: 1fr;
+            }
+            .workflow-step {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+            <header>
+            <h1>E2E Automation Framework</h1>
+            <p class="subtitle">Executive Summary</p>
+            <span class="badge">QA Automation Framework v2.0</span>
+            <p style="margin-top: 1rem; font-size: 0.95rem; opacity: 0.9;">
+                All framework code is available in the GitHub repository
+            </p>
+        </header>
+
+        <div class="content">
+            <!-- Overview -->
+            <section>
+                <h2>Executive Overview</h2>
+                <p style="font-size: 1.1rem; color: #495057; margin-bottom: 1.5rem;">
+                    The <strong>E2E Automation Framework</strong> is a unified, enterprise-grade test automation platform 
+                    designed to streamline quality assurance across the Accelerant End to End ecosystem. 
+                    Built with Cursor AI on modern technologies (Playwright, Cucumber, TypeScript), the framework consolidates UI and 
+                    API testing into a single solution, automating critical phases of the QA lifecycle while maintaining 
+                    human oversight and control at each stage.
+                </p>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <span class="stat-value">6</span>
+                        <span class="stat-label">Automated Phases</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-value">144+</span>
+                        <span class="stat-label">Feature Files</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-value">900+</span>
+                        <span class="stat-label">Test Cases in Zephyr</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-value">5</span>
+                        <span class="stat-label">Systems in Production</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-value">3</span>
+                        <span class="stat-label">Systems Planned</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Business Value -->
+            <section>
+                <h2>Business Value & Strategic Benefits</h2>
+                
+                <div class="benefits-grid">
+                    <div class="benefit-card">
+                        <h4>⚡ 80% Time Reduction</h4>
+                        <p>Test case creation time reduced from hours to minutes through AI-powered generation from Jira work items.</p>
+                    </div>
+                    <div class="benefit-card">
+                        <h4>🔄 Unified Platform</h4>
+                        <p>Single framework eliminates tool fragmentation, reducing training time and maintenance overhead across teams.</p>
+                    </div>
+                    <div class="benefit-card">
+                        <h4>📊 Full Traceability</h4>
+                        <p>Complete audit trail from Jira requirements → Test Cases → Execution → Evidence for compliance and reporting.</p>
+                    </div>
+                    <div class="benefit-card">
+                        <h4>🚀 Faster Time-to-Market</h4>
+                        <p>Parallel execution and comprehensive automation accelerate release cycles while maintaining quality standards.</p>
+                    </div>
+                    <div class="benefit-card">
+                        <h4>💰 Cost Efficiency</h4>
+                        <p>Centralized framework reduces tool licensing costs and maintenance overhead across multiple systems.</p>
+                    </div>
+                    <div class="benefit-card">
+                        <h4>🔍 Risk Mitigation</h4>
+                        <p>Cross-system data validation ensures data integrity across the entire CLM ecosystem before production deployment.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Systems Coverage -->
+            <section>
+                <h2>Systems Integration Coverage</h2>
+                <p style="margin-bottom: 1.5rem;">
+                    The framework provides comprehensive testing across the Accelerant E2E ecosystem, ensuring end-to-end validation 
+                    from source systems through integration layers to data warehouses. <strong>5 systems are currently in 
+                    production</strong>, with <strong>3 additional systems (MuleSoft and Dynamics 365 F&O, Data Cloud) planned</strong> 
+                    for future implementation.
+                </p>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>System</th>
+                            <th>Type</th>
+                            <th>Testing Capability</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Salesforce CRM</strong></td>
+                            <td>Core Platform</td>
+                            <td>UI + API Testing</td>
+                            <td>✅ Production</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Data Cloud</strong></td>
+                            <td>Data Platform</td>
+                            <td>API Integration Testing</td>
+                              <td>📋 Planned</td>
+                        </tr>
+                        <tr>
+                            <td><strong>MuleSoft</strong></td>
+                            <td>Integration Layer</td>
+                            <td>API Contract Testing</td>
+                            <td>📋 Planned</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Operations Workflow</strong></td>
+                            <td>Business Process</td>
+                            <td>UI + API Testing</td>
+                            <td>✅ Production</td>
+                        </tr>
+                        <tr>
+                            <td><strong>RDM</strong></td>
+                            <td>Reference Data Management</td>
+                            <td>API Testing</td>
+                            <td>✅ Production</td>
+                        </tr>
+                        <tr>
+                            <td><strong>CMT</strong></td>
+                            <td>Configuration Management</td>
+                            <td>API Testing</td>
+                            <td>✅ Production</td>
+                        </tr>
+                        <tr>
+                            <td><strong>ODS (SQL Server)</strong></td>
+                            <td>Operational Data Store</td>
+                            <td>Data Validation Testing</td>
+                            <td>✅ Production</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Dynamics 365 F&O</strong></td>
+                            <td>Dynamics Finance Platform</td>
+                            <td>API Testing</td>
+                            <td>📋 Planned</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <!-- QA Lifecycle Automation -->
+            <section>
+                <h2>QA Lifecycle Automation</h2>
+                <p style="margin-bottom: 1.5rem;">
+                    The framework automates <strong>six key phases</strong> of the QA lifecycle. Each phase is 
+                    <strong>initiated, controlled, and reviewed by QA engineers</strong> to ensure quality and accuracy.
+                </p>
+
+                <div class="phase-grid">
+                    <div class="phase-card">
+                        <h4>01. Requirement Analysis</h4>
+                        <p>Extracts acceptance criteria, field definitions, and business rules from Jira work items via API. Manual review of requirements before proceeding.</p>
+                        <span class="status-badge status-automated">✓ Automated + Manual Review</span>
+                    </div>
+                    <div class="phase-card">
+                        <h4>02. Test Case Design</h4>
+                        <p>Generates comprehensive Gherkin (BDD) feature files with positive, negative, and edge case scenarios. Manual review of test scenarios required.</p>
+                        <span class="status-badge status-automated">✓ Automated + Manual Review</span>
+                    </div>
+                    <div class="phase-card">
+                        <h4>03. Test Data Setup</h4>
+                        <p>Creates test data records via Salesforce API with 24+ fields populated. Auto-cleanup included. Manual review of test data quality.</p>
+                        <span class="status-badge status-automated">✓ Automated + Manual Review</span>
+                    </div>
+                    <div class="phase-card">
+                        <h4>04. Test Execution</h4>
+                        <p>Executes UI tests (Playwright) and API tests (REST/JWT) across all integrated systems. Manual review of test results and failures.</p>
+                        <span class="status-badge status-automated">✓ Automated + Manual Review</span>
+                    </div>
+                    <div class="phase-card">
+                        <h4>05. Evidence Generation</h4>
+                        <p>Captures screenshots, generates HTML/JSON reports, uploads evidence to Confluence automatically. Manual review of evidence quality.</p>
+                        <span class="status-badge status-automated">✓ Automated + Manual Review</span>
+                    </div>
+                    <div class="phase-card planned">
+                        <h4>06. Bug Creation</h4>
+                        <p>Automatically creates Jira bugs for failed tests with reproduction steps and evidence links. Manual review of bug details before creation.</p>
+                        <span class="status-badge status-planned">📋 Planned</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Complete Workflow -->
+            <section>
+                <h2>Complete Automation Workflow</h2>
+                <p style="margin-bottom: 1.5rem;">
+                    From work item to deployment validation - every step automated with human oversight.
+                </p>
+
+                <div class="workflow-steps">
+                    <div class="workflow-step">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <h4>Get Work Item</h4>
+                            <p>Add Jira work item to tracking file. Review requirements, acceptance criteria, and field definitions in Jira.</p>
+                        </div>
+                    </div>
+                    <div class="workflow-step">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <h4>Create Test Cases</h4>
+                            <p>Generate comprehensive Gherkin test cases from Jira. Review scenarios, validate step definitions.</p>
+                        </div>
+                    </div>
+                    <div class="workflow-step">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <h4>Create Scripts</h4>
+                            <p>Identify missing steps, create step definitions using Page Object Model and Field Registry. Test locally.</p>
+                        </div>
+                    </div>
+                    <div class="workflow-step">
+                        <div class="step-number">4</div>
+                        <div class="step-content">
+                            <h4>Upload to Zephyr</h4>
+                            <p>Upload test cases to Zephyr Scale. Link test cases to Jira work items for traceability.</p>
+                        </div>
+                    </div>
+                    <div class="workflow-step">
+                        <div class="step-number">5</div>
+                        <div class="step-content">
+                            <h4>Create Test Data</h4>
+                            <p>Test Data Factory auto-creates Accounts, Contacts, Opportunities with 24+ fields. Auto-cleanup after execution.</p>
+                        </div>
+                    </div>
+                    <div class="workflow-step">
+                        <div class="step-number">6</div>
+                        <div class="step-content">
+                            <h4>Execute Tests</h4>
+                            <p>Run UI tests (Playwright) and API tests (REST/JWT) across all integrated systems. Generate test reports.</p>
+                        </div>
+                    </div>
+                    <div class="workflow-step">
+                        <div class="step-number">7</div>
+                        <div class="step-content">
+                            <h4>Commit to GitHub</h4>
+                            <p>Create feature branch, stage changes, commit with descriptive message, push to remote, create Pull Request.</p>
+                        </div>
+                    </div>
+                    <div class="workflow-step">
+                        <div class="step-number">8</div>
+                        <div class="step-content">
+                            <h4>Run Tests in VM</h4>
+                            <p>GitHub Actions triggered. Tests execute on Linux VM (GitHub Runner). Results generated and uploaded to Zephyr.</p>
+                        </div>
+                    </div>
+                    <div class="workflow-step">
+                        <div class="step-number">9</div>
+                        <div class="step-content">
+                            <h4>Gearset Validation</h4>
+                            <p>Gearset detects PR, deploys to QA Sandbox, triggers tests, evaluates results. Blocks/allows deployment based on test outcome.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Key Capabilities -->
+            <section>
+                <h2>Key Capabilities</h2>
+
+                <h3>AI-Powered Test Generation</h3>
+                <p style="margin-bottom: 1rem;">
+                    Automatically generates BDD (Gherkin) test cases from Jira work items. The framework analyzes 
+                    Jira descriptions, acceptance criteria, and comments to create comprehensive test scenarios 
+                    covering all requirements.
+                </p>
+
+                <h3>Test Management Integration</h3>
+                <p style="margin-bottom: 1rem;">
+                    Seamless integration with Jira, Zephyr Scale, and Confluence provides complete traceability 
+                    from requirements to execution results. Test cases are automatically uploaded and linked to 
+                    work items, with execution results and evidence stored for audit compliance.
+                </p>
+
+                <h3>Comprehensive Test Execution</h3>
+                <p style="margin-bottom: 1rem;">
+                    Supports multiple execution modes: headed mode for debugging, headless mode for CI/CD, and 
+                    interactive mode with Playwright Inspector. Tests can be executed by system, type, or work item 
+                    with comprehensive reporting.
+                </p>
+
+                <h3>Data Management</h3>
+                <p style="margin-bottom: 1rem;">
+                    Test Data Factory automatically creates and manages test data via Salesforce API. Supports 
+                    24+ fields with realistic data, automatic cleanup, and idempotent operations for safe re-execution.
+                </p>
+            </section>
+
+            <!-- Repository Information -->
+            <section>
+                <h2>Repository & Code Availability</h2>
+                <div class="highlight-box">
+                    <h4>GitHub Repository</h4>
+                    <p style="color: #495057; margin-top: 0.5rem;">
+                        All framework code, test cases, configurations, and documentation are maintained in the 
+                        <strong>GitHub repository</strong>. The repository includes:
+                    </p>
+                    <ul style="margin-left: 1.5rem; margin-top: 0.5rem; color: #495057;">
+                        <li>Complete source code for the automation framework</li>
+                        <li>144+ feature files with test scenarios</li>
+                        <li>Step definitions and page object models</li>
+                        <li>API clients for all integrated systems</li>
+                        <li>Configuration files and environment setups</li>
+                        <li>Comprehensive documentation and guides</li>
+                        <li>CI/CD pipeline configurations</li>
+                    </ul>
+                    <p style="color: #495057; margin-top: 1rem;">
+                        The repository is actively maintained and follows best practices for version control, 
+                        code quality, and documentation standards.
+                    </p>
+                </div>
+            </section>
+
+            <!-- Technology Stack -->
+            <section>
+                <h2>Technology Stack</h2>
+                <p style="margin-bottom: 1.5rem;">
+                    Built on modern, battle-tested technologies for reliable automation.
+                </p>
+
+                <div class="tech-stack">
+                    <div class="tech-item">
+                        <strong>Playwright</strong>
+                        <span>Browser Automation</span>
+                    </div>
+                    <div class="tech-item">
+                        <strong>Cucumber.js</strong>
+                        <span>BDD Test Runner</span>
+                    </div>
+                    <div class="tech-item">
+                        <strong>TypeScript</strong>
+                        <span>Type-Safe Code</span>
+                    </div>
+                    <div class="tech-item">
+                        <strong>Axios + JWT</strong>
+                        <span>API Testing</span>
+                    </div>
+                    <div class="tech-item">
+                        <strong>SQL Server</strong>
+                        <span>Data Validation</span>
+                    </div>
+                    <div class="tech-item">
+                        <strong>GitHub Actions</strong>
+                        <span>CI/CD Integration</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Key Metrics -->
+            <section>
+                <h2>Key Metrics & Statistics</h2>
+
+                <div class="highlight-box">
+                    <h4>Framework Scale</h4>
+                    <ul style="margin-left: 1.5rem; margin-top: 0.5rem; color: #495057;">
+                        <li><strong>144+ Feature Files</strong> covering multiple work items</li>
+                        <li><strong>110+ Salesforce Work Items</strong> (SF-*) with UI and API coverage</li>
+                        <li><strong>15+ SQL Server Work Items</strong> (SQL-*) for data validation</li>
+                        <li><strong>6+ Dynamics 365 Work Items</strong> for API testing (Planned)</li>
+                        <li><strong>5+ MuleSoft Integration Tests</strong> for contract validation (Planned)</li>
+                    </ul>
+                </div>
+
+                <div class="highlight-box">
+                    <h4>Time Savings</h4>
+                    <ul style="margin-left: 1.5rem; margin-top: 0.5rem; color: #495057;">
+                        <li>Test case creation: <strong>4-6 hours → 30 minutes</strong> (80% reduction)</li>
+                        <li>Test execution: Automated with parallel execution capability</li>
+                        <li>Evidence generation: Automatic capture and upload to Confluence</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Security & Compliance -->
+            <section>
+                <h2>Security & Compliance</h2>
+
+                <h3>Security Practices</h3>
+                <ul style="margin-left: 1.5rem; margin-bottom: 1.5rem; color: #495057;">
+                    <li>✅ <strong>No Hard-Coded Secrets:</strong> All credentials loaded from environment variables</li>
+                    <li>✅ <strong>Git-Ignored Config:</strong> `.env` files excluded from version control</li>
+                    <li>✅ <strong>Secure Authentication:</strong> OAuth 2.0 and JWT token-based authentication</li>
+                    <li>✅ <strong>Parameterized Queries:</strong> SQL injection prevention with parameterized queries</li>
+                    <li>✅ <strong>Read-Only Default:</strong> SQL tests default to read-only operations</li>
+                </ul>
+
+                <h3>Compliance Features</h3>
+                <ul style="margin-left: 1.5rem; color: #495057;">
+                    <li>✅ <strong>Audit Trail:</strong> Complete traceability from requirements to execution</li>
+                    <li>✅ <strong>Evidence Storage:</strong> Screenshots, logs, and reports stored in Confluence</li>
+                    <li>✅ <strong>Test Documentation:</strong> Comprehensive test case documentation in Zephyr</li>
+                    <li>✅ <strong>Change Tracking:</strong> Version control for all test code and configurations</li>
+                </ul>
+            </section>
+
+            <!-- Conclusion -->
+            <section>
+                <h2>Conclusion</h2>
+                <p style="font-size: 1.1rem; color: #495057; margin-bottom: 1rem;">
+                    The E2E Automation Framework represents a significant advancement in test automation for the Accelerant E2E ecosystem. 
+                    By consolidating UI and API testing into a unified platform, automating test case generation, and providing 
+                    comprehensive integration with test management tools, the framework delivers:
+                </p>
+
+                <ul style="margin-left: 1.5rem; color: #495057; font-size: 1.05rem;">
+                    <li><strong>80% reduction</strong> in test case creation time</li>
+                    <li><strong>Complete traceability</strong> from requirements to execution</li>
+                    <li><strong>Scalable architecture</strong> supporting 1000+ test cases</li>
+                    <li><strong>Enterprise-grade</strong> security and compliance features</li>
+                    <li><strong>Significant cost savings</strong> through automation and efficiency</li>
+                </ul>
+
+                <div class="highlight-box" style="margin-top: 2rem;">
+                    <h4>Framework Status</h4>
+                    <p style="color: #495057; margin-top: 0.5rem;">
+                        The framework is <strong>production-ready</strong>, actively maintained, and continuously evolving 
+                        to meet the changing needs of the QA organization. With 144+ feature files, 900+ test cases in 
+                        Zephyr, and comprehensive coverage across <strong>5 systems in production</strong> (with 3 additional 
+                        systems planned), the framework has proven its value in accelerating QA processes while maintaining 
+                        quality standards. All framework code is available in the <strong>GitHub repository</strong> for 
+                        transparency, collaboration, and version control.
+                    </p>
+                </div>
+            </section>
+        </div>
+
+        <footer>
+            <p><strong>E2E Automation Framework</strong></p>
+            <p>QA Automation Team | December 2024</p>
+            <p style="font-size: 0.9rem; margin-top: 1rem; opacity: 0.7;">
+                Unified E2E Testing for Contract Lifecycle Management
+            </p>
+        </footer>
+    </div>
+</body>
+</html>
+

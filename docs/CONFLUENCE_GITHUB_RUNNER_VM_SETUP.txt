@@ -1,0 +1,204 @@
+h1. GitHub Self-Hosted Runner and VM Setup
+
+h2. Overview
+
+This document provides a comprehensive guide for setting up a self-hosted GitHub Actions runner on a Linux VM and integrating it with Jira automation for automated test execution.
+
+h2. Architecture
+
+* *VM Location*: UK South region
+* *Runner Type*: Self-hosted GitHub Actions runner
+* *Integration*: Jira automation triggers GitHub Actions workflows
+* *Test Execution*: Tests run on the self-hosted runner VM
+* *Results*: Automatically uploaded to Zephyr Scale
+
+h2. Prerequisites
+
+h3. VM Requirements
+
+* *Region*: UK South (Azure)
+* *OS*: Ubuntu 20.04 LTS or 22.04 LTS (recommended)
+* *VM Size*: Minimum Standard_B2s (2 vCPUs, 4 GB RAM)
+* *Disk*: Minimum 30 GB SSD
+* *Network*: Outbound internet access required, Port 443 (HTTPS) open
+
+h3. Access Requirements
+
+* SSH access to the VM
+* Sudo/root privileges for installation
+* GitHub repository admin access (for runner registration)
+* Jira project admin access (for automation setup)
+
+h2. Phase 1: VM and Runner Setup
+
+h3. System Configuration
+
+The following steps were completed to set up the VM:
+
+# System packages updated (non-interactive mode)
+# Dedicated user created: *github-runner*
+# Passwordless sudo configured for github-runner user
+# Node.js 20.x installed
+# npm installed
+# Playwright system dependencies installed
+
+h3. GitHub Actions Runner Installation
+
+# Runner downloaded and extracted to ~/actions-runner
+# Runner configured with repository: *rv-qa-ga/rapid-dev*
+# Runner installed as systemd service
+# Service configured to auto-start on boot
+# Runner verified online in GitHub UI
+
+h3. Runner Configuration Details
+
+* *Runner Name*: vm-p-qat-ukw-01
+* *Runner Labels*: self-hosted, Linux, X64
+* *Service Name*: actions.runner.rv-qa-ga-rapid-dev.vm-p-qat-ukw-01.service
+* *Status*: Running and listening for jobs
+
+h2. Phase 2: Workflow Configuration
+
+h3. GitHub Actions Workflow
+
+The workflow file (.github/workflows/e2e-tests.yml) was configured with:
+
+* *Runner*: self-hosted
+* *Node.js*: Version 20
+* *Test Execution*: Supports multiple test types (UI, API, smoke, regression)
+* *Inputs*: work_item, environment, test_type, tags, feature_file
+* *Artifacts*: Test reports and results uploaded automatically
+
+h3. Security Configuration
+
+To ensure secure credential handling:
+
+* *Environment Files*: .env.qa copied from persistent VM location (/home/github-runner/.env.qa)
+* *Certificates*: Certificate files copied from persistent VM location (/home/github-runner/certs/)
+* *Permissions*: All sensitive files set to 600 (owner read/write only)
+* *Git Ignore*: All credentials and certificates excluded from repository
+
+h2. Phase 3: Jira Automation Integration
+
+h3. Setup Overview
+
+Jira automation was configured to trigger GitHub Actions workflows when users manually trigger tests from Jira issues.
+
+h3. Configuration Steps
+
+# *GitHub PAT Created*: Personal Access Token with repo and workflow scopes
+# *Jira Automation Rule Created*: Manual trigger from work item
+# *Web Request Configured*: POST request to GitHub Actions API
+# *Inputs Mapped*: Jira issue key automatically passed to workflow
+# *Access Restricted*: Only authorized user groups can trigger
+
+h3. Automation Rule Details
+
+* *Trigger*: Manual trigger from work item
+* *Access Control*: Restricted to Administrators group
+* *Work Types*: Available on Story and Bug issue types
+* *Action*: Send web request to GitHub Actions API
+* *Branch*: main (production)
+
+h3. API Configuration
+
+The automation sends a POST request to:
+
+{code}
+https://api.github.com/repos/rv-qa-ga/rapid-dev/actions/workflows/e2e-tests.yml/dispatches
+{code}
+
+With the following payload:
+
+{code:json}
+{
+  "ref": "main",
+  "inputs": {
+    "work_item": "{{issue.key}}",
+    "environment": "qa",
+    "test_type": "all"
+  }
+}
+{code}
+
+h2. Workflow Execution Flow
+
+# User clicks manual trigger button in Jira issue
+# Jira automation sends web request to GitHub Actions API
+# GitHub Actions workflow is triggered on self-hosted runner
+# Workflow checks out code, installs dependencies
+# Environment file and certificates copied from persistent VM locations
+# Tests execute on the self-hosted runner
+# Results uploaded to Zephyr Scale automatically
+# Test artifacts available in GitHub Actions
+
+h2. Monitoring and Troubleshooting
+
+h3. Check Runner Status
+
+To verify the runner is online:
+
+# Go to GitHub repository: Settings → Actions → Runners
+# Verify runner status shows "Idle" or "Active"
+# Check runner name: vm-p-qat-ukw-01
+
+h3. Monitor Workflow Execution
+
+# Go to GitHub Actions tab in repository
+# View workflow runs and execution logs
+# Check each step for errors or warnings
+# Review test execution output
+
+h3. View Runner Logs on VM
+
+SSH into the VM and run:
+
+{code:bash}
+sudo journalctl -u actions.runner.*.service -f
+{code}
+
+This shows real-time logs from the runner service.
+
+h3. Common Issues and Solutions
+
+* *Workflow not triggering*: Verify Jira automation rule is turned on and user has permissions
+* *Authentication failures*: Check .env.qa file exists on VM and has correct permissions
+* *Certificate errors*: Verify certificate files are in /home/github-runner/certs/ with 600 permissions
+* *Runner offline*: Check runner service status with: sudo systemctl status actions.runner.*.service
+
+h2. Security Best Practices
+
+* *Credentials*: Never commit .env files or certificates to repository
+* *File Permissions*: All sensitive files set to 600 (owner read/write only)
+* *VM Access*: Limit SSH access to authorized users only
+* *PAT Security*: Store GitHub PAT securely, rotate periodically
+* *Network*: Ensure VM has proper firewall rules configured
+
+h2. Maintenance
+
+h3. Regular Tasks
+
+* Monitor runner service status
+* Check disk space on VM
+* Review workflow execution logs
+* Update runner software when needed
+* Rotate credentials periodically
+
+h3. Runner Updates
+
+The GitHub Actions runner auto-updates when new versions are available. Manual updates can be performed if needed.
+
+h2. Related Documentation
+
+* *Self-Hosted Runner Setup Plan*: Complete setup guide with all commands
+* *Jira to GitHub Actions Setup*: Detailed Jira automation configuration
+* *Runner Quick Reference*: Common commands and troubleshooting
+
+h2. Support
+
+For issues or questions:
+
+# Check workflow execution logs in GitHub Actions
+# Review runner service logs on VM
+# Verify Jira automation rule configuration
+# Check GitHub Actions runner status page

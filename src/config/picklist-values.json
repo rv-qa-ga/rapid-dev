@@ -1,0 +1,160 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "description": "Centralized picklist values configuration for TestDataFactory. Auto-generated from Salesforce metadata.",
+  "version": "1.0.0",
+  "lastUpdated": "2026-01-17T15:45:00Z",
+  "Account": {
+    "Account_Status__c": {
+      "validValues": ["Draft", "Prospect", "Onboarding", "Contracted", "Active", "Runoff", "Offboarded", "Invalid"],
+      "defaultValue": "Prospect",
+      "lastUpdated": "2026-02-21T00:00:00Z",
+      "source": "org-config",
+      "notes": "New is not a valid value. SF-942: business region is Reporting_Region__c (see below)."
+    },
+    "Type": {
+      "validValues": [
+        "Acquisition Company",
+        "Agency",
+        "Agency Branch",
+        "Distribution Partner",
+        "Group",
+        "Insurer",
+        "Insurer Branch",
+        "Legal Entity",
+        "Member",
+        "Non - Member MGA",
+        "Placing Broker",
+        "Reinsurance Broker",
+        "Reinsurer",
+        "Reinsurer Branch",
+        "Service Company",
+        "Third Party Administrator",
+        "TPA Group"
+      ],
+      "defaultValue": "Agency",
+      "lastUpdated": "2026-01-17T15:45:00Z",
+      "source": "salesforce-metadata"
+    },
+    "Affiliate_Non_Affiliate__c": {
+      "validValues": ["NAF", "AFL", "Blank"],
+      "defaultValue": "NAF",
+      "lastUpdated": "2026-01-17T15:45:00Z",
+      "source": "salesforce-metadata",
+      "conditionalRequirements": {
+        "when": {
+          "Type": ["Member", "Insurer", "Insurer Branch", "Group"],
+          "Account_Status__c": ["Onboarding", "Active"]
+        },
+        "required": true,
+        "defaultValue": "AFL"
+      }
+    },
+    "Reporting_Region__c": {
+      "validValues": ["UK&I", "EU", "CA", "US"],
+      "defaultValue": "US",
+      "lastUpdated": "2026-04-15T00:00:00Z",
+      "source": "org-config",
+      "notes": "SF-942 Reporting Region — mandatory on Account creation; approvals/routing use this field. Replaces deprecated Region__c."
+    },
+    "Functional_Currency__c": {
+      "validValues": ["USD", "EUR", "GBP", "CAD", "AUD", "CHF"],
+      "defaultValue": "USD",
+      "lastUpdated": "2026-01-17T15:45:00Z",
+      "source": "salesforce-metadata"
+    },
+    "Admission_Status__c": {
+      "validValues": ["Admitted", "Non-Admitted", "Not Applicable"],
+      "defaultValue": "Admitted",
+      "lastUpdated": "2026-01-17T15:45:00Z",
+      "source": "salesforce-metadata"
+    },
+    "Account_Team_Roles__c": {
+      "validValues": [
+        "Member Relationship Director",
+        "Actuarial Lead",
+        "Operations Manager",
+        "Claims Manager",
+        "Underwriter",
+        "Claims Operations Specialist",
+        "Processing Lead"
+      ],
+      "defaultValue": "Member Relationship Director",
+      "lastUpdated": "2026-01-17T15:45:00Z",
+      "source": "salesforce-metadata"
+    },
+    "CurrencyIsoCode": {
+      "validValues": ["GBP", "CAD", "EUR", "USD"],
+      "defaultValue": "USD",
+      "lastUpdated": "2026-01-17T15:45:00Z",
+      "source": "salesforce-metadata"
+    },
+    "Rating": {
+      "validValues": ["Hot", "Warm", "Cold"],
+      "defaultValue": "Warm",
+      "lastUpdated": "2026-01-17T15:45:00Z",
+      "source": "salesforce-metadata"
+    },
+    "AccountSource": {
+      "validValues": [
+        "Paid Ads",
+        "Website",
+        "Purchased List",
+        "Referrals - COI",
+        "Referral - Internal Staff",
+        "Research",
+        "Conference"
+      ],
+      "defaultValue": "Website",
+      "lastUpdated": "2026-01-17T15:45:00Z",
+      "source": "salesforce-metadata"
+    }
+  },
+  "Opportunity": {
+    "StageName": {
+      "validValues": ["Pipeline", "Due Diligence", "Contract", "Go-Live", "Active", "Unqualified"],
+      "defaultValue": "Pipeline",
+      "lastUpdated": "2026-02-21T00:00:00Z",
+      "source": "org-config",
+      "notes": "Prospecting is NOT valid."
+    },
+    "Reporting_Region__c": {
+      "validValues": ["UK&I", "EU", "CA", "US"],
+      "defaultValue": "US",
+      "lastUpdated": "2026-04-15T00:00:00Z",
+      "source": "org-config",
+      "notes": "SF-942 — inherited from Account per story."
+    }
+  },
+  "Lead": {
+    "Status": {
+      "validValues": ["Unqualified", "New", "Funnel", "Qualified"],
+      "defaultValue": "New",
+      "lastUpdated": "2026-02-21T00:00:00Z",
+      "source": "org-config",
+      "notes": "Prospecting is NOT valid for Lead."
+    },
+    "Reporting_Region__c": {
+      "validValues": ["UK&I", "EU", "CA", "US"],
+      "defaultValue": "US",
+      "lastUpdated": "2026-04-15T00:00:00Z",
+      "source": "org-config",
+      "notes": "SF-942 — required for lead conversion to Account per story."
+    }
+  },
+  "Contact": {
+    "LeadSource": {
+      "validValues": [
+        "Paid Ads",
+        "Website",
+        "Purchased List",
+        "Referrals - COI",
+        "Referral - Internal Staff",
+        "Research",
+        "Conference"
+      ],
+      "defaultValue": "Website",
+      "lastUpdated": "2026-01-17T15:45:00Z",
+      "source": "salesforce-metadata"
+    }
+  }
+}

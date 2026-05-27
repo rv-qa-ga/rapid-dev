@@ -1,0 +1,49 @@
+{
+  "key": "SF-544",
+  "summary": "Remove Country and State/Province From Account Object",
+  "type": "Story",
+  "status": "In QA",
+  "priority": "Medium",
+  "description": {
+    "raw": "As a Data Governance owner I want the fields  Country__c  and  State_Province__c  removed from the Account object for all Account Types So that obsolete location fields are not visible, not populated, and not maintained in Salesforce. Scenario 1: Remove Country__c field from all Account record types   Given the field Country__c exists on the Account object   When the system is updated   Then the Country__c field must be deleted from the Account object   And must be removed from all page layouts for all Account Types   And must not be available for reporting, automation, or integration Scenario 2: Remove State_Province__c field from all Account record types   Given the field State_Province__c exists on the Account object   When the system is updated   Then the State_Province__c field must be deleted from the Account object   And must be removed from all page layouts for all Account Types   And must not be available for reporting, automation, or integration Scenario 3: Remove dependencies referencing Country__c or State_Province__c   Given automation, validation rules, reports, and integrations may reference Country__c or State_Province__c   When the fields are removed   Then all dependencies must be removed or updated   And no broken references or errors must remain in the system",
+    "parsed": {
+      "sentences": [
+        "As a Data Governance owner I want the fields  Country__c  and  State_Province__c  removed from the Account object for all Account Types So that obsolete location fields are not visible, not populated, and not maintained in Salesforce",
+        "Scenario 1: Remove Country__c field from all Account record types   Given the field Country__c exists on the Account object   When the system is updated   Then the Country__c field must be deleted from the Account object   And must be removed from all page layouts for all Account Types   And must not be available for reporting, automation, or integration Scenario 2: Remove State_Province__c field from all Account record types   Given the field State_Province__c exists on the Account object   When the system is updated   Then the State_Province__c field must be deleted from the Account object   And must be removed from all page layouts for all Account Types   And must not be available for reporting, automation, or integration Scenario 3: Remove dependencies referencing Country__c or State_Province__c   Given automation, validation rules, reports, and integrations may reference Country__c or State_Province__c   When the fields are removed   Then all dependencies must be removed or updated   And no broken references or errors must remain in the system"
+      ],
+      "entities": [
+        "Account"
+      ],
+      "fields": [
+        "Country__c",
+        "State_Province__c"
+      ],
+      "actions": [
+        "update",
+        "delete",
+        "populate"
+      ]
+    }
+  },
+  "acceptanceCriteria": [],
+  "comments": [],
+  "relatedIssues": [],
+  "fieldDefinitions": {
+    "Country__c": {
+      "type": "Custom",
+      "required": false,
+      "description": "Field: Country__c"
+    },
+    "State_Province__c": {
+      "type": "Custom",
+      "required": false,
+      "description": "Field: State_Province__c"
+    }
+  },
+  "generatedFeatures": {
+    "ui": "src/features/ui/SF/SF-544.feature",
+    "api": "src/features/api/SF/SF-544.feature"
+  },
+  "qaReviewedFeatures": {},
+  "extractedAt": "2025-12-17T18:40:40.287Z"
+}

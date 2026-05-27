@@ -1,0 +1,99 @@
+# Org compliance: required GitHub check name "system-tests" (minimal validation for this repo)
+#
+# Workflow filename stays org-system-tests-gate.yml so it is not confused with the
+# ruleset context "system-tests". The check is created/updated via Checks API because
+# native Actions job names do not match that exact context name.
+#
+# Intentionally minimal (automation framework — not a deployable app):
+#   npm ci → npm run ci:system-tests  (TypeScript compile + ESLint only)
+#
+# QA can extend coverage locally with test:unit, Cucumber, validate:steps, etc.;
+# those are not part of this gate to keep PR checks simple and stable.
+#
+# Fork PRs: GITHUB_TOKEN may not allow checks:write for forks; same-repo PRs are fine.
+
+name: org-system-tests-gate
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened, ready_for_review]
+
+concurrency:
+  group: org-system-tests-gate-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  checks: write
+
+jobs:
+  post-system-tests-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Open check run (exact name system-tests for org ruleset)
+        id: open
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const sha =
+              context.payload.pull_request?.head?.sha || context.sha;
+            const { data } = await github.rest.checks.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              name: 'system-tests',
+              head_sha: sha,
+              status: 'in_progress',
+              output: {
+                title: 'system-tests',
+                summary: 'Running npm ci and ci:system-tests (typecheck + lint)…',
+              },
+            });
+            return data.id;
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      - name: Validate (npm ci, ci:system-tests)
+        id: validate
+        run: |
+          npm ci
+          npm run ci:system-tests
+        continue-on-error: true
+
+      - name: Complete system-tests check and fail job if validation failed
+        if: always()
+        uses: actions/github-script@v7
+        env:
+          CHECK_RUN_ID: ${{ steps.open.outputs.result }}
+          VALIDATE_OUTCOME: ${{ steps.validate.outcome }}
+        with:
+          script: |
+            const id = Number(process.env.CHECK_RUN_ID);
+            if (!Number.isFinite(id)) {
+              core.setFailed('Could not create system-tests check run');
+              return;
+            }
+            const ok = process.env.VALIDATE_OUTCOME === 'success';
+            await github.rest.checks.update({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              check_run_id: id,
+              status: 'completed',
+              conclusion: ok ? 'success' : 'failure',
+              output: {
+                title: 'system-tests',
+                summary: ok
+                  ? 'npm ci and ci:system-tests (typecheck + lint) passed.'
+                  : 'Validation failed. See this workflow run log for details.',
+              },
+            });
+            if (!ok) core.setFailed('system-tests validation failed');

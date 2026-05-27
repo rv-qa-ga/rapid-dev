@@ -1,0 +1,7 @@
+{
+  "_comment": "Committed counter for Lloyd's Row-1 sanity test correlation IDs. Bumped automatically by `npm run lloyds:sanity:prepare` (persists the id you're about to paste) and by `npm run lloyds:sanity:send-xml` (once SPN has Service Bus Sender). Format: 0000-0000-0000-NNNNN (range 03000–99999, avoids the 00000–02999 band used by manual tests). Successful landings: 03004 = AAIE EU-167668 (record 01712, Approved), 03005 = AACA CA-6178 (record 01725, plan-driven).",
+  "lastCorrelationId": "0000-0000-0000-03106",
+  "lastRunAt": "2026-05-17T20:04:02.968Z",
+  "lastXmlName": "WBX_US-60464_8a958a6d-515f-4e0e-9fbe-10eb8de6ee5a_2026-04-29 21-40-14.994.xml",
+  "lastRow": 4
+}

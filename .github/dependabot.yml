@@ -1,0 +1,44 @@
+# Dependabot configuration for the E2E automation framework.
+# Docs: https://docs.github.com/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
+#
+# Scope:
+#   - npm (package.json / package-lock.json at repo root)
+#   - GitHub Actions workflows
+#
+# NOTE on axios (do not remove without security review):
+#   axios is intentionally pinned to 1.13.5 in package.json. Reasons:
+#     1. The DoS fix tracked as CVE-2026-25639 landed in axios 1.13.5.
+#     2. Releases published after 1.13.5 were implicated in the 2026 npm /
+#        axios supply-chain incident (malicious publishes).
+#   We therefore suppress Dependabot updates AND suppress Dependabot security
+#   updates for axios here, so the repo does not churn on alerts we have
+#   already triaged. When upstream axios is demonstrably safe again, remove
+#   this ignore entry and re-evaluate the pin.
+#
+# NOTE on the existing transitive fixes:
+#   Dependabot currently has open PRs for follow-redirects, lodash, and vite.
+#   Those should be reviewed and merged via normal PR review; this file is
+#   not intended to block them.
+
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: "/"
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 10
+    labels:
+      - dependencies
+    ignore:
+      # See header comment. Pinned at axios@1.13.5 (known-good) until further notice.
+      - dependency-name: "axios"
+
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly
+      day: monday
+    labels:
+      - dependencies
+      - github-actions

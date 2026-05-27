@@ -1,0 +1,47 @@
+h1. QA Onboarding Progress Tracker
+
+Track each resource's progress through the automation onboarding baby steps. Update the table as people complete each step.
+
+*Parent:* [Automation Testing]
+
+
+h2. How to use
+
+* Edit this page and add or update the *Resource* name in the first column.
+* Use the status columns to record progress: {{☑}} = done, {{☐}} = not started. Replace {{☐}} with {{☑}} when a step is complete.
+* Optional: add dates or notes in the *Notes* column.
+
+
+h2. Progress by resource
+
+|| Resource || Read documentation || Prerequisites requested || Prerequisites complete || Software installed || Env configured || Looked at framework || First deliverable (Gherkin in Jira) || Automating steps || Notes ||
+| Jaya Saxena | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | |
+| Shubhada Latake | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | |
+| Akhilesh Dukare | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | |
+| Flo Marcelin | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | |
+| Arushi Baghel | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | |
+| Boopathi Selvaraj | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | |
+| Puja Kandhaway | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | |
+| Sadique Iqbal | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | |
+| Swapnil Pandharkar | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | |
+| Raghavendra Dammalapati | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | |
+| Mani Vridhagiri | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | |
+| Malini B | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | |
+| Manja Smiljanovska | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | |
+| Anita Mudel | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | |
+
+
+h2. Step reference (what each column means)
+
+* *Read documentation* — Read README, runbook (Automation Testing page), and Confluence workflow guide / automation docs.
+* *Prerequisites requested* — ServiceNow tickets raised for Cursor access and Enterprise GitHub access.
+* *Prerequisites complete* — Cursor and GitHub access granted; Atlassian API token created and added to {{.env.qa}} (for Jira/Zephyr).
+* *Software installed* — Node.js 18+, Git, Cursor or VS Code; repo cloned; {{npm install}} and {{npm run build}} successful.
+* *Env configured* — {{.env.qa}} created from {{env.sample}}; Jira/Zephyr credentials and project keys filled in.
+* *Looked at framework* — Explored {{src/features/ui/}}, {{src/features/api/}}, {{src/step-definitions/}}; understood Gherkin.
+* *First deliverable (Gherkin in Jira)* — Used Jira generate for a work item; uploaded test cases to Jira (e.g. Zephyr).
+* *Automating steps* — Implementing or adjusting step definitions; branch created; PR opened (or first test run).
+
+
+---
+*Last updated: February 2025*

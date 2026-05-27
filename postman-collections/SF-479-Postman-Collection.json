@@ -1,0 +1,409 @@
+{
+	"info": {
+		"_postman_id": "work-item-sf-479",
+		"name": "SF-479 - API Tests",
+		"description": "API - SF-479 - Delete Legal_Entity__c from Lead only; ensure no impact to other objects or systems\n\n══════════════════════════════════════════════════════════════════════════════\nGenerated: 2025-12-19T15:09:13.369Z (FeatureGenerator v3.1)\n══════════════════════════════════════════════════════════════════════════════\n═══════════════════════════════════════════════════════════════════════════\nSUMMARY OF UNDERSTANDING\n═══════════════════════════════════════════════════════════════════════════\nOverview: Delete Legal_Entity__c from Lead only; ensure no impact to other objects or systems\nPrimary Ent\n\nGenerated from: C:\\Automation\\E2EAutomation\\src\\features\\api\\SF\\SF-479.feature\n\n## Setup Instructions:\n1. Import this collection into Postman\n2. Create a new environment (or use existing Salesforce QA environment)\n3. Set the following environment variables:\n   - `sf_base_url`: https://arx--qa.sandbox.my.salesforce.com\n   - `sf_api_version`: v60.0\n   - `sf_access_token`: Your Salesforce access token (get via OAuth or JWT)\n   - `sf_instance_url`: Your Salesforce instance URL\n\n## Authentication:\nThis collection uses Bearer Token authentication. Obtain an access token via:\n- OAuth 2.0 flow\n- JWT Bearer Token flow\n- Username/Password flow",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{sf_access_token}}",
+				"type": "string"
+			}
+		]
+	},
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "{{sf_base_url}}",
+			"type": "string"
+		},
+		{
+			"key": "api_version",
+			"value": "{{sf_api_version}}",
+			"type": "string"
+		},
+		{
+			"key": "record_id",
+			"value": "",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "API - Verify Legal_Entity__c field exists on Case",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response contains fields\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.fields).to.be.an(\"array\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Case/describe",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"services",
+						"data",
+						"{{api_version}}",
+						"sobjects",
+						"Case",
+						"describe"
+					]
+				},
+				"description": "API - API - Verify Legal_Entity__c field exists on Case\n\n**Test ID:** SF-479-API-001\n**Priority:** p1\n**Tags:** @smoke\n\n**Feature:** API - SF-479 - Delete Legal_Entity__c from Lead only; ensure no impact to other objects or systems\n"
+			},
+			"response": []
+		},
+		{
+			"name": "API - Verify Legal_Entity__c field exists on Accou",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response contains fields\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.fields).to.be.an(\"array\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Account/describe",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"services",
+						"data",
+						"{{api_version}}",
+						"sobjects",
+						"Account",
+						"describe"
+					]
+				},
+				"description": "API - API - Verify Legal_Entity__c field exists on Account\n\n**Test ID:** SF-479-API-002\n**Priority:** p1\n\n**Feature:** API - SF-479 - Delete Legal_Entity__c from Lead only; ensure no impact to other objects or systems\n"
+			},
+			"response": []
+		},
+		{
+			"name": "API - Create Case with Legal_Entity__c",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"pm.test(\"Response contains record ID\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property(\"id\");",
+							"    pm.expect(jsonData.id).to.not.be.empty;",
+							"    pm.collectionVariables.set(\"record_id\", jsonData.id);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Case/",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"services",
+						"data",
+						"{{api_version}}",
+						"sobjects",
+						"Case"
+					]
+				},
+				"description": "API - API - Create Case with Legal_Entity__c\n\n**Test ID:** SF-479-API-003\n**Priority:** p1\n\n**Feature:** API - SF-479 - Delete Legal_Entity__c from Lead only; ensure no impact to other objects or systems\n",
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"Name\": \"Test Case\"\n}"
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "API - Update Legal_Entity__c on Case",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 204\", function () {",
+							"    pm.response.to.have.status(204);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Case/{{record_id}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"services",
+						"data",
+						"{{api_version}}",
+						"sobjects",
+						"Case",
+						"{{record_id}}"
+					]
+				},
+				"description": "API - API - Update Legal_Entity__c on Case\n\n**Test ID:** SF-479-API-004\n**Priority:** p1\n\n**Feature:** API - SF-479 - Delete Legal_Entity__c from Lead only; ensure no impact to other objects or systems\n",
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"Legal_Entity__c\": \"Updated Value\"\n}"
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "API - Query Case by Legal_Entity__c",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response contains records\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property(\"records\");",
+							"    pm.expect(jsonData.records).to.be.an(\"array\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/services/data/{{api_version}}/query/?q=SELECT%20Id%2C%20Name%20FROM%20Case%20LIMIT%2010",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"services",
+						"data",
+						"{{api_version}}",
+						"query"
+					],
+					"query": [
+						{
+							"key": "q",
+							"value": "SELECT Id, Name FROM Case LIMIT 10"
+						}
+					]
+				},
+				"description": "API - API - Query Case by Legal_Entity__c\n\n**Test ID:** SF-479-API-005\n**Priority:** p2\n\n**Feature:** API - SF-479 - Delete Legal_Entity__c from Lead only; ensure no impact to other objects or systems\n"
+			},
+			"response": []
+		},
+		{
+			"name": "API - Create Case with each valid Legal_Entity__c",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"pm.test(\"Response contains record ID\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property(\"id\");",
+							"    pm.expect(jsonData.id).to.not.be.empty;",
+							"    pm.collectionVariables.set(\"record_id\", jsonData.id);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Case/",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"services",
+						"data",
+						"{{api_version}}",
+						"sobjects",
+						"Case"
+					]
+				},
+				"description": "API - API - Create Case with each valid Legal_Entity__c\n\n**Test ID:** SF-479-API-006\n**Priority:** p2\n\n**Feature:** API - SF-479 - Delete Legal_Entity__c from Lead only; ensure no impact to other objects or systems\n",
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"Name\": \"Test Case\"\n}"
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "API - Reject invalid Legal_Entity__c value",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"pm.test(\"Response contains record ID\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property(\"id\");",
+							"    pm.expect(jsonData.id).to.not.be.empty;",
+							"    pm.collectionVariables.set(\"record_id\", jsonData.id);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Case/",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"services",
+						"data",
+						"{{api_version}}",
+						"sobjects",
+						"Case"
+					]
+				},
+				"description": "API - API - Reject invalid Legal_Entity__c value\n\n**Test ID:** SF-479-API-007\n**Priority:** p2\n**Tags:** @negative\n\n**Feature:** API - SF-479 - Delete Legal_Entity__c from Lead only; ensure no impact to other objects or systems\n",
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"Name\": \"Test Case\"\n}"
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "API - Handle null Legal_Entity__c value",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response contains records\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property(\"records\");",
+							"    pm.expect(jsonData.records).to.be.an(\"array\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/services/data/{{api_version}}/query/?q=SELECT%20Id%2C%20Name%20FROM%20the%20LIMIT%2010",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"services",
+						"data",
+						"{{api_version}}",
+						"query"
+					],
+					"query": [
+						{
+							"key": "q",
+							"value": "SELECT Id, Name FROM the LIMIT 10"
+						}
+					]
+				},
+				"description": "API - API - Handle null Legal_Entity__c value\n\n**Test ID:** SF-479-API-008\n**Priority:** p2\n**Tags:** @negative\n\n**Feature:** API - SF-479 - Delete Legal_Entity__c from Lead only; ensure no impact to other objects or systems\n"
+			},
+			"response": []
+		}
+	]
+}

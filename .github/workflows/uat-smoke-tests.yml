@@ -1,0 +1,137 @@
+# UAT Smoke Tests (Gearset / Webhook)
+#
+# Purpose: Run build validation against UAT after deployments. Triggered by:
+#   1. Webhook (e.g. Gearset) → repository_dispatch event "uat-smoke"
+#   2. Manual run → workflow_dispatch (same flow, for local/CI parity)
+#
+# Build validation runs @build-validation only (login + object list access).
+# Use this as the deployment gate: minimal, robust checks (~1–2 min).
+# For full smoke including UI record creation, run: npm run test:uat:smoke
+#
+# Webhook URL (POST): https://api.github.com/repos/OWNER/REPO/dispatches
+# Body: {"event_type": "uat-smoke", "client_payload": {"branch": "main"}}
+# Header: Authorization: token GITHUB_PAT (repo scope)
+# See docs/UAT_SMOKE_WEBHOOK_SETUP.md for full details.
+
+name: UAT Smoke Tests
+
+on:
+  repository_dispatch:
+    types: [uat-smoke]
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch to checkout (default: main)'
+        required: false
+        type: string
+        default: 'main'
+
+# Concurrency: one UAT smoke run at a time (queue others)
+concurrency:
+  group: uat-smoke-tests
+  cancel-in-progress: false
+
+jobs:
+  uat-smoke:
+    runs-on: self-hosted
+    timeout-minutes: 45
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          # repository_dispatch → client_payload.branch; workflow_dispatch → inputs.branch
+          ref: ${{ github.event.client_payload.branch || github.event.inputs.branch || 'main' }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install system dependencies
+        run: |
+          sudo DEBIAN_FRONTEND=noninteractive apt-get update
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y \
+            libnss3 libnspr4 libatk1.0-0 libatk-bridge2.0-0 libcups2 libdrm2 \
+            libdbus-1-3 libxkbcommon0 libxcomposite1 libxdamage1 libxfixes3 \
+            libxrandr2 libgbm1 libasound2 libpango-1.0-0 libcairo2 \
+            libxshmfence1 libxss1 libgconf-2-4 fonts-liberation \
+            libappindicator3-1 xdg-utils || true
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Copy .env.uat file if available
+        # Copy .env.uat from persistent location on VM (if it exists)
+        # Same pattern as Automation/Regression/Smoke workflows use for .env.qa
+        # Keeps UAT credentials on the VM; not committed to repo
+        run: |
+          ENV_FILE="/home/github-runner/.env.uat"
+          TARGET_DIR="src/config/env"
+
+          if [ -f "$ENV_FILE" ]; then
+            echo "📁 Found .env.uat on VM, copying to workspace..."
+            mkdir -p "$TARGET_DIR"
+            cp "$ENV_FILE" "$TARGET_DIR/.env.uat"
+            chmod 600 "$TARGET_DIR/.env.uat"
+            ls -la "$TARGET_DIR/.env.uat" | awk '{print "✅ File permissions: " $1 " (owner: " $3 ":" $4 ")"}'
+            echo "✅ .env.uat copied"
+          else
+            echo "ℹ️  No .env.uat at $ENV_FILE - using secrets/uat.json only"
+          fi
+        continue-on-error: true
+        shell: bash
+
+      - name: Copy certificates if available
+        run: |
+          CERTS_DIR="/home/github-runner/certs"
+          TARGET_DIR="certs"
+          if [ -d "$CERTS_DIR" ]; then
+            mkdir -p "$TARGET_DIR"
+            cp -r "$CERTS_DIR"/* "$TARGET_DIR/" || true
+            find "$TARGET_DIR" -type f -exec chmod 600 {} \;
+            echo "✅ Certificates copied"
+          fi
+        continue-on-error: true
+        shell: bash
+
+      - name: Run UAT smoke tests
+        env:
+          ENV: uat
+          HEADLESS: true
+          CI: true
+          TAKE_SCREENSHOTS: true
+          CAPTURE_EVIDENCE: true
+          ATLASSIAN_EMAIL: ${{ secrets.ATLASSIAN_EMAIL }}
+          ATLASSIAN_API_TOKEN: ${{ secrets.ATLASSIAN_API_TOKEN }}
+          JIRA_BASE_URL: ${{ secrets.JIRA_BASE_URL }}
+          ZEPHYR_BASE_URL: ${{ secrets.ZEPHYR_BASE_URL }}
+          ZEPHYR_PROJECT_KEY: ${{ secrets.ZEPHYR_PROJECT_KEY }}
+          ZEPHYR_API_TOKEN: ${{ secrets.ZEPHYR_API_TOKEN }}
+        run: |
+          echo "🚀 UAT Build Validation (@build-validation)"
+          echo "   Environment: uat"
+          echo "   Branch: ${{ github.event.client_payload.branch || github.event.inputs.branch || 'main' }}"
+          npm run test:uat:build-validation
+
+      - name: Upload test artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: uat-smoke-results-${{ github.run_number }}
+          path: |
+            reports/**/*
+            artifacts/**/*
+          retention-days: 14
+
+      - name: Publish summary
+        if: always()
+        run: |
+          echo "## UAT Smoke Test Run" >> $GITHUB_STEP_SUMMARY
+          echo "- **Environment**: UAT" >> $GITHUB_STEP_SUMMARY
+          echo "- **Run**: ${{ github.run_number }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Artifacts**: Available in Actions tab" >> $GITHUB_STEP_SUMMARY

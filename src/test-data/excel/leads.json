@@ -1,0 +1,28 @@
+{
+  "_description": "Lead test data - JSON format for version control",
+  "_columns": ["TestCaseID", "FirstName", "LastName", "Company", "Email", "Status", "LeadSource", "Tags"],
+  "data": [
+    {
+      "TestCaseID": "LEAD-001",
+      "FirstName": "Test",
+      "LastName": "Lead",
+      "Company": "Test Company Inc",
+      "Email": "test.lead@example.com",
+      "Status": "Open - Not Contacted",
+      "LeadSource": "Web",
+      "Tags": "smoke,positive"
+    },
+    {
+      "TestCaseID": "LEAD-002",
+      "FirstName": "Qualified",
+      "LastName": "Lead",
+      "Company": "Qualified Corp",
+      "Email": "qualified@example.com",
+      "Status": "Working - Contacted",
+      "LeadSource": "Partner Referral",
+      "Tags": "regression"
+    }
+  ],
+  "statusValues": ["Open - Not Contacted", "Working - Contacted", "Closed - Converted", "Closed - Not Converted"]
+}
+

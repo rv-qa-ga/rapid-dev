@@ -1,0 +1,71 @@
+h1. End-to-End Process
+
+
+----
+
+h2. Current Status
+
+
+h3. E2E pipeline overview
+
+_Attach or insert the image from repo: {{docs/planning/assets/e2e-flow-overview.png}}_
+
+Data flow: Data Source (Salesforce, Gen-2/ADP, Blob/SP) → Power Apps → Data Warehouse (ODS, TDS, XML) → GL/Accounting/Reinsurance (Dynamics 365 GL, Tagetik, Duck Creek) → Financial Reporting (Data Mart/PBI, Workiva).
+
+
+h3. QA scope by system (DE QA In Scope vs Out of Scope)
+
+_Attach or insert the image from repo: {{docs/planning/assets/e2e-qa-scope.png}}_
+
+* Purple = DE QA In Scope
+* Yellow = DE QA Out of Scope for QA team. *ADP (yellow) will become in scope for end-to-end testing as the source of data.*
+
+
+h3. Automation status by system
+
+|| System || Automation status ||
+|*Salesforce*|Some automation done|
+|*MuleSoft*|Very little automation done|
+|*Dynamics* (CRM, F&O)|Very little automation done|
+|*ODS, TDS* and other systems (Utility Server, Sharepoint, Power BI, Tagetik, DCR)|No automation as of now|
+
+
+h3. Framework expansion needed
+
+The automation framework needs to be expanded with:
+
+* *ODS* and *TDS* related test cases
+* *Dynamics F&O* (Finance and Operations) test cases
+* *Power BI report* test cases
+
+
+h3. QA team scope
+
+* The *yellow boxes* in the second diagram (e.g. Power BI Report, Tagetik, DCR) are *out of scope* for the QA team.
+* *ADP* (Gen-2) is currently shown out of scope but *will become in scope* for end-to-end testing, as it is the *source of data* for the pipeline.
+
+
+h3. Integrated lower environment
+
+* We do *not* currently have a *lower environment integrated* for all systems.
+* The gap is the *source system (ADP)* — ADP is missing in lower environments.
+* We are working with the *ADP team* to come up with a solution. Once that solution is complete, we will be able to use it for *end-to-end testing*.
+* There will be *work needed on the ODS side* to make this solution work in an *integrated environment*.
+
+*More detail:* [Automation Testing Strategy for End-to-End Workflow|https://accelins.atlassian.net/wiki/spaces/TM/pages/1982333036/Automation+Testing+Strategy+for+End-to-End+Workflow] and [QA Automation Framework – Complete Workflow Guide|https://accelins.atlassian.net/wiki/spaces/TM/pages/2692710418/QA+Automation+Framework+-+Complete+Workflow+Guide].
+
+
+----
+
+h2. Plan to Improve (Next Quarters)
+
+|| Quarter || Objective || Actions ||
+|Q1|Document and align|Single "End-to-end / Testing & Environment" runbook: env checklist, access, dependencies (ADP, ODS); expand framework with ODS/TDS, Dynamics F&O, Power BI test cases; update Confluence|
+|Q2|ADP solution and ODS|Adopt ADP solution in lower env; complete ODS work for integrated environment; document in runbook|
+|Q2+|Environment health checks|Add connectivity/readiness checks; document in runbook|
+|Q3+|Full E2E in lower env|Utilize integrated lower environment for end-to-end testing; define env refresh/parity process|
+
+
+---
+*Last updated: February 2025*
+*Parent:* [BSGQA Next-Version Planning Hub – Overview]

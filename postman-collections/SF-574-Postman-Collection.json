@@ -1,0 +1,771 @@
+{
+	"info": {
+		"_postman_id": "work-item-sf-574",
+		"name": "SF-574 - Salesforce API Tests",
+		"description": "API - SF-574 - Delete Member Qualification Action Plan field on the lead\n\n══════════════════════════════════════════════════════════════════════════════\nUpdated: 2026-01-26 - Regenerated with proper field deletion test scenarios\n══════════════════════════════════════════════════════════════════════════════\n═══════════════════════════════════════════════════════════════════════════\nSUMMARY OF UNDERSTANDING\n═══════════════════════════════════════════════════════════════════════════\nOverview: Delete Member Qualification Action Plan field on the lead\nPrimary Entity: Lead\n\n\nGenerated from: C:\\Automation\\E2EAutomation\\src\\features\\api\\SF\\SF-574.feature\n\n## Setup Instructions:\n1. Import this collection into Postman\n2. Create a new environment (or use existing Salesforce QA environment)\n3. Set the following environment variables:\n   - `sf_client_id`: Your Connected App Consumer Key\n   - `sf_client_secret`: Your Connected App Consumer Secret\n   - `sf_username`: Your Salesforce username\n   - `sf_password`: Your Salesforce password\n   - `sf_security_token`: Your Salesforce security token\n   - `sf_login_url`: Your Salesforce login URL (e.g., https://login.salesforce.com or https://test.salesforce.com)\n   - `sf_api_version`: API version (e.g., v60.0)\n\n## Authentication:\n1. Run the \"🔐 Get Salesforce Access Token\" request first\n2. The access token and instance URL will be automatically saved to collection variables\n3. All subsequent requests will use this token via Bearer authentication",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{sf_access_token}}",
+				"type": "string"
+			}
+		]
+	},
+	"variable": [
+		{
+			"key": "sf_access_token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "sf_instance_url",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "base_url",
+			"value": "{{sf_instance_url}}",
+			"type": "string"
+		},
+		{
+			"key": "api_version",
+			"value": "{{sf_api_version}}",
+			"type": "string"
+		},
+		{
+			"key": "record_id",
+			"value": "",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "🔐 Get Salesforce Access Token",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response contains access_token\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property(\"access_token\");",
+							"    pm.expect(jsonData.access_token).to.not.be.empty;",
+							"    pm.expect(jsonData).to.have.property(\"instance_url\");",
+							"    ",
+							"    // Save token and instance URL to collection variables",
+							"    pm.collectionVariables.set(\"sf_access_token\", jsonData.access_token);",
+							"    pm.collectionVariables.set(\"sf_instance_url\", jsonData.instance_url);",
+							"    pm.collectionVariables.set(\"sf_base_url\", jsonData.instance_url);",
+							"    ",
+							"    console.log(\"✅ Access token saved to collection variable: sf_access_token\");",
+							"    console.log(\"✅ Instance URL saved: \" + jsonData.instance_url);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "grant_type",
+							"value": "password",
+							"type": "text"
+						},
+						{
+							"key": "client_id",
+							"value": "{{sf_client_id}}",
+							"type": "text"
+						},
+						{
+							"key": "client_secret",
+							"value": "{{sf_client_secret}}",
+							"type": "text"
+						},
+						{
+							"key": "username",
+							"value": "{{sf_username}}",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "{{sf_password}}{{sf_security_token}}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{sf_login_url}}/services/oauth2/token",
+					"host": [
+						"{{sf_login_url}}"
+					],
+					"path": [
+						"services",
+						"oauth2",
+						"token"
+					]
+				},
+				"description": "Obtains a Salesforce access token using OAuth2 Username/Password flow.\n\n**Required Environment Variables:**\n- `sf_client_id`: Your Connected App Consumer Key\n- `sf_client_secret`: Your Connected App Consumer Secret\n- `sf_username`: Your Salesforce username\n- `sf_password`: Your Salesforce password\n- `sf_security_token`: Your Salesforce security token (appended to password)\n- `sf_login_url`: Your Salesforce login URL (e.g., https://login.salesforce.com or https://test.salesforce.com)\n\n**Response:**\nReturns `access_token`, `instance_url`, and other OAuth details. The access token and instance URL are automatically saved to collection variables for use in subsequent requests."
+			},
+			"response": []
+		},
+		{
+			"name": "API - Verify Member_Qualification_Action_Plan__c field does NOT exist on Lead",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response contains fields\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.fields).to.be.an(\"array\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Lead/describe",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"services",
+						"data",
+						"{{api_version}}",
+						"sobjects",
+						"Lead",
+						"describe"
+					]
+				},
+				"description": "API - API - Verify Member_Qualification_Action_Plan__c field does NOT exist on Lead\n\n**Test ID:** SF-574-API-001\n**Priority:** p1\n**Tags:** @smoke\n\n**Feature:** API - SF-574 - Delete Member Qualification Action Plan field on the lead\n"
+			},
+			"response": []
+		},
+		{
+			"name": "API - Verify Member_Qualification_Action_Plan__c is not in Lead metadata",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response contains fields\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.fields).to.be.an(\"array\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Lead/describe",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"services",
+						"data",
+						"{{api_version}}",
+						"sobjects",
+						"Lead",
+						"describe"
+					]
+				},
+				"description": "API - API - Verify Member_Qualification_Action_Plan__c is not in Lead metadata\n\n**Test ID:** SF-574-API-002\n**Priority:** p1\n\n**Feature:** API - SF-574 - Delete Member Qualification Action Plan field on the lead\n"
+			},
+			"response": []
+		},
+		{
+			"name": "API - Reject attempt to create Lead with Member_Qualification_Action_Plan__c",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"pm.test(\"Response contains record ID\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property(\"id\");",
+							"    pm.expect(jsonData.id).to.not.be.empty;",
+							"    pm.collectionVariables.set(\"record_id\", jsonData.id);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Lead/",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"services",
+						"data",
+						"{{api_version}}",
+						"sobjects",
+						"Lead"
+					]
+				},
+				"description": "API - API - Reject attempt to create Lead with Member_Qualification_Action_Plan__c\n\n**Test ID:** SF-574-API-003\n**Priority:** p1\n**Tags:** @negative\n\n**Feature:** API - SF-574 - Delete Member Qualification Action Plan field on the lead\n",
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"LastName\": \"Test Lead\",\n  \"Company\": \"Test Company\"\n}"
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "API - Reject attempt to update Member_Qualification_Action_Plan__c on Lead",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 204\", function () {",
+							"    pm.response.to.have.status(204);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Lead/{{record_id}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"services",
+						"data",
+						"{{api_version}}",
+						"sobjects",
+						"Lead",
+						"{{record_id}}"
+					]
+				},
+				"description": "API - API - Reject attempt to update Member_Qualification_Action_Plan__c on Lead\n\n**Test ID:** SF-574-API-004\n**Priority:** p1\n**Tags:** @negative\n\n**Feature:** API - SF-574 - Delete Member Qualification Action Plan field on the lead\n",
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"Member_Qualification_Action_Plan__c\": \"true\"\n}"
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "API - Reject attempt to query Lead by Member_Qualification_Action_Plan__c",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response contains records\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property(\"records\");",
+							"    pm.expect(jsonData.records).to.be.an(\"array\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/services/data/{{api_version}}/query/?q=SELECT%20Id%2C%20Name%20FROM%20Lead%20LIMIT%2010",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"services",
+						"data",
+						"{{api_version}}",
+						"query"
+					],
+					"query": [
+						{
+							"key": "q",
+							"value": "SELECT Id, Name FROM Lead LIMIT 10"
+						}
+					]
+				},
+				"description": "API - API - Reject attempt to query Lead by Member_Qualification_Action_Plan__c\n\n**Test ID:** SF-574-API-005\n**Priority:** p2\n**Tags:** @negative\n\n**Feature:** API - SF-574 - Delete Member Qualification Action Plan field on the lead\n"
+			},
+			"response": []
+		},
+		{
+			"name": "API - Create Lead without Member_Qualification_Action_Plan__c",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"pm.test(\"Response contains record ID\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property(\"id\");",
+							"    pm.expect(jsonData.id).to.not.be.empty;",
+							"    pm.collectionVariables.set(\"record_id\", jsonData.id);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Lead/",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"services",
+						"data",
+						"{{api_version}}",
+						"sobjects",
+						"Lead"
+					]
+				},
+				"description": "API - API - Create Lead without Member_Qualification_Action_Plan__c\n\n**Test ID:** SF-574-API-006\n**Priority:** p1\n\n**Feature:** API - SF-574 - Delete Member Qualification Action Plan field on the lead\n",
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"LastName\": \"Test Lead\",\n  \"Company\": \"Test Company\"\n}"
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "API - Update Lead status without Member_Qualification_Action_Plan__c",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 204\", function () {",
+							"    pm.response.to.have.status(204);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Lead/{{record_id}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"services",
+						"data",
+						"{{api_version}}",
+						"sobjects",
+						"Lead",
+						"{{record_id}}"
+					]
+				},
+				"description": "API - API - Update Lead status without Member_Qualification_Action_Plan__c\n\n**Test ID:** SF-574-API-007\n**Priority:** p1\n\n**Feature:** API - SF-574 - Delete Member Qualification Action Plan field on the lead\n",
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"Status\": \"<toStatus>\"\n}"
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "API - Query Lead without Member_Qualification_Action_Plan__c",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response contains records\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property(\"records\");",
+							"    pm.expect(jsonData.records).to.be.an(\"array\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/services/data/{{api_version}}/query/?q=SELECT%20Id%2C%20Name%20FROM%20the%20LIMIT%2010",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"services",
+						"data",
+						"{{api_version}}",
+						"query"
+					],
+					"query": [
+						{
+							"key": "q",
+							"value": "SELECT Id, Name FROM the LIMIT 10"
+						}
+					]
+				},
+				"description": "API - API - Query Lead without Member_Qualification_Action_Plan__c\n\n**Test ID:** SF-574-API-008\n**Priority:** p2\n\n**Feature:** API - SF-574 - Delete Member Qualification Action Plan field on the lead\n"
+			},
+			"response": []
+		},
+		{
+			"name": "API - Lead status progression works without the field - New to Funnel",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 204\", function () {",
+							"    pm.response.to.have.status(204);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Lead/{{record_id}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"services",
+						"data",
+						"{{api_version}}",
+						"sobjects",
+						"Lead",
+						"{{record_id}}"
+					]
+				},
+				"description": "API - API - Lead status progression works without the field - New to Funnel\n\n**Test ID:** SF-574-API-009\n**Priority:** p2\n\n**Feature:** API - SF-574 - Delete Member Qualification Action Plan field on the lead\n",
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"Status\": \"Funnel\"\n}"
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "API - Lead status progression works without the field - Funnel to Qualified",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 204\", function () {",
+							"    pm.response.to.have.status(204);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Lead/{{record_id}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"services",
+						"data",
+						"{{api_version}}",
+						"sobjects",
+						"Lead",
+						"{{record_id}}"
+					]
+				},
+				"description": "API - API - Lead status progression works without the field - Funnel to Qualified\n\n**Test ID:** SF-574-API-010\n**Priority:** p2\n\n**Feature:** API - SF-574 - Delete Member Qualification Action Plan field on the lead\n",
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"Status\": \"Qualified\"\n}"
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "API - Lead status progression works without the field - Funnel to Converted",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 204\", function () {",
+							"    pm.response.to.have.status(204);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Lead/{{record_id}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"services",
+						"data",
+						"{{api_version}}",
+						"sobjects",
+						"Lead",
+						"{{record_id}}"
+					]
+				},
+				"description": "API - API - Lead status progression works without the field - Funnel to Converted\n\n**Test ID:** SF-574-API-011\n**Priority:** p2\n\n**Feature:** API - SF-574 - Delete Member Qualification Action Plan field on the lead\n",
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"Status\": \"Converted\"\n}"
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "API - Lead status progression works without the field - Any Status to Unqualified",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 204\", function () {",
+							"    pm.response.to.have.status(204);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Lead/{{record_id}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"services",
+						"data",
+						"{{api_version}}",
+						"sobjects",
+						"Lead",
+						"{{record_id}}"
+					]
+				},
+				"description": "API - API - Lead status progression works without the field - Any Status to Unqualified\n\n**Test ID:** SF-574-API-012\n**Priority:** p2\n\n**Feature:** API - SF-574 - Delete Member Qualification Action Plan field on the lead\n",
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"Status\": \"Unqualified\"\n}"
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "API - Lead conversion works without Member_Qualification_Action_Plan__c - Convert Lead",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response contains opportunityId\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property(\"opportunityId\");",
+							"    if (jsonData.opportunityId) {",
+							"        pm.collectionVariables.set(\"opportunity_id\", jsonData.opportunityId);",
+							"    }",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/services/data/v58.0/sobjects/Lead/{{lead_id}}/convert",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"services",
+						"data",
+						"v58.0",
+						"sobjects",
+						"Lead",
+						"{{lead_id}}",
+						"convert"
+					]
+				},
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"convertedStatus\": \"Qualified\",\n  \"doNotCreateOpportunity\": false,\n  \"overwriteLeadSource\": false\n}"
+				},
+				"description": "API - API - Lead conversion works without Member_Qualification_Action_Plan__c\n\n**Test ID:** SF-574-API-013\n**Priority:** p2\n\n**Feature:** API - SF-574 - Delete Member Qualification Action Plan field on the lead\n\n\n**Note:** Using API version v58.0 for Lead conversion. Set {{lead_id}} collection variable from the Create Lead request response."
+			},
+			"response": []
+		},
+		{
+			"name": "API - Verify no validation rules reference Member_Qualification_Action_Plan__c",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response contains fields\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.fields).to.be.an(\"array\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Lead/describe",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"services",
+						"data",
+						"{{api_version}}",
+						"sobjects",
+						"Lead",
+						"describe"
+					]
+				},
+				"description": "API - API - Verify no validation rules reference Member_Qualification_Action_Plan__c\n\n**Test ID:** SF-574-API-014\n**Priority:** p2\n\n**Feature:** API - SF-574 - Delete Member Qualification Action Plan field on the lead\n"
+			},
+			"response": []
+		}
+	]
+}

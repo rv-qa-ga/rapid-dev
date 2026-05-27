@@ -1,0 +1,166 @@
+﻿
+Test scenarios-
+
+@PP-392-UI-001 :
+
+  Scenario: Verify that when XML File has status Awaiting Approval and f any required dimension value does not exist then entire validation status for that record is considered Failed.
+
+
+    Given XML File has status Awaiting Approval 
+When I navigate to  Fabric Lakehouse / Data Lake path to fetch XML
+And The system MUST validate each non-empty dimension token against dbo.DimensionAttributeValueCombination
+Then required dimensions should be validated
+When any required dimension value does not exist
+Then The entire validation status for that record is considered Failed.
+And system must The system MUST identify and return:The invalid dimension value,Its logical dimension type,Which display value field it came from.
+And I take a screenshot as evidence
+
+
+
+@PP-392-UI-002 :
+
+Scenario: Verify that when all required dimensions exist then The record MUST moved to Ready to Ship to Dynamics.
+
+
+Given XML File has status Awaiting Approval 
+When I navigate to  Fabric Lakehouse / Data Lake path to fetch XML
+And The system MUST validate each non-empty dimension token against dbo.DimensionAttributeValueCombination
+Then required dimensions should be validated
+When all required dimensions exist
+Then record status should be â€œ Ready to ship to Dynamicsâ€
+And dimension validation fields MUST be updated to indicate success and last checked timestamp.
+And I take a screenshot as evidence
+
+@PP-392-UI-003 :
+
+Scenario: Verify that when XML File has status Awaiting Approval and one or more dimensions are invalid then approval state as Pending Approval
+
+    Given XML File has status Awaiting Approval 
+When I navigate to  Fabric Lakehouse / Data Lake path to fetch XML
+And The system MUST validate each non-empty dimension token against dbo.DimensionAttributeValueCombination
+Then required dimensions should be validated
+When one or many required dimension value does not exist
+Then system should show a clear validation error message: â€œX is invalid {type of dimension} dimension. Before submitting this file for approvals, request dimension to be created.â€
+And keep record approval state as Pending Approval.
+And I take a screenshot as evidence
+
+
+
+@PP-392-UI-004 :
+
+Scenario: Verify error message when No XML found at Blob location
+
+Given XML File has status Awaiting Approval 
+When I navigate to  Fabric Lakehouse / Data Lake path to fetch XML
+And I donâ€™t see XML at blob location
+Then Mark validation as Failed.
+And Error message: â€œXML file cannot be located. Please contact support.â€ Should be displayed
+And I take a screenshot as evidence
+
+
+
+@PP-392-UI-005 :
+
+Scenario-Verify system error when Malformed XML found 
+
+Given XML File has status Awaiting Approval 
+When I navigate to  Fabric Lakehouse / Data Lake path to fetch XML
+And I see malformed XML at blob location
+Then Mark validation as Failed.
+And Log technical details to show generic user error
+And I tke a screenshot as evidence.
+
+
+@PP-392-UI-006 :
+
+Scenario- verify when Timeout / connectivity issues to Dynamics dimension store then record status should not be changed.
+
+Given XML File has status Awaiting Approval 
+When I navigate to  Fabric Lakehouse / Data Lake path to fetch XML
+And I see XML at blob location
+And Timeout / connectivity issues to Dynamics dimension store 
+Then Mark validation as Failed and record should not be approved
+And instruct user to retry later with message.
+And I take a screenshot as evidence
+
+
+
+
+
+
+
+
+
+@PP-392-UI-007 :
+
+Scenario- verify when Partial invalid dimensions are found in xML then approval must be blocked
+
+Given XML File has status Awaiting Approval 
+When I navigate to  Fabric Lakehouse / Data Lake path to fetch XML
+And I see XML at blob location
+And one or many invalid dimensions are found
+Then Mark validation as Failed and approval must be blocked
+And I take a screenshot as evidence
+
+
+
+
+
+@PP-392-UI-008 :
+
+Scenario- verify the OFFSETACCOUNTDISPLAYVALUE, DEFAULTDIMENSIONDISPLAYVALUE and OFFSETDEFAULTDIMENSIONDISPLAYVALUE
+
+Given XML File has status Awaiting Approval
+When I download XML file and checking all ledgers
+Then I should see OFFSETACCOUNTDISPLAYVALUE, DEFAULTDIMENSIONDISPLAYVALUE and OFFSETDEFAULTDIMENSIONDISPLAYVALUE with it
+And the sequence of values is mentioned 
+When I check values of OFFSETACCOUNTDISPLAYVALUE
+Then it should be mainaccountvalue~lineofbussvalue~~mgavalue~productvalue~tradingpartnervalue~underwritingyearvalue~risklocationvalue~regulatorylobvalue~~affiliationvalue~businessunitvalue
+When I check value of DEFAULTDIMENSIONDISPLAYVALUE
+Then it should be lineofbussvalue~~mgavalue~productvalue~tradingpartnervalue~underwritingyearvalue~risklocationvalue~regulatorylobvalue~~affiliationvalue~businessunitvalue
+When I check OFFSETDEFAULTDIMENSIONDISPLAYVALUE
+Then I should be able to DEFAULTDIMENSIONDISPLAYVALUE:lineofbussvalue~~mgavalue~productvalue~tradingpartnervalue~underwritingyearvalue~risklocationvalue~regulatorylobvalue~~affiliationvalue~businessunitvalue
+And I take a screenshot as evidence
+
+
+@PP-392-UI-009 :Verify the dimension values are existing values of Fabric
+
+Given XML File has status Awaiting Approval
+When I download XML file and checking all ledgers
+Then I should see OFFSETACCOUNTDISPLAYVALUE, DEFAULTDIMENSIONDISPLAYVALUE and OFFSETDEFAULTDIMENSIONDISPLAYVALUE with it
+And I need to open fabric for it
+When I am trying to check dimensions values in fabric database
+Then All values should be existing values
+And I take a screenshot as evidence
+
+PP-392-UI-010:Verify the dimension values are not existing values of Fabric
+
+Given XML File has status Awaiting Approval
+When I download XML file and checking all ledgers
+Then I should see OFFSETACCOUNTDISPLAYVALUE, DEFAULTDIMENSIONDISPLAYVALUE and OFFSETDEFAULTDIMENSIONDISPLAYVALUE with it
+And I need to open fabric for it
+When I am trying to check dimensions values in fabric database
+And if values are not existing values 
+Then 
+And I take a screenshot as evidence
+
+
+
+PP-392-UI-011:Verify the dimension validation status,Dimensions validation last check on  and dimensions validation error
+
+Given XML File has status Awaiting Approval
+When I download XML file and checking all ledgers and dimesions
+Then I should see OFFSETACCOUNTDISPLAYVALUE, DEFAULTDIMENSIONDISPLAYVALUE and OFFSETDEFAULTDIMENSIONDISPLAYVALUE with it
+When file has incorrect dimensions values
+Then record status should be awaiting approval only
+And I should see the dimension validation status,Dimensions validation last check on  and dimensions validation error
+And I take a screenshot as evidence
+
+
+
+
+
+
+
+
+

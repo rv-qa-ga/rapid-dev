@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QA Planning – Review (Temp)</title>
+  <style>
+    :root { --bg: #1a1d23; --card: #252830; --text: #e2e4e9; --muted: #8b909a; --accent: #5c9ead; --link: #7eb8c9; --code: #2d3139; --border: #3a3f4a; }
+    * { box-sizing: border-box; }
+    body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; margin: 0; padding: 2rem; max-width: 900px; margin-left: auto; margin-right: auto; }
+    h1 { font-size: 1.75rem; margin-top: 0; border-bottom: 2px solid var(--accent); padding-bottom: 0.5rem; }
+    h2 { font-size: 1.35rem; margin-top: 2.5rem; color: var(--accent); }
+    h3 { font-size: 1.1rem; margin-top: 1.5rem; }
+    h4 { font-size: 1rem; margin-top: 1.25rem; color: var(--muted); }
+    .doc-block { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; margin-bottom: 2rem; }
+    .toc { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 1rem 1.5rem; margin-bottom: 2rem; }
+    .toc a { color: var(--link); text-decoration: none; }
+    .toc a:hover { text-decoration: underline; }
+    .toc ul { margin: 0.5rem 0 0 1rem; padding: 0; list-style: none; }
+    .toc li { margin: 0.35rem 0; }
+    table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.9rem; }
+    th, td { border: 1px solid var(--border); padding: 0.5rem 0.75rem; text-align: left; }
+    th { background: var(--code); color: var(--text); }
+    tr:nth-child(even) { background: rgba(255,255,255,0.03); }
+    code, .cmd { background: var(--code); padding: 0.15rem 0.4rem; border-radius: 4px; font-family: 'Consolas', monospace; font-size: 0.9em; }
+    pre { background: var(--code); padding: 1rem; border-radius: 6px; overflow-x: auto; margin: 0.75rem 0; }
+    pre code { background: none; padding: 0; }
+    a { color: var(--link); }
+    ul { padding-left: 1.25rem; }
+    .meta { color: var(--muted); font-size: 0.85rem; margin-top: 1.5rem; }
+    .checklist { list-style: none; padding-left: 0; }
+    .checklist li { margin: 0.5rem 0; padding-left: 1.5rem; position: relative; }
+    .checklist li::before { content: '☐'; position: absolute; left: 0; }
+    hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+    .placeholder { color: var(--muted); font-style: italic; }
+    .runbook { margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border); }
+    .e2e-img { max-width: 100%; height: auto; border: 1px solid var(--border); border-radius: 6px; margin: 1rem 0; display: block; }
+    .e2e-fig { margin: 1rem 0; }
+    .e2e-fig figcaption { font-size: 0.85rem; color: var(--muted); margin-top: 0.35rem; }
+  </style>
+</head>
+<body>
+
+  <h1>QA Planning – Review (Temporary HTML)</h1>
+  <p class="meta">Three sections only: <strong>Month-end process</strong>, <strong>End-to-end process</strong>, <strong>Automation testing</strong> (each with Current status + Plan for next weeks/months). Automation runbook is part of Automation testing. Progress is tracked separately in <code>docs/planning/PROGRESS_TRACKER.md</code>.</p>
+
+  <nav class="toc" aria-label="Table of contents">
+    <strong>Contents</strong>
+    <ul>
+      <li><a href="#month-end">1. Month-end process</a></li>
+      <li><a href="#e2e">2. End-to-end process</a></li>
+      <li><a href="#automation">3. Automation testing</a></li>
+    </ul>
+  </nav>
+
+  <div class="doc-block">
+    <p><strong>Related Confluence:</strong>
+      <a href="https://accelins.atlassian.net/wiki/spaces/TM/pages/1982333036/Automation+Testing+Strategy+for+End-to-End+Workflow" target="_blank" rel="noopener">Automation Testing Strategy for End-to-End Workflow</a> ·
+      <a href="https://accelins.atlassian.net/wiki/spaces/TM/pages/2692710418/QA+Automation+Framework+-+Complete+Workflow+Guide" target="_blank" rel="noopener">QA Automation Framework – Complete Workflow Guide</a>
+      · <strong>Repository:</strong> GitHub (E2E Automation Framework) · <strong>Recommended tool for QA:</strong> Cursor IDE.
+    </p>
+
+    <!-- ---------- 1. MONTH-END PROCESS ---------- -->
+    <h2 id="month-end">1. Month-end process</h2>
+
+    <h4>Current status</h4>
+    <p><strong>Source:</strong> <code>docs/planning/Month-End-Close-Process.pptx</code></p>
+
+    <p><strong>What it is</strong></p>
+    <p>The month-end close is a critical, recurring operational cycle where Accelerant processes, validates, and reconciles all financial data across multiple systems, regions, and entities — culminating in consolidated financial statements for that month. It runs at the end of each month and involves executing a sequenced set of stored procedures that generate CSV files consumed by downstream finance, reinsurance, and reporting systems.</p>
+
+    <p><strong>Teams involved</strong></p>
+    <table>
+      <thead><tr><th>Team</th><th>Role</th></tr></thead>
+      <tbody>
+        <tr><td>Operations</td><td>Stops BDX loading ~1 week before close per the month-end calendar</td></tr>
+        <tr><td>Production Support (Stacey's team)</td><td>Runs the month-end process in production every month</td></tr>
+        <tr><td>Finance (EU / US / CA)</td><td>Reviews, approves, and posts journal entries to the ledger</td></tr>
+        <tr><td>Data Engineering</td><td>Maintains ODS, TDS, and Data Products pipelines</td></tr>
+        <tr><td>Enterprise Technology</td><td>System availability — Dynamics 365, Tagetik, infrastructure</td></tr>
+        <tr><td>QA Engineering</td><td>Tests process changes; validates new insurers and regions</td></tr>
+      </tbody>
+    </table>
+
+    <p><strong>End-to-end system flow</strong></p>
+    <p>BDX Sources → ADP Ingestion → ODS Enrich → TDS Transform → D365 GL / SL → Tagetik and DCR → Close &amp; Report</p>
+
+    <p><strong>QA team’s role in month-end</strong></p>
+    <p>QA does <strong>not</strong> run the month-end process in production. Production Support executes it monthly. QA is engaged when changes are made to stored procedures, mappings, or when new insurers / contract types / regions are onboarded.</p>
+    <ul>
+      <li><strong>Change testing:</strong> Stored procedure modifications; new/updated field mappings; schema or table changes; new fee codes or LOB mappings</li>
+      <li><strong>Output validation:</strong> CSV file generation verification; file format &amp; schema compliance; control totals &amp; row counts; data completeness checks</li>
+      <li><strong>New contract type / insurer / region:</strong> End-to-end data flow for new entity; reference data alignment (RDM / CMT); downstream system acceptance; DCR mapping validation</li>
+      <li><strong>Test types:</strong> Smoke (system readiness); Integration (multi-hop data flows); Regression (monthly validation pack)</li>
+    </ul>
+    <p><em>Goal: Catch issues before they reach production — reduce multi-day resolution cycles during the live close window.</em></p>
+
+    <p><strong>Pain points (production challenges)</strong></p>
+    <table>
+      <thead><tr><th>Area</th><th>Risk</th><th>Root cause</th></tr></thead>
+      <tbody>
+        <tr><td>DCR / Tagetik alignment</td><td>HIGH</td><td>Late-arriving data, mismatched mappings, missing reference values</td></tr>
+        <tr><td>File load failures</td><td>HIGH</td><td>BDX format mismatches, schema drift, missing fields</td></tr>
+        <tr><td>Historical data fixes</td><td>HIGH</td><td>Manual fix scripts per region / insurer before every snapshot</td></tr>
+        <tr><td>Posting &amp; journal errors</td><td>MED</td><td>Dynamics mismatches, incorrect mappings, missing RDM values</td></tr>
+        <tr><td>Approvals (EU / US)</td><td>MED</td><td>SLA variance, inconsistent thresholds, manual routing delays</td></tr>
+        <tr><td>IC reconciliations</td><td>LOW</td><td>Minor timing differences, reference mismatches</td></tr>
+      </tbody>
+    </table>
+
+    <p><strong>Business impact</strong></p>
+    <ul>
+      <li>Multi-day resolution cycles every month-end close</li>
+      <li>4 regions (EU, UK, US, CA) all impacted simultaneously</li>
+      <li>6+ systems (Finance, DCR, Tagetik) blocked downstream</li>
+      <li>Public company reporting deadlines are non-negotiable</li>
+    </ul>
+
+    <p><strong>Strategic options under evaluation</strong></p>
+    <p>Short-term, Mid-term, and Long-term options. Long-term includes <strong>Re-architecture evaluation</strong>: assess complete re-architecture of the stored procedure chain — modernise pipelines to eliminate structural failures.</p>
+
+    <h4>Plan for next weeks / months</h4>
+    <table>
+      <thead><tr><th>When</th><th>Objective</th><th>Actions</th></tr></thead>
+      <tbody>
+        <tr><td>Next weeks / Q1</td><td>Align month-end with automation</td><td>Define month-end checklist (runbook); tie automation results to month-end report</td></tr>
+        <tr><td>Q2</td><td>Automate more metrics</td><td>Extend reporting (e.g. pass/fail by work item, coverage trends); optional scheduled runs</td></tr>
+        <tr><td>Q3+</td><td>Predictable cadence</td><td>Standardize month-end date and deliverables; auto-generate summary for stakeholders</td></tr>
+      </tbody>
+    </table>
+
+    <hr style="margin: 1.5rem 0;">
+
+    <!-- ---------- 2. END-TO-END PROCESS ---------- -->
+    <h2 id="e2e">2. End-to-end process</h2>
+
+    <h4>Current status</h4>
+
+    <p><strong>E2E pipeline overview</strong></p>
+    <figure class="e2e-fig">
+      <img src="../assets/e2e-flow-overview.png" alt="E2E data flow: Data Source → Power Apps → Data Warehouse → GL, Accounting Engine and Reinsurance → Financial Reporting" class="e2e-img" width="900">
+      <figcaption>Data flow: Data Source (Salesforce, Gen-2/ADP, Blob/SP) → Power Apps → Data Warehouse (ODS, TDS, XML) → GL/Accounting/Reinsurance (Dynamics 365 GL, Tagetik, Duck Creek) → Financial Reporting (Data Mart/PBI, Workiva).</figcaption>
+    </figure>
+
+    <p><strong>QA scope by system (DE QA In Scope vs Out of Scope)</strong></p>
+    <figure class="e2e-fig">
+      <img src="../assets/e2e-qa-scope.png" alt="E2E QA scope diagram: Salesforce, MuleSoft, Dynamics CRM, ODS, TDS, Utility Server, Dynamics F&amp;O, Sharepoint in scope; ADP, Power BI, Tagetik, DCR out of scope" class="e2e-img" width="900">
+      <figcaption>Purple = DE QA In Scope. Yellow = DE QA Out of Scope for QA team. ADP (yellow) will become in scope for end-to-end testing as the source of data.</figcaption>
+    </figure>
+
+    <p><strong>Automation status by system</strong></p>
+    <table>
+      <thead><tr><th>System</th><th>Automation status</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Salesforce</strong></td><td>Some automation done</td></tr>
+        <tr><td><strong>MuleSoft</strong></td><td>Very little automation done</td></tr>
+        <tr><td><strong>Dynamics</strong> (CRM, F&amp;O)</td><td>Very little automation done</td></tr>
+        <tr><td><strong>ODS, TDS</strong> and other systems (Utility Server, Sharepoint, Power BI, Tagetik, DCR)</td><td>No automation as of now</td></tr>
+      </tbody>
+    </table>
+
+    <p><strong>Framework expansion needed</strong></p>
+    <p>The automation framework needs to be expanded with:</p>
+    <ul>
+      <li><strong>ODS</strong> and <strong>TDS</strong> related test cases</li>
+      <li><strong>Dynamics F&amp;O</strong> (Finance and Operations) test cases</li>
+      <li><strong>Power BI report</strong> test cases</li>
+    </ul>
+
+    <p><strong>QA team scope</strong></p>
+    <ul>
+      <li>The <strong>yellow boxes</strong> in the second diagram (e.g. Power BI Report, Tagetik, DCR) are <strong>out of scope</strong> for the QA team.</li>
+      <li><strong>ADP</strong> (Gen-2) is currently shown out of scope but <strong>will become in scope</strong> for end-to-end testing, as it is the <strong>source of data</strong> for the pipeline.</li>
+    </ul>
+
+    <p><strong>Integrated lower environment</strong></p>
+    <ul>
+      <li>We do <strong>not</strong> currently have a <strong>lower environment integrated</strong> for all systems.</li>
+      <li>The gap is the <strong>source system (ADP)</strong> — ADP is missing in lower environments.</li>
+      <li>We are working with the <strong>ADP team</strong> to come up with a solution. Once that solution is complete, we will be able to use it for <strong>end-to-end testing</strong>.</li>
+      <li>There will be <strong>work needed on the ODS side</strong> to make this solution work in an <strong>integrated environment</strong>.</li>
+    </ul>
+    <p>More detail: <a href="https://accelins.atlassian.net/wiki/spaces/TM/pages/1982333036/Automation+Testing+Strategy+for+End-to-End+Workflow" target="_blank" rel="noopener">Automation Testing Strategy for End-to-End Workflow</a> and <a href="https://accelins.atlassian.net/wiki/spaces/TM/pages/2692710418/QA+Automation+Framework+-+Complete+Workflow+Guide" target="_blank" rel="noopener">QA Automation Framework – Complete Workflow Guide</a>.</p>
+
+    <h4>Plan for next weeks / months</h4>
+    <table>
+      <thead><tr><th>When</th><th>Objective</th><th>Actions</th></tr></thead>
+      <tbody>
+        <tr><td>Next weeks / Q1</td><td>Document and align</td><td>Single “End-to-end / Testing &amp; Environment” runbook: env checklist, access, dependencies (ADP, ODS); expand framework with ODS/TDS, Dynamics F&amp;O, Power BI test cases; update Confluence</td></tr>
+        <tr><td>Q2</td><td>ADP solution and ODS</td><td>Adopt ADP solution in lower env; complete ODS work for integrated environment; document in runbook</td></tr>
+        <tr><td>Q2+</td><td>Environment health checks</td><td>Add connectivity/readiness checks; document in runbook</td></tr>
+        <tr><td>Q3+</td><td>Full E2E in lower env</td><td>Utilize integrated lower environment for end-to-end testing; define env refresh/parity process</td></tr>
+      </tbody>
+    </table>
+
+    <hr style="margin: 1.5rem 0;">
+
+    <!-- ---------- 3. AUTOMATION TESTING (includes Runbook) ---------- -->
+    <h2 id="automation">3. Automation testing</h2>
+
+    <h4>Current status</h4>
+    <table>
+      <thead><tr><th>Area</th><th>Status</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Framework</strong></td><td>Production-ready</td><td>Playwright + Cucumber + TypeScript; UI + API; POM, field registry, test data factory</td></tr>
+        <tr><td><strong>Location</strong></td><td>GitHub</td><td>Single repo; clone and use per docs</td></tr>
+        <tr><td><strong>Documentation</strong></td><td>In repo + Confluence</td><td>README, <code>docs/</code> (guides, setup, framework-documentation); Confluence workflow guide (needs updates)</td></tr>
+        <tr><td><strong>Adoption</strong></td><td>Mixed</td><td>Some QA use it; manual QA adoption is a goal</td></tr>
+        <tr><td><strong>Onboarding</strong></td><td>Runbook added</td><td>Automation Runbook (checklist) published so manual QA can run and use the framework; Cursor recommended</td></tr>
+      </tbody>
+    </table>
+
+    <h4>Plan for next weeks / months</h4>
+    <table>
+      <thead><tr><th>When</th><th>Objective</th><th>Actions</th></tr></thead>
+      <tbody>
+        <tr><td>Next weeks / Q1</td><td>Socialize runbook</td><td>Share Automation Runbook with all manual QA; recommend Cursor and GitHub</td></tr>
+        <tr><td>Q2</td><td>Confluence and training</td><td>Update Confluence strategy + workflow pages; optional short “automation 101” sessions</td></tr>
+        <tr><td>Q3+</td><td>Broader adoption</td><td>Target: every QA can run at least one test and interpret results; track adoption in progress tracker</td></tr>
+      </tbody>
+    </table>
+
+    <!-- Automation Runbook – QA Adoption (part of section 3) -->
+    <div class="runbook">
+      <h3>Automation Runbook – QA Adoption</h3>
+      <p><strong>Audience:</strong> Manual QA team members who want to run and use the E2E automation framework. <strong>Goal:</strong> Checklist to run tests, understand results, and contribute. <strong>Recommendation:</strong> Use <strong>Cursor</strong> IDE. <strong>Code:</strong> GitHub (clone repo).</p>
+
+      <h4>How to use</h4>
+      <ul>
+        <li>Work through sections in order; check off each item when done.</li>
+        <li>If something fails, see Troubleshooting below or ask the framework owner.</li>
+      </ul>
+
+      <h4>1. Get the code and tooling</h4>
+      <ul class="checklist">
+        <li><strong>1.1</strong> Install Node.js 18+ (<a href="https://nodejs.org" target="_blank" rel="noopener">nodejs.org</a>), Git (<a href="https://git-scm.com" target="_blank" rel="noopener">git-scm.com</a>).</li>
+        <li><strong>1.2</strong> (Recommended) Install <strong>Cursor</strong> (<a href="https://cursor.com" target="_blank" rel="noopener">cursor.com</a>); open project in Cursor.</li>
+        <li><strong>1.3</strong> Clone repo: <code>git clone &lt;repository-url&gt;</code>, <code>cd E2EAutomation</code>, then <code>npm install</code>, <code>npm run build</code>.</li>
+      </ul>
+
+      <h4>2. Environment configuration</h4>
+      <ul class="checklist">
+        <li><strong>2.1</strong> Copy <code>src/config/env/env.sample</code> to <code>src/config/env/.env.qa</code> (do not commit).</li>
+        <li><strong>2.2</strong> Get credentials from your lead (Salesforce, Jira/Zephyr, MuleSoft as needed); fill <code>.env.qa</code>.</li>
+        <li><strong>2.3</strong> (Optional) <code>npm run connectivity:check</code></li>
+      </ul>
+
+      <h4>3. Run your first tests</h4>
+      <ul class="checklist">
+        <li><strong>3.1</strong> <code>npm run test:all</code> · UI only: <code>npm run test:ui</code> · API only: <code>npm run test:api</code></li>
+        <li><strong>3.2</strong> By work item: <code>npm run test:tag -- --tags @SF-563</code></li>
+        <li><strong>3.3</strong> With browser: <code>npm run test:interactive</code> · Reports: <code>reports/</code> or <code>npm run report:open</code></li>
+      </ul>
+
+      <h4>4. Basics</h4>
+      <ul class="checklist">
+        <li><strong>4.1</strong> UI tests: <code>src/features/ui/</code>, API: <code>src/features/api/</code>; steps: <code>src/step-definitions/</code>.</li>
+        <li><strong>4.2</strong> Read README.md; skim docs/framework-documentation.md or Confluence.</li>
+      </ul>
+
+      <h4>5. Cursor and GitHub (recommended)</h4>
+      <ul class="checklist">
+        <li><strong>5.1</strong> Open project in Cursor; branch: <code>git checkout -b your-name/short-description</code>.</li>
+        <li><strong>5.2</strong> After changes, run relevant test; commit, push, open Pull Request.</li>
+      </ul>
+
+      <h4>Optional: Jira/Zephyr</h4>
+      <p><code>npm run jira:generate -- SF-600</code>; <code>npm run zephyr:UploadAndLink -- --work-item SF-600</code>; <code>npm run process:new-qa-items</code>. Full steps in <code>docs/planning/AUTOMATION_RUNBOOK_QA_ADOPTION.md</code>.</p>
+
+      <h4>Quick reference – common commands</h4>
+      <table>
+        <thead><tr><th>Goal</th><th>Command</th></tr></thead>
+        <tbody>
+          <tr><td>Run all tests</td><td><code>npm run test:all</code></td></tr>
+          <tr><td>Run UI / API only</td><td><code>npm run test:ui</code> / <code>npm run test:api</code></td></tr>
+          <tr><td>Run by tag</td><td><code>npm run test:tag -- --tags @SF-563</code></td></tr>
+          <tr><td>Run with browser</td><td><code>npm run test:interactive</code></td></tr>
+          <tr><td>Generate from Jira</td><td><code>npm run jira:generate -- SF-XXX</code></td></tr>
+          <tr><td>Process new QA items</td><td><code>npm run process:new-qa-items</code></td></tr>
+          <tr><td>Weekly QA report</td><td><code>npm run report:weekly-qa</code></td></tr>
+          <tr><td>Check connectivity</td><td><code>npm run connectivity:check</code></td></tr>
+        </tbody>
+      </table>
+
+      <h4>Troubleshooting</h4>
+      <table>
+        <thead><tr><th>Issue</th><th>What to do</th></tr></thead>
+        <tbody>
+          <tr><td><code>npm install</code> fails</td><td>Node ≥ 18; try <code>npm ci</code> if lockfile exists.</td></tr>
+          <tr><td>Auth / login failures</td><td>Check <code>src/config/env/.env.qa</code> (Salesforce URL, username, JWT/password).</td></tr>
+          <tr><td>Module/path errors</td><td>Run <code>npm run build</code>; ensure you’re in repo root.</td></tr>
+          <tr><td>Wrong env / no tests run</td><td>Ensure <code>.env.qa</code> exists and <code>ENV=qa</code> set if required.</td></tr>
+          <tr><td>Jira/Zephyr fail</td><td>Check credentials and project key in env; see Confluence/docs for tokens.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p class="meta">Last updated: February 2025</p>
+  </div>
+
+  <p class="meta" style="margin-top:2rem;">Progress and pending work are tracked in <strong><code>docs/planning/PROGRESS_TRACKER.md</code></strong> (separate from this review document). Delete <code>docs/planning/temp/</code> when no longer needed.</p>
+
+</body>
+</html>

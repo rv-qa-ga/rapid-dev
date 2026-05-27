@@ -1,0 +1,220 @@
+h1. Zephyr Test Case Linking Utility - Documentation
+
+h2. Overview
+
+The Zephyr Link Utility allows you to automatically link Zephyr Scale test cases to Jira work items. This utility is optimized for scalability and can handle projects with thousands of test cases efficiently.
+
+h2. Key Features
+
+* *Automatic Test Case Discovery*: Finds test cases by label or name pattern
+* *Pagination Support*: Efficiently handles projects with 1000+ test cases
+* *Duplicate Prevention*: Skips test cases that are already linked
+* *Retry Logic*: Handles Zephyr indexing delays with automatic retries
+* *Dry Run Mode*: Preview what would be linked without making changes
+
+h2. Scalability Improvements
+
+The utility has been optimized to handle large projects efficiently:
+
+# *Pagination Support*: Fetches test cases in pages of 1000, avoiding memory issues
+# *Streaming Filtering*: Filters test cases during pagination, not after loading all data
+# *Early Termination*: Stops pagination when safety limits are reached (10,000 test cases)
+# *Efficient Label Search*: Uses exact matching for work item labels to avoid false positives
+
+h3. Performance Characteristics
+
+* *Small Projects (< 1000 test cases)*: Fast, single API call
+* *Medium Projects (1000-5000 test cases)*: Efficient pagination, typically 2-5 API calls
+* *Large Projects (5000-10000 test cases)*: Handles gracefully with pagination, typically 5-10 API calls
+* *Very Large Projects (> 10000 test cases)*: Safety limit prevents excessive API calls
+
+h2. Command Reference
+
+h3. Basic Usage
+
+Link all test cases for a work item:
+
+{code}
+npm run zephyr:LinkToJira -- --work-item SF-570
+{code}
+
+h3. Link Specific Test Case
+
+Link a single test case by test case ID or Zephyr key:
+
+{code}
+# By test case ID (label)
+npm run zephyr:LinkToJira -- --work-item SF-570 --test-case SF-570-UI-001
+
+# By Zephyr key
+npm run zephyr:LinkToJira -- --work-item SF-570 --test-case SF-T1523
+{code}
+
+h3. Dry Run (Preview Mode)
+
+Preview what would be linked without making changes:
+
+{code}
+npm run zephyr:LinkToJira -- --work-item SF-570 --dry-run
+{code}
+
+h2. How It Works
+
+h3. Search Strategy
+
+The utility uses a two-step search strategy:
+
+# *Label Search*: Searches for test cases with the exact work item label (e.g., "SF-570")
+# *Name Pattern Search*: Falls back to searching by name pattern if label search finds no results
+## Matches test case names starting with the work item (e.g., "SF-570-UI-001: ...")
+## Matches test case ID labels (e.g., "SF-570-UI-001", "SF-570-API-001")
+
+h3. Linking Process
+
+# *Verify Jira Work Item*: Confirms the work item exists in Jira
+# *Get Jira Issue ID*: Retrieves the internal Jira issue ID required by Zephyr API
+# *Check Existing Links*: Identifies test cases already linked to avoid duplicates
+# *Create Links*: Links test cases that aren't already linked
+
+h3. Retry Logic
+
+The utility includes automatic retries to handle Zephyr indexing delays:
+
+* *Default Retries*: 3 attempts
+* *Delay Between Retries*: 2s, 4s, 6s (exponential backoff)
+* *Use Case*: Newly created test cases may take a few seconds to be indexed
+
+h2. Example Output
+
+h3. Successful Linking
+
+{code}
+================================================================================
+🔗 LINK ZEPHYR TEST CASES TO JIRA WORK ITEM
+================================================================================
+
+Work Item: SF-570
+Dry Run: No (will create links)
+
+📋 Step 1: Verifying Jira work item exists...
+✅ Found Jira work item: Account Status Field Enhancement
+
+🔍 Step 2: Searching for test cases in Zephyr...
+[Attempt 1/3] Searching for test cases with label: "SF-570"
+   Found 0 test case(s) by label
+[Attempt 1/3] Searching for test cases by name pattern "SF-570:"...
+   Retrieved 1250 total test cases from API (after pagination)
+   Found 21 test case(s) by name pattern (scanned 1250 total test cases)
+
+✅ Found 21 test case(s) in Zephyr:
+   1. SF-T1523: SF-570-UI-001: Invalid value added to Account Status picklist
+   2. SF-T1524: SF-570-UI-002: Restrict who can set a record to Invalid
+   ...
+
+🔗 Step 3 & 4: Linking test cases to Jira work item...
+📋 Verifying Jira work item exists...
+✅ Found Jira work item: Account Status Field Enhancement
+🔍 Getting Jira issue ID...
+✅ Jira issue ID: 12345
+🔍 Checking for existing links...
+   Found 0 existing Zephyr link(s)
+
+🔗 Linking 21 test case(s) to Jira work item...
+   ✅ Linked: SF-T1523 - SF-570-UI-001: Invalid value added to Account Status picklist
+   ✅ Linked: SF-T1524 - SF-570-UI-002: Restrict who can set a record to Invalid
+   ...
+
+================================================================================
+📊 LINKING SUMMARY
+================================================================================
+   Total test cases found: 21
+   ✅ Successfully linked: 21
+   ⏭️  Already linked (skipped): 0
+
+✅ Successfully linked 21 test case(s) to Jira work item SF-570
+   View the links in Jira: https://accelins.atlassian.net/browse/SF-570
+{code}
+
+h3. Dry Run Output
+
+{code}
+================================================================================
+🔗 LINK ZEPHYR TEST CASES TO JIRA WORK ITEM
+================================================================================
+
+Work Item: SF-570
+Dry Run: Yes (no changes will be made)
+
+📋 Step 1: Verifying Jira work item exists...
+✅ Found Jira work item: Account Status Field Enhancement
+
+🔍 Step 2: Searching for test cases in Zephyr...
+✅ Found 21 test case(s) in Zephyr
+
+   [DRY RUN] Would link the following test cases:
+   - SF-T1523: SF-570-UI-001: Invalid value added to Account Status picklist
+   - SF-T1524: SF-570-UI-002: Restrict who can set a record to Invalid
+   ...
+
+   Run without --dry-run to actually create the links.
+{code}
+
+h2. Troubleshooting
+
+h3. No Test Cases Found
+
+If the utility reports "No test cases found", check:
+
+# *Test Cases Exist*: Verify test cases exist in Zephyr Scale UI
+# *Labels*: Ensure test cases have the work item label (e.g., "SF-570")
+# *Name Pattern*: Test case names should start with the work item (e.g., "SF-570-UI-001: ...")
+# *Project Key*: Verify the test cases are in the correct project (default: "SF")
+# *Indexing Delay*: Wait a few minutes after creating test cases, then retry
+
+h3. Performance Issues
+
+If the utility is slow:
+
+# *Large Projects*: Projects with 5000+ test cases will take longer due to pagination
+# *Network*: Slow network connections will affect API call performance
+# *Zephyr API*: Zephyr API response times can vary based on server load
+
+h3. Duplicate Links
+
+The utility automatically skips test cases that are already linked. If you see "Already linked (skipped)" messages, this is expected behavior.
+
+h2. Best Practices
+
+# *Use Dry Run First*: Always run with {{--dry-run}} to preview what will be linked
+# *Link After Upload*: Link test cases immediately after uploading them to Zephyr
+# *Batch Processing*: For multiple work items, process them one at a time
+# *Monitor Performance*: For large projects, monitor the pagination progress in the logs
+
+h2. Related Commands
+
+* *Upload Test Cases*: {{npm run zephyr:UploadTestCase -- --work-item SF-570}}
+* *Upload and Link*: {{npm run zephyr:UploadAndLink -- --work-item SF-570}}
+* *Diagnose Duplicates*: {{npm run diagnose:duplicates -- SF-570}}
+
+h2. Technical Details
+
+h3. API Endpoints Used
+
+* {{GET /testcases?projectKey={projectKey}&startAt={startAt}&maxResults={maxResults}}} - Fetch test cases with pagination
+* {{GET /issues/{issueId}}} - Get Jira issue details
+* {{GET /issues/{issueId}/remotelink}} - Get existing remote links
+* {{POST /testcases/{testCaseKey}/links/issues/{issueId}}} - Create link between test case and Jira issue
+
+h3. Environment Variables
+
+* {{ZEPHYR_PROJECT_KEY}}: Project key for Zephyr (default: "SF")
+* {{JIRA_BASE_URL}}: Base URL for Jira instance
+* {{ZEPHYR_NON_INTERACTIVE}}: Set to "true" for non-interactive mode
+
+h2. Support
+
+For issues or questions:
+# Check the troubleshooting section above
+# Review the diagnostic output with {{--dry-run}}
+# Use the diagnostic utility: {{npm run diagnose:duplicates -- {WORK_ITEM}}}
+

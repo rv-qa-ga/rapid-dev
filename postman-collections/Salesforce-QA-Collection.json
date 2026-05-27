@@ -1,0 +1,653 @@
+{
+	"info": {
+		"_postman_id": "salesforce-qa-crud-collection",
+		"name": "Salesforce QA - CRUD Operations",
+		"description": "Salesforce REST API collection for QA environment with CRUD operations for Accounts, Leads, and Contacts.\n\n## Setup Instructions:\n1. Import this collection into Postman\n2. Create a new environment (or use the provided environment template)\n3. Set the following environment variables:\n   - `sf_base_url`: https://arx--qa.sandbox.my.salesforce.com\n   - `sf_api_version`: v60.0\n   - `sf_access_token`: Your Salesforce access token (get via OAuth or JWT)\n   - `sf_instance_url`: Your Salesforce instance URL (usually same as base_url)\n\n## Authentication:\nThis collection uses Bearer Token authentication. You can obtain an access token via:\n- OAuth 2.0 flow (recommended for Postman)\n- JWT Bearer Token flow\n- Username/Password flow\n\n## Note:\nNo credentials are stored in this collection. All sensitive data should be stored in Postman environment variables.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{sf_access_token}}",
+				"type": "string"
+			}
+		]
+	},
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "{{sf_base_url}}",
+			"type": "string"
+		},
+		{
+			"key": "api_version",
+			"value": "{{sf_api_version}}",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "Accounts",
+			"item": [
+				{
+					"name": "Create Account",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"Name\": \"Test Account\",\n  \"Type\": \"Customer\",\n  \"Industry\": \"Technology\",\n  \"Phone\": \"555-1234\",\n  \"Website\": \"https://example.com\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Account/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"services",
+								"data",
+								"{{api_version}}",
+								"sobjects",
+								"Account",
+								""
+							]
+						},
+						"description": "Creates a new Account record in Salesforce.\n\n**Required Fields:**\n- Name (string)\n\n**Common Optional Fields:**\n- Type (string)\n- Industry (string)\n- Phone (string)\n- Website (string)\n- BillingStreet, BillingCity, BillingState, BillingPostalCode, BillingCountry\n- Description (string)"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Account by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Account/{{account_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"services",
+								"data",
+								"{{api_version}}",
+								"sobjects",
+								"Account",
+								"{{account_id}}"
+							]
+						},
+						"description": "Retrieves an Account record by its Salesforce ID.\n\n**Path Parameter:**\n- account_id: The 18-character Salesforce ID of the Account"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Account with Specific Fields",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Account/{{account_id}}?fields=Id,Name,Type,Industry,Phone,Website",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"services",
+								"data",
+								"{{api_version}}",
+								"sobjects",
+								"Account",
+								"{{account_id}}"
+							],
+							"query": [
+								{
+									"key": "fields",
+									"value": "Id,Name,Type,Industry,Phone,Website"
+								}
+							]
+						},
+						"description": "Retrieves an Account record with only specified fields (more efficient than getting all fields).\n\n**Query Parameter:**\n- fields: Comma-separated list of field API names to retrieve"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Account",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"Name\": \"Updated Account Name\",\n  \"Type\": \"Partner\",\n  \"Industry\": \"Finance\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Account/{{account_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"services",
+								"data",
+								"{{api_version}}",
+								"sobjects",
+								"Account",
+								"{{account_id}}"
+							]
+						},
+						"description": "Updates an existing Account record.\n\n**Path Parameter:**\n- account_id: The 18-character Salesforce ID of the Account to update\n\n**Note:** Only include fields you want to update in the request body."
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Account",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Account/{{account_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"services",
+								"data",
+								"{{api_version}}",
+								"sobjects",
+								"Account",
+								"{{account_id}}"
+							]
+						},
+						"description": "Deletes an Account record by its ID.\n\n**Path Parameter:**\n- account_id: The 18-character Salesforce ID of the Account to delete\n\n**Note:** Deletion is permanent. Some records may not be deletable due to relationships or validation rules."
+					},
+					"response": []
+				},
+				{
+					"name": "Query Accounts (SOQL)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/services/data/{{api_version}}/query/?q=SELECT Id, Name, Type, Industry FROM Account WHERE Type = 'Customer' LIMIT 10",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"services",
+								"data",
+								"{{api_version}}",
+								"query",
+								""
+							],
+							"query": [
+								{
+									"key": "q",
+									"value": "SELECT Id, Name, Type, Industry FROM Account WHERE Type = 'Customer' LIMIT 10"
+								}
+							]
+						},
+						"description": "Queries Account records using SOQL (Salesforce Object Query Language).\n\n**Query Parameter:**\n- q: SOQL query string (URL encoded)\n\n**Example SOQL Queries:**\n- `SELECT Id, Name FROM Account LIMIT 10`\n- `SELECT Id, Name FROM Account WHERE Industry = 'Technology'`\n- `SELECT Id, Name, (SELECT Id, Name FROM Contacts) FROM Account`"
+					},
+					"response": []
+				}
+			],
+			"description": "CRUD operations for Salesforce Account objects"
+		},
+		{
+			"name": "Leads",
+			"item": [
+				{
+					"name": "Create Lead",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"FirstName\": \"John\",\n  \"LastName\": \"Doe\",\n  \"Company\": \"Acme Corp\",\n  \"Email\": \"john.doe@acme.com\",\n  \"Phone\": \"555-5678\",\n  \"Status\": \"Open - Not Contacted\",\n  \"LeadSource\": \"Web\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Lead/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"services",
+								"data",
+								"{{api_version}}",
+								"sobjects",
+								"Lead",
+								""
+							]
+						},
+						"description": "Creates a new Lead record in Salesforce.\n\n**Required Fields:**\n- LastName (string)\n- Company (string)\n\n**Common Optional Fields:**\n- FirstName (string)\n- Email (string)\n- Phone (string)\n- Status (string) - e.g., \"Open - Not Contacted\", \"Working - Contacted\"\n- LeadSource (string) - e.g., \"Web\", \"Phone Inquiry\", \"Partner Referral\"\n- Title (string)\n- Industry (string)"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Lead by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Lead/{{lead_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"services",
+								"data",
+								"{{api_version}}",
+								"sobjects",
+								"Lead",
+								"{{lead_id}}"
+							]
+						},
+						"description": "Retrieves a Lead record by its Salesforce ID.\n\n**Path Parameter:**\n- lead_id: The 18-character Salesforce ID of the Lead"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Lead with Specific Fields",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Lead/{{lead_id}}?fields=Id,FirstName,LastName,Company,Email,Phone,Status",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"services",
+								"data",
+								"{{api_version}}",
+								"sobjects",
+								"Lead",
+								"{{lead_id}}"
+							],
+							"query": [
+								{
+									"key": "fields",
+									"value": "Id,FirstName,LastName,Company,Email,Phone,Status"
+								}
+							]
+						},
+						"description": "Retrieves a Lead record with only specified fields.\n\n**Query Parameter:**\n- fields: Comma-separated list of field API names to retrieve"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Lead",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"Status\": \"Working - Contacted\",\n  \"Phone\": \"555-9999\",\n  \"LeadSource\": \"Phone Inquiry\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Lead/{{lead_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"services",
+								"data",
+								"{{api_version}}",
+								"sobjects",
+								"Lead",
+								"{{lead_id}}"
+							]
+						},
+						"description": "Updates an existing Lead record.\n\n**Path Parameter:**\n- lead_id: The 18-character Salesforce ID of the Lead to update\n\n**Note:** Only include fields you want to update in the request body."
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Lead",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Lead/{{lead_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"services",
+								"data",
+								"{{api_version}}",
+								"sobjects",
+								"Lead",
+								"{{lead_id}}"
+							]
+						},
+						"description": "Deletes a Lead record by its ID.\n\n**Path Parameter:**\n- lead_id: The 18-character Salesforce ID of the Lead to delete"
+					},
+					"response": []
+				},
+				{
+					"name": "Query Leads (SOQL)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/services/data/{{api_version}}/query/?q=SELECT Id, FirstName, LastName, Company, Email, Status FROM Lead WHERE Status = 'Open - Not Contacted' LIMIT 10",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"services",
+								"data",
+								"{{api_version}}",
+								"query",
+								""
+							],
+							"query": [
+								{
+									"key": "q",
+									"value": "SELECT Id, FirstName, LastName, Company, Email, Status FROM Lead WHERE Status = 'Open - Not Contacted' LIMIT 10"
+								}
+							]
+						},
+						"description": "Queries Lead records using SOQL.\n\n**Query Parameter:**\n- q: SOQL query string (URL encoded)\n\n**Example SOQL Queries:**\n- `SELECT Id, FirstName, LastName, Company FROM Lead LIMIT 10`\n- `SELECT Id, FirstName, LastName FROM Lead WHERE LeadSource = 'Web'`\n- `SELECT Id, FirstName, LastName, Company FROM Lead WHERE CreatedDate = TODAY`"
+					},
+					"response": []
+				}
+			],
+			"description": "CRUD operations for Salesforce Lead objects"
+		},
+		{
+			"name": "Contacts",
+			"item": [
+				{
+					"name": "Create Contact",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"FirstName\": \"Jane\",\n  \"LastName\": \"Smith\",\n  \"Email\": \"jane.smith@example.com\",\n  \"Phone\": \"555-9012\",\n  \"Title\": \"Sales Manager\",\n  \"AccountId\": \"{{account_id}}\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Contact/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"services",
+								"data",
+								"{{api_version}}",
+								"sobjects",
+								"Contact",
+								""
+							]
+						},
+						"description": "Creates a new Contact record in Salesforce.\n\n**Required Fields:**\n- LastName (string)\n\n**Common Optional Fields:**\n- FirstName (string)\n- Email (string)\n- Phone (string)\n- Title (string)\n- AccountId (string) - Link to an Account\n- MailingStreet, MailingCity, MailingState, MailingPostalCode, MailingCountry\n- Description (string)"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Contact by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Contact/{{contact_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"services",
+								"data",
+								"{{api_version}}",
+								"sobjects",
+								"Contact",
+								"{{contact_id}}"
+							]
+						},
+						"description": "Retrieves a Contact record by its Salesforce ID.\n\n**Path Parameter:**\n- contact_id: The 18-character Salesforce ID of the Contact"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Contact with Specific Fields",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Contact/{{contact_id}}?fields=Id,FirstName,LastName,Email,Phone,Title,AccountId",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"services",
+								"data",
+								"{{api_version}}",
+								"sobjects",
+								"Contact",
+								"{{contact_id}}"
+							],
+							"query": [
+								{
+									"key": "fields",
+									"value": "Id,FirstName,LastName,Email,Phone,Title,AccountId"
+								}
+							]
+						},
+						"description": "Retrieves a Contact record with only specified fields.\n\n**Query Parameter:**\n- fields: Comma-separated list of field API names to retrieve"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Contact",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"Title\": \"Senior Sales Manager\",\n  \"Phone\": \"555-3456\",\n  \"Email\": \"jane.smith.updated@example.com\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Contact/{{contact_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"services",
+								"data",
+								"{{api_version}}",
+								"sobjects",
+								"Contact",
+								"{{contact_id}}"
+							]
+						},
+						"description": "Updates an existing Contact record.\n\n**Path Parameter:**\n- contact_id: The 18-character Salesforce ID of the Contact to update\n\n**Note:** Only include fields you want to update in the request body."
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Contact",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Contact/{{contact_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"services",
+								"data",
+								"{{api_version}}",
+								"sobjects",
+								"Contact",
+								"{{contact_id}}"
+							]
+						},
+						"description": "Deletes a Contact record by its ID.\n\n**Path Parameter:**\n- contact_id: The 18-character Salesforce ID of the Contact to delete"
+					},
+					"response": []
+				},
+				{
+					"name": "Query Contacts (SOQL)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/services/data/{{api_version}}/query/?q=SELECT Id, FirstName, LastName, Email, Phone, AccountId FROM Contact WHERE AccountId = '{{account_id}}' LIMIT 10",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"services",
+								"data",
+								"{{api_version}}",
+								"query",
+								""
+							],
+							"query": [
+								{
+									"key": "q",
+									"value": "SELECT Id, FirstName, LastName, Email, Phone, AccountId FROM Contact WHERE AccountId = '{{account_id}}' LIMIT 10"
+								}
+							]
+						},
+						"description": "Queries Contact records using SOQL.\n\n**Query Parameter:**\n- q: SOQL query string (URL encoded)\n\n**Example SOQL Queries:**\n- `SELECT Id, FirstName, LastName, Email FROM Contact LIMIT 10`\n- `SELECT Id, FirstName, LastName FROM Contact WHERE AccountId = '001XX000003DGbQ'`\n- `SELECT Id, FirstName, LastName, (SELECT Id, Name FROM Account) FROM Contact`"
+					},
+					"response": []
+				}
+			],
+			"description": "CRUD operations for Salesforce Contact objects"
+		},
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "OAuth 2.0 - Get Access Token (Username/Password)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/x-www-form-urlencoded"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "grant_type",
+									"value": "password",
+									"type": "text"
+								},
+								{
+									"key": "client_id",
+									"value": "{{sf_client_id}}",
+									"type": "text"
+								},
+								{
+									"key": "client_secret",
+									"value": "{{sf_client_secret}}",
+									"type": "text"
+								},
+								{
+									"key": "username",
+									"value": "{{sf_username}}",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "{{sf_password}}{{sf_security_token}}",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/services/oauth2/token",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"services",
+								"oauth2",
+								"token"
+							]
+						},
+						"description": "Obtains an access token using Username/Password OAuth flow.\n\n**Required Environment Variables:**\n- sf_client_id: Your Connected App Consumer Key\n- sf_client_secret: Your Connected App Consumer Secret\n- sf_username: Your Salesforce username\n- sf_password: Your Salesforce password\n- sf_security_token: Your Salesforce security token (appended to password)\n\n**Response:**\nReturns access_token, instance_url, and other OAuth details. Copy the access_token to your sf_access_token environment variable."
+					},
+					"response": []
+				},
+				{
+					"name": "OAuth 2.0 - Get Access Token (JWT Bearer)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/x-www-form-urlencoded"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "grant_type",
+									"value": "urn:ietf:params:oauth:grant-type:jwt-bearer",
+									"type": "text"
+								},
+								{
+									"key": "assertion",
+									"value": "{{sf_jwt_assertion}}",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/services/oauth2/token",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"services",
+								"oauth2",
+								"token"
+							]
+						},
+						"description": "Obtains an access token using JWT Bearer Token flow.\n\n**Required Environment Variables:**\n- sf_jwt_assertion: JWT token (base64 encoded) signed with your private key\n\n**Note:** JWT assertion must be generated separately using your private key and Connected App configuration. This is typically done programmatically.\n\n**Response:**\nReturns access_token, instance_url, and other OAuth details. Copy the access_token to your sf_access_token environment variable."
+					},
+					"response": []
+				}
+			],
+			"description": "Authentication endpoints for obtaining Salesforce access tokens"
+		}
+	]
+}
+

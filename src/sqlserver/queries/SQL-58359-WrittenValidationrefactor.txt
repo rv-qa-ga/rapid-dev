@@ -1,0 +1,306 @@
+USE [TDS]
+GO
+
+/****** Object:  StoredProcedure [D365].[sp_D365WrittenValidation]    Script Date: 12/4/2025 10:26:35 AM ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+
+-- =============================================
+-- Author:           Dave Cornwell
+-- Create date: 
+-- Description:      This PROC is designed to output Written Bordereau transaction records in an XML format that can be ingested by D365
+--v2.00 where we remove the last of the hardcoding around the agency i.e. (AAUK AAIE etc)
+--Accelerant Agency UK - AAUK
+--Accelerant Agency Limited (IE) = AAIE
+--Accelerant Agency Limited (UK Branch) = AAUB
+
+-- Revision History:
+-- Date				Who					Reference ID	Change Description	
+-- -----------		------------------	--------------	------------------------------------------------------------------------
+-- 21/03/2024		Pradeep Kumar		U/S#21780		Included validation checks for Agency BusinessUnit& Insurer Busniess Unit fields
+--2024-03-26		Pradeep Kumar		#US 24971		added Validation Check for  Trading Partner
+--03/27/2024        Sushil Baghel       Bug-29362       Preprod: EU-73 data not loaded to tWrittenPremiumExport table due to Bad Insurer Code validation in D365
+--04/04/2024        Pradeep Kumar       Bug-29444       updated InsurerBusinessUnit Validation check for Coinsurance
+--2024/05/20		Kirika Ndegwa		DevOps 31793	Fix Trading partner pre and post validation check
+--2024/05/21		Kirika Ndegwa		DevOps 31860	Update logic for checking Trading partner Dynamics Pre and Post Validations
+--2024-06-24        Sushil Baghel       US-33310        D365 | New Written Pre-validation check - Regulatory LOB
+--2025-01-09		Kirika Ndegwa		DevOps 42175	Prevalidation check on a Zero CorrectAmount line is erroring
+--2025-01-16		Jeff Davis			DevOps 42175	Revert Prevalidation check on a Zero CorrectAmount line is erroring so other code can be released ahead of this change
+--2025-01-16		Jeff Davis			DevOps 42175	Reapplying Prevalidation check on a Zero CorrectAmount line is erroring (Kirika's change)
+--2025-04-02		David Cornwell		#43279 			Aligning PTYMasterID Checks to no longer use Names where possible (dependent upon PTYMAsterID's in D365lake) - Note WrittenValidationHelper Index also updated
+--2025-07-25        Sushil Baghel       #40275          Adding Fees Contracts Validation Checks 
+--2025-09-23        Ryan Vogel		    #55282	        Revert back to using InsurerOrganisationName
+--2025-10-01        Sushil Baghel       #55575          Removing Other Fees Validation
+-- =============================================================================================================================
+ CREATE PROCEDURE [D365].[sp_D365WrittenValidationNew] @RepositoryID NVARCHAR(25) =NULL , @PRE_TRANSFORMATION  BIT =0
+       
+AS
+BEGIN
+	   /*
+	   DROP TABLE IF EXISTS #WrittenPost;
+
+	   SELECT DISTINCT [RepositoryID],[MGAName],[VENDORACCOUNTNUMBER],[Original Currency],[AgencyCode],[Line Of Business],[ProductName],[RiskCountry],
+	   [UnderwritingYear],[AgencyBusinessUnit],InsurerBusinessUnit
+	   ,[GroupPartyMasterID],[MemberPartyMasterID],InsurerPartyMasterID,[AgencyPartyMasterID] INTO #WrittenPost 
+	   FROM [D365].[tTEMPWrittenPremiumExport] WHERE [RepositoryID] = @RepositoryID AND CorrectAmount <> 0;
+	   */
+	   DROP TABLE IF EXISTS #WrittenPre;
+
+	   SELECT DISTINCT [RepositoryID],[MGA Name],[InsurerOrganisationName],[Original Currency],[Line Of Business],[ProductName],[Risk Country],
+	   [Underwriting Year],[Agency Branch Code],[BinderUMRReference],Insurer,[Settlement Currency] ,RegulatoryLOB
+	   ,[GroupPartyMasterID],[MemberPartyMasterID],InsurerPartyMasterID,[AgencyPartyMasterID],FrontingCompanyPartyMasterID
+	   ,[model],[Type of Insurance],[Fronting Fee],[CarrierOverrideFeeAmount],[DistributionPartnerFeeAmount] INTO #WrittenPre 
+	   FROM [D365].[tWrittenPremiumStaging] WHERE [RepositoryID] = @RepositoryID;
+
+       
+	   DECLARE @BADREPOSITORYID AS NVARCHAR(25)
+	   DECLARE @ACCPERIOD DATETIME
+	   --DECLARE @RepositoryID AS NVARCHAR(25)
+	   DECLARE @RETTABLE TABLE (REPID NVARCHAR(50),ErrorDesc  NVARCHAR(500), ValidationSucess INT,[EventTypeID] INT , [PRE_transformation] BIT);
+       SET NOCOUNT ON;
+	   --SET @RepositoryID = 'EU-12345test'
+	   SET @BADREPOSITORYID = NULL;
+	   
+
+       
+
+	   SELECT @ACCPERIOD = AccountingPeriod FROM [D365].[t_AccountingPeriod] WHERE GETDATE()>=StartDate and GETDATE() <=EndDate	;	
+		
+
+WITH BADJOURNALNAME AS --N.B. this currently uses a linked server to the TEST Instance this will change at some point in the future. ALSO NOT Hardcoded AAUK ******
+(
+    --**hard code for now until config correct**
+	SELECT TOP(1) @RepositoryID AS RepositoryID ,'WBX' AS [NAME]
+	--, ISNULL(JS.[NAME],'INVALIDJOURNALNAME')AS [NAME] , ACCINT.[Description],ACCINT.DATAAREAID FROM [D365Lake].[ods].[ACCIntegrationTypesDataStaging] AS ACCINT
+              --INNER JOIN  [D365Lake].[ods].[LedgerJournalNameStaging] AS JS ON JS.AccIntegrationCode= ACCINT.[ACCINTEGRATIONCODE]   WHERE  ACCINT.DATAAREAID='AAUK' AND ACCINT.[Description]='WrittenBdx'
+)
+,BADMGANAMESPRETRANSFORMATION AS
+(
+	SELECT RepositoryID,'Bad MGA Name '+WP.[MGA Name] AS Errorstring FROM #WrittenPre AS WP WHERE [MGA Name] NOT IN 
+	(SELECT  CS.[ORGANIZATIONNAME] COLLATE Latin1_General_CI_AS  FROM [D365].[CustCustomerV3Staging] AS CS WHERE [ORGANIZATIONNAME] IS NOT NULL)
+),BADACCOUNTDISPLAYVALUEVENDORPRETRANSFORMATION AS
+(
+	SELECT RepositoryID,'Bad AccountDisplayValue Vendor' AS Errorstring FROM #WrittenPre AS WPE WHERE  WPE.[InsurerOrganisationName] NOT IN  --check this logic
+	(SELECT  VS.[VENDORORGANIZATIONNAME] COLLATE Latin1_General_CI_AS  FROM [D365].[VendVendorV2Staging] AS VS WHERE [VENDORORGANIZATIONNAME] IS NOT NULL)
+),BADCURRENCYCODEPRETRANSFORMATION AS
+(
+	SELECT RepositoryID,'Bad CurrencyCode '+WPE.[Original Currency] AS Errorstring FROM #WrittenPre AS WPE WHERE  WPE.[Original Currency] NOT IN 
+	(SELECT  CU.[CURRENCYCODE] COLLATE Latin1_General_CI_AS  FROM [D365].[CurrencyStaging] AS CU WHERE [CURRENCYCODE] IS NOT NULL)
+),BADBANKACCOUNTPRETRANSFORMATION AS
+(
+	SELECT RepositoryID,'Bad BankAccount' AS Errorstring FROM #WrittenPre AS WPE WHERE  WPE.[Settlement Currency] NOT IN 
+	(SELECT  BA.CURRENCYCODE COLLATE Latin1_General_CI_AS  FROM [D365].[BankAccountStaging] AS BA WHERE [CURRENCYCODE] IS NOT NULL AND [BANKGROUPID]='HSBCCL' AND DATAAREAID = 'AAIE' )
+),BADLOBPRETRANSFORMATION AS
+(
+	SELECT RepositoryID,'Bad Line of Business '+WPE.[Line Of Business] AS Errorstring FROM #WrittenPre AS WPE WHERE  WPE.[Line Of Business] NOT IN 
+	(SELECT  FD.[DESCRIPTION] COLLATE Latin1_General_CI_AS  FROM [D365].[FinancialDimensionValueEntityStaging] AS FD WHERE [DIMENSIONVALUE] IS NOT NULL AND FINANCIALDIMENSION = 'LineOfBuss'  )
+),BADPRODPRETRANSFORMATION AS
+(
+	SELECT RepositoryID,'Bad Product '+WPE.ProductName AS Errorstring FROM #WrittenPre AS WPE WHERE  WPE.[ProductName] NOT IN 
+	(SELECT  FD.[DESCRIPTION] COLLATE Latin1_General_CI_AS  FROM [D365].[FinancialDimensionValueEntityStaging] AS FD WHERE [DIMENSIONVALUE] IS NOT NULL AND FINANCIALDIMENSION = 'Product' )
+),BADRLOCPRETRANSFORMATION AS
+(
+	SELECT RepositoryID,'Bad Risk Location '+WPE.[Risk Country] AS Errorstring FROM #WrittenPre AS WPE INNER JOIN Reference.master.Country AS MCTY ON MCTY.[Alpha-3 Code]  = [Risk Country] WHERE  MCTY.Name NOT IN 
+	(SELECT  FD.[DESCRIPTION] COLLATE Latin1_General_CI_AS  FROM [D365].[FinancialDimensionValueEntityStaging] AS FD WHERE [DIMENSIONVALUE] IS NOT NULL AND FINANCIALDIMENSION = 'RiskLocation' )
+),BADUWYRPRETRANSFORMATION AS
+(
+	SELECT RepositoryID,'Bad UW YEar' AS Errorstring FROM #WrittenPre AS WPE WHERE  WPE.[Underwriting Year] NOT IN 
+	(SELECT  FD.[DESCRIPTION] COLLATE Latin1_General_CI_AS  FROM [D365].[FinancialDimensionValueEntityStaging] AS FD WHERE [DIMENSIONVALUE] IS NOT NULL AND FINANCIALDIMENSION = 'UnderwritingYear' )
+),BADMGAFDPRETRANSFORMATION AS
+(
+	SELECT RepositoryID,'Bad MGA Financial Dimension '+WPE.[MGA Name] AS Errorstring FROM #WrittenPre AS WPE WHERE  WPE.[MGA Name] NOT IN 
+	(SELECT  FD.[DESCRIPTION] COLLATE Latin1_General_CI_AS  FROM [D365].[FinancialDimensionValueEntityStaging] AS FD WHERE [DIMENSIONVALUE] IS NOT NULL AND FINANCIALDIMENSION = 'MGA' )
+),BADAGENCYCODE AS
+(
+	SELECT RepositoryID,'Bad Agency Code' AS Errorstring FROM #WrittenPre AS WPE WHERE  WPE.[Agency Branch Code] IS NULL
+)
+
+
+,BADREPACCPERIOD AS
+(
+	SELECT WPE.RepositoryID,'Bad Reporting / D365 Accounting Period Combination' AS Errorstring FROM #WrittenPre AS WPE 
+	INNER JOIN [Reference].[master].[BordereauRepository] AS BP ON BP.RepositoryID=WPE.RepositoryID
+	WHERE  DATEADD (MONTH,1,CONVERT(DATE,REPLACE(BP.[Report Period],' ','')+'-01')) <>@ACCPERIOD
+)/*,     /*U/S# 21780 */
+BADAGENCYBUSINESSUNIT  AS
+(
+	SELECT RepositoryID,'Agency Business Unit not in Dynamics  '+WPE.[AgencyBusinessUnit] AS Errorstring FROM #WrittenPost AS WPE
+	WHERE  WPE.[AgencyBusinessUnit] NOT IN 
+	(SELECT  FD.[DIMENSIONVALUE] COLLATE Latin1_General_CI_AS  FROM [D365Lake].[ods].[FinancialDimensionValueEntityStaging] AS FD 
+	WHERE [DIMENSIONVALUE] IS NOT NULL AND FINANCIALDIMENSION = 'BusinessUnit' ) 
+),
+BADINSURERBUSINESSUNIT AS /*for Bug 29444*/
+(
+	SELECT RepositoryID,'Bad Insurer Business Unit '+WPE.[InsurerBusinessUnit] AS Errorstring 
+	FROM #WrittenPost AS WPE
+	WHERE  WPE.[InsurerBusinessUnit]='INVALID'  
+	AND  WPE.RepositoryID  IN (SELECT DISTINCT RepositoryID FROM #WrittenPre AS WP 
+	INNER  JOIN Reference.[dbo].[vw_ContractManagementInsTypeAffStatus] AS CM
+        ON CM.[ContractReference] = WP.BinderUMRReference COLLATE SQL_Latin1_General_CP1_CI_AS
+           AND WP.[Risk Inception Date] >= CM.[ContractVersionStartDate]
+           AND WP.[Risk Inception Date] <= CM.[ContractVersionEndDate]
+           AND WP.Insurer = CM.InsurerName 
+		  AND CM.CoinsuranceApplicable ='False'
+		  AND WP.RepositoryID=@RepositoryID)
+),
+BADAGENCYINSURERBUSINESSUNIT AS
+(
+	SELECT RepositoryID,'Both Agency Business Unit & Insurer Business Units are Invalid' AS Errorstring FROM #WrittenPost AS WPE
+	WHERE  WPE.[AgencyBusinessUnit]='INVALID'   /*U/S# 21780 */
+)
+,
+BADTRADINGPARTNERPOSTTRANSFORMATION AS   /*U/S# 24971 */
+(	--31860
+	SELECT WPE.RepositoryID,'Trading Partner not Configured in Dynamics '+ISNULL([group_tp].[PartyAlias], [tp].[PartyAlias])  AS Errorstring FROM #WrittenPost AS WPE 
+	INNER JOIN #WrittenPre AS WPS ON WPE.RepositoryID = WPS.RepositoryID
+	INNER JOIN Reference.[master].[ContractManagement] AS [cm] ON [cm].[ContractReference] = wps.BinderUMRReference
+	LEFT JOIN [Reference].[master].[Party] AS [group_tp] ON [cm].[GroupName] = [group_tp].[PartyName] AND [group_tp].[PartyTypeName] = 'Group'
+	LEFT JOIN [Reference].[master].[Party] AS [tp] ON [cm].[MemberName] = [tp].[PartyName] AND [cm].[GroupName] IS NULL AND [tp].[PartyTypeName] = 'Member'
+	WHERE WPS.RepositoryID = @repositoryID
+	AND ISNULL([group_tp].[PartyAlias], [tp].[PartyAlias]) NOT IN (SELECT  FD.[DIMENSIONVALUE] COLLATE Latin1_General_CI_AS  FROM [D365Lake].[ods].[FinancialDimensionValueEntityStaging] AS FD WHERE [DIMENSIONVALUE] IS NOT NULL AND FINANCIALDIMENSION = 'TradingPartner')
+)
+,
+BADTRADINGPARTNERPRETRANSFORMATION AS
+(	--31860
+	SELECT WPS.RepositoryID,'Trading Partner not Configured in Dynamics '+ISNULL([group_tp].[PartyAlias], [tp].[PartyAlias])  AS Errorstring FROM #WrittenPre AS WPS 
+	INNER JOIN Reference.[master].[ContractManagement] AS [cm] ON [cm].[ContractReference] = wps.BinderUMRReference
+	LEFT JOIN [Reference].[master].[Party] AS [group_tp] ON [cm].[GroupName] = [group_tp].[PartyName] AND [group_tp].[PartyTypeName] = 'Group'
+	LEFT JOIN [Reference].[master].[Party] AS [tp] ON [cm].[MemberName] = [tp].[PartyName] AND [cm].[GroupName] IS NULL AND [tp].[PartyTypeName] = 'Member'
+	WHERE WPS.RepositoryID = @repositoryID
+	AND ISNULL([group_tp].[PartyAlias], [tp].[PartyAlias]) NOT IN (SELECT  FD.[DIMENSIONVALUE] COLLATE Latin1_General_CI_AS  FROM [D365Lake].[ods].[FinancialDimensionValueEntityStaging] AS FD WHERE [DIMENSIONVALUE] IS NOT NULL AND FINANCIALDIMENSION = 'TradingPartner')
+),BAD_UEPCabAccount AS
+(
+SELECT DISTINCT Pre.RepositoryID,ISNULL('Missing CAB Account in Dynamics For : '+Pre.FrontingCompanyPartyMasterID,'Missing FrontingCompanyPartyMasterID for CAB Account')+'' AS Errorstring FROM #WrittenPre AS Pre LEFT JOIN Reference.[master].[FeeTypeMapping] Fee
+ON Pre.FrontingCompanyPartyMasterID = Fee.DefaultAccountPartyMasterID WHERE Pre.model ='UEP'  AND Fee.AccountType = 'CUST' AND NOT EXISTS
+(SELECT CUSTOMERACCOUNT FROM [d365lake].[ods].[CustCustomerV3Staging] Cust WHERE (Cust.ORGANIZATIONNUMBER <> ''OR Cust.ORGANIZATIONNUMBER IS NOT NULL ) AND Cust.ORGANIZATIONNUMBER = Pre.FrontingCompanyPartyMasterID))
+
+, -- US-33310 D365 | New Written Pre-validation check - Regulatory LOB
+BAD_RegulatoryLOB AS
+(
+SELECT RepositoryID,'Missing Regulatory LOB ' AS Errorstring FROM #WrittenPre AS WP 
+WHERE (( WP.RegulatoryLOB IS NULL OR RTRIM(LTRIM(WP.RegulatoryLOB)) ='' ) OR 
+WP.RegulatoryLOB NOT IN (	SELECT DISTINCT DIMENSIONVALUE COLLATE Latin1_General_CI_AS FROM [D365Lake].[ods].[FinancialDimensionValueEntityStaging] WHERE [DIMENSIONVALUE] IS NOT NULL AND FINANCIALDIMENSION ='RegulatoryLOB'))
+AND SUBSTRING(WP.RepositoryID, 1, 2) NOT IN ('EU')
+),
+NULL_MemberMasterPartyID AS
+(
+	SELECT RepositoryID,'NULL Member MasterParty ID' AS Errorstring FROM #WrittenPre AS WPE WHERE  WPE.[MemberPartyMasterID] IS NULL
+	AND WPE.[MemberPartyMasterID] NOT IN (
+	SELECT   ORGANIZATIONNUMBER FROM [D365Lake].[ods].[CustCustomerV3Staging] WHERE ORGANIZATIONNUMBER <>'' OR ORGANIZATIONNUMBER IS NOT NULL)
+)
+,NULL_InsurerMasterPartyID AS
+(
+	SELECT RepositoryID,'NULL Insurer Master Party ID' AS Errorstring FROM #WrittenPre AS WPE WHERE  WPE.InsurerPartyMasterID IS NULL
+	AND WPE.InsurerPartyMasterID NOT IN (
+	SELECT   ORGANIZATIONNUMBER FROM [D365Lake].[ods].[VendVendorV2Staging] WHERE ORGANIZATIONNUMBER <>'' OR ORGANIZATIONNUMBER IS NOT NULL)
+)
+,NULL_AgencyPartyMasterID AS
+(
+	SELECT RepositoryID,'NULL Group Master Party ID' AS Errorstring FROM #WrittenPre AS WPE WHERE  WPE.[AgencyPartyMasterID] IS NULL
+	AND WPE.[AgencyPartyMasterID] NOT IN (
+	SELECT   ORGANIZATIONNUMBER FROM [D365Lake].[ods].[CustCustomerV3Staging] WHERE ORGANIZATIONNUMBER <>'' OR ORGANIZATIONNUMBER IS NOT NULL)
+)
+,BADFeePreValidation AS
+(
+SELECT TOP(1) RepositoryID,ISNULL('Missing Fronting Fee in FeeMapping Table for Member:'+MemberPartyMasterID,'Missing Member PartyMasterID for Fronting Fee') AS Errorstring FROM #WrittenPre AS Pre
+WHERE  (RepositoryID =  @RepositoryID) AND  (  ISNULL([Fronting Fee],0) <> 0 ) AND NOT EXISTS
+(SELECT 1 FROM Reference.[master].[FeeTypeMapping] AS FEEMAP WHERE 
+	(FEEMAP.MemberPartyMasterID = Pre.MemberPartyMasterID AND FEEMAP.SourceFieldMapping = 'Fronting Fee'  AND FEEMAP.ContractReference = 'ALL')
+OR (FEEMAP.MemberPartyMasterID = Pre.MemberPartyMasterID AND FEEMAP.SourceFieldMapping = 'Fronting Fee'  AND  FEEMAP.ContractReference = Pre.BinderUMRReference))
+
+UNION
+SELECT TOP(1) RepositoryID,ISNULL('Missing Carrier Override Fee in FeeMapping Table for Member: '+MemberPartyMasterID,'Missing Member PartyMasterID for Carrier Override Fee') AS Errorstring FROM #WrittenPre AS Pre
+WHERE  (RepositoryID =  @RepositoryID) AND   (  ISNULL([Pre].[CarrierOverrideFeeAmount],0) <> 0 ) AND NOT EXISTS
+(SELECT 1 FROM Reference.[master].[FeeTypeMapping] AS FEEMAP WHERE 
+	(FEEMAP.MemberPartyMasterID = Pre.MemberPartyMasterID AND FEEMAP.SourceFieldMapping = 'Carrier Override Fee Amount'  AND FEEMAP.ContractReference = 'ALL')
+OR (FEEMAP.MemberPartyMasterID = Pre.MemberPartyMasterID AND FEEMAP.SourceFieldMapping = 'Carrier Override Fee Amount'  AND  FEEMAP.ContractReference = Pre.BinderUMRReference))
+UNION
+SELECT TOP(1) RepositoryID,ISNULL('Missing Distribution Fee in FeeMapping Table for Member:'+MemberPartyMasterID,'Missing Member PartyMasterID For Distribution Fee') AS Errorstring FROM #WrittenPre AS Pre
+WHERE  (RepositoryID =  @RepositoryID) AND   (  ISNULL([Pre].[DistributionPartnerFeeAmount],0) <> 0 ) AND NOT EXISTS
+(SELECT 1 FROM Reference.[master].[FeeTypeMapping] AS FEEMAP WHERE 
+	(FEEMAP.MemberPartyMasterID = Pre.MemberPartyMasterID AND FEEMAP.SourceFieldMapping = 'Distribution Partner Fee Amount'  AND FEEMAP.ContractReference = 'ALL')
+OR (FEEMAP.MemberPartyMasterID = Pre.MemberPartyMasterID AND FEEMAP.SourceFieldMapping = 'Distribution Partner Fee Amount'  AND  FEEMAP.ContractReference = Pre.BinderUMRReference))
+)
+*/
+INSERT INTO @RETTABLE (REPID,ErrorDesc,ValidationSucess,[EventTypeID],PRE_transformation)  
+		SELECT RepositoryID ,'NO Written Journal Name Found' ,0,1,1 FROM BADJOURNALNAME WHERE RepositoryID IS NULL OR NAME LIKE '%INVALID%' UNION
+		
+
+		SELECT RepositoryID ,BADMGANAMESPRETRANSFORMATION.Errorstring ,0,1,1 FROM BADMGANAMESPRETRANSFORMATION WHERE RepositoryID IS NOT NULL UNION
+		SELECT RepositoryID ,NULL ,1,1,1 FROM BADMGANAMESPRETRANSFORMATION WHERE RepositoryID IS  NULL UNION 
+
+		SELECT RepositoryID ,BADACCOUNTDISPLAYVALUEVENDORPRETRANSFORMATION.Errorstring ,0,1,1 FROM BADACCOUNTDISPLAYVALUEVENDORPRETRANSFORMATION WHERE RepositoryID IS NOT NULL UNION
+		SELECT RepositoryID ,NULL ,1,1,1 FROM BADACCOUNTDISPLAYVALUEVENDORPRETRANSFORMATION WHERE RepositoryID IS  NULL UNION
+		
+
+		SELECT RepositoryID ,BADCURRENCYCODEPRETRANSFORMATION.Errorstring ,0,1,1 FROM BADCURRENCYCODEPRETRANSFORMATION WHERE RepositoryID IS NOT NULL UNION
+		SELECT RepositoryID ,NULL ,1,1,1 FROM BADCURRENCYCODEPRETRANSFORMATION WHERE RepositoryID IS  NULL UNION
+
+		SELECT RepositoryID ,BADBANKACCOUNTPRETRANSFORMATION.Errorstring ,0,1,1 FROM BADBANKACCOUNTPRETRANSFORMATION WHERE RepositoryID IS NOT NULL UNION
+		SELECT RepositoryID ,NULL ,1,1,1 FROM BADBANKACCOUNTPRETRANSFORMATION WHERE RepositoryID IS  NULL UNION
+
+		SELECT RepositoryID ,BADLOBPRETRANSFORMATION.Errorstring ,0,1,1 FROM BADLOBPRETRANSFORMATION WHERE RepositoryID IS NOT NULL UNION
+		SELECT RepositoryID ,NULL ,1,1,1 FROM BADLOBPRETRANSFORMATION WHERE RepositoryID IS  NULL UNION
+
+
+		SELECT RepositoryID ,BADPRODPRETRANSFORMATION.Errorstring ,0,1,1 FROM BADPRODPRETRANSFORMATION WHERE RepositoryID IS NOT NULL UNION
+		SELECT RepositoryID ,NULL ,1,1,1 FROM BADPRODPRETRANSFORMATION WHERE RepositoryID IS  NULL UNION
+
+
+		SELECT RepositoryID ,BADRLOCPRETRANSFORMATION.Errorstring ,0,1,1 FROM BADRLOCPRETRANSFORMATION WHERE RepositoryID IS NOT NULL UNION
+		SELECT RepositoryID ,NULL ,1,1,1 FROM BADRLOCPRETRANSFORMATION WHERE RepositoryID IS  NULL UNION
+
+		SELECT RepositoryID ,'Bad UW Year' ,0,1,1 FROM BADUWYRPRETRANSFORMATION WHERE RepositoryID IS NOT NULL UNION
+		SELECT RepositoryID ,NULL ,1,1,1 FROM BADUWYRPRETRANSFORMATION WHERE RepositoryID IS  NULL UNION
+
+
+		SELECT RepositoryID ,BADMGAFDPRETRANSFORMATION.Errorstring ,0,1,1 FROM BADMGAFDPRETRANSFORMATION WHERE RepositoryID IS NOT NULL UNION
+		SELECT RepositoryID ,NULL ,1,1,1 FROM BADMGAFDPRETRANSFORMATION WHERE RepositoryID IS  NULL UNION
+
+		SELECT RepositoryID ,'Bad Agency Code' ,0,1,1 FROM BADAGENCYCODE WHERE RepositoryID IS NOT NULL UNION
+		SELECT RepositoryID ,NULL ,1,1,1 FROM BADAGENCYCODE WHERE RepositoryID IS NULL --UNION
+		
+		/*Commenting based on Bug29362 - We are going get NULL Value Insurer Code.*/
+		--SELECT RepositoryID ,'Bad Insurer Code' ,0,1,1 FROM BADINSURERCODE WHERE RepositoryID IS NOT NULL UNION
+		--SELECT RepositoryID ,NULL ,1,1,1 FROM BADINSURERCODE WHERE RepositoryID IS NULL UNION   /*U/S# 21780 */
+/*
+		SELECT RepositoryID ,BADAGENCYBUSINESSUNIT.Errorstring ,0,1,0 FROM BADAGENCYBUSINESSUNIT WHERE RepositoryID IS NOT NULL UNION
+		SELECT RepositoryID ,NULL ,1,1,0 FROM BADAGENCYBUSINESSUNIT WHERE RepositoryID IS NULL UNION
+		SELECT RepositoryID ,BADINSURERBUSINESSUNIT.Errorstring ,0,1,0 FROM BADINSURERBUSINESSUNIT WHERE RepositoryID IS NOT NULL UNION
+		SELECT RepositoryID ,NULL ,1,1,0 FROM BADINSURERBUSINESSUNIT WHERE RepositoryID IS NULL UNION
+		SELECT RepositoryID ,BADAGENCYINSURERBUSINESSUNIT.Errorstring ,0,1,0 FROM BADAGENCYINSURERBUSINESSUNIT WHERE RepositoryID IS NOT NULL UNION
+		SELECT RepositoryID ,NULL ,1,1,0 FROM BADAGENCYINSURERBUSINESSUNIT WHERE RepositoryID IS NULL  
+		
+		UNION  
+
+
+		SELECT RepositoryID ,BADTRADINGPARTNERPOSTTRANSFORMATION.Errorstring ,0,1,0 FROM BADTRADINGPARTNERPOSTTRANSFORMATION WHERE RepositoryID IS NOT NULL UNION
+		SELECT RepositoryID ,NULL ,1,1,0 FROM BADTRADINGPARTNERPOSTTRANSFORMATION WHERE RepositoryID IS  NULL UNION
+		SELECT RepositoryID ,BADTRADINGPARTNERPRETRANSFORMATION.Errorstring ,0,1,1 FROM BADTRADINGPARTNERPRETRANSFORMATION WHERE RepositoryID IS NOT NULL UNION
+		SELECT RepositoryID ,NULL ,1,1,1 FROM BADTRADINGPARTNERPRETRANSFORMATION WHERE RepositoryID IS  NULL UNION
+		SELECT RepositoryID ,BAD_RegulatoryLOB.Errorstring ,0,1,1 FROM BAD_RegulatoryLOB WHERE RepositoryID IS NOT NULL UNION
+        
+		SELECT RepositoryID ,NULL_MemberMasterPartyID.Errorstring ,1,1,0 FROM NULL_MemberMasterPartyID  WHERE RepositoryID IS NULL UNION  
+		SELECT RepositoryID ,NULL_InsurerMasterPartyID.Errorstring,1,1,0 FROM NULL_InsurerMasterPartyID WHERE RepositoryID IS NULL UNION
+        SELECT RepositoryID ,NULL_AgencyPartyMasterID.Errorstring ,1,1,0 FROM NULL_AgencyPartyMasterID  WHERE RepositoryID IS NULL UNION
+
+		SELECT RepositoryID ,NULL_MemberMasterPartyID.Errorstring ,0,1,1 FROM NULL_MemberMasterPartyID  WHERE RepositoryID IS NOT NULL UNION  
+		SELECT RepositoryID ,NULL_InsurerMasterPartyID.Errorstring,0,1,1 FROM NULL_InsurerMasterPartyID WHERE RepositoryID IS NOT NULL UNION
+        SELECT RepositoryID ,NULL_AgencyPartyMasterID.Errorstring ,0,1,1 FROM NULL_AgencyPartyMasterID  WHERE RepositoryID IS NOT NULL UNION
+
+		SELECT RepositoryID ,A.Errorstring ,1,1,0 FROM BAD_UEPCabAccount A WHERE RepositoryID IS NOT NULL UNION  
+		SELECT RepositoryID ,A.Errorstring ,1,1,1 FROM BADFeePreValidation A           WHERE RepositoryID IS NOT NULL  
+
+*/
+SELECT DISTINCT * FROM @RETTABLE WHERE PRE_transformation = @PRE_TRANSFORMATION
+--SELECT 'Finished'
+
+
+END
+GO
+
+

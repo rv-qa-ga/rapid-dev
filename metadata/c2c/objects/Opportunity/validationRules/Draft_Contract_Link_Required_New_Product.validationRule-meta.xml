@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Draft_Contract_Link_Required_New_Product</fullName>
+    <active>true</active>
+    <description>SF-1100 Scenario 2 / SF-1237 — require Draft Contract Link for Expansion + New Product when moving Due Diligence to Contracting (c2c fix)</description>
+    <errorConditionFormula>AND(
+  ISPICKVAL(Type, &quot;Expansion&quot;),
+  ISPICKVAL(Sub_Type__c, &quot;New Product&quot;),
+  ISCHANGED(StageName),
+  ISPICKVAL(PRIORVALUE(StageName), &quot;Due Diligence&quot;),
+  ISPICKVAL(StageName, &quot;Contracting&quot;),
+  ISBLANK(Draft_Contract_Link__c)
+)</errorConditionFormula>
+    <errorDisplayField>Draft_Contract_Link__c</errorDisplayField>
+    <errorMessage>Please add Draft Contract Link before moving to Contracting.</errorMessage>
+</ValidationRule>

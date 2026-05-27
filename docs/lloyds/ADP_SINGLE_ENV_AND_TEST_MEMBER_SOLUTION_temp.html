@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ADP single env – Data flow and test-member solution (TEMP)</title>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <style>
+    :root { --bg: #0f1419; --surface: #1a2332; --text: #e6edf3; --muted: #8b949e; --accent: #58a6ff; --success: #3fb950; --warning: #d29922; --danger: #f85149; --border: #30363d; }
+    * { box-sizing: border-box; }
+    body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; max-width: 980px; margin: 0 auto; padding: 2rem; }
+    h1 { font-size: 1.6rem; margin-bottom: 0.25rem; }
+    .subtitle { color: var(--muted); font-size: 0.9rem; margin-bottom: 1.5rem; }
+    h2 { font-size: 1.2rem; margin-top: 1.75rem; margin-bottom: 0.5rem; padding-bottom: 0.3rem; border-bottom: 1px solid var(--border); color: var(--accent); }
+    h3 { font-size: 1rem; margin-top: 1rem; margin-bottom: 0.4rem; }
+    p { margin: 0.5rem 0; }
+    ul, ol { margin: 0.5rem 0; padding-left: 1.5rem; }
+    li { margin: 0.25rem 0; }
+    table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.88rem; background: var(--surface); border-radius: 6px; border: 1px solid var(--border); }
+    th, td { padding: 0.5rem 0.75rem; text-align: left; border-bottom: 1px solid var(--border); }
+    th { background: rgba(88, 166, 255, 0.12); color: var(--accent); font-weight: 600; }
+    tr:last-child td { border-bottom: none; }
+    .flow-box { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1rem; margin: 1rem 0; }
+    .mermaid { display: flex; justify-content: center; margin: 0.75rem 0; }
+    .mermaid svg { max-width: 100%; }
+    .badge { display: inline-block; padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.7rem; font-weight: 600; }
+    .badge-prod { background: rgba(248, 81, 73, 0.2); color: var(--danger); }
+    .badge-lower { background: rgba(63, 185, 80, 0.2); color: var(--success); }
+    .badge-sync { background: rgba(210, 153, 34, 0.25); color: var(--warning); }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    code { background: rgba(255,255,255,0.08); padding: 0.15rem 0.4rem; border-radius: 3px; font-size: 0.85em; }
+    .note { font-style: italic; color: var(--muted); font-size: 0.9rem; }
+  </style>
+</head>
+<body>
+
+<div style="background:#fff4e5; border:2px solid #ff991f; padding:10px 14px; border-radius:4px; margin-bottom:1.5rem; font-weight:600;">⚠ TEMP – FOR REVIEW ONLY. ADP single env and test-member solution for E2E testing.</div>
+
+<h1>ADP single environment – Data flow and test-member solution</h1>
+<p class="subtitle">Corrected flow (VIPR sunset, ADP ingests bordereaux), the lower-env testing problem, and how the ADP test-member seed approach enables day-in day-out E2E testing.</p>
+
+<!-- 1. Corrected flow -->
+<section>
+  <h2>1. Corrected data flow (current state)</h2>
+  <p><strong>VIPR is sunset.</strong> <strong>ADP</strong> is the system that ingests bordereaux files. To load those files, ADP needs Dynamics, CMT, and RDM data:</p>
+  <ul>
+    <li>ADP holds a <strong>local copy</strong> of Dynamics RDM and CMT data inside ADP, used when loading files into ADP.</li>
+    <li>Once loaded in ADP, data is sent to <strong>ODS</strong>. ODS also refers to Dynamics RDM and CMT data, using <strong>its own version</strong> of that reference data (separate from ADP’s copy).</li>
+  </ul>
+  <p>So there are <strong>two</strong> reference-data views: (1) ADP’s local copy for ingestion, (2) ODS’s (and downstream’s) copy for processing and validation.</p>
+
+  <h3>1.1 End-to-end path</h3>
+  <div class="flow-box">
+    <div class="mermaid">
+flowchart LR
+  subgraph ingress["Ingestion"]
+    Bordereaux["Bordereaux files"]
+    ADP["ADP"]
+    Bordereaux --> ADP
+  end
+  subgraph ref_adp["Reference data (ADP)"]
+    RDM_CMT_ADP["Local copy of Dynamics RDM & CMT"]
+  end
+  subgraph downstream["Downstream"]
+    ODS["ODS"]
+    TDS["TDS"]
+    D365["Dynamics F&O"]
+    Tagetik["Tagetik"]
+    DCR["DCR"]
+  end
+  subgraph ref_ods["Reference data (ODS/downstream)"]
+    RDM_CMT_ODS["Own copy of Dynamics RDM & CMT"]
+  end
+  RDM_CMT_ADP -.->|"used for load"| ADP
+  ADP -->|"loaded data"| ODS
+  RDM_CMT_ODS -.->|"referred by"| ODS
+  ODS --> TDS --> D365
+  TDS --> Tagetik
+  TDS --> DCR
+    </div>
+  </div>
+</section>
+
+<!-- 2. The problem -->
+<section>
+  <h2>2. The problem: ADP is single (broad) env only</h2>
+  <p><strong>ADP has only one environment</strong> (broad/prod). <strong>ODS, TDS, Dynamics, RDM, CMT</strong> have separate <strong>prod</strong> and <strong>non-prod / lower</strong> environments.</p>
+  <ul>
+    <li>For <strong>E2E testing in lower envs</strong>, we need test data to flow through the pipeline into lower ODS → TDS → Dynamics F&O (and Tagetik/DCR where applicable).</li>
+    <li>Today, ADP runs in prod and uses <strong>prod</strong> Dynamics/RDM/CMT data for loads. So test data ingested via ADP is tied to prod reference data; getting that same data to <strong>lower</strong> ODS/TDS/Dynamics is the gap.</li>
+  </ul>
+
+  <h3>2.1 Environment split (simplified)</h3>
+  <table>
+    <thead><tr><th>Component</th><th>Prod</th><th>Non-prod / lower</th></tr></thead>
+    <tbody>
+      <tr><td>ADP</td><td><span class="badge badge-prod">Single (broad) env</span></td><td>—</td></tr>
+      <tr><td>ODS</td><td>ODS Prod</td><td>ODS Lower</td></tr>
+      <tr><td>TDS</td><td>TDS Prod</td><td>TDS Lower</td></tr>
+      <tr><td>Dynamics / RDM / CMT</td><td>Prod</td><td>Lower</td></tr>
+    </tbody>
+  </table>
+  <p class="note">Because ADP is prod-only, test data must be ingestible in <strong>prod ADP</strong> and then flow to <strong>lower</strong> environments so we can run E2E tests there.</p>
+</section>
+
+<!-- 3. ADP solution: test members -->
+<section>
+  <h2>3. ADP solution: test members / test seed data in prod</h2>
+  <p>The approach (aligned with ADP team and the seed-data architecture) is:</p>
+  <ul>
+    <li>Define <strong>test members</strong> (and related test data) in the <strong>production</strong> environment so that ADP (prod) can ingest bordereaux for those members.</li>
+    <li>That ingested data is then routed or copied to <strong>lower</strong> ODS/TDS/Dynamics so E2E tests can run in lower env.</li>
+  </ul>
+
+  <h3>3.1 How test members are created (from ADP seed-data architecture)</h3>
+  <p>From the <strong>it-test-member-portal</strong> seed-data architecture (e.g. <code>2026-02-03-seed-data-architecture.md</code>):</p>
+  <ul>
+    <li><strong>Config:</strong> Test member configuration is defined in <code>.ci/test_member_data.json</code> (parties, repository files, optional AE reference and ae-fin-ops flags).</li>
+    <li><strong>CI Flow Orchestrator</strong> (<code>ci_flow.py</code>): <code>TestMemberCreation.run()</code> runs a series of seed steps:
+      <code>seed_parties()</code> → <code>seed_repository_files()</code> → <code>seed_bdx_tracker()</code> → <code>seed_contracts()</code>, <code>seed_insurer_details()</code>, <code>seed_accounting_periods()</code>, <strong><code>seed_member_controls()</code></strong> (AC-55911), <code>seed_product_mappings()</code>.</li>
+    <li>Seeds are written to CSV files in submodules: <strong>ae-reference-data-dbt</strong>, <strong>data-domain-reference-data</strong>, and <strong>ae-fin-ops-dbt</strong> (e.g. <code>written_member_control_prod.csv</code>, <code>claims_member_control_prod.csv</code>).</li>
+    <li>A <strong>Git PR Helper</strong> creates PRs in those repos; once merged, seed data flows into <strong>Snowflake (RAW_BDX_ORCHESTRATOR)</strong> / ADP pipeline so test members exist in prod and can be used for loads.</li>
+  </ul>
+  <p>So: <strong>test members</strong> (e.g. party_master_id <code>TST-000001</code>, repository files <code>TS-9xxx</code>) are created in prod via this seed pipeline; ADP then uses that data to ingest bordereaux for those members; the same pipeline can feed or sync to lower envs.</p>
+
+  <h3>3.2 Sync challenge (RDM/CMT and member control)</h3>
+  <p><strong>Critical constraint:</strong> The RDM and CMT data (and member control) that <strong>ADP uses in prod</strong> for these test members must be <strong>in sync</strong> with the RDM/CMT (and member control) in the <strong>lower</strong> environment where we run Dynamics, ODS, and TDS. Otherwise:</p>
+  <ul>
+    <li>Joins and validations in lower ODS/TDS/Dynamics may fail (e.g. party or member control not found, or wrong effective dates).</li>
+    <li>E2E assertions (e.g. Repository ID status, ledger lines) may not match.</li>
+  </ul>
+  <p>So day-in day-out testing depends on:</p>
+  <ol>
+    <li>Test members and their seed data (including member control) being present and up to date in <strong>prod</strong> (ADP side).</li>
+    <li>The same (or compatible) reference and member control data being present in <strong>lower</strong> Dynamics/ODS/TDS so that when data is ingested to lower env, it resolves correctly.</li>
+  </ol>
+</section>
+
+<!-- 4. Limitations and assumptions -->
+<section>
+  <h2>4. Limitations and assumptions</h2>
+
+  <h3>4.1 Regression-only: new contract types or new members</h3>
+  <p><strong>This approach only works for regression</strong>—i.e. when the contract type and member <strong>already exist in prod</strong>. If there is a <strong>new</strong> contract type or a <strong>new</strong> member that does not exist in prod:</p>
+  <ul>
+    <li>ADP cannot <strong>clone</strong> or <strong>seed</strong> data for that test member, because there is <strong>no actual raw data in prod</strong> to clone from.</li>
+    <li>Tests that require brand-new contract types or brand-new members (e.g. for feature or UAT validation before prod release) are <strong>out of scope</strong> for this ADP test-member solution unless prod is updated first (e.g. new contract/member goes to prod, then clone/seed becomes possible).</li>
+  </ul>
+  <p class="note">So: the test-member solution covers “reuse existing prod data for E2E in lower”; it does not cover “test a contract/member that has never been in prod.”</p>
+
+  <h3>4.2 Assumption: clone on demand by contract and member</h3>
+  <p>A core assumption of the approach is that <strong>ADP will be able to clone (or seed) data on demand</strong> based on the <strong>contract</strong> and <strong>member</strong> that the test scenario refers to. In other words:</p>
+  <ul>
+    <li>Tests are not limited to “whatever test members happen to be pre-seeded”; they need to <strong>target</strong> specific contracts and members.</li>
+    <li>The pipeline (or an API/process) should support something like: “for this test run, clone/seed data for <em>contract X</em> and <em>member Y</em>” so that the scenario has the right data in lower env.</li>
+  </ul>
+  <p>If ADP cannot clone on demand by contract and member, test design is constrained to a fixed set of pre-seeded test members and contracts, which may not be enough for targeted scenarios.</p>
+
+  <h3>4.3 Scale: many contract types and targeted contract testing</h3>
+  <p>There could be on the order of <strong>40 (or more) contract types</strong>, and the team may want to run tests for <strong>targeted</strong> contracts—e.g. “test only contract type A” or “test member M with contract type B.” The solution should support:</p>
+  <ul>
+    <li>Cloning or seeding data for <strong>specific</strong> contract types and members that the scenario needs, rather than only a single generic test member.</li>
+    <li>Test scenarios (or test data config) that specify which contract(s) and member(s) are under test, so the right data is made available in lower env.</li>
+  </ul>
+  <p>This ties back to the on-demand clone assumption: without it, covering 40 contract types with targeted tests would require pre-seeding and maintaining 40 (or more) test variants, which may not be practical.</p>
+
+  <p><strong>Summary:</strong> The ADP test-member solution is <strong>regression-oriented</strong> and assumes <strong>on-demand clone/seed by contract and member</strong>. New contract types or new members not yet in prod are out of scope unless prod is updated first. For targeted testing across many contract types, confirm with the ADP team that clone-on-demand (or equivalent) is supported and how test scenarios can request specific contracts and members.</p>
+</section>
+
+<!-- 5. Day-in day-out testing -->
+<section>
+  <h2>5. Day-in day-out E2E testing with this solution</h2>
+  <p>A practical flow that uses the test-member approach:</p>
+  <ol>
+    <li><strong>Ensure test members exist in prod:</strong> Run or rely on the ADP test-member creation flow (e.g. <code>TestMemberCreation.run()</code> and seed PRs) so that test parties (TST-######), repository files (TS-####), member control seeds, and related RDM/CMT-style data are present in prod and in the ADP pipeline.</li>
+    <li><strong>Keep lower env in sync:</strong> Ensure the lower environment (Dynamics, ODS, TDS) has the same—or a compatible—set of test members and reference/member control data (e.g. by deploying the same seed CSVs or equivalent to lower, or by a documented sync process). This addresses the “RDM/CMT in sync” requirement.</li>
+    <li><strong>Ingest test bordereaux in prod ADP:</strong> Use the test members (e.g. TS-#### files, test member IDs) to trigger or run a load in ADP (prod) so that test data is ingested.</li>
+    <li><strong>Route/copy to lower:</strong> Rely on the existing (or planned) mechanism that sends/copies that ingested data to <strong>lower</strong> ODS (and then TDS, Dynamics F&O, etc.).</li>
+    <li><strong>Run E2E tests in lower:</strong> Execute automation against lower ODS, TDS, and Dynamics F&O (and Tagetik/DCR if in scope), asserting on Repository ID, ledger lines, and other outcomes.</li>
+  </ol>
+  <p>Ongoing work with the ADP team can focus on: (a) formalising the sync of RDM/CMT and member control between prod (ADP view) and lower (ODS/TDS/Dynamics view), and (b) any automation to re-seed or refresh test members when needed.</p>
+</section>
+
+<!-- 5. Diagram: PROD vs Non-PROD with test members -->
+<section>
+  <h2>6. Diagram: PROD vs non-PROD with test members</h2>
+  <p>Same as your screenshot idea: ADP (prod) is shared; downstream has separate lower envs. Test members live in prod so ADP can ingest; data then flows to lower for E2E.</p>
+  <div class="flow-box">
+    <div class="mermaid">
+flowchart TB
+  subgraph prod["PROD"]
+    direction LR
+    ADP_P["ADP (PROD)"]
+    ODS_P["ODS"]
+    TDS_P["TDS"]
+    D365_P["Dynamics F&O"]
+    Tag_P["Tagetik"]
+    DCR_P["DCR"]
+    ADP_P --> ODS_P --> TDS_P --> D365_P
+    TDS_P --> Tag_P
+    TDS_P --> DCR_P
+  end
+  subgraph lower["Non-PROD / Lower Env"]
+    direction LR
+    ADP_L["ADP (PROD)"]
+    ODS_L["ODS Lower"]
+    TDS_L["TDS Lower"]
+    D365_L["Dynamics F&O Lower"]
+    Tag_L["Tagetik lower"]
+    DCR_L["DCR lower"]
+    ADP_L --> ODS_L --> TDS_L --> D365_L
+    TDS_L --> Tag_L
+    TDS_L --> DCR_L
+  end
+  TestMembers["Test members / seed data in PROD"]
+  TestMembers -.->|"ingest for test members"| ADP_P
+  TestMembers -.->|"same data to lower"| ADP_L
+  ADP_P -.->|"data to lower"| ODS_L
+  Sync["RDM/CMT & member control in sync"]
+  Sync -.-> ODS_L
+  Sync -.-> TDS_L
+    </div>
+  </div>
+  <p class="note">ADP (PROD) appears in both flows because there is only one ADP env. Test members are configured in prod; the pipeline sends ingested data to lower ODS/TDS/Dynamics for E2E testing. RDM/CMT and member control must stay in sync between prod and lower.</p>
+</section>
+
+<section>
+  <h2>7. References</h2>
+  <ul>
+    <li>ADP seed-data architecture: <code>it-test-member-portal</code> – <code>thoughts/shared/research/2026-02-03-seed-data-architecture.md</code> (TestMemberCreation, seed_member_controls, ae-fin-ops-dbt seeds).</li>
+    <li>Lloyd’s / MuleSoft test strategy and flows: <code>docs/lloyds/LLOYDS_TEST_STRATEGY.md</code>, <code>engineering/test-strategy-mulesoft-integration.html</code>.</li>
+  </ul>
+</section>
+
+<p class="subtitle" style="margin-top: 2rem;">TEMP document – ADP single env and test-member solution for E2E testing. Last updated: March 2026.</p>
+
+<script>
+  mermaid.initialize({ startOnLoad: true, theme: 'dark', themeVariables: { primaryColor: '#1a2332', primaryTextColor: '#e6edf3', lineColor: '#58a6ff' } });
+</script>
+</body>
+</html>

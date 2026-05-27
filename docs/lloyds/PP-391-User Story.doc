@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>[#PP-391] Lloyd&#39;s D365 Journal Integration | 1 Capture Source &amp; XML Financial Summaries</title>
+    <meta http-equiv="Content-Type" Content="application/vnd.ms-word; charset=UTF-8">
+        <style type="text/css">
+
+.tableBorder, .grid
+{
+    background-color: #fff;
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.tableBorder td, .grid td
+{
+    vertical-align: top;
+    padding: 2px;
+    border: 1px solid #ccc;
+}
+
+.noPadding
+{
+    padding: 0 !important;
+}
+
+h3 .subText
+{
+    font-size: 60%;
+    font-weight: normal;
+}
+
+.tabLabel
+{
+    font-weight: bold;
+    border: 1px solid #ccc;
+    border-bottom:none;
+    padding: 2px;
+    display: inline;
+}
+
+td.blank
+{
+    padding: 0;
+    margin: 0;
+}
+
+.blank td
+{
+    border: none;
+}
+
+#descriptionArea
+{
+    margin: 0;
+    padding: 2px;
+    border: 1px solid #ccc;
+}
+
+hr
+{
+    border-top:1px solid #aaa;
+}
+
+hr.fullcontent
+{
+  height: 15px;
+  padding: 10px 0;
+  background: #fff url('https://accelins.atlassian.net/images/icons/hr.gif') no-repeat scroll center;
+}
+
+</style>
+
+</head>
+<body>
+
+<table class="tableBorder" cellpadding="0" cellspacing="0" border="0" width="100%">
+    <tr>
+        <td bgcolor="#f0f0f0" width="100%" colspan="2" valign="top">
+                            <b><a id="parent_issue_summary" href="https://accelins.atlassian.net/browse/PP-390">Lloyd&#39;s | D365 Journal Integration Feedback &amp; 3‑Way Reconciliation Loop</a></b>
+                <span style="font-size: 9px">(<a id="parent_issue_key" href="https://accelins.atlassian.net/browse/PP-390">PP-390</a>)</span>
+                <h3 class="formtitle"><img src="https://accelins.atlassian.net/images/icons/link_out_bot.gif" width="16" height="16" />
+                        [PP-391]&nbsp;<a href="https://accelins.atlassian.net/browse/PP-391">Lloyd&#39;s D365 Journal Integration | 1 Capture Source &amp; XML Financial Summaries</a>
+            <span class="subText">
+               Created: 04/Mar/26                   &nbsp;Updated: 17/Apr/26
+
+                                    &nbsp;Due: 01/May/26
+                                            </span>
+            </h3>
+        </td>
+    </tr>
+    <tr>
+        <td width="20%"><b>Status:</b></td>
+        <td width="80%">In QA</td>
+    </tr>
+    <tr>
+        <td width="20%"><b>Project:</b></td>
+        <td width="80%"><a href="https://accelins.atlassian.net/secure/BrowseProject.jspa?id=11551">Power platform</a></td>
+    </tr>
+
+        <tr>
+            <td><b>Components:</b></td>
+            <td>
+                            None
+                </td>
+    </tr>
+    
+
+        <tr>
+            <td><b>Affects versions:</b></td>
+            <td>
+                            None
+                </td>
+    </tr>
+    
+
+        <tr>
+            <td><b>Fix versions:</b></td>
+            <td>
+                            None
+                </td>
+    </tr>
+    
+    
+            <td width="20%"><b>Parent:</b></td>
+        <td width="80%"><a href="https://accelins.atlassian.net/browse/PP-390">Lloyd&#39;s | D365 Journal Integration Feedback &amp; 3‑Way Reconciliation Loop</a></td>
+    </table>
+
+<br />
+<table class="grid" cellpadding="0" cellspacing="0" border="0" width="100%">
+    <tr>
+        <td bgcolor="#f0f0f0" valign="top" width="20%">
+            <b>Type:</b>
+        </td>
+        <td bgcolor="#ffffff" valign="top"  width="30%" >
+            Story
+        </td>
+
+                    <td bgcolor="#f0f0f0">
+                <b>Priority:</b>
+            </td>
+            <td bgcolor="#ffffff" valign="top" nowrap>
+                Highest
+            </td>
+            </tr>
+    <tr>
+                        <td bgcolor="#f0f0f0" valign="top" width="20%">
+                <b>Reporter:</b>
+            </td>
+            <td bgcolor="#ffffff" valign="top"  width="30%" >
+                                        
+                
+        
+            <a class="user-hover" rel="640b32cc4307e46ad1488ee4"
+                id="word_reporter_640b32cc4307e46ad1488ee4"
+                href="https://accelins.atlassian.net/secure/ViewProfile.jspa?accountId=640b32cc4307e46ad1488ee4">
+                    Susan Skiles
+                </a>
+
+                            </td>
+        
+                    <td bgcolor="#f0f0f0" width="20%">
+                <b>Assignee:</b>
+            </td>
+            <td bgcolor="#ffffff" valign="top" nowrap  width="30%" >
+                                        
+                
+        
+            <a class="user-hover" rel="712020:8f1a74bf-4db4-4add-8c94-67e99b62833c"
+                id="word_assignee_712020:8f1a74bf-4db4-4add-8c94-67e99b62833c"
+                href="https://accelins.atlassian.net/secure/ViewProfile.jspa?accountId=712020%3A8f1a74bf-4db4-4add-8c94-67e99b62833c">
+                    Shubhada Latake
+                </a>
+
+                            </td>
+            </tr>
+    	<tr>
+		<td bgcolor="#f0f0f0" width="20%">
+			<b>Resolution:</b>
+		</td>
+		<td bgcolor="#ffffff" valign="top" width="30%" nowrap>
+            				Unresolved
+                    </td>
+                    <td bgcolor="#f0f0f0" width="20%">
+                <b>Votes:</b>
+            </td>
+            <td bgcolor="#ffffff" valign="top" width="30%" nowrap>
+                0
+            </td>
+        
+    </tr>
+    
+        <tr>
+        <td bgcolor="#f0f0f0" width="20%">
+            <b>Labels:</b>
+        </td>
+        <td id="labels-1109539-value" class="value" bgcolor="#ffffff" valign="top" colspan="3" nowrap>
+                            Lloyd&#39;s                    </td>
+    </tr>
+    
+    	<tr>
+                <td bgcolor="#f0f0f0" width="20%"><b>Σ Remaining Estimate:</b></td>
+        <td bgcolor="#ffffff" valign="top" nowrap>
+                            Not Specified
+                    </td>
+        		<td bgcolor="#f0f0f0" width="20%"><b>Remaining Estimate:</b></td>
+        <td bgcolor="#ffffff" valign="top" nowrap>
+                            Not Specified
+            		</td>
+    </tr>
+    <tr>
+                <td bgcolor="#f0f0f0" width="20%"><b>Σ Time Spent:</b></td>
+        <td bgcolor="#ffffff" valign="top" nowrap>
+                            Not Specified
+                    </td>
+                <td bgcolor="#f0f0f0" width="20%"><b>Time Spent:</b></td>
+		<td bgcolor="#ffffff" valign="top" nowrap>
+                            Not Specified
+            		</td>
+	</tr>
+    <tr>
+                <td bgcolor="#f0f0f0" width="20%"><b>Σ Original Estimate:</b></td>
+        <td bgcolor="#ffffff" valign="top" nowrap>
+                            Not Specified
+                    </td>
+                <td bgcolor="#f0f0f0" width="20%"><b>Original estimate:</b></td>
+		<td bgcolor="#ffffff" valign="top" nowrap>
+                            Not Specified
+            		</td>
+    </tr>
+    
+    </table>
+
+
+
+    <br />
+
+    	<table class="grid" cellpadding="0" cellspacing="0" border="0" width="100%">
+            
+
+        
+            <tr>
+            <td bgcolor="#f0f0f0" width="20%" valign="top">
+                <b>Issue links:</b>
+            </td>
+            <td bgcolor="#ffffff" valign="top" class="noPadding">
+                <table cellpadding="0" cellspacing="0" border="0" width="100%" class="blank">
+                                            <tr>
+                            <td colspan="4" bgcolor="#f0f0f0">
+                                <b>Blocks</b><br/>
+                            </td>
+                        </tr>
+                                                                <tr>
+            <td>
+                is blocked by
+            </td>
+            <td>
+                <a href="https://accelins.atlassian.net/browse/PP-428">
+                     <strike>PP-428</strike>                 </a>
+            </td>
+            <td>
+                Implement ServiceBus-triggered XML To...
+            </td>
+            <td>
+                Done
+            </td>
+        </tr>
+            <tr>
+            <td>
+                is blocked by
+            </td>
+            <td>
+                <a href="https://accelins.atlassian.net/browse/ENG-223">
+                     <strike>ENG-223</strike>                 </a>
+            </td>
+            <td>
+                Mulesoft Access
+            </td>
+            <td>
+                Done
+            </td>
+        </tr>
+                                        </table>
+            </td>
+        </tr>
+    
+
+
+            <tr><td bgcolor="#f0f0f0" width="20%" valign="top"><b>Sub-tasks:</b></td>
+    <td bgcolor="#ffffff" valign="top">
+        <table class="grid" cellpadding="0" cellspacing="0" border="0" width="100%">
+            <tr bgcolor="#f0f0f0">
+                <td>
+                    <b>Key</b><br/>
+                </td>
+                <td>
+                    <b>Summary</b><br/>
+                </td>
+                <td>
+                    <b>Type</b><br/>
+                </td>
+                <td>
+                    <b>Status</b><br/>
+                </td>
+                <td>
+                    <b>Assignee</b><br/>
+                </td>
+            </tr>
+                            <tr>
+                    <td>
+                        <a href="https://accelins.atlassian.net/browse/PP-482">PP-482</a>
+                    </td>
+                    <td valign="top" width="25%">
+                        <a href="https://accelins.atlassian.net/browse/PP-482">Test Design</a>
+                    </td>
+                    <td>
+                        Sub-task
+                    </td>
+                    <td>
+                        Done
+                    </td>
+                    <td>
+                                                     Shubhada Latake  &nbsp;
+                                            </td>
+                </tr>
+                            <tr>
+                    <td>
+                        <a href="https://accelins.atlassian.net/browse/PP-450">PP-450</a>
+                    </td>
+                    <td valign="top" width="25%">
+                        <a href="https://accelins.atlassian.net/browse/PP-450">Analysis - Journal Integration</a>
+                    </td>
+                    <td>
+                        Sub-task
+                    </td>
+                    <td>
+                        Done
+                    </td>
+                    <td>
+                                                     Neha Priya  &nbsp;
+                                            </td>
+                </tr>
+                            <tr>
+                    <td>
+                        <a href="https://accelins.atlassian.net/browse/PP-535">PP-535</a>
+                    </td>
+                    <td valign="top" width="25%">
+                        <a href="https://accelins.atlassian.net/browse/PP-535">Peer Review</a>
+                    </td>
+                    <td>
+                        Sub-task
+                    </td>
+                    <td>
+                        Done
+                    </td>
+                    <td>
+                                                     Anastasija Lukjancenko  &nbsp;
+                                            </td>
+                </tr>
+                            <tr>
+                    <td>
+                        <a href="https://accelins.atlassian.net/browse/PP-544">PP-544</a>
+                    </td>
+                    <td valign="top" width="25%">
+                        <a href="https://accelins.atlassian.net/browse/PP-544">Test Execution</a>
+                    </td>
+                    <td>
+                        Sub-task
+                    </td>
+                    <td>
+                        In Progress
+                    </td>
+                    <td>
+                                                     Shubhada Latake  &nbsp;
+                                            </td>
+                </tr>
+                    </table>
+    </td>
+</tr>
+    
+                        <tr>
+                <td bgcolor="#f0f0f0" width="20%" valign="top"><b>Acceptance Criteria:</b></td>
+                <td id="customfield_11018-1109539-value" class="value" bgcolor="#ffffff" width="80%">      <p><b>Acceptance Criteria:</b></p>
+
+<ul>
+	<li>Given a new ADP data set is ready
+	<ul>
+		<li>when <b>XmlGenerated</b> event is received.</li>
+		<li>Below is retrieved from event payload:
+		<ul>
+			<li>File ID</li>
+			<li>RepositoryID</li>
+			<li>LegalEntity</li>
+			<li>FileName</li>
+			<li>CorrelationId</li>
+			<li>BlobId</li>
+			<li>ADP_Currency</li>
+			<li>ADP_TotalPremium</li>
+			<li>ADP_TotalTax</li>
+			<li>ADP_TotalOtherContributions</li>
+			<li>ADP_TotalAgencyCommission</li>
+			<li>ADP_TotalCommissionAmount</li>
+		</ul>
+		</li>
+	</ul>
+	</li>
+	<li>Given XML file exists in Azure Blob Storage:
+	<ul>
+		<li>When Dataverse retrieves file contents</li>
+		<li>Then XML file should be scanned and summary of financials must be persisted on XML record including:<a href="https://accelins.atlassian.net/wiki/x/GIALsg" title="smart-link" class="external-link" rel="nofollow noreferrer">https://accelins.atlassian.net/wiki/x/GIALsg</a>
+		<ul>
+			<li>XML_Currency</li>
+			<li>XML_TotalPremium</li>
+			<li>XML_TotalTax</li>
+			<li>XML_TotalOtherContributions</li>
+			<li>XML_TotalAgencyCommission</li>
+			<li>XML_TotalCommissionAmount</li>
+			<li>Process Path = ADP</li>
+		</ul>
+		</li>
+	</ul>
+	</li>
+	<li>When all of the values are populated, then status reason is set to <tt>Approved</tt></li>
+	<li>If all value match between ADP and XML  each value toggle is updated and overall toggle is updated.</li>
+	<li>Comparison between each financial pair should be an ABS comparison with tolerance of 5 Unit of any currency.</li>
+</ul>
+
+  </td>
+            </tr>
+                                <tr>
+                <td bgcolor="#f0f0f0" width="20%" valign="top"><b>Raised By:</b></td>
+                <td id="customfield_10425-1109539-value" class="value" bgcolor="#ffffff" width="80%">      Yuvika Bhatia
+  </td>
+            </tr>
+                                <tr>
+                <td bgcolor="#f0f0f0" width="20%" valign="top"><b>Story Points:</b></td>
+                <td id="customfield_10033-1109539-value" class="value" bgcolor="#ffffff" width="80%">    13
+</td>
+            </tr>
+                                <tr>
+                <td bgcolor="#f0f0f0" width="20%" valign="top"><b>Raised Date:</b></td>
+                <td id="customfield_10426-1109539-value" class="value" bgcolor="#ffffff" width="80%">          <span title="04/Mar/26"><time datetime="2026-03-04">04/Mar/26</time></span>
+    </td>
+            </tr>
+                                <tr>
+                <td bgcolor="#f0f0f0" width="20%" valign="top"><b>Start date:</b></td>
+                <td id="customfield_10015-1109539-value" class="value" bgcolor="#ffffff" width="80%">          <span title="16/Mar/26"><time datetime="2026-03-16">16/Mar/26</time></span>
+    </td>
+            </tr>
+                                <tr>
+                <td bgcolor="#f0f0f0" width="20%" valign="top"><b>Target end:</b></td>
+                <td id="customfield_10023-1109539-value" class="value" bgcolor="#ffffff" width="80%">          <span title="24/Apr/26"><time datetime="2026-04-24">24/Apr/26</time></span>
+    </td>
+            </tr>
+                                <tr>
+                <td bgcolor="#f0f0f0" width="20%" valign="top"><b>Sprint:</b></td>
+                <td id="customfield_10020-1109539-value" class="value" bgcolor="#ffffff" width="80%">Power Sprint 98, Power Sprint 99, Power Sprint 97</td>
+            </tr>
+                                <tr>
+                <td bgcolor="#f0f0f0" width="20%" valign="top"><b>Epic Link:</b></td>
+                <td id="customfield_10014-1109539-value" class="value" bgcolor="#ffffff" width="80%">
+    <a class="aui-label ghx-label-14" href="https://accelins.atlassian.net/browse/PP-390">
+        Lloyd&#39;s | D365 Journal Integration Feedback &amp; 3‑Way Reconciliation Loop
+    </a>
+</td>
+            </tr>
+                                <tr>
+                <td bgcolor="#f0f0f0" width="20%" valign="top"><b>Issue color:</b></td>
+                <td id="customfield_10017-1109539-value" class="value" bgcolor="#ffffff" width="80%">      dark_orange
+  </td>
+            </tr>
+            </table>
+
+    <br/>
+
+    <table cellpadding="2" cellspacing="0" border="0" width="100%" align="center">
+    <tr>
+        <td bgcolor="#bbbbbb" width="1%" nowrap align="center">
+            &nbsp;<font color="#ffffff"><b>Description</b></font>&nbsp;
+        </td>
+        <td>&nbsp;</td>
+    </tr>
+    </table>
+
+    <table cellpadding="0" cellspacing="0" border="0" width="100%">
+    <tr>
+        <td id="descriptionArea">
+            <p><b>Summary:</b> As a operations user, I want to see Source and XML financial summaries so that we have a reliable basis for reconciliation before sending data to D365.</p>
+
+<p><b>Description:</b></p>
+
+<p>MuleSoft must calculate and provide source financial summaries and Dataverse must persist XML-level financial summaries for each XML file record for downstream approval and reconciliation.</p>
+            <br/>
+        </td>
+    </tr>
+    </table>
+
+    <br/>
+
+    <table cellpadding="2" cellspacing="0" border="0" width="100%" align="center">
+    <tr>
+        <td bgcolor="#bbbbbb" width="1%" nowrap align="center">
+            &nbsp;<font color="#ffffff"><b>Comments</b></font>&nbsp;
+        </td>
+        <td>&nbsp;</td>
+    </tr>
+    </table>
+
+    <table cellpadding="0" cellspacing="0" border="0" width="100%" class="grid" style="margin: 0;">
+                <tr id="comment-header-2669089"><td bgcolor="#f0f0f0">
+            Comment by  
+                                                    
+                
+        
+            <a class="user-hover" rel="712020:eb641cde-faad-4e60-b1f9-573434c3896c"
+                id="word_commented_712020:eb641cde-faad-4e60-b1f9-573434c3896c"
+                href="https://accelins.atlassian.net/secure/ViewProfile.jspa?accountId=712020%3Aeb641cde-faad-4e60-b1f9-573434c3896c">
+                    Anastasija Lukjancenko
+                </a>
+
+                                        <font size="-2">
+            [
+                <font color="#336699">25/Mar/26</font>
+
+                            ]
+            </font>
+
+        </td></tr>
+        <tr id="comment-body-2669089"><td bgcolor="#ffffff">
+            <p>Ticket Reference: <a href="https://support.accelerant247.com/accelerant?id=ticket&amp;table=sc_req_item&amp;sys_id=7ec309112b27b2105ec3f1324291bff2&amp;view=sp" title="smart-link" class="external-link" rel="nofollow noreferrer">https://support.accelerant247.com/accelerant?id=ticket&amp;table=sc_req_item&amp;sys_id=7ec309112b27b2105ec3f1324291bff2&amp;view=sp</a> <br/>
+Chat: <br/>
+<span class="error">&#91;Lloyds - Blockers | Group Chat | Microsoft Teams|https://teams.microsoft.com/l/chat/19:f4666b0c5f7d4d3b940dd9f45f7deb4c@thread.v2/conversations?context=%7B%22contextType%22%3A%22chat%22%7D&#93;</span><br/>
+<span class="error">&#91;Llyods Porject Infrastructure Build Timelines | Meeting Chat | Microsoft Teams|https://teams.microsoft.com/l/chat/19:meeting_OTg3NGIxODMtODRmNi00OGY2LWIwNjMtYWJhOGM0NTFlOTQx@thread.v2/conversations?context=%7B%22contextType%22%3A%22chat%22%7D&#93;</span></p>
+        </td></tr>
+                <tr id="comment-header-2684148"><td bgcolor="#f0f0f0">
+            Comment by  
+                                                    
+                
+        
+            <a class="user-hover" rel="712020:eb641cde-faad-4e60-b1f9-573434c3896c"
+                id="word_commented_712020:eb641cde-faad-4e60-b1f9-573434c3896c"
+                href="https://accelins.atlassian.net/secure/ViewProfile.jspa?accountId=712020%3Aeb641cde-faad-4e60-b1f9-573434c3896c">
+                    Anastasija Lukjancenko
+                </a>
+
+                                        <font size="-2">
+            [
+                <font color="#336699">26/Mar/26</font>
+
+                            ]
+            </font>
+
+        </td></tr>
+        <tr id="comment-body-2684148"><td bgcolor="#ffffff">
+            <p><a href="https://accelins.atlassian.net/secure/ViewProfile.jspa?accountId=712020%3A2cc7801f-bd6c-45f5-8ea1-803cbda487a3" class="user-hover" rel="712020:2cc7801f-bd6c-45f5-8ea1-803cbda487a3" data-account-id="712020:2cc7801f-bd6c-45f5-8ea1-803cbda487a3" accountid="712020:2cc7801f-bd6c-45f5-8ea1-803cbda487a3" rel="noreferrer">Neha Priya</a><a href="https://accelins.atlassian.net/secure/ViewProfile.jspa?accountId=712020%3A6ba62a51-b97b-4865-ab4f-9d97e28c5270" class="user-hover" rel="712020:6ba62a51-b97b-4865-ab4f-9d97e28c5270" data-account-id="712020:6ba62a51-b97b-4865-ab4f-9d97e28c5270" accountid="712020:6ba62a51-b97b-4865-ab4f-9d97e28c5270" rel="noreferrer">Anchal Kumar</a> <a href="https://accelins.atlassian.net/secure/ViewProfile.jspa?accountId=712020%3A62ca503a-f191-4be8-9925-97697da84e80" class="user-hover" rel="712020:62ca503a-f191-4be8-9925-97697da84e80" data-account-id="712020:62ca503a-f191-4be8-9925-97697da84e80" accountid="712020:62ca503a-f191-4be8-9925-97697da84e80" rel="noreferrer">Anusha Vasadi</a>  adding this page for XML details: <a href="https://accelins.atlassian.net/wiki/x/D4Cvtw" title="smart-link" class="external-link" rel="nofollow noreferrer">https://accelins.atlassian.net/wiki/x/D4Cvtw</a> </p>
+        </td></tr>
+                <tr id="comment-header-2690728"><td bgcolor="#f0f0f0">
+            Comment by  
+                                                    
+                
+        
+            <a class="user-hover" rel="712020:eb641cde-faad-4e60-b1f9-573434c3896c"
+                id="word_commented_712020:eb641cde-faad-4e60-b1f9-573434c3896c"
+                href="https://accelins.atlassian.net/secure/ViewProfile.jspa?accountId=712020%3Aeb641cde-faad-4e60-b1f9-573434c3896c">
+                    Anastasija Lukjancenko
+                </a>
+
+                                        <font size="-2">
+            [
+                <font color="#336699">10/Apr/26</font>
+
+                            ]
+            </font>
+
+        </td></tr>
+        <tr id="comment-body-2690728"><td bgcolor="#ffffff">
+            <p><a href="https://accelins.atlassian.net/secure/ViewProfile.jspa?accountId=712020%3A2cc7801f-bd6c-45f5-8ea1-803cbda487a3" class="user-hover" rel="712020:2cc7801f-bd6c-45f5-8ea1-803cbda487a3" data-account-id="712020:2cc7801f-bd6c-45f5-8ea1-803cbda487a3" accountid="712020:2cc7801f-bd6c-45f5-8ea1-803cbda487a3" rel="noreferrer">Neha Priya</a>  Peer review completed.</p>
+        </td></tr>
+                <tr id="comment-header-2693623"><td bgcolor="#f0f0f0">
+            Comment by  
+                                                    
+                
+        
+            <a class="user-hover" rel="712020:eb641cde-faad-4e60-b1f9-573434c3896c"
+                id="word_commented_712020:eb641cde-faad-4e60-b1f9-573434c3896c"
+                href="https://accelins.atlassian.net/secure/ViewProfile.jspa?accountId=712020%3Aeb641cde-faad-4e60-b1f9-573434c3896c">
+                    Anastasija Lukjancenko
+                </a>
+
+                                        <font size="-2">
+            [
+                <font color="#336699">16/Apr/26</font>
+
+                            ]
+            </font>
+
+        </td></tr>
+        <tr id="comment-body-2693623"><td bgcolor="#ffffff">
+            <p><img class="emoticon" src="/images/icons/emoticons/flag.png" height="16" width="16" align="absmiddle" alt="" border="0"/> Flag added </p>
+
+<p>Awaiting Test Azure Resources</p>
+        </td></tr>
+            </table>
+Generated at Thu Apr 23 14:53:01 UTC 2026 by Ravindranath Vazhenkhat using Jira 1001.0.0-SNAPSHOT#100291-rev:8af5eb3fe8ec8ff4c45c5b8497811390f76c79eb.
+
+</body>
+</html>

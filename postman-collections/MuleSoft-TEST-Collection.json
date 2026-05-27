@@ -1,0 +1,1214 @@
+{
+	"info": {
+		"_postman_id": "mulesoft-test-collection",
+		"name": "MuleSoft TEST Environment - Log Access",
+		"description": "MuleSoft Anypoint Platform API collection for TEST environment (EU region).\n\n## Setup Instructions:\n1. Import this collection into Postman\n2. Import the MuleSoft-TEST-Environment.json environment file\n3. Set the following environment variables:\n   - `mulesoft_client_id`: Your Connected App Client ID\n   - `mulesoft_client_secret`: Your Connected App Client Secret\n   - `mulesoft_base_url`: https://eu1.anypoint.mulesoft.com (EU region)\n   - `mulesoft_api_base_url`: https://eu1.anypoint.mulesoft.com/armui/api/v2\n   - `mulesoft_organization_id`: Your organization ID (REQUIRED)\n   - `mulesoft_environment_id`: TEST environment ID (REQUIRED)\n\n## Authentication:\nThis collection uses OAuth2 Client Credentials flow.\n1. Run the 'Get Access Token' request first\n2. The token will be automatically saved to `mulesoft_access_token` variable\n3. All subsequent requests use Bearer token authentication\n\n## Applications:\n- PAPI: sf-accounts-papi-qa\n- SAPI: accl-dataverse-sys-api-qa\n\n## Note:\nNo credentials are stored in this collection. All sensitive data should be stored in Postman environment variables.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{mulesoft_access_token}}",
+				"type": "string"
+			}
+		]
+	},
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "{{mulesoft_base_url}}",
+			"type": "string"
+		},
+		{
+			"key": "api_base_url",
+			"value": "{{mulesoft_api_base_url}}",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "Get Access Token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.environment.set('mulesoft_access_token', jsonData.access_token);",
+									"    pm.environment.set('mulesoft_token_expires_in', jsonData.expires_in);",
+									"    console.log('Access token saved to environment variable');",
+									"    console.log('Token expires in: ' + jsonData.expires_in + ' seconds');",
+									"} else {",
+									"    console.log('Authentication failed');",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/x-www-form-urlencoded"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "client_id",
+									"value": "{{mulesoft_client_id}}",
+									"type": "text"
+								},
+								{
+									"key": "client_secret",
+									"value": "{{mulesoft_client_secret}}",
+									"type": "text"
+								},
+								{
+									"key": "grant_type",
+									"value": "client_credentials",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/accounts/api/v2/oauth2/token",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"accounts",
+								"api",
+								"v2",
+								"oauth2",
+								"token"
+							]
+						},
+						"description": "Authenticates with MuleSoft Anypoint Platform using OAuth2 Client Credentials flow.\n\n**Required Variables:**\n- `mulesoft_client_id`: Connected App Client ID\n- `mulesoft_client_secret`: Connected App Client Secret\n\n**Response:**\n- `access_token`: Bearer token for API requests\n- `expires_in`: Token expiration time in seconds\n\n**Note:** The access token is automatically saved to the environment variable `mulesoft_access_token`."
+					},
+					"response": []
+				},
+				{
+					"name": "Get My Organization Info",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{mulesoft_access_token}}",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/accounts/api/me",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"accounts",
+								"api",
+								"me"
+							]
+						},
+						"description": "Gets information about the authenticated user and organization.\n\n**Use this to find:**\n- Organization ID\n- User information\n- Organization details\n\n**Response includes:**\n- `organization.id`: Your Organization ID\n- `organization.name`: Organization name\n- User details\n\n**After running:**\n1. Look for `organization.id` in the response\n2. Copy it to `mulesoft_organization_id` environment variable"
+					},
+					"response": []
+				},
+				{
+					"name": "List Environments",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{mulesoft_access_token}}",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/accounts/api/organizations/{{mulesoft_organization_id}}/environments",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"accounts",
+								"api",
+								"organizations",
+								"{{mulesoft_organization_id}}",
+								"environments"
+							]
+						},
+						"description": "Lists all environments in your organization.\n\n**Prerequisites:**\n- Must have `mulesoft_organization_id` set first (use 'Get My Organization Info')\n\n**Use this to find:**\n- Environment ID for TEST environment\n\n**Response includes:**\n- Array of environments with:\n  - `id`: Environment ID\n  - `name`: Environment name (e.g., \"TEST\")\n  - `type`: Environment type\n\n**After running:**\n1. Find the environment with `name: \"TEST\"`\n2. Copy its `id` to `mulesoft_environment_id` environment variable"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Applications",
+			"item": [
+				{
+					"name": "List All Applications (ARMUI)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{mulesoft_access_token}}",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "X-ANYPNT-ORG-ID",
+								"value": "{{mulesoft_organization_id}}",
+								"type": "text"
+							},
+							{
+								"key": "X-ANYPNT-ENV-ID",
+								"value": "{{mulesoft_environment_id}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{api_base_url}}/applications",
+							"host": [
+								"{{api_base_url}}"
+							],
+							"path": [
+								"applications"
+							]
+						},
+						"description": "Lists all applications using ARMUI API.\n\n**Note:** If you get 403, check Connected App has Runtime Manager scope.\n\n**Response:**\nReturns an array of application objects with details like:\n- id\n- name\n- domain\n- status\n- targetId\n- targetName\n- targetType"
+					},
+					"response": []
+				},
+				{
+					"name": "List All Applications (Runtime Manager API)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{mulesoft_access_token}}",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "X-ANYPNT-ORG-ID",
+								"value": "{{mulesoft_organization_id}}",
+								"type": "text"
+							},
+							{
+								"key": "X-ANYPNT-ENV-ID",
+								"value": "{{mulesoft_environment_id}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/runtime-manager/api/v2/applications",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"runtime-manager",
+								"api",
+								"v2",
+								"applications"
+							]
+						},
+						"description": "Lists all applications using Runtime Manager API (alternative endpoint).\n\n**Use this if ARMUI API returns 403.**\n\n**Response:**\nReturns an array of application objects."
+					},
+					"response": []
+				},
+				{
+					"name": "Get PAPI Application",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{mulesoft_access_token}}",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "X-ANYPNT-ORG-ID",
+								"value": "{{mulesoft_organization_id}}",
+								"type": "text"
+							},
+							{
+								"key": "X-ANYPNT-ENV-ID",
+								"value": "{{mulesoft_environment_id}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{api_base_url}}/applications/sf-accounts-papi-qa",
+							"host": [
+								"{{api_base_url}}"
+							],
+							"path": [
+								"applications",
+								"sf-accounts-papi-qa"
+							]
+						},
+						"description": "Gets details for the PAPI (Salesforce Accounts API) application.\n\n**Application:** sf-accounts-papi-qa\n\n**Response:**\nReturns application details including status, target information, and configuration."
+					},
+					"response": []
+				},
+				{
+					"name": "Get SAPI Application",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{mulesoft_access_token}}",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "X-ANYPNT-ORG-ID",
+								"value": "{{mulesoft_organization_id}}",
+								"type": "text"
+							},
+							{
+								"key": "X-ANYPNT-ENV-ID",
+								"value": "{{mulesoft_environment_id}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{api_base_url}}/applications/accl-dataverse-sys-api-qa",
+							"host": [
+								"{{api_base_url}}"
+							],
+							"path": [
+								"applications",
+								"accl-dataverse-sys-api-qa"
+							]
+						},
+						"description": "Gets details for the SAPI (Dataverse System API) application.\n\n**Application:** accl-dataverse-sys-api-qa\n\n**Response:**\nReturns application details including status, target information, and configuration."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "PAPI Logs",
+			"item": [
+				{
+					"name": "Get PAPI Specs",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{mulesoft_access_token}}",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{api_base_url}}/organizations/{{mulesoft_organization_id}}/environments/{{mulesoft_environment_id}}/deployments/1750fc69-329f-4e85-95cb-8659ab957e6e/specs?limit=1000",
+							"host": [
+								"{{api_base_url}}"
+							],
+							"path": [
+								"organizations",
+								"{{mulesoft_organization_id}}",
+								"environments",
+								"{{mulesoft_environment_id}}",
+								"deployments",
+								"1750fc69-329f-4e85-95cb-8659ab957e6e",
+								"specs"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "1000",
+									"description": "Maximum number of specs to return"
+								}
+							]
+						},
+						"description": "Gets specs for PAPI deployment. The first spec in the response (most recent) contains the spec ID needed for logs.\n\n**Deployment ID:** 1750fc69-329f-4e85-95cb-8659ab957e6e (PAPI)\n\n**Response:** Array of specs, each with a `version` field (this is the spec ID).\n\n**Use the first spec's `version` field as the spec ID for logs.**"
+					},
+					"response": []
+				},
+				{
+					"name": "Get PAPI Logs",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{mulesoft_access_token}}",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{api_base_url}}/organizations/{{mulesoft_organization_id}}/environments/{{mulesoft_environment_id}}/deployments/1750fc69-329f-4e85-95cb-8659ab957e6e/specs/9e3e5aba-91df-426a-9ac0-0c1ce9739078/logs?startTime=&endTime=&descending=false",
+							"host": [
+								"{{api_base_url}}"
+							],
+							"path": [
+								"organizations",
+								"{{mulesoft_organization_id}}",
+								"environments",
+								"{{mulesoft_environment_id}}",
+								"deployments",
+								"1750fc69-329f-4e85-95cb-8659ab957e6e",
+								"specs",
+								"9e3e5aba-91df-426a-9ac0-0c1ce9739078",
+								"logs"
+							],
+							"query": [
+								{
+									"key": "startTime",
+									"value": "",
+									"description": "Start time in milliseconds (timestamp)",
+									"disabled": true
+								},
+								{
+									"key": "endTime",
+									"value": "",
+									"description": "End time in milliseconds (timestamp)",
+									"disabled": true
+								},
+								{
+									"key": "descending",
+									"value": "false",
+									"description": "Sort order (false = ascending, true = descending)"
+								},
+								{
+									"key": "afterDocId",
+									"value": "",
+									"description": "Pagination cursor (from previous response)",
+									"disabled": true
+								},
+								{
+									"key": "offset",
+									"value": "0",
+									"description": "Pagination offset",
+									"disabled": true
+								},
+								{
+									"key": "level",
+									"value": "",
+									"description": "Filter by log level (ERROR, WARN, INFO, DEBUG)",
+									"disabled": true
+								},
+								{
+									"key": "startDate",
+									"value": "",
+									"description": "Start date in ISO 8601 format (e.g., 2026-01-19T00:00:00Z)",
+									"disabled": true
+								},
+								{
+									"key": "endDate",
+									"value": "",
+									"description": "End date in ISO 8601 format (e.g., 2026-01-19T23:59:59Z)",
+									"disabled": true
+								},
+								{
+									"key": "searchText",
+									"value": "",
+									"description": "Search for specific text in logs",
+									"disabled": true
+								}
+							]
+						},
+						"description": "Retrieves logs for the PAPI deployment using the correct CloudHub 2.0 endpoint.\n\n**Deployment ID:** 1750fc69-329f-4e85-95cb-8659ab957e6e (PAPI)\n**Spec ID:** 9e3e5aba-91df-426a-9ac0-0c1ce9739078 (from Get PAPI Specs)\n**Endpoint:** /organizations/{orgId}/environments/{envId}/deployments/{deploymentId}/specs/{specId}/logs\n\n**Query Parameters:**\n- `startTime`: Start time in milliseconds (timestamp) - optional\n- `endTime`: End time in milliseconds (timestamp) - optional\n- `descending`: Sort order (false = ascending, true = descending)\n- `afterDocId`: Pagination cursor from previous response - optional\n\n**Note:** First get the spec ID using 'Get PAPI Specs', then use the first spec's `version` field as the spec ID."
+					},
+					"response": []
+				},
+				{
+					"name": "Get PAPI Logs (CloudHub API)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{mulesoft_access_token}}",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "X-ANYPNT-ORG-ID",
+								"value": "{{mulesoft_organization_id}}",
+								"type": "text"
+							},
+							{
+								"key": "X-ANYPNT-ENV-ID",
+								"value": "{{mulesoft_environment_id}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/cloudhub/api/v2/applications/sf-accounts-papi-qa/logs?limit=100",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"cloudhub",
+								"api",
+								"v2",
+								"applications",
+								"sf-accounts-papi-qa",
+								"logs"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "100",
+									"description": "Maximum number of log entries"
+								}
+							]
+						},
+						"description": "Try CloudHub API endpoint instead of ARMUI.\n\n**Base URL:** {{base_url}}/cloudhub/api/v2\n\n**Use this if ARMUI endpoints don't work.**"
+					},
+					"response": []
+				},
+				{
+					"name": "Get PAPI Logs (Monitoring API)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{mulesoft_access_token}}",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "X-ANYPNT-ORG-ID",
+								"value": "{{mulesoft_organization_id}}",
+								"type": "text"
+							},
+							{
+								"key": "X-ANYPNT-ENV-ID",
+								"value": "{{mulesoft_environment_id}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/monitoring/api/v2/applications/sf-accounts-papi-qa/logs?limit=100",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"monitoring",
+								"api",
+								"v2",
+								"applications",
+								"sf-accounts-papi-qa",
+								"logs"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "100",
+									"description": "Maximum number of log entries"
+								}
+							]
+						},
+						"description": "Try Monitoring API endpoint.\n\n**Base URL:** {{base_url}}/monitoring/api/v2\n\n**Logs might be accessed through Monitoring API instead of ARMUI.**"
+					},
+					"response": []
+				},
+				{
+					"name": "Get PAPI ERROR Logs",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{mulesoft_access_token}}",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "X-ANYPNT-ORG-ID",
+								"value": "{{mulesoft_organization_id}}",
+								"type": "text"
+							},
+							{
+								"key": "X-ANYPNT-ENV-ID",
+								"value": "{{mulesoft_environment_id}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{api_base_url}}/applications/sf-accounts-papi-qa/logs?level=ERROR&limit=100",
+							"host": [
+								"{{api_base_url}}"
+							],
+							"path": [
+								"applications",
+								"sf-accounts-papi-qa",
+								"logs"
+							],
+							"query": [
+								{
+									"key": "level",
+									"value": "ERROR",
+									"description": "Filter by ERROR level"
+								},
+								{
+									"key": "limit",
+									"value": "100",
+									"description": "Maximum number of log entries"
+								}
+							]
+						},
+						"description": "Retrieves ERROR level logs for the PAPI application.\n\n**Application:** sf-accounts-papi-qa\n**Filter:** ERROR level only"
+					},
+					"response": []
+				},
+				{
+					"name": "Search PAPI Logs",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{mulesoft_access_token}}",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "X-ANYPNT-ORG-ID",
+								"value": "{{mulesoft_organization_id}}",
+								"type": "text"
+							},
+							{
+								"key": "X-ANYPNT-ENV-ID",
+								"value": "{{mulesoft_environment_id}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{api_base_url}}/applications/sf-accounts-papi-qa/logs?searchText={{search_text}}&limit=100",
+							"host": [
+								"{{api_base_url}}"
+							],
+							"path": [
+								"applications",
+								"sf-accounts-papi-qa",
+								"logs"
+							],
+							"query": [
+								{
+									"key": "searchText",
+									"value": "{{search_text}}",
+									"description": "Text to search for in logs"
+								},
+								{
+									"key": "limit",
+									"value": "100",
+									"description": "Maximum number of log entries"
+								}
+							]
+						},
+						"description": "Searches for specific text in PAPI logs.\n\n**Application:** sf-accounts-papi-qa\n\n**Usage:**\nSet the `search_text` environment variable before running this request.\n\n**Example searches:**\n- \"accounts\"\n- \"status=400\"\n- \"Exception\"\n- \"Failed\""
+					},
+					"response": []
+				},
+				{
+					"name": "Download PAPI Log File",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{mulesoft_access_token}}",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "X-ANYPNT-ORG-ID",
+								"value": "{{mulesoft_organization_id}}",
+								"type": "text"
+							},
+							{
+								"key": "X-ANYPNT-ENV-ID",
+								"value": "{{mulesoft_environment_id}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{api_base_url}}/applications/sf-accounts-papi-qa/log-file",
+							"host": [
+								"{{api_base_url}}"
+							],
+							"path": [
+								"applications",
+								"sf-accounts-papi-qa",
+								"log-file"
+							]
+						},
+						"description": "Downloads the raw log file for the PAPI application.\n\n**Application:** sf-accounts-papi-qa\n\n**Response:**\nReturns the raw log file content as text."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "SAPI Logs",
+			"item": [
+				{
+					"name": "Get SAPI Specs",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{mulesoft_access_token}}",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{api_base_url}}/organizations/{{mulesoft_organization_id}}/environments/{{mulesoft_environment_id}}/deployments/8b315668-c91f-4cad-ac74-20208a5ed749/specs?limit=1000",
+							"host": [
+								"{{api_base_url}}"
+							],
+							"path": [
+								"organizations",
+								"{{mulesoft_organization_id}}",
+								"environments",
+								"{{mulesoft_environment_id}}",
+								"deployments",
+								"8b315668-c91f-4cad-ac74-20208a5ed749",
+								"specs"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "1000",
+									"description": "Maximum number of specs to return"
+								}
+							]
+						},
+						"description": "Gets specs for SAPI deployment. The first spec in the response (most recent) contains the spec ID needed for logs.\n\n**Deployment ID:** 8b315668-c91f-4cad-ac74-20208a5ed749 (SAPI)\n\n**Response:** Array of specs, each with a `version` field (this is the spec ID).\n\n**Use the first spec's `version` field as the spec ID for logs.**"
+					},
+					"response": []
+				},
+				{
+					"name": "Get SAPI Logs",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{mulesoft_access_token}}",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{api_base_url}}/organizations/{{mulesoft_organization_id}}/environments/{{mulesoft_environment_id}}/deployments/8b315668-c91f-4cad-ac74-20208a5ed749/specs/{{mulesoft_sapi_spec_id}}/logs?startTime=&endTime=&descending=false",
+							"host": [
+								"{{api_base_url}}"
+							],
+							"path": [
+								"organizations",
+								"{{mulesoft_organization_id}}",
+								"environments",
+								"{{mulesoft_environment_id}}",
+								"deployments",
+								"8b315668-c91f-4cad-ac74-20208a5ed749",
+								"specs",
+								"{{mulesoft_sapi_spec_id}}",
+								"logs"
+							],
+							"query": [
+								{
+									"key": "startTime",
+									"value": "",
+									"description": "Start time in milliseconds (timestamp)",
+									"disabled": true
+								},
+								{
+									"key": "endTime",
+									"value": "",
+									"description": "End time in milliseconds (timestamp)",
+									"disabled": true
+								},
+								{
+									"key": "descending",
+									"value": "false",
+									"description": "Sort order (false = ascending, true = descending)"
+								},
+								{
+									"key": "afterDocId",
+									"value": "",
+									"description": "Pagination cursor (from previous response)",
+									"disabled": true
+								},
+								{
+									"key": "offset",
+									"value": "0",
+									"description": "Pagination offset",
+									"disabled": true
+								},
+								{
+									"key": "level",
+									"value": "",
+									"description": "Filter by log level (ERROR, WARN, INFO, DEBUG)",
+									"disabled": true
+								},
+								{
+									"key": "startDate",
+									"value": "",
+									"description": "Start date in ISO 8601 format (e.g., 2026-01-19T00:00:00Z)",
+									"disabled": true
+								},
+								{
+									"key": "endDate",
+									"value": "",
+									"description": "End date in ISO 8601 format (e.g., 2026-01-19T23:59:59Z)",
+									"disabled": true
+								},
+								{
+									"key": "searchText",
+									"value": "",
+									"description": "Search for specific text in logs",
+									"disabled": true
+								}
+							]
+						},
+						"description": "Retrieves logs for the SAPI deployment using the correct CloudHub 2.0 endpoint.\n\n**Deployment ID:** 8b315668-c91f-4cad-ac74-20208a5ed749 (SAPI)\n**Spec ID:** {{mulesoft_sapi_spec_id}} (get from 'Get SAPI Specs' response - first spec's `version` field)\n**Endpoint:** /organizations/{orgId}/environments/{envId}/deployments/{deploymentId}/specs/{specId}/logs\n\n**Query Parameters:**\n- `startTime`: Start time in milliseconds (timestamp) - optional\n- `endTime`: End time in milliseconds (timestamp) - optional\n- `descending`: Sort order (false = ascending, true = descending)\n- `afterDocId`: Pagination cursor from previous response - optional\n\n**Note:** First run 'Get SAPI Specs' to get the spec ID, then set `mulesoft_sapi_spec_id` environment variable."
+					},
+					"response": []
+				},
+				{
+					"name": "Get SAPI Logs (Alternative - Deployments)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{mulesoft_access_token}}",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "X-ANYPNT-ORG-ID",
+								"value": "{{mulesoft_organization_id}}",
+								"type": "text"
+							},
+							{
+								"key": "X-ANYPNT-ENV-ID",
+								"value": "{{mulesoft_environment_id}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{api_base_url}}/deployments/8b315668-c91f-4cad-ac74-20208a5ed749/logs?limit=100",
+							"host": [
+								"{{api_base_url}}"
+							],
+							"path": [
+								"deployments",
+								"8b315668-c91f-4cad-ac74-20208a5ed749",
+								"logs"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "100",
+									"description": "Maximum number of log entries"
+								}
+							]
+						},
+						"description": "Alternative endpoint using deployment ID instead of application name.\n\n**Deployment ID:** 8b315668-c91f-4cad-ac74-20208a5ed749 (SAPI)\n\n**Use this if the /applications/{name}/logs endpoint returns 404.**"
+					},
+					"response": []
+				},
+				{
+					"name": "Get SAPI ERROR Logs",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{mulesoft_access_token}}",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "X-ANYPNT-ORG-ID",
+								"value": "{{mulesoft_organization_id}}",
+								"type": "text"
+							},
+							{
+								"key": "X-ANYPNT-ENV-ID",
+								"value": "{{mulesoft_environment_id}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{api_base_url}}/applications/accl-dataverse-sys-api-qa/logs?level=ERROR&limit=100",
+							"host": [
+								"{{api_base_url}}"
+							],
+							"path": [
+								"applications",
+								"accl-dataverse-sys-api-qa",
+								"logs"
+							],
+							"query": [
+								{
+									"key": "level",
+									"value": "ERROR",
+									"description": "Filter by ERROR level"
+								},
+								{
+									"key": "limit",
+									"value": "100",
+									"description": "Maximum number of log entries"
+								}
+							]
+						},
+						"description": "Retrieves ERROR level logs for the SAPI application.\n\n**Application:** accl-dataverse-sys-api-qa\n**Filter:** ERROR level only"
+					},
+					"response": []
+				},
+				{
+					"name": "Search SAPI Logs - Dataverse",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{mulesoft_access_token}}",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "X-ANYPNT-ORG-ID",
+								"value": "{{mulesoft_organization_id}}",
+								"type": "text"
+							},
+							{
+								"key": "X-ANYPNT-ENV-ID",
+								"value": "{{mulesoft_environment_id}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{api_base_url}}/applications/accl-dataverse-sys-api-qa/logs?searchText=Dataverse&limit=100",
+							"host": [
+								"{{api_base_url}}"
+							],
+							"path": [
+								"applications",
+								"accl-dataverse-sys-api-qa",
+								"logs"
+							],
+							"query": [
+								{
+									"key": "searchText",
+									"value": "Dataverse",
+									"description": "Search for Dataverse events"
+								},
+								{
+									"key": "limit",
+									"value": "100",
+									"description": "Maximum number of log entries"
+								}
+							]
+						},
+						"description": "Searches for Dataverse-related events in SAPI logs.\n\n**Application:** accl-dataverse-sys-api-qa\n**Search:** \"Dataverse\""
+					},
+					"response": []
+				},
+				{
+					"name": "Search SAPI Logs - Flow Execution",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{mulesoft_access_token}}",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "X-ANYPNT-ORG-ID",
+								"value": "{{mulesoft_organization_id}}",
+								"type": "text"
+							},
+							{
+								"key": "X-ANYPNT-ENV-ID",
+								"value": "{{mulesoft_environment_id}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{api_base_url}}/applications/accl-dataverse-sys-api-qa/logs?searchText=accelins-parties-post-flow&limit=100",
+							"host": [
+								"{{api_base_url}}"
+							],
+							"path": [
+								"applications",
+								"accl-dataverse-sys-api-qa",
+								"logs"
+							],
+							"query": [
+								{
+									"key": "searchText",
+									"value": "accelins-parties-post-flow",
+									"description": "Search for flow execution"
+								},
+								{
+									"key": "limit",
+									"value": "100",
+									"description": "Maximum number of log entries"
+								}
+							]
+						},
+						"description": "Searches for flow execution events in SAPI logs.\n\n**Application:** accl-dataverse-sys-api-qa\n**Search:** \"accelins-parties-post-flow\""
+					},
+					"response": []
+				},
+				{
+					"name": "Search SAPI Logs - HTTP 400 Errors",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{mulesoft_access_token}}",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "X-ANYPNT-ORG-ID",
+								"value": "{{mulesoft_organization_id}}",
+								"type": "text"
+							},
+							{
+								"key": "X-ANYPNT-ENV-ID",
+								"value": "{{mulesoft_environment_id}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{api_base_url}}/applications/accl-dataverse-sys-api-qa/logs?searchText=status%3D400&limit=100",
+							"host": [
+								"{{api_base_url}}"
+							],
+							"path": [
+								"applications",
+								"accl-dataverse-sys-api-qa",
+								"logs"
+							],
+							"query": [
+								{
+									"key": "searchText",
+									"value": "status=400",
+									"description": "Search for HTTP 400 errors"
+								},
+								{
+									"key": "limit",
+									"value": "100",
+									"description": "Maximum number of log entries"
+								}
+							]
+						},
+						"description": "Searches for HTTP 400 errors in SAPI logs.\n\n**Application:** accl-dataverse-sys-api-qa\n**Search:** \"status=400\""
+					},
+					"response": []
+				},
+				{
+					"name": "Search SAPI Logs - Custom Text",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{mulesoft_access_token}}",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "X-ANYPNT-ORG-ID",
+								"value": "{{mulesoft_organization_id}}",
+								"type": "text"
+							},
+							{
+								"key": "X-ANYPNT-ENV-ID",
+								"value": "{{mulesoft_environment_id}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{api_base_url}}/applications/accl-dataverse-sys-api-qa/logs?searchText={{search_text}}&limit=100",
+							"host": [
+								"{{api_base_url}}"
+							],
+							"path": [
+								"applications",
+								"accl-dataverse-sys-api-qa",
+								"logs"
+							],
+							"query": [
+								{
+									"key": "searchText",
+									"value": "{{search_text}}",
+									"description": "Text to search for in logs"
+								},
+								{
+									"key": "limit",
+									"value": "100",
+									"description": "Maximum number of log entries"
+								}
+							]
+						},
+						"description": "Searches for custom text in SAPI logs.\n\n**Application:** accl-dataverse-sys-api-qa\n\n**Usage:**\nSet the `search_text` environment variable before running this request.\n\n**Example searches:**\n- Correlation ID (e.g., \"53ced740-f53d-11f0-91fb-9aaf90f8584b\")\n- Error messages\n- Specific flow names\n- HTTP status codes"
+					},
+					"response": []
+				},
+				{
+					"name": "Download SAPI Log File",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{mulesoft_access_token}}",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "X-ANYPNT-ORG-ID",
+								"value": "{{mulesoft_organization_id}}",
+								"type": "text"
+							},
+							{
+								"key": "X-ANYPNT-ENV-ID",
+								"value": "{{mulesoft_environment_id}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{api_base_url}}/applications/accl-dataverse-sys-api-qa/log-file",
+							"host": [
+								"{{api_base_url}}"
+							],
+							"path": [
+								"applications",
+								"accl-dataverse-sys-api-qa",
+								"log-file"
+							]
+						},
+						"description": "Downloads the raw log file for the SAPI application.\n\n**Application:** accl-dataverse-sys-api-qa\n\n**Response:**\nReturns the raw log file content as text."
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

@@ -1,0 +1,49 @@
+{
+  "key": "SF-477",
+  "summary": "Create Opportunity field Annual_GWP_Estimate_Year_1__c (editable) and sync updates back to Lead",
+  "type": "Story",
+  "status": "In QA",
+  "priority": "Medium",
+  "description": {
+    "raw": "User Story: As a  Salesforce Business User I want an Opportunity field called Annual_GWP_Estimate_Year_1__c (Currency) that is editable on Opportunity, and whenever that Opportunity value is updated it must also update the same field on the originating Lead So that  data stays consistent between Opportunity and the Lead it was created from and any changes on Opportunity are reflected on the Lead Description / Scope: Create a custom field on Opportunity with API name Annual_GWP_Estimate_Year_1__c (Currency). Ensure the Opportunity field is populated from Lead.Annual_GWP_Estimate_Year_1__c on Lead conversion. The opportunity field must be editable by users. When the Opportunity field value is changed (UI or API), update the originating Lead’s Annual_GWP_Estimate_Year_1__c to match.    This was part of   ‘s review and alignment of Hipten’s work  Consolidation and Review of Artefacts - Salesforce CLM - Confluence Acceptance Criteria (GIVEN / WHEN / THEN): Field creation GIVEN a Salesforce org WHEN I inspect Opportunity fields THEN there is a custom field named Annual_GWP_Estimate_Year_1__c on Opportunity with data type Currency Auto-populate on Lead conversion (primary flow) GIVEN a Lead with Annual_GWP_Estimate_Year_1__c populated WHEN that Lead is converted to create an Opportunity THEN Opportunity.Annual_GWP_Estimate_Year_1__c is populated with the Lead value as part of conversion Editable on Opportunity GIVEN any Salesforce user with edit rights to Opportunity WHEN they open an Opportunity record THEN they can edit Annual_GWP_Estimate_Year_1__c and save changes Sync back to Lead on update (primary requirement) GIVEN an Opportunity that was created from a Lead WHEN the Opportunity.Annual_GWP_Estimate_Year_1__c value is updated (UI or API) THEN the originating Lead’s Annual_GWP_Estimate_Year_1__c is updated to the same value automatically",
+    "parsed": {
+      "sentences": [
+        "User Story: As a  Salesforce Business User I want an Opportunity field called Annual_GWP_Estimate_Year_1__c (Currency) that is editable on Opportunity, and whenever that Opportunity value is updated it must also update the same field on the originating Lead So that  data stays consistent between Opportunity and the Lead it was created from and any changes on Opportunity are reflected on the Lead Description / Scope: Create a custom field on Opportunity with API name Annual_GWP_Estimate_Year_1__c (Currency)",
+        "Ensure the Opportunity field is populated from Lead.Annual_GWP_Estimate_Year_1__c on Lead conversion",
+        "The opportunity field must be editable by users",
+        "When the Opportunity field value is changed (UI or API), update the originating Lead’s Annual_GWP_Estimate_Year_1__c to match",
+        "This was part of   ‘s review and alignment of Hipten’s work  Consolidation and Review of Artefacts - Salesforce CLM - Confluence Acceptance Criteria (GIVEN / WHEN / THEN): Field creation GIVEN a Salesforce org WHEN I inspect Opportunity fields THEN there is a custom field named Annual_GWP_Estimate_Year_1__c on Opportunity with data type Currency Auto-populate on Lead conversion (primary flow) GIVEN a Lead with Annual_GWP_Estimate_Year_1__c populated WHEN that Lead is converted to create an Opportunity THEN Opportunity.Annual_GWP_Estimate_Year_1__c is populated with the Lead value as part of conversion Editable on Opportunity GIVEN any Salesforce user with edit rights to Opportunity WHEN they open an Opportunity record THEN they can edit Annual_GWP_Estimate_Year_1__c and save changes Sync back to Lead on update (primary requirement) GIVEN an Opportunity that was created from a Lead WHEN the Opportunity.Annual_GWP_Estimate_Year_1__c value is updated (UI or API) THEN the originating Lead’s Annual_GWP_Estimate_Year_1__c is updated to the same value automatically"
+      ],
+      "entities": [
+        "Opportunity",
+        "Lead"
+      ],
+      "fields": [
+        "Annual_GWP_Estimate_Year_1__c"
+      ],
+      "actions": [
+        "create",
+        "update",
+        "populate",
+        "auto-populate",
+        "convert"
+      ]
+    }
+  },
+  "acceptanceCriteria": [],
+  "comments": [],
+  "relatedIssues": [],
+  "fieldDefinitions": {
+    "Annual_GWP_Estimate_Year_1__c": {
+      "type": "Custom",
+      "required": false,
+      "description": "Field: Annual_GWP_Estimate_Year_1__c"
+    }
+  },
+  "generatedFeatures": {
+    "ui": "src/features/ui/SF/SF-477.feature",
+    "api": "src/features/api/SF/SF-477.feature"
+  },
+  "qaReviewedFeatures": {},
+  "extractedAt": "2025-12-17T18:40:43.616Z"
+}

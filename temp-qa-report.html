@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Weekly Program QA Report - SF & ST</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      line-height: 1.6;
+      color: #172B4D;
+      background-color: #F4F5F7;
+      margin: 0;
+      padding: 20px;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background-color: #FFFFFF;
+      padding: 32px;
+      border-radius: 4px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+    h1, h2, h3, h4 {
+      color: #172B4D;
+      margin-top: 24px;
+      margin-bottom: 12px;
+    }
+    h1 { font-size: 28px; }
+    h2 { font-size: 24px; }
+    h3 { font-size: 20px; }
+    h4 { font-size: 16px; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0;
+    }
+    th, td {
+      padding: 12px;
+      text-align: left;
+      border: 1px solid #dfe1e6;
+    }
+    th {
+      background-color: #F4F5F7;
+      font-weight: 600;
+    }
+    code {
+      background-color: #f4f5f7;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+      font-size: 13px;
+    }
+    pre {
+      background-color: #f4f5f7;
+      border: 1px solid #dfe1e6;
+      border-radius: 4px;
+      padding: 12px;
+      overflow-x: auto;
+    }
+    ul, ol {
+      margin: 12px 0;
+      padding-left: 24px;
+    }
+    li {
+      margin: 6px 0;
+    }
+    hr {
+      border: none;
+      border-top: 2px solid #dfe1e6;
+      margin: 20px 0;
+    }
+    .chart-container {
+      text-align: center;
+      margin: 20px 0;
+    }
+    svg {
+      max-width: 100%;
+      height: auto;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    
+    <div style="background: linear-gradient(135deg, #0052CC 0%, #0065FF 100%); padding: 24px; border-radius: 8px; margin-bottom: 20px;">
+      <h1 style="color: white; margin: 0 0 8px 0; font-size: 32px;">Weekly Program QA Report</h1>
+      <p style="color: rgba(255,255,255,0.9); margin: 0; font-size: 14px;">
+        <strong>Projects:</strong> SF & ST | <strong>Report Date:</strong> January 30, 2026 at 02:51 PM
+      </p>
+    </div>
+    
+    <!-- Executive Summary Section -->
+    <div style="background-color: #ffffff; border: 1px solid #dfe1e6; border-radius: 4px; padding: 16px; margin: 16px 0;"><div style="font-weight: bold; color: #42526E; font-size: 16px; margin-bottom: 12px;">📋 Executive Summary</div><div>
+        <!-- Overall Status - Yellow Highlighted -->
+        <div style="background-color: #FFF4E5; border: 2px solid #FFAB00; border-radius: 6px; padding: 20px; margin-bottom: 20px;">
+          <div style="text-align: center;">
+            <div style="display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 0;">
+              <span style="font-size: 32px;">⚠️</span>
+              <div style="font-size: 28px; font-weight: bold; color: #FFAB00;">Overall Status: At Risk</div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Key Highlights -->
+        <div style="background-color: #f4f5f7; border-radius: 6px; padding: 20px; margin-bottom: 16px;">
+          <h3 style="color: #0052CC; font-size: 18px; font-weight: bold; margin: 0 0 12px 0; border-bottom: 2px solid #0052CC; padding-bottom: 8px;">Sprint Progress Highlights</h3>
+          
+          <!-- Test Progress -->
+          <div style="margin-bottom: 16px;">
+            <h4 style="color: #0052CC; font-size: 16px; font-weight: bold; margin: 0 0 8px 0;">Test Progress</h4>
+            <div style="color: #6B778C; font-size: 14px; line-height: 1.6; margin-bottom: 8px;">
+              Both ST and SF teams are merged together. QA team is focusing on the Salesforce specific work items and the carry over items from last sprint which are in QA backlog. Currently all integration work is On-Hold waiting for Salesforce functionalities to be developed.
+            </div>
+            <div style="color: #6B778C; font-size: 14px; line-height: 1.6; margin-bottom: 0;">
+              This week - QA was asked to focus on items related to Lead Object (SF-289) and we were able to make good progress on it (Out of 11 work items, 4 are QA signed Off, 4 are blocked due to various reasons and 3 are waiting on BA/DEV work completion).
+            </div>
+          </div>
+          
+          <!-- Updated Testing Approach -->
+          <div style="margin-bottom: 16px;">
+            <h4 style="color: #0052CC; font-size: 16px; font-weight: bold; margin: 0 0 8px 0;">✓ Updated Testing Approach</h4>
+            <div style="color: #6B778C; font-size: 14px; line-height: 1.6; margin-bottom: 8px;">
+              The QA team has adopted a risk-based testing strategy that focuses on comprehensive UI testing combined with minimal API smoke tests. This approach reduces testing time while maintaining high quality confidence. For more details refer to <a href="https://accelins.atlassian.net/wiki/spaces/SA/pages/2532114485/QA+Test+Plan+Strategy+and+Approach" target="_blank" style="color: #0052CC; text-decoration: underline;">QA Test Plan</a>.
+            </div>
+            <div style="color: #6B778C; font-size: 14px; line-height: 1.6; margin-bottom: 0;">
+              MuleSoft integration testing has also progressed, with available APIs being validated. This work helps prepare for resumption of ST integration testing once Salesforce dependencies are resolved.
+            </div>
+          </div>
+          
+          <!-- Open Risks & Dependencies -->
+          <div style="margin-bottom: 0;">
+            <h4 style="color: #0052CC; font-size: 16px; font-weight: bold; margin: 0 0 8px 0;">⚠️ Open Risks & Dependencies</h4>
+            <ul style="color: #6B778C; font-size: 14px; line-height: 1.6; margin: 0; padding-left: 20px;">
+              <li style="margin-bottom: 4px;">Salesforce personas are not yet fully defined, limiting full test coverage</li>
+              <li style="margin-bottom: 4px;">Migration and integration mapping requirements are still being finalized</li>
+              <li style="margin-bottom: 0;">ST integration testing remains dependent on Salesforce feature completion and stabilization</li>
+            </ul>
+          </div>
+        </div>
+        
+        <!-- Test Execution Summary -->
+        <div style="background-color: #E3FCEF; border-left: 4px solid #36B37E; border-radius: 4px; padding: 16px; margin-top: 16px;">
+          <div style="font-weight: bold; color: #42526E; font-size: 15px; margin-bottom: 8px;">📊 Test Execution Summary</div>
+          <div style="color: #6B778C; font-size: 14px; line-height: 1.7;">
+            <strong style="color: #0052CC;">910 test executions</strong> have been completed with a pass rate of <strong style="color: #DE350B;">76.5%</strong> 
+            (<strong>361 passed</strong>, <strong>95 failed</strong>). 
+            <strong style="color: #0052CC;">121 new test cases</strong> were created this sprint.
+          </div>
+        </div>
+      </div></div>
+    
+    <!-- Grid Layout for Single Page View - 2x2 Grid -->
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+      <!-- Key Metrics Panel -->
+      <div style="background-color: #ffffff; border: 1px solid #dfe1e6; border-radius: 4px; padding: 16px; margin: 16px 0;"><div style="font-weight: bold; color: #42526E; font-size: 16px; margin-bottom: 12px;">📊 Key Metrics</div><div>
+          <table style="width: 100%; border-collapse: collapse;">
+            <tr>
+              <td style="padding: 16px; text-align: center; border: 1px solid #dfe1e6; width: 50%;">
+                <div style="font-size: 36px; font-weight: bold; color: #0052CC; margin-bottom: 4px;">100</div>
+                <div style="color: #42526E; font-size: 14px; font-weight: 500; margin-bottom: 4px;">Work Items</div>
+                <div style="color: #6B778C; font-size: 12px;">
+                  0 In QA | 18 Ready for UAT
+                </div>
+              </td>
+              <td style="padding: 16px; text-align: center; border: 1px solid #dfe1e6; width: 50%;">
+                <div style="font-size: 36px; font-weight: bold; color: #0052CC; margin-bottom: 4px;">1146</div>
+                <div style="color: #42526E; font-size: 14px; font-weight: 500; margin-bottom: 4px;">Test Cases</div>
+                <div style="color: #6B778C; font-size: 12px;">
+                  121 created this sprint
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding: 16px; text-align: center; border: 1px solid #dfe1e6; width: 50%;">
+                <div style="font-size: 36px; font-weight: bold; color: #DE350B; margin-bottom: 4px;">
+                  76.5%
+                </div>
+                <div style="color: #42526E; font-size: 14px; font-weight: 500; margin-bottom: 4px;">Test Pass Rate</div>
+                <div style="color: #6B778C; font-size: 12px;">
+                  361/910 passed
+                </div>
+              </td>
+              <td style="padding: 16px; text-align: center; border: 1px solid #dfe1e6; width: 50%;">
+                <div style="font-size: 36px; font-weight: bold; color: #DE350B; margin-bottom: 4px;">18</div>
+                <div style="color: #42526E; font-size: 14px; font-weight: 500; margin-bottom: 4px;">Open Bugs</div>
+                <div style="color: #6B778C; font-size: 12px;">
+                  38 total | 52.6% resolved
+                </div>
+              </td>
+            </tr>
+          </table>
+        </div></div>
+      
+      <!-- Test Execution Panel -->
+      
+    <div style="background-color: #ffffff; border: 1px solid #dfe1e6; border-radius: 4px; padding: 16px; margin: 16px 0;"><div style="font-weight: bold; color: #42526E; font-size: 16px; margin-bottom: 12px;">✅ Test Execution Results</div><div>
+        <table style="width: 100%; border-collapse: collapse;">
+          <tr>
+            <td style="padding: 16px; border: 1px solid #dfe1e6; background-color: white; text-align: center; width: 50%;">
+              <div style="font-size: 14px; color: #42526E; margin-bottom: 4px;">Total Executions</div>
+              <div style="font-size: 32px; font-weight: bold; color: #0052CC;">910</div>
+            </td>
+            <td style="padding: 16px; border: 1px solid #dfe1e6; background-color: white; text-align: center; width: 50%;">
+              <div style="font-size: 14px; color: #42526E; margin-bottom: 4px;">Passed</div>
+              <div style="font-size: 32px; font-weight: bold; color: #36B37E;">361</div>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 16px; border: 1px solid #dfe1e6; background-color: white; text-align: center; width: 50%;">
+              <div style="font-size: 14px; color: #42526E; margin-bottom: 4px;">Failed</div>
+              <div style="font-size: 32px; font-weight: bold; color: #DE350B;">95</div>
+            </td>
+            <td style="padding: 16px; border: 1px solid #dfe1e6; background-color: white; text-align: center; width: 50%;">
+              <div style="font-size: 14px; color: #42526E; margin-bottom: 4px;">Not Executed</div>
+              <div style="font-size: 32px; font-weight: bold; color: #42526E;">438</div>
+            </td>
+          </tr>
+        </table>
+        <div style="margin-top: 16px; padding: 12px; background-color: #FFEBE6; border-radius: 4px; border-left: 4px solid #DE350B;">
+          <div style="font-size: 16px; color: #42526E; margin-bottom: 4px;"><strong>Pass Rate</strong></div>
+          <div style="font-size: 36px; font-weight: bold; color: #DE350B;">76.5%</div>
+        </div>
+        <div style="margin-top: 20px; padding: 16px; background-color: white; border-radius: 4px; border: 1px solid #dfe1e6;">
+          <div style="font-size: 14px; color: #42526E; font-weight: bold; margin-bottom: 16px;">Test Execution Dashboard</div>
+          
+          <!-- Overall Progress Chart -->
+          <div style="margin-bottom: 24px;">
+            <div style="font-size: 16px; font-weight: bold; color: #42526E; margin-bottom: 12px; text-align: center;">Overall Progress</div>
+            <div style="display: flex; align-items: center; justify-content: center; gap: 30px;">
+              <!-- Donut Chart Visualization -->
+              <div style="position: relative; width: 150px; height: 150px;">
+                <svg width="150" height="150" viewBox="0 0 150 150" style="transform: rotate(-90deg);">
+                  <circle cx="75" cy="75" r="60" fill="none" stroke="#dfe1e6" stroke-width="20"/>
+                  <circle cx="75" cy="75" r="60" fill="none" stroke="#00B8D9" stroke-width="20" 
+                          stroke-dasharray="195.54285714285717 377" 
+                          stroke-dashoffset="0" stroke-linecap="round"/>
+                </svg>
+                <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center;">
+                  <div style="font-size: 24px; font-weight: bold; color: #0052CC;">472</div>
+                  <div style="font-size: 12px; color: #6B778C;">Completed</div>
+                </div>
+              </div>
+              <!-- Legend -->
+              <div style="display: flex; flex-direction: column; gap: 8px;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <div style="width: 16px; height: 16px; background-color: #00B8D9; border-radius: 2px;"></div>
+                  <span style="font-size: 14px; color: #42526E;">Completed: 472</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <div style="width: 16px; height: 16px; background-color: #dfe1e6; border-radius: 2px;"></div>
+                  <span style="font-size: 14px; color: #42526E;">Remaining: 438</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Test Execution Results Chart -->
+          <div>
+            <div style="font-size: 16px; font-weight: bold; color: #42526E; margin-bottom: 12px; text-align: center;">Test Execution Results</div>
+            <div style="display: flex; align-items: center; justify-content: center; gap: 30px;">
+              <!-- Donut Chart Visualization -->
+              <div style="position: relative; width: 150px; height: 150px;">
+                <svg width="150" height="150" viewBox="0 0 150 150" style="transform: rotate(-90deg);">
+                  <circle cx="75" cy="75" r="60" fill="none" stroke="#dfe1e6" stroke-width="20"/>
+                  <!-- Pass (green) -->
+                  <circle cx="75" cy="75" r="60" fill="none" stroke="#36B37E" stroke-width="20" 
+                          stroke-dasharray="149.55714285714285 377" 
+                          stroke-dashoffset="0" stroke-linecap="round"/>
+                  <!-- Fail (red) -->
+                  <circle cx="75" cy="75" r="60" fill="none" stroke="#DE350B" stroke-width="20" 
+                          stroke-dasharray="39.35714285714286 377" 
+                          stroke-dashoffset="-149.55714285714285" stroke-linecap="round"/>
+                  <!-- Not Executed (grey) -->
+                  <circle cx="75" cy="75" r="60" fill="none" stroke="#dfe1e6" stroke-width="20" 
+                          stroke-dasharray="181.45714285714286 377" 
+                          stroke-dashoffset="-188.9142857142857" stroke-linecap="round"/>
+                  <!-- Blocked (blue) - small segment -->
+                  <circle cx="75" cy="75" r="60" fill="none" stroke="#0052CC" stroke-width="20" 
+                          stroke-dasharray="6.628571428571429 377" 
+                          stroke-dashoffset="-370.37142857142857" stroke-linecap="round"/>
+                  <!-- In Progress (orange) - small segment -->
+                  
+                </svg>
+                <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center;">
+                  <div style="font-size: 20px; font-weight: bold; color: #0052CC;">910</div>
+                  <div style="font-size: 11px; color: #6B778C;">Total</div>
+                </div>
+              </div>
+              <!-- Legend -->
+              <div style="display: flex; flex-direction: column; gap: 8px;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <div style="width: 16px; height: 16px; background-color: #DE350B; border-radius: 2px;"></div>
+                  <span style="font-size: 14px; color: #42526E;">Fail: 95</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <div style="width: 16px; height: 16px; background-color: #dfe1e6; border-radius: 2px;"></div>
+                  <span style="font-size: 14px; color: #42526E;">Not Executed: 438</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <div style="width: 16px; height: 16px; background-color: #36B37E; border-radius: 2px;"></div>
+                  <span style="font-size: 14px; color: #42526E;">Pass: 361</span>
+                </div>
+                
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <div style="width: 16px; height: 16px; background-color: #0052CC; border-radius: 2px;"></div>
+                  <span style="font-size: 14px; color: #42526E;">Blocked: 16</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Zephyr Dashboard Images Section -->
+        <div style="margin-top: 24px; padding: 16px; background-color: white; border-radius: 4px; border: 1px solid #dfe1e6;">
+          <div style="font-size: 14px; color: #42526E; font-weight: bold; margin-bottom: 16px;">📊 Zephyr Test Execution Dashboard</div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 16px;">
+            <div style="text-align: center; padding: 12px; background-color: #f4f5f7; border-radius: 4px;">
+              <div style="font-size: 12px; color: #6B778C; margin-bottom: 8px;">Overall Progress</div>
+              <div style="font-size: 11px; color: #42526E;">
+                <strong>Completed:</strong> 472 | <strong>Remaining:</strong> 438
+              </div>
+              <div style="margin-top: 8px; font-size: 10px; color: #6B778C; font-style: italic;">
+                [Image: Test execution results summary - Overall Progress donut chart]
+              </div>
+            </div>
+            <div style="text-align: center; padding: 12px; background-color: #f4f5f7; border-radius: 4px;">
+              <div style="font-size: 12px; color: #6B778C; margin-bottom: 8px;">Test Execution Results</div>
+              <div style="font-size: 11px; color: #42526E;">
+                <strong>Pass:</strong> 361 | <strong>Fail:</strong> 95 | <strong>Not Executed:</strong> 438 | <strong>Blocked:</strong> 16
+              </div>
+              <div style="margin-top: 8px; font-size: 10px; color: #6B778C; font-style: italic;">
+                [Image: Test execution results summary - Test Execution Results donut chart]
+              </div>
+            </div>
+          </div>
+          <div style="padding: 12px; background-color: #f4f5f7; border-radius: 4px;">
+            <div style="font-size: 12px; color: #6B778C; margin-bottom: 8px;">Test Execution Completion Over Time</div>
+            <div style="font-size: 10px; color: #6B778C; font-style: italic;">
+              [Image: Line graph showing accumulated test executions by status over time (Nov 2025 - Jan 2026)]
+            </div>
+          </div>
+          <div style="margin-top: 12px; padding: 8px; background-color: #E3FCEF; border-left: 3px solid #36B37E; border-radius: 3px;">
+            <div style="font-size: 11px; color: #42526E;">
+              <strong>Note:</strong> Dashboard images should be uploaded to Confluence and embedded here. The numbers above reflect the current dashboard data as of January 30, 2026 at 02:51 PM.
+            </div>
+          </div>
+        </div>
+      </div></div>
+  
+      
+      <!-- Test Cases Panel -->
+      
+    <div style="background-color: #ffffff; border: 1px solid #dfe1e6; border-radius: 4px; padding: 16px; margin: 16px 0;"><div style="font-weight: bold; color: #42526E; font-size: 16px; margin-bottom: 12px;">🧪 Test Case Metrics</div><div>
+        <table style="width: 100%; border-collapse: collapse;">
+          <tr>
+            <td style="padding: 16px; border: 1px solid #dfe1e6; background-color: white; text-align: center; width: 50%;">
+              <div style="font-size: 14px; color: #42526E; margin-bottom: 4px;">Total Test Cases</div>
+              <div style="font-size: 32px; font-weight: bold; color: #0052CC;">1146</div>
+            </td>
+            <td style="padding: 16px; border: 1px solid #dfe1e6; background-color: white; text-align: center; width: 50%;">
+              <div style="font-size: 14px; color: #42526E; margin-bottom: 4px;">Created This Sprint</div>
+              <div style="font-size: 32px; font-weight: bold; color: #36B37E;">121</div>
+            </td>
+          </tr>
+          <tr>
+          </tr>
+        </table>
+      </div></div>
+  
+      
+      <!-- Bugs Panel -->
+      
+    <div style="background-color: #ffffff; border: 1px solid #dfe1e6; border-radius: 4px; padding: 16px; margin: 16px 0;"><div style="font-weight: bold; color: #42526E; font-size: 16px; margin-bottom: 12px;">🐛 Bug Status & Quality Metrics</div><div>
+        <table style="width: 100%; border-collapse: collapse;">
+          <tr>
+            <td style="padding: 16px; border: 1px solid #dfe1e6; background-color: white; text-align: center; width: 50%;">
+              <div style="font-size: 14px; color: #42526E; margin-bottom: 4px;">Total Bugs</div>
+              <div style="font-size: 32px; font-weight: bold; color: #0052CC;">38</div>
+            </td>
+            <td style="padding: 16px; border: 1px solid #dfe1e6; background-color: white; text-align: center; width: 50%;">
+              <div style="font-size: 14px; color: #42526E; margin-bottom: 4px;">Open</div>
+              <div style="font-size: 32px; font-weight: bold; color: #DE350B;">18</div>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 16px; border: 1px solid #dfe1e6; background-color: white; text-align: center; width: 50%;">
+              <div style="font-size: 14px; color: #42526E; margin-bottom: 4px;">Resolved</div>
+              <div style="font-size: 32px; font-weight: bold; color: #36B37E;">20</div>
+            </td>
+            <td style="padding: 16px; border: 1px solid #dfe1e6; background-color: white; text-align: center; width: 50%;">
+              <div style="font-size: 14px; color: #42526E; margin-bottom: 4px;">Resolution Rate</div>
+              <div style="font-size: 32px; font-weight: bold; color: #0052CC;">52.6%</div>
+            </td>
+          </tr>
+        </table>
+      </div></div>
+  
+    </div>
+    
+    <!-- Filter Info Panel -->
+    <div style="background-color: #E3FCEF; border-left: 4px solid #36B37E; border-radius: 4px; padding: 16px; margin: 16px 0;"><div style="font-weight: bold; color: #42526E; font-size: 15px; margin-bottom: 8px;">ℹ️ Work Items Filter Criteria</div><div style="color: #6B778C; font-size: 14px;">
+        <p><strong>This report includes work items that meet the following criteria:</strong></p>
+        <ul>
+          <li>Projects: <code>SF, ST</code></li>
+          <li>Work Type: <code>Story</code></li>
+          <li><strong>Status Filter:</strong> Excludes work items with status: <code>Backlog</code>, <code>Approved</code>, <code>Cancelled</code>, <code>"Not Started"</code>, <code>CANCELED</code>, <code>Done</code></li>
+        </ul>
+        <p><strong>JQL Query:</strong> <code>project IN (SF, ST) AND status NOT IN (Backlog, Approved, Cancelled, "Not Started", CANCELED, Done) AND worktype = Story</code></p>
+        <p><em>Note: Based on Jira board filter showing 100 work items. Work items marked as "Done" before December 2025 have been excluded.</em></p>
+      </div></div>
+    
+    <hr style="border: none; border-top: 2px solid #dfe1e6; margin: 20px 0;"/>
+    <div style="background-color: #f4f5f7; padding: 12px; border-radius: 4px;">
+      <p style="margin: 0; color: #6B778C; font-size: 11px;">
+        <strong>Report Generated:</strong> January 30, 2026 at 02:51 PM | <strong>Source:</strong> E2E Automation Framework | <strong>Data Sources:</strong> Jira (SF, ST) & Zephyr Scale
+      </p>
+    </div>
+  
+  </div>
+</body>
+</html>

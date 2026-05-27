@@ -1,0 +1,65 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "description": "Mapping from Salesforce Account object to SQL Server table",
+  "source": {
+    "system": "Salesforce",
+    "object": "Account"
+  },
+  "target": {
+    "database": "Reporting",
+    "table": "Accounts",
+    "schema": "dbo"
+  },
+  "fieldMappings": [
+    {
+      "sourceField": "Id",
+      "sqlColumn": "SalesforceId",
+      "description": "Salesforce Account ID"
+    },
+    {
+      "sourceField": "Name",
+      "sqlColumn": "AccountName",
+      "description": "Account name"
+    },
+    {
+      "sourceField": "Type",
+      "sqlColumn": "AccountType",
+      "description": "Account type"
+    },
+    {
+      "sourceField": "Industry",
+      "sqlColumn": "Industry",
+      "description": "Industry classification"
+    },
+    {
+      "sourceField": "Phone",
+      "sqlColumn": "Phone",
+      "description": "Phone number"
+    },
+    {
+      "sourceField": "Website",
+      "sqlColumn": "Website",
+      "description": "Website URL"
+    },
+    {
+      "sourceField": "CreatedDate",
+      "sqlColumn": "CreatedDate",
+      "description": "Record creation date",
+      "transform": "datetime"
+    },
+    {
+      "sourceField": "LastModifiedDate",
+      "sqlColumn": "LastModifiedDate",
+      "description": "Last modification date",
+      "transform": "datetime"
+    }
+  ],
+  "keyFields": [
+    {
+      "sourceField": "Id",
+      "sqlColumn": "SalesforceId",
+      "description": "Primary key for matching records"
+    }
+  ]
+}
+

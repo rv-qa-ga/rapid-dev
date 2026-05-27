@@ -1,0 +1,224 @@
+name: Smoke Tests
+
+# Runs smoke tests via Zephyr "Smoke Tests" cycle (test:regression --cycle "Smoke Tests").
+# If the cycle is missing or no test case IDs are extracted, a tag-based fallback runs
+# src/features/ui/General/qa-smoke-test.feature with @smoke. Ensure the branch checked out
+# (e.g. main) contains the smoke feature and steps (merge from Smoke-Tests-Automation or Sprint100 if needed).
+
+on:
+  # Run smoke tests on schedule (optional - adjust as needed)
+  # schedule:
+  #   - cron: '0 8 * * *'  # Daily at 8 AM UTC
+  # Allow manual trigger
+  workflow_dispatch:
+    inputs:
+      work_item:
+        description: 'Jira work item for smoke tests (optional). Related item: SF-699'
+        required: false
+        type: string
+      cycle_name:
+        description: 'Zephyr test cycle name (default: Smoke Tests)'
+        required: false
+        type: string
+        default: 'Smoke Tests'
+      environment:
+        description: 'Environment (dev, qa, uat)'
+        required: false
+        default: 'qa'
+        type: choice
+        options:
+          - dev
+          - qa
+          - uat
+      branch:
+        description: 'Branch to checkout (defaults to main)'
+        required: false
+        type: string
+        default: 'main'
+
+# Concurrency control: Only one smoke test run at a time
+concurrency:
+  group: smoke-tests
+  cancel-in-progress: false  # Queue instead of cancel
+
+jobs:
+  smoke-tests:
+    # Self-hosted runner on Linux VM (UK South region)
+    runs-on: self-hosted
+    timeout-minutes: 60  # Smoke tests should be faster than regression
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.branch || 'main' }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install system dependencies
+        run: |
+          sudo DEBIAN_FRONTEND=noninteractive apt-get update
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y \
+            libnss3 \
+            libnspr4 \
+            libatk1.0-0 \
+            libatk-bridge2.0-0 \
+            libcups2 \
+            libdrm2 \
+            libdbus-1-3 \
+            libxkbcommon0 \
+            libxcomposite1 \
+            libxdamage1 \
+            libxfixes3 \
+            libxrandr2 \
+            libgbm1 \
+            libasound2 \
+            libpango-1.0-0 \
+            libcairo2 \
+            libxshmfence1 \
+            libxss1 \
+            libgconf-2-4 \
+            fonts-liberation \
+            libappindicator3-1 \
+            xdg-utils || true
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Copy .env.qa file if available
+        # Copy .env.qa from persistent location on VM (if it exists)
+        # This allows keeping credentials on the VM without committing them
+        # Security: File is hidden (starts with .) and has restrictive permissions (600)
+        run: |
+          ENV_FILE="/home/github-runner/.env.qa"
+          TARGET_DIR="src/config/env"
+          
+          if [ -f "$ENV_FILE" ]; then
+            echo "📁 Found .env.qa on VM, copying to workspace..."
+            mkdir -p "$TARGET_DIR"
+            cp "$ENV_FILE" "$TARGET_DIR/.env.qa"
+            # Set restrictive permissions: owner read/write only (600 = rw-------)
+            chmod 600 "$TARGET_DIR/.env.qa"
+            # Verify permissions
+            ls -la "$TARGET_DIR/.env.qa" | awk '{print "✅ File permissions: " $1 " (owner: " $3 ":" $4 ")"}'
+            echo "✅ .env.qa copied securely"
+          else
+            echo "ℹ️  No .env.qa found at $ENV_FILE"
+            echo "   Using GitHub Secrets and JSON config only"
+          fi
+        continue-on-error: true
+        # Don't show command output that might expose file contents
+        shell: bash
+
+      - name: Copy certificates if available
+        # Copy certificates from persistent location on VM (if they exist)
+        run: |
+          CERTS_DIR="/home/github-runner/certs"
+          TARGET_DIR="certs"
+          
+          if [ -d "$CERTS_DIR" ]; then
+            echo "📁 Found certificates on VM, copying to workspace..."
+            mkdir -p "$TARGET_DIR"
+            cp -r "$CERTS_DIR"/* "$TARGET_DIR/" || true
+            # Set restrictive permissions on certificate files
+            find "$TARGET_DIR" -type f -exec chmod 600 {} \;
+            echo "✅ Certificates copied securely"
+          else
+            echo "ℹ️  No certificates found at $CERTS_DIR"
+          fi
+        continue-on-error: true
+        shell: bash
+
+      - name: Set smoke test work item
+        id: set-work-item
+        run: |
+          if [ -n "${{ github.event.inputs.work_item }}" ]; then
+            echo "work_item=${{ github.event.inputs.work_item }}" >> $GITHUB_OUTPUT
+            echo "✅ Using work item: ${{ github.event.inputs.work_item }}"
+          else
+            echo "work_item=" >> $GITHUB_OUTPUT
+            echo "ℹ️  No work item specified - running smoke tests only"
+          fi
+
+      - name: Run smoke tests
+        env:
+          ENV: ${{ github.event.inputs.environment || 'qa' }}
+          HEADLESS: true
+          CI: true
+          TAKE_SCREENSHOTS: true
+          CAPTURE_EVIDENCE: true
+          # Atlassian credentials
+          ATLASSIAN_EMAIL: ${{ secrets.ATLASSIAN_EMAIL }}
+          ATLASSIAN_API_TOKEN: ${{ secrets.ATLASSIAN_API_TOKEN }}
+          JIRA_BASE_URL: ${{ secrets.JIRA_BASE_URL }}
+          # Zephyr credentials
+          ZEPHYR_BASE_URL: ${{ secrets.ZEPHYR_BASE_URL }}
+          ZEPHYR_PROJECT_KEY: ${{ secrets.ZEPHYR_PROJECT_KEY }}
+          ZEPHYR_API_TOKEN: ${{ secrets.ZEPHYR_API_TOKEN }}
+        run: |
+          CYCLE_NAME="${{ github.event.inputs.cycle_name || 'Smoke Tests' }}"
+          WORK_ITEM="${{ steps.set-work-item.outputs.work_item }}"
+          
+          echo "🚀 Running smoke tests"
+          echo "   Cycle: ${CYCLE_NAME}"
+          if [ -n "${WORK_ITEM}" ]; then
+            echo "   Work Item: ${WORK_ITEM}"
+          fi
+          echo "   Environment: ${ENV}"
+          
+          # Run from test cycle (primary method) - gets test cases directly from cycle
+          # Optionally include work item for result tracking
+          if [ -n "${WORK_ITEM}" ]; then
+            npm run test:regression -- \
+              --cycle "${CYCLE_NAME}" \
+              --work-item "${WORK_ITEM}" \
+              --environment "${ENV}"
+          else
+            npm run test:regression -- \
+              --cycle "${CYCLE_NAME}" \
+              --environment "${ENV}"
+          fi
+
+      - name: Upload test artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: smoke-test-results-${{ github.run_number }}
+          path: |
+            reports/**/*
+            artifacts/**/*
+          retention-days: 30
+
+      - name: Publish test summary
+        if: always()
+        run: |
+          echo "📊 Checking for test reports..."
+          if [ -f reports/json/cucumber-report.json ]; then
+            echo "✅ Test results found: reports/json/cucumber-report.json"
+            echo "   Results will be uploaded to Zephyr Scale"
+          elif [ -f reports/cucumber-report.json ]; then
+            echo "✅ Test results found: reports/cucumber-report.json"
+            echo "   Results will be uploaded to Zephyr Scale"
+          else
+            echo "⚠️  No test report generated"
+            echo "   Expected location: reports/json/cucumber-report.json or reports/cucumber-report.json"
+            echo "   Available files in reports/:"
+            find reports/ -name "*.json" -type f 2>/dev/null | head -10 || echo "   (reports directory may not exist)"
+          fi
+          
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## Smoke Test Execution Summary" >> $GITHUB_STEP_SUMMARY
+          echo "- **Cycle**: ${{ github.event.inputs.cycle_name || 'Smoke Tests' }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Environment**: ${{ github.event.inputs.environment || 'qa' }}" >> $GITHUB_STEP_SUMMARY
+          if [ -n "${{ github.event.inputs.work_item }}" ]; then
+            echo "- **Work Item**: ${{ github.event.inputs.work_item }}" >> $GITHUB_STEP_SUMMARY
+          fi
+          echo "- **Run Number**: ${{ github.run_number }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Artifacts**: Available in Actions tab" >> $GITHUB_STEP_SUMMARY

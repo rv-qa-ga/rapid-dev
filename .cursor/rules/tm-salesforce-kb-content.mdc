@@ -1,0 +1,20 @@
+---
+description: When updating TM Salesforce knowledge base Confluence content, use Jira-linked Gherkin + repo kb features as sources of truth.
+globs:
+  - scripts/knowledge/sync-tm-salesforce-kb-capability.ts
+  - src/features/kb/sf/**/*
+  - docs/knowledge/TM_SALESFORCE_KB_PLAN.md
+---
+
+# TM Salesforce KB — content updates
+
+When editing **Confluence body templates** in `scripts/knowledge/sync-tm-salesforce-kb-capability.ts` (or adding capabilities):
+
+1. **Read** `src/features/**/SF/*.feature` (and `ui/General` smoke where relevant) for the same theme — use **file header comments** (Jira key, summary) and **Feature:** line + scenarios.
+2. **Cite canonical Jira** with browse links (`https://accelins.atlassian.net/browse/SF-xxx` unless `JIRA_BASE_URL` differs). Prefer **higher SF number** when stories conflict; note drift → TM **Drift log**.
+3. **Reference Layer B** paths under `src/features/kb/sf/<capability>/` and tags `@kb_sf_<capability>_ui_001` / `_api_001`.
+4. **Do not** paste full Gherkin into Confluence — summarise **behaviour** and point to **file paths** for auditors.
+5. **Publishing:** interactive sync with **Y** per page, **or** unattended `npm run confluence:sync:tm-sf-kb-<capability> -- --apply-updates` (overwrites **all** pages for that capability from the script — no prompts). Use `--missing-only` only to add missing pages without overwriting.
+6. **Child page titles** must stay **unique in TM space** (use `{Capability} — Subtopic` when a generic name like "Create" would collide).
+
+Update **docs/knowledge/TM_SALESFORCE_KB_PLAN.md** progress table when a capability’s template moves from stub to filled.

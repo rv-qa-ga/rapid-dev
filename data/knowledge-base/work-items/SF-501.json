@@ -1,0 +1,62 @@
+{
+  "key": "SF-501",
+  "summary": "Account, Opportunity, Role consolidation",
+  "type": "Story",
+  "status": "In QA",
+  "priority": "Medium",
+  "description": {
+    "raw": "Scope: Hide Account Contact Relationship Currency (Account Contact) Delete Relationship_Strength__c (Account Contact) Remove picklist value “Other” from Roles and add help text (Account Contact ) User Story As a Product Owner / Data Owner I want the Account Contact Relationship field  Account Contact Relationship Currency  hidden, the Account Contact Relationship field  Relationship_Strength__c  removed, and the Roles picklist value  Other  removed (with help text added to guide users how to request a new role) So that the UI is cleaner, obsolete fields are removed, and users have clear guidance when the available Roles do not apply Description / Scope Account Contact Relationship:  Hide  Account Contact Relationship Currency  from standard users (remove from page layouts and set FLS so non-admins can’t see it). Keep the field in the schema for admins/support if needed. Account Contact Relationship:  Delete  Relationship_Strength__c  from the  Account Contact  object. Ensure automations, metadata and integrations are updated to remove references. (No existing data to migrate.) Roles:  Remove the  Other  picklist value from Roles. Add concise help text on the Roles field explaining how to request a new role when none of the options fit. Acceptance Criteria (GIVEN / WHEN / THEN) Account Contact Relationship  — hide field GIVEN a non-admin user WHEN they open an Account Contact Relationship record THEN  Account Contact Relationship Currency  is not visible on the page, compact layout or list views Account Contact Relationship — delete field GIVEN the Account Contact Relationship object after deployment WHEN users and systems interact with Account Contact Relationship metadata THEN  Relationship_Strength__c  is no longer present on Account Contact Relationship and no automations or integrations reference it Roles — remove Other & add help text GIVEN the Roles picklist WHEN a user views or edits Roles THEN the value  Other  is not available and field help text explains how to request a new role (example help text: “If a suitable role is not listed, contact the CRM Administrator or submit a Role Request to the Service Desk.”)",
+    "parsed": {
+      "sentences": [
+        "Scope: Hide Account Contact Relationship Currency (Account Contact) Delete Relationship_Strength__c (Account Contact) Remove picklist value “Other” from Roles and add help text (Account Contact ) User Story As a Product Owner / Data Owner I want the Account Contact Relationship field  Account Contact Relationship Currency  hidden, the Account Contact Relationship field  Relationship_Strength__c  removed, and the Roles picklist value  Other  removed (with help text added to guide users how to request a new role) So that the UI is cleaner, obsolete fields are removed, and users have clear guidance when the available Roles do not apply Description / Scope Account Contact Relationship:  Hide  Account Contact Relationship Currency  from standard users (remove from page layouts and set FLS so non-admins can’t see it)",
+        "Keep the field in the schema for admins/support if needed",
+        "Account Contact Relationship:  Delete  Relationship_Strength__c  from the  Account Contact  object",
+        "Ensure automations, metadata and integrations are updated to remove references",
+        "(No existing data to migrate.) Roles:  Remove the  Other  picklist value from Roles",
+        "Add concise help text on the Roles field explaining how to request a new role when none of the options fit",
+        "Acceptance Criteria (GIVEN / WHEN / THEN) Account Contact Relationship  — hide field GIVEN a non-admin user WHEN they open an Account Contact Relationship record THEN  Account Contact Relationship Currency  is not visible on the page, compact layout or list views Account Contact Relationship — delete field GIVEN the Account Contact Relationship object after deployment WHEN users and systems interact with Account Contact Relationship metadata THEN  Relationship_Strength__c  is no longer present on Account Contact Relationship and no automations or integrations reference it Roles — remove Other & add help text GIVEN the Roles picklist WHEN a user views or edits Roles THEN the value  Other  is not available and field help text explains how to request a new role (example help text: “If a suitable role is not listed, contact the CRM Administrator or submit a Role Request to the Service Desk.”)"
+      ],
+      "entities": [
+        "Account",
+        "Contact",
+        "Product"
+      ],
+      "fields": [
+        "Relationship_Strength__c",
+        "Account",
+        "GIVEN"
+      ],
+      "actions": [
+        "hide",
+        "update",
+        "delete"
+      ]
+    }
+  },
+  "acceptanceCriteria": [],
+  "comments": [],
+  "relatedIssues": [],
+  "fieldDefinitions": {
+    "Relationship_Strength__c": {
+      "type": "Custom",
+      "required": false,
+      "description": "Field: Relationship_Strength__c"
+    },
+    "Account": {
+      "type": "Text",
+      "required": false,
+      "description": "Field: Account"
+    },
+    "GIVEN": {
+      "type": "Text",
+      "required": false,
+      "description": "Field: GIVEN"
+    }
+  },
+  "generatedFeatures": {
+    "ui": "src/features/ui/SF/SF-501.feature",
+    "api": "src/features/api/SF/SF-501.feature"
+  },
+  "qaReviewedFeatures": {},
+  "extractedAt": "2025-12-17T18:40:28.169Z"
+}

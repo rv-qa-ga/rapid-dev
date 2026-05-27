@@ -1,0 +1,213 @@
+{
+  "info": {
+    "_postman_id": "sf-44-api-tests",
+    "name": "SF-44 - Binding Authority Limited Flag - API Tests",
+    "description": "API - SF-44 - 8108: Binding Authority Limited Flag\n\n══════════════════════════════════════════════════════════════════════════════\nGenerated: 2025-12-19T15:08:25.141Z (FeatureGenerator v3.1)\n══════════════════════════════════════════════════════════════════════════════\n\n═══════════════════════════════════════════════════════════════════════════\nSUMMARY OF UNDERSTANDING\n═══════════════════════════════════════════════════════════════════════════\n\nOverview: 8108: Binding Authority Limited Flag\nPrimary Entity: Account\n\nTest Requirements (2):\nREQ-1: I\n\nGenerated from: C:\\Automation\\E2EAutomation\\src\\features\\api\\SF\\SF-44.feature\n\nThis collection contains API tests for SF-44 work item.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{sf_access_token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "{{sf_base_url}}",
+      "type": "string"
+    },
+    {
+      "key": "api_version",
+      "value": "{{sf_api_version}}",
+      "type": "string"
+    },
+    {
+      "key": "record_id",
+      "value": "{{record_id}}",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "SF-44-API-001 - Describe Account Object",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Account/describe",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "services",
+            "data",
+            "{{api_version}}",
+            "sobjects",
+            "Account",
+            "describe"
+          ]
+        },
+        "description": "Verify checkbox_is_checked_Then_the_Reason__c field exists on Account"
+      },
+      "response": []
+    },
+    {
+      "name": "SF-44-API-002 - Create Account",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"Name\": \"API Test Account\",\n  \"Type\": \"Member\",\n  \"Account_Status__c\": \"New\",\n  \"Region__c\": \"US\",\n  \"Functional_Currency__c\": \"USD\",\n  \"BillingCountry\": \"United States\",\n  \"BillingCity\": \"New York\",\n  \"BillingState\": \"New York\",\n  \"BillingPostalCode\": \"10001\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Account/",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "services",
+            "data",
+            "{{api_version}}",
+            "sobjects",
+            "Account",
+            ""
+          ]
+        },
+        "description": "Create Account with checkbox_is_checked_Then_the_Reason__c field"
+      },
+      "response": []
+    },
+    {
+      "name": "SF-44-API-003 - Update checkbox_is_checked_Then_the_Reason__c",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"checkbox_is_checked_Then_the_Reason__c\": \"Updated Value\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Account/{{record_id}}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "services",
+            "data",
+            "{{api_version}}",
+            "sobjects",
+            "Account",
+            "{{record_id}}"
+          ]
+        },
+        "description": "Update checkbox_is_checked_Then_the_Reason__c field on Account"
+      },
+      "response": []
+    },
+    {
+      "name": "SF-44-API-004 - Query All Accounts",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/services/data/{{api_version}}/query/?q=SELECT Id, Name, checkbox_is_checked_Then_the_Reason__c FROM Account LIMIT 10",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "services",
+            "data",
+            "{{api_version}}",
+            "query",
+            ""
+          ],
+          "query": [
+            {
+              "key": "q",
+              "value": "SELECT Id, Name, checkbox_is_checked_Then_the_Reason__c FROM Account LIMIT 10"
+            }
+          ]
+        },
+        "description": "Query Account records to verify checkbox_is_checked_Then_the_Reason__c field"
+      },
+      "response": []
+    },
+    {
+      "name": "SF-44-API-005 - Create Account with Invalid Value (Negative Test)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"Name\": \"Invalid Test\",\n  \"Type\": \"Member\",\n  \"checkbox_is_checked_Then_the_Reason__c\": \"INVALID_VALUE_###\",\n  \"Region__c\": \"US\",\n  \"Functional_Currency__c\": \"USD\",\n  \"BillingCountry\": \"United States\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Account/",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "services",
+            "data",
+            "{{api_version}}",
+            "sobjects",
+            "Account",
+            ""
+          ]
+        },
+        "description": "Negative test: Attempt to create Account with invalid checkbox_is_checked_Then_the_Reason__c value. Expected: Error response"
+      },
+      "response": []
+    },
+    {
+      "name": "SF-44-API-006 - Get Account by ID (Verify Null Value)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Account/{{record_id}}?fields=Id,Name,checkbox_is_checked_Then_the_Reason__c",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "services",
+            "data",
+            "{{api_version}}",
+            "sobjects",
+            "Account",
+            "{{record_id}}"
+          ],
+          "query": [
+            {
+              "key": "fields",
+              "value": "Id,Name,checkbox_is_checked_Then_the_Reason__c"
+            }
+          ]
+        },
+        "description": "Get Account record to verify checkbox_is_checked_Then_the_Reason__c is null or empty"
+      },
+      "response": []
+    }
+  ]
+}

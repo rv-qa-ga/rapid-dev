@@ -1,0 +1,1025 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Automation Framework | Mission Control v3.0</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Orbitron:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #00d4ff; --primary-glow: rgba(0,212,255,0.4);
+            --secondary: #ff6b35; --accent: #a855f7; --success: #10b981;
+            --warning: #f59e0b; --danger: #ef4444;
+            --bg-dark: #0f1420; --bg-card: rgba(30,40,60,0.85);
+            --bg-card-hover: rgba(40,55,80,0.9);
+            --border: rgba(0,212,255,0.3); --border-bright: rgba(0,212,255,0.6);
+            --text: #e4e4e7; --text-dim: #9ca3af; --text-bright: #ffffff;
+        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        html { scroll-behavior:smooth; }
+        body { font-family:'Exo 2',sans-serif; background:var(--bg-dark); color:var(--text); min-height:100vh; overflow-x:hidden; }
+        .grid-bg { position:fixed; top:0; left:0; width:100%; height:100%; background:linear-gradient(135deg,#0f1420 0%,#1a2332 50%,#0f1420 100%); background-image:linear-gradient(rgba(0,212,255,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(0,212,255,0.04) 1px,transparent 1px); background-size:50px 50px; pointer-events:none; z-index:0; }
+        .grid-bg::before { content:''; position:absolute; top:0; left:0; width:100%; height:100%; background:radial-gradient(ellipse at 50% 0%,rgba(0,212,255,0.12) 0%,transparent 60%); }
+        .scanlines { position:fixed; top:0; left:0; width:100%; height:100%; background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.03) 2px,rgba(0,0,0,0.03) 4px); pointer-events:none; z-index:1000; opacity:0.15; }
+
+        nav { position:fixed; top:0; left:0; width:100%; padding:1rem 2rem; background:linear-gradient(180deg,rgba(15,20,32,0.97) 0%,transparent 100%); z-index:100; display:flex; justify-content:space-between; align-items:center; backdrop-filter:blur(10px); }
+        .logo { font-family:'Orbitron',sans-serif; font-size:1.1rem; font-weight:700; color:var(--primary); text-transform:uppercase; letter-spacing:3px; display:flex; align-items:center; gap:0.75rem; }
+        .logo-icon { width:40px; height:40px; border:2px solid var(--primary); border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:1.5rem; animation:pulse-glow 2s ease-in-out infinite; }
+        @keyframes pulse-glow { 0%,100%{box-shadow:0 0 10px var(--primary-glow)} 50%{box-shadow:0 0 25px var(--primary-glow),0 0 50px rgba(0,212,255,0.2)} }
+        .nav-links { display:flex; gap:1.5rem; list-style:none; flex-wrap:wrap; }
+        .nav-links a { color:var(--text-dim); text-decoration:none; font-size:0.8rem; font-weight:500; text-transform:uppercase; letter-spacing:1px; transition:all 0.3s ease; position:relative; }
+        .nav-links a:hover { color:var(--primary); }
+        .nav-links a::after { content:''; position:absolute; bottom:-4px; left:0; width:0; height:2px; background:var(--primary); transition:width 0.3s ease; }
+        .nav-links a:hover::after { width:100%; }
+
+        section { padding:6rem 2rem; position:relative; z-index:1; opacity:0; transform:translateY(30px); transition:opacity 0.6s ease-out,transform 0.6s ease-out; }
+        section.visible { opacity:1; transform:translateY(0); }
+        .section-header { text-align:center; margin-bottom:4rem; }
+        .section-badge { font-family:'Orbitron',sans-serif; font-size:0.65rem; font-weight:600; color:var(--secondary); text-transform:uppercase; letter-spacing:3px; margin-bottom:1rem; display:block; }
+        .section-title { font-family:'Orbitron',sans-serif; font-size:clamp(1.75rem,4vw,2.5rem); font-weight:700; color:var(--text-bright); margin-bottom:1rem; }
+        .section-desc { color:var(--text-dim); max-width:650px; margin:0 auto; line-height:1.7; }
+
+        .hero { min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:2rem; position:relative; z-index:1; }
+        .hero-badge { font-family:'Orbitron',sans-serif; font-size:0.7rem; font-weight:600; color:var(--primary); text-transform:uppercase; letter-spacing:4px; margin-bottom:1.5rem; padding:0.5rem 1.5rem; border:1px solid var(--border); border-radius:100px; background:rgba(0,212,255,0.05); animation:float 3s ease-in-out infinite; }
+        @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+        .hero h1 { font-family:'Orbitron',sans-serif; font-size:clamp(2.5rem,8vw,5rem); font-weight:800; line-height:1.1; margin-bottom:1.5rem; background:linear-gradient(135deg,var(--text-bright) 0%,var(--primary) 50%,var(--accent) 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+        .hero-subtitle { font-size:1.2rem; color:var(--text-dim); max-width:650px; margin-bottom:3rem; line-height:1.7; }
+        .hero-stats { display:flex; gap:2.5rem; margin-bottom:3rem; flex-wrap:wrap; justify-content:center; }
+        .stat { text-align:center; }
+        .stat-value { font-family:'Orbitron',sans-serif; font-size:2.5rem; font-weight:700; color:var(--primary); display:block; }
+        .stat-label { font-size:0.75rem; color:var(--text-dim); text-transform:uppercase; letter-spacing:2px; }
+        .cta-group { display:flex; gap:1rem; }
+        .btn { font-family:'Exo 2',sans-serif; font-size:0.9rem; font-weight:600; padding:1rem 2rem; border:none; border-radius:8px; cursor:pointer; text-decoration:none; text-transform:uppercase; letter-spacing:1px; transition:all 0.3s ease; display:inline-flex; align-items:center; gap:0.5rem; }
+        .btn-primary { background:linear-gradient(135deg,var(--primary) 0%,#0099cc 100%); color:var(--bg-dark); box-shadow:0 0 30px var(--primary-glow); }
+        .btn-primary:hover { transform:translateY(-2px); box-shadow:0 0 50px var(--primary-glow),0 10px 40px rgba(0,0,0,0.3); }
+        .btn-secondary { background:transparent; color:var(--text); border:1px solid var(--border); }
+        .btn-secondary:hover { border-color:var(--primary); color:var(--primary); background:rgba(0,212,255,0.05); }
+
+        .arch-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:1.5rem; }
+        .arch-card { background:var(--bg-card); border:1px solid var(--border); border-radius:16px; padding:2rem; transition:all 0.4s ease; position:relative; overflow:hidden; }
+        .arch-card::before { content:''; position:absolute; top:0; left:0; width:100%; height:3px; background:linear-gradient(90deg,transparent,var(--primary),transparent); opacity:0; transition:opacity 0.3s ease; }
+        .arch-card:hover { background:var(--bg-card-hover); border-color:var(--border-bright); transform:translateY(-5px); box-shadow:0 20px 60px rgba(0,0,0,0.4),0 0 30px var(--primary-glow); }
+        .arch-card:hover::before { opacity:1; }
+        .arch-icon { width:50px; height:50px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:1.5rem; margin-bottom:1.25rem; }
+        .arch-card.sf .arch-icon { background:linear-gradient(135deg,#3b82f6,#1d4ed8); }
+        .arch-card.dynamics .arch-icon { background:linear-gradient(135deg,#10b981,#059669); }
+        .arch-card.pp .arch-icon { background:linear-gradient(135deg,#f59e0b,#d97706); }
+        .arch-card.mulesoft .arch-icon { background:linear-gradient(135deg,#8b5cf6,#7c3aed); }
+        .arch-card.sql .arch-icon { background:linear-gradient(135deg,#ef4444,#dc2626); }
+        .arch-card.ado .arch-icon { background:linear-gradient(135deg,#06b6d4,#0891b2); }
+        .arch-card h3 { font-family:'Orbitron',sans-serif; font-size:1rem; font-weight:600; color:var(--text-bright); margin-bottom:0.5rem; }
+        .arch-card p { font-size:0.85rem; color:var(--text-dim); line-height:1.6; margin-bottom:1rem; }
+        .arch-tag { font-size:0.7rem; padding:0.25rem 0.75rem; border-radius:100px; text-transform:uppercase; letter-spacing:1px; display:inline-block; margin-right:0.5rem; margin-bottom:0.25rem; }
+        .arch-tag.active { background:rgba(16,185,129,0.15); color:var(--success); border:1px solid rgba(16,185,129,0.3); }
+        .arch-tag.planned { background:rgba(245,158,11,0.1); color:var(--warning); border:1px solid rgba(245,158,11,0.3); }
+        .arch-tag.core { background:rgba(0,212,255,0.1); color:var(--primary); border:1px solid rgba(0,212,255,0.3); }
+
+        .workflow { max-width:1200px; margin:0 auto; }
+        .workflow-timeline { position:relative; padding-left:3rem; }
+        .workflow-timeline::before { content:''; position:absolute; left:15px; top:0; bottom:0; width:2px; background:linear-gradient(180deg,var(--primary),var(--accent),var(--secondary)); }
+        .workflow-step { position:relative; margin-bottom:2rem; padding:1.75rem; background:var(--bg-card); border:1px solid var(--border); border-radius:16px; transition:all 0.4s ease; }
+        .workflow-step:hover { background:var(--bg-card-hover); border-color:var(--border-bright); box-shadow:0 10px 40px rgba(0,0,0,0.3); }
+        .workflow-number { position:absolute; left:-3rem; top:1.75rem; width:30px; height:30px; background:var(--bg-dark); border:2px solid var(--primary); border-radius:50%; display:flex; align-items:center; justify-content:center; font-family:'Orbitron',sans-serif; font-size:0.8rem; font-weight:700; color:var(--primary); z-index:1; }
+        .workflow-step.active .workflow-number { background:var(--primary); color:var(--bg-dark); box-shadow:0 0 20px var(--primary-glow); }
+        .workflow-header { display:flex; align-items:center; gap:1rem; margin-bottom:0.75rem; }
+        .workflow-icon { font-size:1.5rem; }
+        .workflow-step h3 { font-family:'Orbitron',sans-serif; font-size:1rem; font-weight:600; color:var(--text-bright); }
+        .workflow-step p { color:var(--text-dim); font-size:0.85rem; line-height:1.7; margin-bottom:0.75rem; }
+        .workflow-output { background:rgba(0,0,0,0.3); border:1px solid var(--border); border-radius:8px; padding:0.75rem 1rem; font-family:'JetBrains Mono',monospace; font-size:0.8rem; color:var(--success); }
+
+        .terminal-section { max-width:1000px; margin:0 auto; }
+        .terminal { background:#0d1117; border:1px solid var(--border); border-radius:16px; overflow:hidden; box-shadow:0 20px 60px rgba(0,0,0,0.5); }
+        .terminal-header { background:linear-gradient(180deg,#1c2333 0%,#0d1117 100%); padding:1rem 1.5rem; display:flex; align-items:center; gap:0.75rem; border-bottom:1px solid var(--border); }
+        .terminal-dot { width:12px; height:12px; border-radius:50%; }
+        .terminal-dot.red { background:#ff5f56; } .terminal-dot.yellow { background:#ffbd2e; } .terminal-dot.green { background:#27ca40; }
+        .terminal-title { flex:1; text-align:center; font-family:'JetBrains Mono',monospace; font-size:0.8rem; color:var(--text-dim); }
+        .terminal-body { padding:1.5rem; min-height:400px; max-height:500px; overflow-y:auto; }
+        .terminal-line { font-family:'JetBrains Mono',monospace; font-size:0.82rem; line-height:1.8; margin-bottom:0.2rem; }
+        .terminal-prompt { color:var(--primary); } .terminal-command { color:var(--text-bright); }
+        .terminal-output { color:var(--text-dim); } .terminal-success { color:var(--success); }
+        .terminal-warning { color:var(--warning); } .terminal-error { color:var(--danger); }
+        .terminal-info { color:var(--accent); }
+        .terminal-cursor { display:inline-block; width:10px; height:18px; background:var(--primary); animation:blink 1s step-end infinite; vertical-align:text-bottom; }
+        @keyframes blink { 50%{opacity:0} }
+        .demo-buttons { display:flex; flex-wrap:wrap; gap:0.75rem; margin-top:2rem; justify-content:center; }
+        .demo-btn { font-family:'JetBrains Mono',monospace; font-size:0.72rem; padding:0.7rem 1.1rem; background:var(--bg-card); border:1px solid var(--border); border-radius:8px; color:var(--text); cursor:pointer; transition:all 0.3s ease; }
+        .demo-btn:hover { background:var(--bg-card-hover); border-color:var(--primary); color:var(--primary); }
+        .demo-btn.active { background:rgba(0,212,255,0.1); border-color:var(--primary); color:var(--primary); }
+
+        .phases { max-width:1200px; margin:0 auto; }
+        .phases-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(340px,1fr)); gap:1.5rem; }
+        .phase-card { background:var(--bg-card); border:1px solid var(--border); border-radius:16px; padding:2rem; position:relative; overflow:hidden; transition:all 0.4s ease; }
+        .phase-card:hover { background:var(--bg-card-hover); transform:translateX(5px); box-shadow:0 10px 40px rgba(0,0,0,0.3); }
+        .phase-number { font-family:'Orbitron',sans-serif; font-size:3rem; font-weight:800; color:rgba(0,212,255,0.08); position:absolute; top:1rem; right:1.5rem; }
+        .phase-card h3 { font-family:'Orbitron',sans-serif; font-size:0.95rem; font-weight:600; color:var(--text-bright); margin-bottom:0.75rem; display:flex; align-items:center; gap:0.5rem; }
+        .phase-card p { font-size:0.82rem; color:var(--text-dim); line-height:1.6; margin-bottom:1rem; }
+        .phase-status { display:inline-flex; align-items:center; gap:0.5rem; font-size:0.72rem; padding:0.3rem 0.7rem; border-radius:100px; text-transform:uppercase; letter-spacing:1px; }
+        .phase-status.automated { background:rgba(16,185,129,0.1); color:var(--success); border:1px solid rgba(16,185,129,0.3); }
+        .phase-status.planned { background:rgba(245,158,11,0.1); color:var(--warning); border:1px solid rgba(245,158,11,0.3); }
+
+        .metrics-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:1.5rem; max-width:1200px; margin:0 auto; }
+        .metric-card { background:var(--bg-card); border:1px solid var(--border); border-radius:16px; padding:2rem; text-align:center; transition:all 0.4s ease; position:relative; overflow:hidden; }
+        .metric-card:hover { background:var(--bg-card-hover); border-color:var(--border-bright); transform:translateY(-5px); box-shadow:0 15px 40px rgba(0,0,0,0.3),0 0 20px var(--primary-glow); }
+        .metric-value { font-family:'Orbitron',sans-serif; font-size:2.5rem; font-weight:700; margin-bottom:0.5rem; }
+        .metric-value.blue { color:var(--primary); } .metric-value.green { color:var(--success); }
+        .metric-value.orange { color:var(--secondary); } .metric-value.purple { color:var(--accent); }
+        .metric-label { font-size:0.82rem; color:var(--text-dim); text-transform:uppercase; letter-spacing:1px; }
+
+        .tech-stack { max-width:1100px; margin:0 auto; }
+        .tech-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:1.25rem; }
+        .tech-item { background:var(--bg-card); border:1px solid var(--border); border-radius:12px; padding:1.5rem; text-align:center; transition:all 0.3s ease; }
+        .tech-item:hover { background:var(--bg-card-hover); border-color:var(--border-bright); transform:translateY(-3px); }
+        .tech-icon { font-size:2.5rem; margin-bottom:0.75rem; }
+        .tech-item h4 { font-family:'Orbitron',sans-serif; font-size:0.85rem; font-weight:600; color:var(--text-bright); margin-bottom:0.25rem; }
+        .tech-item p { font-size:0.72rem; color:var(--text-dim); }
+
+        .commands { max-width:1000px; margin:0 auto; }
+        .command-group { margin-bottom:2rem; }
+        .command-group h3 { font-family:'Orbitron',sans-serif; font-size:0.85rem; font-weight:600; color:var(--primary); margin-bottom:1rem; text-transform:uppercase; letter-spacing:1px; }
+        .command-list { background:var(--bg-card); border:1px solid var(--border); border-radius:12px; overflow:hidden; }
+        .command-item { display:flex; justify-content:space-between; align-items:center; padding:0.85rem 1.5rem; border-bottom:1px solid var(--border); transition:background 0.3s ease; gap:1rem; }
+        .command-item:last-child { border-bottom:none; }
+        .command-item:hover { background:var(--bg-card-hover); }
+        .command-content { display:flex; flex-direction:column; gap:0.2rem; flex:1; min-width:0; }
+        .command-code { font-family:'JetBrains Mono',monospace; font-size:0.82rem; color:var(--success); }
+        .command-desc { font-size:0.75rem; color:var(--text-dim); }
+        .copy-btn { background:transparent; border:1px solid var(--border); color:var(--text-dim); padding:0.35rem 0.7rem; border-radius:6px; font-size:0.68rem; cursor:pointer; transition:all 0.3s ease; font-family:'Exo 2',sans-serif; white-space:nowrap; }
+        .copy-btn:hover { border-color:var(--primary); color:var(--primary); background:rgba(0,212,255,0.1); }
+        .copy-btn.copied { border-color:var(--success); color:var(--success); background:rgba(16,185,129,0.1); }
+
+        .cicd-pipeline { max-width:1100px; margin:0 auto; }
+        .pipeline-flow { display:flex; flex-wrap:wrap; gap:1rem; justify-content:center; align-items:stretch; }
+        .pipeline-stage { background:var(--bg-card); border:1px solid var(--border); border-radius:16px; padding:1.75rem; flex:1; min-width:200px; max-width:260px; position:relative; transition:all 0.4s ease; }
+        .pipeline-stage:hover { background:var(--bg-card-hover); border-color:var(--border-bright); transform:translateY(-5px); box-shadow:0 15px 40px rgba(0,0,0,0.3); }
+        .pipeline-stage h4 { font-family:'Orbitron',sans-serif; font-size:0.85rem; color:var(--text-bright); margin-bottom:0.5rem; }
+        .pipeline-stage p { font-size:0.78rem; color:var(--text-dim); line-height:1.5; }
+        .pipeline-arrow { display:flex; align-items:center; font-size:1.5rem; color:var(--primary); }
+
+        .improvement-timeline { max-width:1200px; margin:0 auto; display:grid; grid-template-columns:repeat(auto-fit,minmax(340px,1fr)); gap:1.5rem; }
+        .improvement-card { background:var(--bg-card); border:1px solid var(--border); border-radius:16px; padding:2rem; transition:all 0.4s ease; }
+        .improvement-card:hover { background:var(--bg-card-hover); border-color:var(--border-bright); transform:translateY(-5px); box-shadow:0 15px 40px rgba(0,0,0,0.3); }
+        .improvement-card h3 { font-family:'Orbitron',sans-serif; font-size:1rem; font-weight:600; color:var(--text-bright); margin-bottom:0.5rem; display:flex; align-items:center; gap:0.5rem; }
+        .improvement-card p { font-size:0.85rem; color:var(--text-dim); line-height:1.6; margin-bottom:1rem; }
+        .improvement-badge { display:inline-flex; align-items:center; gap:0.4rem; font-size:0.72rem; padding:0.3rem 0.7rem; border-radius:100px; text-transform:uppercase; letter-spacing:1px; }
+        .improvement-badge.done { background:rgba(16,185,129,0.1); color:var(--success); border:1px solid rgba(16,185,129,0.3); }
+        .improvement-badge.new { background:rgba(0,212,255,0.1); color:var(--primary); border:1px solid rgba(0,212,255,0.3); }
+        .improvement-badge.future { background:rgba(245,158,11,0.1); color:var(--warning); border:1px solid rgba(245,158,11,0.3); }
+
+        .learning-cycle { max-width:1000px; margin:0 auto; }
+        .cycle-container { display:flex; flex-direction:column; gap:0; align-items:center; }
+        .cycle-step { display:flex; align-items:stretch; width:100%; max-width:800px; gap:0; }
+        .cycle-step:nth-child(odd) { flex-direction:row; }
+        .cycle-step:nth-child(even) { flex-direction:row-reverse; }
+        .cycle-connector { display:flex; align-items:center; justify-content:center; width:60px; flex-shrink:0; }
+        .cycle-connector .arrow { font-size:2rem; color:var(--primary); }
+        .cycle-connector-v { display:flex; justify-content:center; padding:0.5rem 0; }
+        .cycle-connector-v .arrow { font-size:1.8rem; color:var(--primary); }
+        .cycle-card { flex:1; background:var(--bg-card); border:1px solid var(--border); border-radius:16px; padding:1.75rem; transition:all 0.4s ease; }
+        .cycle-card:hover { background:var(--bg-card-hover); border-color:var(--border-bright); box-shadow:0 10px 40px rgba(0,0,0,0.3),0 0 15px var(--primary-glow); }
+        .cycle-card h4 { font-family:'Orbitron',sans-serif; font-size:0.95rem; font-weight:600; color:var(--text-bright); margin-bottom:0.5rem; display:flex; align-items:center; gap:0.5rem; }
+        .cycle-card p { font-size:0.82rem; color:var(--text-dim); line-height:1.6; }
+        .cycle-card.highlight { border-color:var(--accent); box-shadow:0 0 20px rgba(168,85,247,0.2); }
+        .cycle-card.highlight h4 { color:var(--accent); }
+        .cycle-loop-label { text-align:center; margin-top:1.5rem; font-family:'Orbitron',sans-serif; font-size:0.75rem; color:var(--primary); text-transform:uppercase; letter-spacing:2px; padding:0.5rem 1.5rem; border:1px dashed var(--border); border-radius:100px; display:inline-block; }
+
+        .toast { position:fixed; bottom:100px; left:50%; transform:translateX(-50%) translateY(100px); background:var(--bg-card); border:1px solid var(--success); color:var(--success); padding:1rem 2rem; border-radius:12px; font-family:'JetBrains Mono',monospace; font-size:0.82rem; z-index:1001; opacity:0; transition:all 0.4s ease; box-shadow:0 10px 40px rgba(0,0,0,0.4); display:flex; align-items:center; gap:0.75rem; }
+        .toast.show { transform:translateX(-50%) translateY(0); opacity:1; }
+
+        footer { padding:4rem 2rem; text-align:center; border-top:1px solid var(--border); position:relative; z-index:1; }
+        .footer-logo { font-family:'Orbitron',sans-serif; font-size:1.5rem; font-weight:700; color:var(--primary); margin-bottom:1rem; }
+        .footer-text { font-size:0.85rem; color:var(--text-dim); margin-bottom:2rem; }
+        .footer-links { display:flex; justify-content:center; gap:2rem; }
+        .footer-links a { color:var(--text-dim); text-decoration:none; font-size:0.85rem; transition:color 0.3s ease; }
+        .footer-links a:hover { color:var(--primary); }
+
+        .presenter-controls { position:fixed; bottom:2rem; right:2rem; display:flex; gap:0.5rem; z-index:200; }
+        .presenter-btn { width:50px; height:50px; border-radius:50%; background:var(--bg-card); border:1px solid var(--border); color:var(--text); font-size:1.25rem; cursor:pointer; transition:all 0.3s ease; display:flex; align-items:center; justify-content:center; }
+        .presenter-btn:hover { background:var(--primary); color:var(--bg-dark); border-color:var(--primary); box-shadow:0 0 30px var(--primary-glow); }
+        .slide-counter { position:fixed; bottom:2rem; left:2rem; font-family:'Orbitron',sans-serif; font-size:0.8rem; color:var(--text-dim); z-index:200; }
+
+        @media (max-width:768px) {
+            nav { flex-direction:column; gap:1rem; }
+            .hero-stats { flex-direction:column; gap:1.5rem; }
+            .cta-group { flex-direction:column; }
+            .pipeline-flow { flex-direction:column; align-items:center; }
+            .pipeline-arrow { transform:rotate(90deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="grid-bg"></div>
+    <div class="scanlines"></div>
+
+    <nav>
+        <div class="logo"><div class="logo-icon">&#9889;</div><span>E2E Automation</span></div>
+        <ul class="nav-links">
+            <li><a href="#hero">Home</a></li>
+            <li><a href="#architecture">Architecture</a></li>
+            <li><a href="#metrics">Metrics</a></li>
+            <li><a href="#workflow">Workflow</a></li>
+            <li><a href="#terminal">Live Demo</a></li>
+            <li><a href="#phases">Phases</a></li>
+            <li><a href="#cicd">CI/CD</a></li>
+            <li><a href="#reporting">Reporting</a></li>
+            <li><a href="#learning">Learning Cycle</a></li>
+            <li><a href="#improvement">Evolution</a></li>
+            <li><a href="#tech">Tech Stack</a></li>
+            <li><a href="#commands">Commands</a></li>
+        </ul>
+    </nav>
+
+    <!-- HERO -->
+    <section class="hero" id="hero">
+        <div class="hero-badge">&#129302; QA Automation Framework v3.0 &mdash; February 2026</div>
+        <h1>QA TEST<br>AUTOMATION FRAMEWORK</h1>
+        <p class="hero-subtitle">
+            Unified E2E testing platform for the Accelerant ecosystem. 
+            Automated test generation, execution, evidence capture, and CI/CD integration across 
+            Salesforce, Dynamics 365, MuleSoft, and SQL Server.
+        </p>
+        <div class="hero-stats">
+            <div class="stat"><span class="stat-value">261</span><span class="stat-label">Feature Files</span></div>
+            <div class="stat"><span class="stat-value">1500+</span><span class="stat-label">Test Scenarios</span></div>
+            <div class="stat"><span class="stat-value">6+</span><span class="stat-label">Systems Integrated</span></div>
+            <div class="stat"><span class="stat-value">120+</span><span class="stat-label">Automation Commands</span></div>
+            <div class="stat"><span class="stat-value">5</span><span class="stat-label">CI/CD Workflows</span></div>
+        </div>
+        <p style="font-size:0.82rem;color:var(--text-dim);text-align:center;font-style:italic;margin-top:0.5rem;margin-bottom:2rem;">*Numbers as of February 19, 2026 &bull; Growing daily &bull; More systems planned</p>
+        <div class="cta-group">
+            <a href="#terminal" class="btn btn-primary"><span>&#9654;</span> Watch Demo</a>
+            <a href="#workflow" class="btn btn-secondary">View Workflow</a>
+        </div>
+    </section>
+
+    <!-- ARCHITECTURE -->
+    <section id="architecture">
+        <div class="section-header">
+            <span class="section-badge">System Integration</span>
+            <h2 class="section-title">Multi-System Architecture</h2>
+            <p class="section-desc">Full testing coverage across the entire ecosystem &mdash; UI + API testing for every integrated platform</p>
+        </div>
+        <div style="max-width:1400px;margin:0 auto;">
+            <div class="arch-grid">
+                <div class="arch-card sf">
+                    <div class="arch-icon">&#9899;</div>
+                    <h3>Salesforce CRM</h3>
+                    <p>Primary CRM platform. Full UI + API testing with JWT auth, Field Registry, Page Object Model, and 150+ feature files. Account, Contact, Opportunity, Lead lifecycle coverage.</p>
+                    <span class="arch-tag active">&#10003; UI + API</span>
+                    <span class="arch-tag core">Core Platform</span>
+                </div>
+                <div class="arch-card dynamics">
+                    <div class="arch-icon">&#9881;&#65039;</div>
+                    <h3>Microsoft Dynamics 365</h3>
+                    <p>Business process automation, Reference Data Management (RDM), and Configuration Management Tool (CMT). Azure AD auth, Dynamics API client, record tracking, and cleanup.</p>
+                    <span class="arch-tag active">&#10003; UI + API</span>
+                    <span class="arch-tag core">Target System</span>
+                </div>
+                <div class="arch-card mulesoft">
+                    <div class="arch-icon">&#128279;</div>
+                    <h3>MuleSoft Integration</h3>
+                    <p>Integration layer with API contract testing. MuleSoft API client with OAuth authentication, request/response validation, and integration flow testing.</p>
+                    <span class="arch-tag active">&#10003; API</span>
+                </div>
+                <div class="arch-card sql">
+                    <div class="arch-icon">&#128451;&#65039;</div>
+                    <h3>SQL Server (ODS/TDS)</h3>
+                    <p>Operational and Transactional Data Store validation. Cross-system data integrity testing, migration validation, and SQL query automation.</p>
+                    <span class="arch-tag active">&#10003; API + SQL</span>
+                </div>
+            </div>
+            <div style="margin-top:2rem;text-align:center;">
+                <div class="arch-grid" style="max-width:800px;margin:0 auto;">
+                    <div class="arch-card" style="border-color:rgba(245,158,11,0.3);">
+                        <div class="arch-icon" style="background:linear-gradient(135deg,rgba(59,130,246,0.5),rgba(29,78,216,0.5));">&#10052;&#65039;</div>
+                        <h3>Snowflake</h3>
+                        <p>Data warehouse pipeline via Fivetran integration.</p>
+                        <span class="arch-tag planned">&#128203; Planned</span>
+                    </div>
+                    <div class="arch-card" style="border-color:rgba(245,158,11,0.3);">
+                        <div class="arch-icon" style="background:linear-gradient(135deg,rgba(59,130,246,0.5),rgba(29,78,216,0.5));">&#128153;</div>
+                        <h3>Data Cloud</h3>
+                        <p>Data platform receiving data from Salesforce.</p>
+                        <span class="arch-tag planned">&#128203; Planned</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- METRICS -->
+    <section id="metrics">
+        <div class="section-header">
+            <span class="section-badge">By The Numbers</span>
+            <h2 class="section-title">Framework Metrics</h2>
+            <p class="section-desc">Real-time snapshot of the framework's scale and coverage</p>
+        </div>
+        <div class="metrics-grid">
+            <div class="metric-card"><div class="metric-value blue">261</div><div class="metric-label">Feature Files</div></div>
+            <div class="metric-card"><div class="metric-value green">44</div><div class="metric-label">Step Definition Files</div></div>
+            <div class="metric-card"><div class="metric-value orange">434</div><div class="metric-label">Automation Scripts</div></div>
+            <div class="metric-card"><div class="metric-value purple">28</div><div class="metric-label">Utility Modules</div></div>
+            <div class="metric-card"><div class="metric-value blue">120+</div><div class="metric-label">NPM Commands</div></div>
+            <div class="metric-card"><div class="metric-value green">5</div><div class="metric-label">CI/CD Workflows</div></div>
+            <div class="metric-card"><div class="metric-value orange">7</div><div class="metric-label">Page Objects</div></div>
+            <div class="metric-card"><div class="metric-value purple">6+</div><div class="metric-label">Integrated Systems</div></div>
+        </div>
+    </section>
+
+    <!-- WORKFLOW -->
+    <section id="workflow">
+        <div class="section-header">
+            <span class="section-badge">Process Flow</span>
+            <h2 class="section-title">Complete Automation Workflow</h2>
+            <p class="section-desc">From work item to CI/CD validation &mdash; every step automated with human oversight</p>
+        </div>
+        <div class="workflow">
+            <div class="workflow-timeline">
+                <div class="workflow-step active">
+                    <div class="workflow-number">1</div>
+                    <div class="workflow-header"><span class="workflow-icon">&#128270;</span><h3>Find QA-Ready Work Items</h3></div>
+                    <p>Utility automatically scans Jira for existing QA-ready work items. Identifies new items that need test coverage, checks for missing work items, and prioritizes the backlog.</p>
+                    <div class="workflow-output">&#8594; Found 8 QA-ready work items: SF-520, SF-561, SF-721...</div>
+                </div>
+                <div class="workflow-step">
+                    <div class="workflow-number">2</div>
+                    <div class="workflow-header"><span class="workflow-icon">&#128229;</span><h3>Get Work Item</h3></div>
+                    <p>Fetch selected work item from Jira. Auto-extract acceptance criteria, field definitions, and business rules via API.</p>
+                    <div class="workflow-output">&#8594; Work item SF-520 retrieved from Jira</div>
+                </div>
+                <div class="workflow-step">
+                    <div class="workflow-number">3</div>
+                    <div class="workflow-header"><span class="workflow-icon">&#128221;</span><h3>Generate Test Cases</h3></div>
+                    <p>AI-powered Gherkin test case generation from work items. Creates UI + API feature files with positive, negative, and edge case scenarios. Knowledge base-driven.</p>
+                    <div class="workflow-output">&#8594; Feature files: SF-520-UI.feature, SF-520-API.feature</div>
+                </div>
+                <div class="workflow-step">
+                    <div class="workflow-number">4</div>
+                    <div class="workflow-header"><span class="workflow-icon">&#9881;&#65039;</span><h3>Create &amp; Validate Scripts</h3></div>
+                    <p>Identify missing steps, create step definitions using POM and Field Registry. Validate all steps match. Auto-generate Postman collections for API tests.</p>
+                    <div class="workflow-output">&#8594; All 24 steps validated &#10003; | Postman collection generated</div>
+                </div>
+                <div class="workflow-step">
+                    <div class="workflow-number">5</div>
+                    <div class="workflow-header"><span class="workflow-icon">&#128228;</span><h3>Upload to Jira-Zephyr</h3></div>
+                    <p>Upload test cases to Zephyr Scale. Link test cases to Jira work items. Sync to test cycles. Full traceability from requirement to test.</p>
+                    <div class="workflow-output">&#8594; 5 test cases uploaded, linked to SF-520</div>
+                </div>
+                <div class="workflow-step">
+                    <div class="workflow-number">6</div>
+                    <div class="workflow-header"><span class="workflow-icon">&#128202;</span><h3>Create Test Data</h3></div>
+                    <p>Test Data Factory creates Accounts, Contacts, Opportunities, Leads with 24+ fields. Role-based data creation with FLS awareness. Auto-cleanup after execution.</p>
+                    <div class="workflow-output">&#8594; Test data ready: ACC-20260219-001 | Cleanup scheduled</div>
+                </div>
+                <div class="workflow-step">
+                    <div class="workflow-number">7</div>
+                    <div class="workflow-header"><span class="workflow-icon">&#9654;&#65039;</span><h3>Execute Tests</h3></div>
+                    <p>Run UI tests (Playwright) and API tests across all integrated systems. Multi-browser, multi-environment (dev/qa/uat/sit/prod). Screenshots and evidence capture.</p>
+                    <div class="workflow-output">&#8594; 15 tests passed, 0 failed | Evidence captured</div>
+                </div>
+                <div class="workflow-step">
+                    <div class="workflow-number">8</div>
+                    <div class="workflow-header"><span class="workflow-icon">&#128202;</span><h3>Generate Reports</h3></div>
+                    <p>Multiple report formats: Cucumber HTML, Allure, JSON, Work Item reports, Weekly QA Progress. Auto-upload results to Zephyr Scale with attachments.</p>
+                    <div class="workflow-output">&#8594; Reports generated: HTML, Allure, Zephyr results uploaded</div>
+                </div>
+                <div class="workflow-step">
+                    <div class="workflow-number">9</div>
+                    <div class="workflow-header"><span class="workflow-icon">&#128228;</span><h3>Commit &amp; Push to GitHub</h3></div>
+                    <p>Feature branch, commit, push, create PR. Documentation auto-updated on Confluence.</p>
+                    <div class="workflow-output">&#8594; PR #142: feature/SF-520-tests | Confluence updated</div>
+                </div>
+                <div class="workflow-step">
+                    <div class="workflow-number">10</div>
+                    <div class="workflow-header"><span class="workflow-icon">&#128640;</span><h3>CI/CD Pipeline</h3></div>
+                    <p>GitHub Actions triggers E2E tests on self-hosted runner. Regression tests run on schedule (2 AM UTC). Results uploaded to Zephyr. Reports saved as artifacts.</p>
+                    <div class="workflow-output" style="color:var(--success);">&#8594; &#10003; GitHub Actions: 5 workflows active on self-hosted runner</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- TERMINAL DEMO -->
+    <section id="terminal">
+        <div class="section-header">
+            <span class="section-badge">Live Demo</span>
+            <h2 class="section-title">Interactive Command Center</h2>
+            <p class="section-desc">Watch the framework in action &mdash; click a demo to see the commands execute</p>
+        </div>
+        <div class="terminal-section">
+            <div class="terminal">
+                <div class="terminal-header">
+                    <div class="terminal-dot red"></div>
+                    <div class="terminal-dot yellow"></div>
+                    <div class="terminal-dot green"></div>
+                    <div class="terminal-title">E2E Automation Terminal &mdash; PowerShell</div>
+                </div>
+                <div class="terminal-body" id="terminal-body">
+                    <div class="terminal-line">
+                        <span class="terminal-prompt">PS C:\Automation</span>&gt; <span class="terminal-cursor"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="demo-buttons">
+                <button class="demo-btn" data-demo="generate">&#128221; Generate Tests</button>
+                <button class="demo-btn" data-demo="execute">&#9654;&#65039; Execute Tests</button>
+                <button class="demo-btn" data-demo="upload">&#128228; Upload to Zephyr</button>
+                <button class="demo-btn" data-demo="cicd">&#128640; CI/CD Pipeline</button>
+                <button class="demo-btn" data-demo="report">&#128202; Generate Reports</button>
+                <button class="demo-btn" data-demo="data">&#128202; Test Data</button>
+                <button class="demo-btn" data-demo="full">&#127775; Full Workflow</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- PHASES -->
+    <section id="phases">
+        <div class="section-header">
+            <span class="section-badge">Automation Coverage</span>
+            <h2 class="section-title">8 QA Lifecycle Phases</h2>
+            <p class="section-desc">Each phase automated with human review at critical checkpoints</p>
+        </div>
+        <div class="phases">
+            <div class="phases-grid">
+                <div class="phase-card"><div class="phase-number">01</div>
+                    <h3>&#128269; Requirement Analysis</h3>
+                    <p>Extracts acceptance criteria, field definitions, and business rules from Jira via API. Knowledge base enrichment.</p>
+                    <span class="phase-status automated">&#10003; Automated + Review</span></div>
+                <div class="phase-card"><div class="phase-number">02</div>
+                    <h3>&#128221; Test Case Design</h3>
+                    <p>AI-powered Gherkin feature file generation with positive, negative, and edge case scenarios. V2 detection and pattern learning.</p>
+                    <span class="phase-status automated">&#10003; Automated + Review</span></div>
+                <div class="phase-card"><div class="phase-number">03</div>
+                    <h3>&#128202; Test Data Setup</h3>
+                    <p>Factory creates records via Salesforce/Dynamics API with 24+ fields. Role-based, FLS-aware. Excel/CSV import support. Auto-cleanup.</p>
+                    <span class="phase-status automated">&#10003; Automated + Review</span></div>
+                <div class="phase-card"><div class="phase-number">04</div>
+                    <h3>&#9654;&#65039; Test Execution</h3>
+                    <p>UI (Playwright) + API tests across 6+ systems. Multi-env (dev/qa/uat/sit/prod), multi-browser, tag-based filtering, regression suites.</p>
+                    <span class="phase-status automated">&#10003; Automated + Review</span></div>
+                <div class="phase-card"><div class="phase-number">05</div>
+                    <h3>&#128248; Evidence &amp; Reporting</h3>
+                    <p>Screenshots, HTML/Allure/JSON reports, work item reports, weekly QA progress, MRD FLS reports. Auto-upload to Confluence and Zephyr.</p>
+                    <span class="phase-status automated">&#10003; Automated + Review</span></div>
+                <div class="phase-card"><div class="phase-number">06</div>
+                    <h3>&#128279; Traceability &amp; Sync</h3>
+                    <p>Full Jira-Zephyr-GitHub traceability. Test case upload, result upload with attachments, cycle sync, duplicate management, and Jira linking.</p>
+                    <span class="phase-status automated">&#10003; Automated</span></div>
+                <div class="phase-card"><div class="phase-number">07</div>
+                    <h3>&#128640; CI/CD Integration</h3>
+                    <p>5 GitHub Actions workflows on self-hosted runner. E2E, regression (scheduled), smoke, tag-based, and runner-check. Artifact management.</p>
+                    <span class="phase-status automated">&#10003; Automated</span></div>
+                <div class="phase-card"><div class="phase-number">08</div>
+                    <h3>&#128027; Bug Creation</h3>
+                    <p>Automatically creates Jira bugs for failed tests with reproduction steps, screenshots, and evidence links. Links bugs to work items for full traceability.</p>
+                    <span class="phase-status planned">&#128203; Planned</span></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CI/CD PIPELINE -->
+    <section id="cicd">
+        <div class="section-header">
+            <span class="section-badge">Continuous Integration</span>
+            <h2 class="section-title">Integration with Jira &amp; GitHub Runner</h2>
+            <p class="section-desc">End-to-end integration from Jira work items to GitHub Actions execution on a self-hosted runner</p>
+        </div>
+        <div class="cicd-pipeline">
+            <div class="pipeline-flow">
+                <div class="pipeline-stage">
+                    <h4>&#128203; Jira</h4>
+                    <p>QA-ready work items fetched. Test cases generated, uploaded to Zephyr Scale, and linked to stories.</p>
+                </div>
+                <div class="pipeline-arrow">&#8594;</div>
+                <div class="pipeline-stage">
+                    <h4>&#128230; Trigger</h4>
+                    <p>Manual dispatch, schedule (2 AM UTC), or PR event. Select work item, tags, env, branch.</p>
+                </div>
+                <div class="pipeline-arrow">&#8594;</div>
+                <div class="pipeline-stage">
+                    <h4>&#9881;&#65039; Setup</h4>
+                    <p>Checkout, Node.js, system deps, npm ci, Playwright install. Copy secrets from VM.</p>
+                </div>
+                <div class="pipeline-arrow">&#8594;</div>
+                <div class="pipeline-stage">
+                    <h4>&#9654;&#65039; Execute</h4>
+                    <p>Run tests by work item, tags, feature, or type on self-hosted GitHub Runner. Multi-env support.</p>
+                </div>
+                <div class="pipeline-arrow">&#8594;</div>
+                <div class="pipeline-stage">
+                    <h4>&#128202; Report</h4>
+                    <p>Upload results to Zephyr. Save reports + test-results as GitHub artifacts.</p>
+                </div>
+            </div>
+            <div style="margin-top:3rem;">
+                <div class="arch-grid" style="max-width:1100px;margin:0 auto;">
+                    <div class="arch-card" style="border-color:rgba(16,185,129,0.4);">
+                        <h3 style="color:var(--success);">e2e-tests.yml</h3>
+                        <p>Primary E2E workflow. Manual dispatch with work item, tags, environment, branch selection.</p>
+                        <span class="arch-tag active">&#10003; Active</span>
+                    </div>
+                    <div class="arch-card" style="border-color:rgba(16,185,129,0.4);">
+                        <h3 style="color:var(--success);">regression-tests.yml</h3>
+                        <p>Scheduled regression at 2 AM UTC + manual dispatch. Runs full Zephyr cycle tests.</p>
+                        <span class="arch-tag active">&#10003; Scheduled</span>
+                    </div>
+                    <div class="arch-card" style="border-color:rgba(16,185,129,0.4);">
+                        <h3 style="color:var(--success);">smoke-tests.yml</h3>
+                        <p>Quick smoke tests to verify core functionality after deployments.</p>
+                        <span class="arch-tag active">&#10003; Active</span>
+                    </div>
+                    <div class="arch-card" style="border-color:rgba(16,185,129,0.4);">
+                        <h3 style="color:var(--success);">tag-based-tests.yml</h3>
+                        <p>Run tests filtered by Cucumber tags. Flexible test suite selection.</p>
+                        <span class="arch-tag active">&#10003; Active</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- REPORTING -->
+    <section id="reporting">
+        <div class="section-header">
+            <span class="section-badge">Evidence &amp; Reports</span>
+            <h2 class="section-title">Multi-Format Reporting</h2>
+            <p class="section-desc">Comprehensive evidence generation with auto-upload to Zephyr and Confluence</p>
+        </div>
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div style="font-size:2.5rem;margin-bottom:0.75rem;">&#127912;</div>
+                <div class="metric-label" style="color:var(--text-bright);font-size:0.9rem;margin-bottom:0.5rem;">Cucumber HTML</div>
+                <div class="metric-label">Rich HTML reports with scenario details, screenshots, and duration</div>
+            </div>
+            <div class="metric-card">
+                <div style="font-size:2.5rem;margin-bottom:0.75rem;">&#128202;</div>
+                <div class="metric-label" style="color:var(--text-bright);font-size:0.9rem;margin-bottom:0.5rem;">Allure Reports</div>
+                <div class="metric-label">Interactive dashboards with trend analysis and test categorization</div>
+            </div>
+            <div class="metric-card">
+                <div style="font-size:2.5rem;margin-bottom:0.75rem;">&#128203;</div>
+                <div class="metric-label" style="color:var(--text-bright);font-size:0.9rem;margin-bottom:0.5rem;">Work Item Reports</div>
+                <div class="metric-label">Per-work-item HTML reports with full test case and result details</div>
+            </div>
+            <div class="metric-card">
+                <div style="font-size:2.5rem;margin-bottom:0.75rem;">&#128200;</div>
+                <div class="metric-label" style="color:var(--text-bright);font-size:0.9rem;margin-bottom:0.5rem;">Weekly QA Progress</div>
+                <div class="metric-label">Automated weekly QA progress reports for stakeholders</div>
+            </div>
+            <div class="metric-card">
+                <div style="font-size:2.5rem;margin-bottom:0.75rem;">&#128196;</div>
+                <div class="metric-label" style="color:var(--text-bright);font-size:0.9rem;margin-bottom:0.5rem;">Excel Evidence</div>
+                <div class="metric-label">Detailed Excel reports for MRD FLS, migration validation, and data imports</div>
+            </div>
+            <div class="metric-card">
+                <div style="font-size:2.5rem;margin-bottom:0.75rem;">&#128228;</div>
+                <div class="metric-label" style="color:var(--text-bright);font-size:0.9rem;margin-bottom:0.5rem;">Auto-Upload</div>
+                <div class="metric-label">Results to Zephyr Scale, documentation to Confluence, artifacts to GitHub</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CONSTANT IMPROVEMENT -->
+    <section id="learning">
+        <div class="section-header">
+            <span class="section-badge">Self-Improving</span>
+            <h2 class="section-title">Constant Improvement Cycle</h2>
+            <p class="section-desc">The framework learns from every manual QA correction, producing smarter V2 feature files each iteration</p>
+        </div>
+        <div class="learning-cycle">
+            <div class="cycle-container">
+                <div class="cycle-card">
+                    <h4>&#129302; Step 1: Framework Generates V1 Feature File</h4>
+                    <p>AI-powered generation creates the first version of the Gherkin feature file from Jira work item requirements, acceptance criteria, and the knowledge base. Produces positive, negative, and edge case scenarios.</p>
+                </div>
+                <div class="cycle-connector-v"><span class="arrow">&#8595;</span></div>
+                <div class="cycle-card">
+                    <h4>&#128221; Step 2: QA Reviews &amp; Updates V1</h4>
+                    <p>Manual QA engineer reviews the generated V1 feature file. Corrects scenarios, adds missing edge cases, refines step definitions, adjusts test data, and improves coverage based on domain expertise.</p>
+                </div>
+                <div class="cycle-connector-v"><span class="arrow">&#8595;</span></div>
+                <div class="cycle-card highlight">
+                    <h4>&#128270; Step 3: Framework Detects Changes</h4>
+                    <p>V2 detection utility (<code style="color:var(--accent);">detect-v2-features</code>) automatically identifies what QA changed between V1 and the manually updated version. Analyzes patterns, corrections, and improvements made by the QA engineer.</p>
+                </div>
+                <div class="cycle-connector-v"><span class="arrow">&#8595;</span></div>
+                <div class="cycle-card highlight">
+                    <h4>&#128218; Step 4: Knowledge Base Updated</h4>
+                    <p>Learnings from QA corrections are fed back into the knowledge base (<code style="color:var(--accent);">knowledge:build</code>). Domain rules, field patterns, validation logic, and best practices are captured and stored for future use.</p>
+                </div>
+                <div class="cycle-connector-v"><span class="arrow">&#8595;</span></div>
+                <div class="cycle-card" style="border-color:var(--success);box-shadow:0 0 15px rgba(16,185,129,0.2);">
+                    <h4 style="color:var(--success);">&#127775; Step 5: Smarter V2 Feature Files</h4>
+                    <p>Next time the framework generates feature files, it uses the enriched knowledge base to produce better, more accurate V2 versions &mdash; requiring fewer manual corrections each cycle. The framework gets smarter with every iteration.</p>
+                </div>
+            </div>
+            <div style="text-align:center;margin-top:2rem;">
+                <span class="cycle-loop-label">&#8634; Continuous Learning Loop &mdash; Every QA Review Makes the Framework Smarter</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- IMPROVEMENT -->
+    <section id="improvement">
+        <div class="section-header">
+            <span class="section-badge">Evolution</span>
+            <h2 class="section-title">Framework Evolution Journey</h2>
+            <p class="section-desc">From manual QA to an intelligent, multi-system automation platform</p>
+        </div>
+        <div class="improvement-timeline">
+            <div class="improvement-card">
+                <h3>&#128221; Phase 1: Foundation</h3>
+                <p>Manual QA processes. Basic Playwright + Cucumber setup. Single-system (Salesforce) coverage with manual test case creation.</p>
+                <span class="improvement-badge done">&#10003; Complete</span>
+            </div>
+            <div class="improvement-card">
+                <h3>&#129302; Phase 2: AI Test Generation</h3>
+                <p>Jira integration for AI-powered test case generation. Automated Gherkin feature files with positive, negative, edge cases. Knowledge base built.</p>
+                <span class="improvement-badge done">&#10003; Complete</span>
+            </div>
+            <div class="improvement-card">
+                <h3>&#128218; Phase 3: Knowledge &amp; Patterns</h3>
+                <p>Knowledge base integration, Field Registry, Page Object Model, Test Data Factory, reusable step definitions. V2 detection and pattern learning.</p>
+                <span class="improvement-badge done">&#10003; Complete</span>
+            </div>
+            <div class="improvement-card">
+                <h3>&#128279; Phase 4: Integrations</h3>
+                <p>Jira, Zephyr Scale, Confluence, GitHub integration. Test case upload, result reporting, evidence capture. Full traceability chain established.</p>
+                <span class="improvement-badge done">&#10003; Complete</span>
+            </div>
+            <div class="improvement-card">
+                <h3>&#127760; Phase 5: Multi-System</h3>
+                <p>Expanded to Dynamics 365, MuleSoft, SQL Server. Multiple API clients, auth mechanisms, and object registries.</p>
+                <span class="improvement-badge new">&#9733; New in 2025-2026</span>
+            </div>
+            <div class="improvement-card">
+                <h3>&#128640; Phase 6: CI/CD &amp; Automation</h3>
+                <p>5 GitHub Actions workflows on self-hosted runner. Scheduled regression, smoke tests, artifact management. 120+ npm commands. 434 automation scripts.</p>
+                <span class="improvement-badge new">&#9733; New in 2025-2026</span>
+            </div>
+            <div class="improvement-card">
+                <h3>&#128202; Phase 7: Advanced Reporting</h3>
+                <p>Allure reports, work item reports, weekly QA progress, MRD FLS reports, Excel evidence, migration validation reports. Confluence auto-documentation.</p>
+                <span class="improvement-badge new">&#9733; New in 2025-2026</span>
+            </div>
+            <div class="improvement-card">
+                <h3>&#128302; Phase 8: Data Intelligence</h3>
+                <p>Excel/CSV data handling, CSV transformation for Workbench, picklist mapping, migration field mapping, FLS validation, permission checking, platform events.</p>
+                <span class="improvement-badge new">&#9733; New in 2025-2026</span>
+            </div>
+            <div class="improvement-card">
+                <h3>&#127775; Phase 9: Future</h3>
+                <p>ML-based test optimization, predictive failure analysis, Gearset deployment validation, self-healing tests, visual regression, and performance testing.</p>
+                <span class="improvement-badge future">&#128203; Planned</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- TECH STACK -->
+    <section id="tech">
+        <div class="section-header">
+            <span class="section-badge">Technology</span>
+            <h2 class="section-title">Technology Stack</h2>
+            <p class="section-desc">Modern, battle-tested tools for reliable multi-system automation</p>
+        </div>
+        <div class="tech-stack">
+            <div class="tech-grid">
+                <div class="tech-item"><div class="tech-icon">&#129476;</div><h4>Cucumber.js</h4><p>BDD Test Runner</p></div>
+                <div class="tech-item"><div class="tech-icon">&#127917;</div><h4>Playwright</h4><p>Browser Automation</p></div>
+                <div class="tech-item"><div class="tech-icon">&#128161;</div><h4>TypeScript</h4><p>Type-Safe Code</p></div>
+                <div class="tech-item"><div class="tech-icon">&#128225;</div><h4>Axios + JWT</h4><p>API Testing</p></div>
+                <div class="tech-item"><div class="tech-icon">&#128451;&#65039;</div><h4>MS SQL (mssql)</h4><p>Database Testing</p></div>
+                <div class="tech-item"><div class="tech-icon">&#128202;</div><h4>Allure Reports</h4><p>Interactive Dashboards</p></div>
+                <div class="tech-item"><div class="tech-icon">&#128195;</div><h4>ExcelJS</h4><p>Excel/CSV Data</p></div>
+                <div class="tech-item"><div class="tech-icon">&#128025;</div><h4>GitHub Actions</h4><p>CI/CD Pipelines</p></div>
+                <div class="tech-item"><div class="tech-icon">&#128279;</div><h4>Jira + Zephyr</h4><p>Test Management</p></div>
+                <div class="tech-item"><div class="tech-icon">&#128196;</div><h4>Confluence</h4><p>Documentation</p></div>
+                <div class="tech-item"><div class="tech-icon">&#128270;</div><h4>Vitest</h4><p>Unit Testing</p></div>
+                <div class="tech-item"><div class="tech-icon">&#128272;</div><h4>JWT + OAuth</h4><p>Multi-System Auth</p></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- COMMANDS -->
+    <section id="commands">
+        <div class="section-header">
+            <span class="section-badge">Reference</span>
+            <h2 class="section-title">Command Quick Reference</h2>
+            <p class="section-desc">Essential commands from the 120+ available automation commands</p>
+        </div>
+        <div class="commands">
+            <div class="command-group">
+                <h3>Test Generation</h3>
+                <div class="command-list">
+                    <div class="command-item"><div class="command-content"><code class="command-code">npm run jira:generate -- --work-item SF-520</code><span class="command-desc">Generate UI + API tests from Jira</span></div><button class="copy-btn" onclick="copyCommand(this)">&#128203; Copy</button></div>
+                    <div class="command-item"><div class="command-content"><code class="command-code">npm run jira:generate -- --work-item SF-520 --type ui</code><span class="command-desc">Generate UI tests only</span></div><button class="copy-btn" onclick="copyCommand(this)">&#128203; Copy</button></div>
+                    <div class="command-item"><div class="command-content"><code class="command-code">npm run jira:find-missing</code><span class="command-desc">Find QA-ready work items in Jira</span></div><button class="copy-btn" onclick="copyCommand(this)">&#128203; Copy</button></div>
+                    <div class="command-item"><div class="command-content"><code class="command-code">npm run postman:generate</code><span class="command-desc">Generate Postman collections</span></div><button class="copy-btn" onclick="copyCommand(this)">&#128203; Copy</button></div>
+                </div>
+            </div>
+            <div class="command-group">
+                <h3>Test Execution</h3>
+                <div class="command-list">
+                    <div class="command-item"><div class="command-content"><code class="command-code">npm run test:feature -- --tags "@SF-520"</code><span class="command-desc">Run all tests for work item</span></div><button class="copy-btn" onclick="copyCommand(this)">&#128203; Copy</button></div>
+                    <div class="command-item"><div class="command-content"><code class="command-code">npm run test:tag:smoke</code><span class="command-desc">Run smoke tests</span></div><button class="copy-btn" onclick="copyCommand(this)">&#128203; Copy</button></div>
+                    <div class="command-item"><div class="command-content"><code class="command-code">npm run test:tag:regression</code><span class="command-desc">Run regression suite</span></div><button class="copy-btn" onclick="copyCommand(this)">&#128203; Copy</button></div>
+                    <div class="command-item"><div class="command-content"><code class="command-code">npm run test:interactive</code><span class="command-desc">Run with Playwright Inspector</span></div><button class="copy-btn" onclick="copyCommand(this)">&#128203; Copy</button></div>
+                    <div class="command-item"><div class="command-content"><code class="command-code">npm run test:regression</code><span class="command-desc">Run Zephyr cycle regression</span></div><button class="copy-btn" onclick="copyCommand(this)">&#128203; Copy</button></div>
+                </div>
+            </div>
+            <div class="command-group">
+                <h3>Zephyr &amp; Jira Integration</h3>
+                <div class="command-list">
+                    <div class="command-item"><div class="command-content"><code class="command-code">npm run zephyr:UploadTestCase -- --work-item SF-520</code><span class="command-desc">Upload test cases to Zephyr</span></div><button class="copy-btn" onclick="copyCommand(this)">&#128203; Copy</button></div>
+                    <div class="command-item"><div class="command-content"><code class="command-code">npm run zephyr:UploadResult -- --work-item SF-520</code><span class="command-desc">Upload test results</span></div><button class="copy-btn" onclick="copyCommand(this)">&#128203; Copy</button></div>
+                    <div class="command-item"><div class="command-content"><code class="command-code">npm run zephyr:UploadAndLink -- --work-item SF-520</code><span class="command-desc">Upload and link to Jira</span></div><button class="copy-btn" onclick="copyCommand(this)">&#128203; Copy</button></div>
+                    <div class="command-item"><div class="command-content"><code class="command-code">npm run zephyr:SyncToCycle</code><span class="command-desc">Sync test cases to cycle</span></div><button class="copy-btn" onclick="copyCommand(this)">&#128203; Copy</button></div>
+                </div>
+            </div>
+            <div class="command-group">
+                <h3>Reports &amp; Evidence</h3>
+                <div class="command-list">
+                    <div class="command-item"><div class="command-content"><code class="command-code">npm run report:full:both</code><span class="command-desc">Generate full HTML + work item reports</span></div><button class="copy-btn" onclick="copyCommand(this)">&#128203; Copy</button></div>
+                    <div class="command-item"><div class="command-content"><code class="command-code">npm run report:allure:open</code><span class="command-desc">Generate and open Allure report</span></div><button class="copy-btn" onclick="copyCommand(this)">&#128203; Copy</button></div>
+                    <div class="command-item"><div class="command-content"><code class="command-code">npm run report:weekly-qa</code><span class="command-desc">Generate weekly QA progress report</span></div><button class="copy-btn" onclick="copyCommand(this)">&#128203; Copy</button></div>
+                    <div class="command-item"><div class="command-content"><code class="command-code">npm run docs:upload:workflow</code><span class="command-desc">Upload workflow to Confluence</span></div><button class="copy-btn" onclick="copyCommand(this)">&#128203; Copy</button></div>
+                </div>
+            </div>
+            <div class="command-group">
+                <h3>Data &amp; Validation</h3>
+                <div class="command-list">
+                    <div class="command-item"><div class="command-content"><code class="command-code">npm run cleanup:accounts:force</code><span class="command-desc">Force cleanup test accounts</span></div><button class="copy-btn" onclick="copyCommand(this)">&#128203; Copy</button></div>
+                    <div class="command-item"><div class="command-content"><code class="command-code">npm run validate:steps -- --work-item SF-520</code><span class="command-desc">Validate step definitions</span></div><button class="copy-btn" onclick="copyCommand(this)">&#128203; Copy</button></div>
+                    <div class="command-item"><div class="command-content"><code class="command-code">npm run validate:migration</code><span class="command-desc">Validate migrated data</span></div><button class="copy-btn" onclick="copyCommand(this)">&#128203; Copy</button></div>
+                    <div class="command-item"><div class="command-content"><code class="command-code">npm run transform:party-csv</code><span class="command-desc">Transform CSV for Workbench</span></div><button class="copy-btn" onclick="copyCommand(this)">&#128203; Copy</button></div>
+                    <div class="command-item"><div class="command-content"><code class="command-code">npm run knowledge:build</code><span class="command-desc">Build knowledge base</span></div><button class="copy-btn" onclick="copyCommand(this)">&#128203; Copy</button></div>
+                </div>
+            </div>
+            <div class="command-group">
+                <h3>CI/CD &amp; Workflow</h3>
+                <div class="command-list">
+                    <div class="command-item"><div class="command-content"><code class="command-code">npm run workflow:check</code><span class="command-desc">Check GitHub workflow status</span></div><button class="copy-btn" onclick="copyCommand(this)">&#128203; Copy</button></div>
+                    <div class="command-item"><div class="command-content"><code class="command-code">npm run workflow:logs</code><span class="command-desc">Get workflow run logs</span></div><button class="copy-btn" onclick="copyCommand(this)">&#128203; Copy</button></div>
+                    <div class="command-item"><div class="command-content"><code class="command-code">npm run connectivity:check</code><span class="command-desc">Check all system connectivity</span></div><button class="copy-btn" onclick="copyCommand(this)">&#128203; Copy</button></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+        <div class="footer-logo">&#9889; END TO END AUTOMATION v3.0</div>
+        <p class="footer-text">
+            QA Automation Team | February 2026<br>
+            Unified E2E Testing for Salesforce, Dynamics 365, MuleSoft &amp; SQL Server
+        </p>
+        <div class="footer-links">
+            <a href="https://accelins.atlassian.net/wiki/spaces/TM/pages/2692710418" target="_blank">&#128196; Confluence</a>
+            <a href="#" target="_blank">&#128218; Documentation</a>
+            <a href="#" target="_blank">&#128172; Support</a>
+        </div>
+    </footer>
+
+    <!-- PRESENTER CONTROLS -->
+    <div class="presenter-controls">
+        <button class="presenter-btn" onclick="scrollToSection(-1)" title="Previous Section">&#8593;</button>
+        <button class="presenter-btn" onclick="scrollToSection(1)" title="Next Section">&#8595;</button>
+    </div>
+    <div class="slide-counter">
+        <span id="current-section">1</span> / <span id="total-sections">12</span>
+    </div>
+
+    <!-- TOAST -->
+    <div class="toast" id="toast">
+        <span class="toast-icon">&#10003;</span>
+        <span id="toast-message">Command copied!</span>
+    </div>
+
+    <script>
+    async function copyCommand(button, customText) {
+        var commandText = customText || button.parentElement.querySelector('.command-code').textContent;
+        try {
+            await navigator.clipboard.writeText(commandText);
+            var orig = button.innerHTML; button.innerHTML = '&#10003; Copied!'; button.classList.add('copied');
+            showToast('Copied: ' + commandText.substring(0,40) + (commandText.length>40?'...':''));
+            setTimeout(function(){ button.innerHTML = orig; button.classList.remove('copied'); }, 2000);
+        } catch(e) { showToast('Failed to copy', true); }
+    }
+    function showToast(msg, isErr) {
+        var t = document.getElementById('toast'), m = document.getElementById('toast-message'), ic = t.querySelector('.toast-icon');
+        m.textContent = msg; ic.textContent = isErr ? '\u2717' : '\u2713';
+        t.style.borderColor = isErr ? 'var(--danger)' : 'var(--success)';
+        t.style.color = isErr ? 'var(--danger)' : 'var(--success)';
+        t.classList.add('show'); setTimeout(function(){ t.classList.remove('show'); }, 3000);
+    }
+
+    var sections = ['hero','architecture','metrics','workflow','terminal','phases','cicd','reporting','learning','improvement','tech','commands'];
+    var currentSectionIndex = 0;
+
+    var demos = {
+        generate: { commands: [
+            {type:'command',text:'npm run jira:generate -- --work-item SF-520'},
+            {type:'output',text:''},
+            {type:'info',text:'Fetching work item SF-520 from Jira...'},
+            {type:'success',text:'Work item retrieved: "Account Status Field Validation"'},
+            {type:'info',text:'Analyzing acceptance criteria...'},
+            {type:'output',text:'   - Found 5 acceptance criteria'},
+            {type:'output',text:'   - Identified 3 field validations'},
+            {type:'output',text:'   - Knowledge base: 12 matching patterns'},
+            {type:'info',text:'Generating Gherkin scenarios...'},
+            {type:'success',text:'Generated: src/features/ui/SF/SF-520.feature (8 scenarios)'},
+            {type:'success',text:'Generated: src/features/api/SF/SF-520.feature (5 scenarios)'},
+            {type:'success',text:'Test generation complete!'}
+        ]},
+        execute: { commands: [
+            {type:'command',text:'npm run test:feature -- --tags "@SF-520"'},
+            {type:'output',text:'   Environment: QA | Browser: Chromium'},
+            {type:'info',text:'Creating test data via API...'},
+            {type:'success',text:'Account created: ACC-20260219-142356'},
+            {type:'info',text:'Running scenarios...'},
+            {type:'success',text:'SF-520-UI-001: Verify Account Status picklist (2.3s)'},
+            {type:'success',text:'SF-520-UI-002: Set Status to Contracted (1.8s)'},
+            {type:'success',text:'SF-520-UI-003: Validate Status transitions (3.1s)'},
+            {type:'success',text:'SF-520-API-001: API Status update (0.4s)'},
+            {type:'success',text:'SF-520-API-002: API validation rules (0.3s)'},
+            {type:'info',text:'Cleaning up test data...'},
+            {type:'success',text:'5 scenarios passed | 0 failed | 7.9s total'}
+        ]},
+        upload: { commands: [
+            {type:'command',text:'npm run zephyr:UploadAndLink -- --work-item SF-520'},
+            {type:'info',text:'Connecting to Zephyr Scale...'},
+            {type:'success',text:'Authenticated successfully'},
+            {type:'info',text:'Uploading test cases...'},
+            {type:'success',text:'SF-520-UI-001 -> Created (TC-4521)'},
+            {type:'success',text:'SF-520-UI-002 -> Created (TC-4522)'},
+            {type:'success',text:'SF-520-UI-003 -> Created (TC-4523)'},
+            {type:'success',text:'SF-520-API-001 -> Created (TC-4524)'},
+            {type:'success',text:'SF-520-API-002 -> Created (TC-4525)'},
+            {type:'info',text:'Linking to Jira work item SF-520...'},
+            {type:'success',text:'5 test cases uploaded and linked!'}
+        ]},
+        cicd: { commands: [
+            {type:'command',text:'npm run workflow:check'},
+            {type:'info',text:'Checking GitHub Actions workflows...'},
+            {type:'success',text:'e2e-tests.yml         : Active (self-hosted)'},
+            {type:'success',text:'regression-tests.yml  : Scheduled 2AM UTC'},
+            {type:'success',text:'smoke-tests.yml       : Active'},
+            {type:'success',text:'tag-based-tests.yml   : Active'},
+            {type:'success',text:'test-runner.yml       : Active'},
+            {type:'output',text:''},
+            {type:'command',text:'# Triggering E2E workflow for SF-520...'},
+            {type:'info',text:'Workflow dispatched: e2e-tests.yml'},
+            {type:'output',text:'   work-item: SF-520, env: qa, branch: main'},
+            {type:'success',text:'Workflow run #247 started on self-hosted runner'},
+            {type:'success',text:'Tests passed. Results uploaded to Zephyr.'}
+        ]},
+        report: { commands: [
+            {type:'command',text:'npm run report:full:both'},
+            {type:'info',text:'Converting Cucumber results...'},
+            {type:'success',text:'JSON report: reports/json/cucumber-report.json'},
+            {type:'info',text:'Generating HTML report...'},
+            {type:'success',text:'HTML report: reports/html/cucumber-report.html'},
+            {type:'info',text:'Generating work item reports...'},
+            {type:'success',text:'Work item report: reports/work-items/SF-520.html'},
+            {type:'output',text:''},
+            {type:'command',text:'npm run report:allure'},
+            {type:'success',text:'Allure report: reports/allure-report/index.html'},
+            {type:'success',text:'All reports generated!'}
+        ]},
+        data: { commands: [
+            {type:'command',text:'npm run test:feature -- --tags "@SF-520" --dry-run'},
+            {type:'info',text:'Test Data Factory: Creating records...'},
+            {type:'output',text:'   Account: 24+ fields (role: QA Admin)'},
+            {type:'output',text:'   Contact: Linked to Account'},
+            {type:'output',text:'   Opportunity: Linked to Account'},
+            {type:'success',text:'Account: ACC-20260219-142356'},
+            {type:'success',text:'Contact: CON-20260219-142357'},
+            {type:'success',text:'Opportunity: OPP-20260219-142358'},
+            {type:'output',text:'   FLS validation: passed'},
+            {type:'output',text:'   Auto-cleanup: scheduled'},
+            {type:'success',text:'Test data setup complete!'}
+        ]},
+        full: { commands: [
+            {type:'command',text:'# Full E2E Automation Workflow'},
+            {type:'info',text:'Step 1: Fetch work item from Jira'},
+            {type:'success',text:'SF-520 retrieved: "Account Status Field Validation"'},
+            {type:'output',text:''},
+            {type:'info',text:'Step 2: Generate test cases'},
+            {type:'command',text:'npm run jira:generate -- --work-item SF-520'},
+            {type:'success',text:'13 scenarios generated (8 UI + 5 API)'},
+            {type:'output',text:''},
+            {type:'info',text:'Step 3: Validate step definitions'},
+            {type:'command',text:'npm run validate:steps -- --work-item SF-520'},
+            {type:'success',text:'All 24 steps validated (100% coverage)'},
+            {type:'output',text:''},
+            {type:'info',text:'Step 4: Upload to Zephyr Scale'},
+            {type:'command',text:'npm run zephyr:UploadAndLink -- --work-item SF-520'},
+            {type:'success',text:'5 test cases uploaded and linked to Jira'},
+            {type:'output',text:''},
+            {type:'info',text:'Step 5: Execute tests'},
+            {type:'command',text:'npm run test:feature -- --tags "@SF-520"'},
+            {type:'success',text:'All tests passed (5/5) | Evidence captured'},
+            {type:'output',text:''},
+            {type:'info',text:'Step 6: Generate reports'},
+            {type:'command',text:'npm run report:full:both'},
+            {type:'success',text:'HTML + Allure + Work item reports generated'},
+            {type:'output',text:''},
+            {type:'info',text:'Step 7: Upload results to Zephyr'},
+            {type:'command',text:'npm run zephyr:UploadResult -- --work-item SF-520'},
+            {type:'success',text:'Results uploaded with attachments'},
+            {type:'output',text:''},
+            {type:'info',text:'Step 8: Commit and push to GitHub'},
+            {type:'success',text:'PR #247 created: feature/SF-520-tests'},
+            {type:'output',text:''},
+            {type:'info',text:'Step 9: CI/CD triggered on self-hosted runner'},
+            {type:'success',text:'GitHub Actions: Tests passed, results uploaded'},
+            {type:'output',text:''},
+            {type:'success',text:'WORKFLOW COMPLETE - All 9 steps automated!'}
+        ]}
+    };
+
+    var terminalBody = document.getElementById('terminal-body');
+    var isAnimating = false;
+
+    async function runDemo(name) {
+        if (isAnimating) return;
+        isAnimating = true;
+        terminalBody.innerHTML = '';
+        var demo = demos[name]; if (!demo) { isAnimating=false; return; }
+        document.querySelectorAll('.demo-btn').forEach(function(b){ b.classList.remove('active'); });
+        document.querySelector('[data-demo="'+name+'"]').classList.add('active');
+        for (var i=0; i<demo.commands.length; i++) {
+            await addLine(demo.commands[i]);
+            await sleep(demo.commands[i].type === 'command' ? 700 : 120);
+        }
+        await addLine({type:'prompt',text:''});
+        isAnimating = false;
+    }
+
+    function addLine(line) {
+        return new Promise(function(resolve) {
+            var d = document.createElement('div'); d.className = 'terminal-line';
+            if (line.type==='command') d.innerHTML = '<span class="terminal-prompt">PS C:\\Automation</span>&gt; <span class="terminal-command">'+line.text+'</span>';
+            else if (line.type==='prompt') d.innerHTML = '<span class="terminal-prompt">PS C:\\Automation</span>&gt; <span class="terminal-cursor"></span>';
+            else if (line.type==='output') d.innerHTML = '<span class="terminal-output">'+line.text+'</span>';
+            else if (line.type==='success') d.innerHTML = '<span class="terminal-success">  \u2713 '+line.text+'</span>';
+            else if (line.type==='warning') d.innerHTML = '<span class="terminal-warning">  \u26A0 '+line.text+'</span>';
+            else if (line.type==='error') d.innerHTML = '<span class="terminal-error">  \u2717 '+line.text+'</span>';
+            else if (line.type==='info') d.innerHTML = '<span class="terminal-info">  \u25B6 '+line.text+'</span>';
+            terminalBody.appendChild(d);
+            terminalBody.scrollTop = terminalBody.scrollHeight;
+            resolve();
+        });
+    }
+    function sleep(ms) { return new Promise(function(r){ setTimeout(r, ms); }); }
+
+    document.querySelectorAll('.demo-btn').forEach(function(btn) {
+        btn.addEventListener('click', function(){ runDemo(btn.dataset.demo); });
+    });
+
+    function scrollToSection(dir) {
+        currentSectionIndex += dir;
+        if (currentSectionIndex < 0) currentSectionIndex = 0;
+        if (currentSectionIndex >= sections.length) currentSectionIndex = sections.length - 1;
+        var el = document.getElementById(sections[currentSectionIndex]);
+        if (el) el.scrollIntoView({ behavior:'smooth' });
+        updateCounter();
+    }
+    function updateCounter() {
+        document.getElementById('current-section').textContent = currentSectionIndex + 1;
+        document.getElementById('total-sections').textContent = sections.length;
+    }
+
+    document.addEventListener('keydown', function(e) {
+        if (e.key==='ArrowDown'||e.key==='PageDown'||e.key===' ') { e.preventDefault(); scrollToSection(1); }
+        else if (e.key==='ArrowUp'||e.key==='PageUp') { e.preventDefault(); scrollToSection(-1); }
+    });
+
+    var scrollTimeout;
+    window.addEventListener('scroll', function() {
+        clearTimeout(scrollTimeout);
+        scrollTimeout = setTimeout(function() {
+            var sp = window.scrollY + window.innerHeight/2;
+            sections.forEach(function(id, idx) {
+                var el = document.getElementById(id);
+                if (el && sp >= el.offsetTop && sp < el.offsetTop + el.offsetHeight) {
+                    currentSectionIndex = idx; updateCounter();
+                }
+            });
+        }, 50);
+    });
+
+    window.addEventListener('load', function() {
+        var obs = new IntersectionObserver(function(entries) {
+            entries.forEach(function(e) { if (e.isIntersecting) e.target.classList.add('visible'); });
+        }, { threshold: 0.15 });
+        sections.forEach(function(id) { var el = document.getElementById(id); if (el) obs.observe(el); });
+        var first = document.getElementById(sections[0]);
+        if (first) setTimeout(function(){ first.classList.add('visible'); }, 300);
+        updateCounter();
+        setTimeout(function(){ runDemo('full'); }, 2000);
+    });
+    </script>
+</body>
+</html>

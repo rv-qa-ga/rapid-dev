@@ -1,0 +1,53 @@
+{
+  "key": "SF-506",
+  "summary": "Hide Estimated Onboarding Date on Account and Map from Lead to Opportunity",
+  "type": "Story",
+  "status": "In QA",
+  "priority": "Medium",
+  "description": {
+    "raw": "As an MRD I want the  Estimated Onboarding Date  field to be hidden from all Account page layouts So that it is only used during the Lead-to-Opportunity process and not visible or editable once the Account is created, while still ensuring the value carries over automatically from Lead to Opportunity. Scenario 1: Estimated Onboarding Date hidden from all Account page layouts   Given an Account record is displayed   When any user views or edits an Account   Then the \"Estimated_Onboarding_Date__c\" field should not appear on the page layout   And users should not be able to view or edit this field on any Account record type Scenario 2: Estimated Onboarding Date maps from Lead to Opportunity   Given a Lead record has a value in the \"Estimated_Onboarding_Date__c\" field   When the Lead is converted to an Opportunity   Then the \"Estimated_Onboarding_Date__c\" field on the Opportunity should automatically populate with the same value from the Lead Scenario 3: No mapping to Account during conversion   Given a Lead is converted   When the system creates the related Account record   Then the \"Estimated_Onboarding_Date__c\" field should not populate or appear on the Account",
+    "parsed": {
+      "sentences": [
+        "As an MRD I want the  Estimated Onboarding Date  field to be hidden from all Account page layouts So that it is only used during the Lead-to-Opportunity process and not visible or editable once the Account is created, while still ensuring the value carries over automatically from Lead to Opportunity",
+        "Scenario 1: Estimated Onboarding Date hidden from all Account page layouts   Given an Account record is displayed   When any user views or edits an Account   Then the \"Estimated_Onboarding_Date__c\" field should not appear on the page layout   And users should not be able to view or edit this field on any Account record type Scenario 2: Estimated Onboarding Date maps from Lead to Opportunity   Given a Lead record has a value in the \"Estimated_Onboarding_Date__c\" field   When the Lead is converted to an Opportunity   Then the \"Estimated_Onboarding_Date__c\" field on the Opportunity should automatically populate with the same value from the Lead Scenario 3: No mapping to Account during conversion   Given a Lead is converted   When the system creates the related Account record   Then the \"Estimated_Onboarding_Date__c\" field should not populate or appear on the Account"
+      ],
+      "entities": [
+        "Account",
+        "Opportunity",
+        "Lead"
+      ],
+      "fields": [
+        "Estimated_Onboarding_Date__c",
+        "When"
+      ],
+      "actions": [
+        "display",
+        "create",
+        "populate",
+        "map",
+        "convert"
+      ]
+    }
+  },
+  "acceptanceCriteria": [],
+  "comments": [],
+  "relatedIssues": [],
+  "fieldDefinitions": {
+    "Estimated_Onboarding_Date__c": {
+      "type": "Date",
+      "required": false,
+      "description": "Field: Estimated_Onboarding_Date__c"
+    },
+    "When": {
+      "type": "Text",
+      "required": false,
+      "description": "Field: When"
+    }
+  },
+  "generatedFeatures": {
+    "ui": "src/features/ui/SF/SF-506.feature",
+    "api": "src/features/api/SF/SF-506.feature"
+  },
+  "qaReviewedFeatures": {},
+  "extractedAt": "2025-12-17T18:40:30.179Z"
+}

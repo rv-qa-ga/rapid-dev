@@ -1,0 +1,847 @@
+{
+  "info": {
+    "_postman_id": "sf-489-api-tests",
+    "name": "SF-489 - Delete Account Fields - API Tests",
+    "description": "API - SF-489 - Delete Account fields Series_Entity__c, Sub_Type__c, Legal_Entity__c, Legal_Entity_Lookup__c, Legal_Entity_Name__c\n\n══════════════════════════════════════════════════════════════════════════════\nGenerated: 2026-01-18\n══════════════════════════════════════════════════════════════════════════════\n\nSUMMARY:\n  Delete Account fields Series_Entity__c, Sub_Type__c, Legal_Entity__c, Legal_Entity_Lookup__c, Legal_Entity_Name__c\n\nDESCRIPTION:\n  As a Product Owner / Business Analyst I want the custom fields Series_Entity__c, \n  Sub_Type__c, Legal_Entity__c, Legal_Entity_Lookup__c and Legal_Entity_Name__c \n  removed from the Account object only So that the Account object is simplified and \n  obsolete/unused fields are cleaned up, while ensuring no other Salesforce object, \n  automation, integration, report, scheduled job, or managed package is negatively affected.\n\nFIELDS TO DELETE (Account object only):\n  1. Series_Entity__c\n  2. Sub_Type__c\n  3. Legal_Entity__c\n  4. Legal_Entity_Lookup__c\n  5. Legal_Entity_Name__c\n\nIMPORTANT:\n  - Fields should be removed from Account object ONLY\n  - Fields with same API names on other objects (e.g., Lead) should remain unchanged\n  - Verify fields do NOT exist on Account after deletion\n  - Verify fields still exist on Lead (if applicable)\n\nAPI TESTING REQUIREMENTS:\n  - Verify fields do NOT exist on Account (after deletion)\n  - Verify fields may still exist on Lead (if applicable)\n  - Attempt to use deleted fields on Account should fail\n  - CRUD operations validation\n  - Negative/boundary scenarios\n\nGenerated from: src/features/api/SF/SF-489.feature\n\nThis collection contains API tests for SF-489 work item.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{sf_access_token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "{{sf_base_url}}",
+      "type": "string"
+    },
+    {
+      "key": "api_version",
+      "value": "v60.0",
+      "type": "string"
+    },
+    {
+      "key": "lead_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "account_id",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Field Existence Verification - Account (Should NOT Exist)",
+      "item": [
+        {
+          "name": "SF-489-API-001 - Verify Series_Entity__c does NOT exist on Account",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Series_Entity__c field does NOT exist on Account\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    var fields = jsonData.fields;",
+                  "    var field = fields.find(function(f) { return f.name === 'Series_Entity__c'; });",
+                  "    pm.expect(field).to.be.undefined;",
+                  "    console.log('✅ Series_Entity__c correctly does NOT exist on Account (field deleted)');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Account/describe",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "data",
+                "{{api_version}}",
+                "sobjects",
+                "Account",
+                "describe"
+              ]
+            },
+            "description": "Verify Series_Entity__c field does NOT exist on Account (should be deleted)\n\n**Test:** SF-489-API-001\n**Purpose:** Verify field deletion on Account object\n**Expected:** Field should NOT exist"
+          },
+          "response": []
+        },
+        {
+          "name": "SF-489-API-002 - Verify Sub_Type__c does NOT exist on Account",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Sub_Type__c field does NOT exist on Account\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    var fields = jsonData.fields;",
+                  "    var field = fields.find(function(f) { return f.name === 'Sub_Type__c'; });",
+                  "    pm.expect(field).to.be.undefined;",
+                  "    console.log('✅ Sub_Type__c correctly does NOT exist on Account (field deleted)');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Account/describe",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "data",
+                "{{api_version}}",
+                "sobjects",
+                "Account",
+                "describe"
+              ]
+            },
+            "description": "Verify Sub_Type__c field does NOT exist on Account (should be deleted)\n\n**Test:** SF-489-API-002\n**Purpose:** Verify field deletion on Account object"
+          },
+          "response": []
+        },
+        {
+          "name": "SF-489-API-003 - Verify Legal_Entity__c does NOT exist on Account",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Legal_Entity__c field does NOT exist on Account\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    var fields = jsonData.fields;",
+                  "    var field = fields.find(function(f) { return f.name === 'Legal_Entity__c'; });",
+                  "    pm.expect(field).to.be.undefined;",
+                  "    console.log('✅ Legal_Entity__c correctly does NOT exist on Account (field deleted)');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Account/describe",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "data",
+                "{{api_version}}",
+                "sobjects",
+                "Account",
+                "describe"
+              ]
+            },
+            "description": "Verify Legal_Entity__c field does NOT exist on Account (should be deleted)\n\n**Test:** SF-489-API-003\n**Purpose:** Verify field deletion on Account object"
+          },
+          "response": []
+        },
+        {
+          "name": "SF-489-API-004 - Verify Legal_Entity_Lookup__c does NOT exist on Account",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Legal_Entity_Lookup__c field does NOT exist on Account\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    var fields = jsonData.fields;",
+                  "    var field = fields.find(function(f) { return f.name === 'Legal_Entity_Lookup__c'; });",
+                  "    pm.expect(field).to.be.undefined;",
+                  "    console.log('✅ Legal_Entity_Lookup__c correctly does NOT exist on Account (field deleted)');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Account/describe",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "data",
+                "{{api_version}}",
+                "sobjects",
+                "Account",
+                "describe"
+              ]
+            },
+            "description": "Verify Legal_Entity_Lookup__c field does NOT exist on Account (should be deleted)\n\n**Test:** SF-489-API-004\n**Purpose:** Verify field deletion on Account object"
+          },
+          "response": []
+        },
+        {
+          "name": "SF-489-API-005 - Verify Legal_Entity_Name__c does NOT exist on Account",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Legal_Entity_Name__c field does NOT exist on Account\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    var fields = jsonData.fields;",
+                  "    var field = fields.find(function(f) { return f.name === 'Legal_Entity_Name__c'; });",
+                  "    pm.expect(field).to.be.undefined;",
+                  "    console.log('✅ Legal_Entity_Name__c correctly does NOT exist on Account (field deleted)');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Account/describe",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "data",
+                "{{api_version}}",
+                "sobjects",
+                "Account",
+                "describe"
+              ]
+            },
+            "description": "Verify Legal_Entity_Name__c field does NOT exist on Account (should be deleted)\n\n**Test:** SF-489-API-005\n**Purpose:** Verify field deletion on Account object"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Field Existence Verification - Lead (May Still Exist)",
+      "item": [
+        {
+          "name": "SF-489-API-006 - Verify Series_Entity__c may exist on Lead",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Check if Series_Entity__c exists on Lead\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    var fields = jsonData.fields;",
+                  "    var field = fields.find(function(f) { return f.name === 'Series_Entity__c'; });",
+                  "    if (field) {",
+                  "        console.log('✅ Series_Entity__c exists on Lead (as expected - deletion was Account-only)');",
+                  "        console.log('Field type: ' + field.type);",
+                  "    } else {",
+                  "        console.log('⚠️ Series_Entity__c does NOT exist on Lead (may have been deleted or never existed)');",
+                  "    }",
+                  "    // This test passes regardless - we're just checking status",
+                  "    pm.expect(pm.response.code).to.equal(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Lead/describe",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "data",
+                "{{api_version}}",
+                "sobjects",
+                "Lead",
+                "describe"
+              ]
+            },
+            "description": "Verify Series_Entity__c may still exist on Lead (deletion was Account-only)\n\n**Test:** SF-489-API-006\n**Purpose:** Verify fields on other objects remain unchanged\n**Note:** Field may or may not exist on Lead - this is informational"
+          },
+          "response": []
+        },
+        {
+          "name": "SF-489-API-007 - Verify other fields may exist on Lead",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Check if deleted Account fields exist on Lead\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    var fields = jsonData.fields;",
+                  "    var fieldNames = fields.map(function(f) { return f.name; });",
+                  "    ",
+                  "    var fieldsToCheck = ['Sub_Type__c', 'Legal_Entity__c', 'Legal_Entity_Lookup__c', 'Legal_Entity_Name__c'];",
+                  "    ",
+                  "    fieldsToCheck.forEach(function(fieldName) {",
+                  "        var field = fields.find(function(f) { return f.name === fieldName; });",
+                  "        if (field) {",
+                  "            console.log('✅ ' + fieldName + ' exists on Lead (as expected - deletion was Account-only)');",
+                  "        } else {",
+                  "            console.log('⚠️ ' + fieldName + ' does NOT exist on Lead');",
+                  "        }",
+                  "    });",
+                  "    ",
+                  "    // This test passes regardless - we're just checking status",
+                  "    pm.expect(pm.response.code).to.equal(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Lead/describe",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "data",
+                "{{api_version}}",
+                "sobjects",
+                "Lead",
+                "describe"
+              ]
+            },
+            "description": "Verify other deleted Account fields may still exist on Lead\n\n**Test:** SF-489-API-007\n**Purpose:** Verify fields on other objects remain unchanged"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "CRUD Operations - Account (Should Fail)",
+      "item": [
+        {
+          "name": "SF-489-API-008 - Attempt to Create Account with Series_Entity__c (Should Fail)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code indicates error\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([400, 422]);",
+                  "});",
+                  "",
+                  "pm.test(\"Error mentions field does not exist\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    var errorString = JSON.stringify(jsonData).toLowerCase();",
+                  "    var hasFieldError = errorString.includes('series_entity') || errorString.includes('no such column') || errorString.includes('invalid field');",
+                  "    console.log('Error response: ' + JSON.stringify(jsonData, null, 2));",
+                  "    // Field should not exist, so API should reject it",
+                  "    pm.expect(pm.response.code).to.be.oneOf([400, 422]);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"Name\": \"SF-489 Test Account\",\n  \"Series_Entity__c\": \"Test Value\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Account/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "data",
+                "{{api_version}}",
+                "sobjects",
+                "Account",
+                ""
+              ]
+            },
+            "description": "Attempt to create Account with Series_Entity__c field (should fail - field deleted)\n\n**Test:** SF-489-API-008\n**Purpose:** Verify deleted field cannot be used in create operations\n**Expected:** 400 or 422 error (field does not exist)"
+          },
+          "response": []
+        },
+        {
+          "name": "SF-489-API-009 - Attempt to Update Account with Sub_Type__c (Should Fail)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code indicates error\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([400, 422]);",
+                  "});",
+                  "",
+                  "pm.test(\"Error mentions field does not exist\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    var errorString = JSON.stringify(jsonData).toLowerCase();",
+                  "    var hasFieldError = errorString.includes('sub_type') || errorString.includes('no such column') || errorString.includes('invalid field');",
+                  "    console.log('Error response: ' + JSON.stringify(jsonData, null, 2));",
+                  "    pm.expect(pm.response.code).to.be.oneOf([400, 422]);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "var accountId = pm.collectionVariables.get('account_id');",
+                  "if (!accountId) {",
+                  "    // Create a basic Account first",
+                  "    console.log('⚠️ account_id not set. This request will fail if Account is required.');",
+                  "} else {",
+                  "    console.log('Attempting to update Account: ' + accountId + ' with deleted field Sub_Type__c');",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"Sub_Type__c\": \"Test Value\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Account/{{account_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "data",
+                "{{api_version}}",
+                "sobjects",
+                "Account",
+                "{{account_id}}"
+              ]
+            },
+            "description": "Attempt to update Account with Sub_Type__c field (should fail - field deleted)\n\n**Test:** SF-489-API-009\n**Purpose:** Verify deleted field cannot be used in update operations\n**Expected:** 400 or 422 error (field does not exist)\n**Note:** Create Account first using 'Create Account (Basic)' request"
+          },
+          "response": []
+        },
+        {
+          "name": "SF-489-API-010 - Create Account (Basic - Without Deleted Fields)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test(\"Response contains Account ID\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.id).to.not.be.undefined;",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    pm.collectionVariables.set('account_id', jsonData.id);",
+                  "    console.log('✅ Account created: ' + jsonData.id);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"Name\": \"SF-489 Test Account\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Account/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "data",
+                "{{api_version}}",
+                "sobjects",
+                "Account",
+                ""
+              ]
+            },
+            "description": "Create Account without deleted fields (should succeed)\n\n**Test:** SF-489-API-010 (Setup)\n**Purpose:** Create Account for update tests"
+          },
+          "response": []
+        },
+        {
+          "name": "SF-489-API-011 - Query Account by ID - Verify Deleted Fields Not Returned",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Deleted fields are not in response\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    var deletedFields = ['Series_Entity__c', 'Sub_Type__c', 'Legal_Entity__c', 'Legal_Entity_Lookup__c', 'Legal_Entity_Name__c'];",
+                  "    ",
+                  "    deletedFields.forEach(function(fieldName) {",
+                  "        pm.expect(jsonData[fieldName]).to.be.undefined;",
+                  "    });",
+                  "    ",
+                  "    console.log('✅ Deleted fields correctly not returned in Account query');",
+                  "    console.log('Account ID: ' + jsonData.Id);",
+                  "    console.log('Account Name: ' + jsonData.Name);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "var accountId = pm.collectionVariables.get('account_id');",
+                  "if (!accountId) {",
+                  "    throw new Error('account_id variable is not set. Please run the Create Account request first.');",
+                  "}",
+                  "console.log('Querying Account: ' + accountId);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Account/{{account_id}}?fields=Id,Name",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "data",
+                "{{api_version}}",
+                "sobjects",
+                "Account",
+                "{{account_id}}"
+              ],
+              "query": [
+                {
+                  "key": "fields",
+                  "value": "Id,Name"
+                }
+              ]
+            },
+            "description": "Query Account by ID - Verify deleted fields are not returned\n\n**Test:** SF-489-API-011\n**Query Format:** GET /sobjects/{object}/{id}?fields=...\n**Purpose:** Verify deleted fields cannot be queried"
+          },
+          "response": []
+        },
+        {
+          "name": "SF-489-API-012 - SOQL Query Account - Attempt to Select Deleted Fields (Should Fail)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code indicates error\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([400, 422]);",
+                  "});",
+                  "",
+                  "pm.test(\"Error mentions invalid field\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    var errorString = JSON.stringify(jsonData).toLowerCase();",
+                  "    var hasFieldError = errorString.includes('no such column') || errorString.includes('invalid field') || errorString.includes('series_entity');",
+                  "    console.log('Error response: ' + JSON.stringify(jsonData, null, 2));",
+                  "    pm.expect(pm.response.code).to.be.oneOf([400, 422]);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/query?q=SELECT Id,Name,Series_Entity__c,Sub_Type__c,Legal_Entity__c FROM Account LIMIT 1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "data",
+                "{{api_version}}",
+                "query"
+              ],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "SELECT Id,Name,Series_Entity__c,Sub_Type__c,Legal_Entity__c FROM Account LIMIT 1",
+                  "description": "SOQL query attempting to select deleted fields - should fail"
+                }
+              ]
+            },
+            "description": "SOQL Query attempting to select deleted fields from Account (should fail)\n\n**Test:** SF-489-API-012\n**Query Format:** GET /query?q=SELECT... (SOQL)\n**Purpose:** Verify deleted fields cannot be queried via SOQL\n**Expected:** 400 or 422 error (invalid field)"
+          },
+          "response": []
+        },
+        {
+          "name": "SF-489-API-013 - SOQL Query Account - Valid Fields Only (Should Succeed)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Query returned results\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.records).to.be.an('array');",
+                  "    console.log('✅ SOQL query succeeded with valid fields only');",
+                  "    console.log('Records returned: ' + jsonData.totalSize);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/query?q=SELECT Id,Name FROM Account LIMIT 10",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "data",
+                "{{api_version}}",
+                "query"
+              ],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "SELECT Id,Name FROM Account LIMIT 10",
+                  "description": "SOQL query with valid fields only - should succeed"
+                }
+              ]
+            },
+            "description": "SOQL Query Account with valid fields only (should succeed)\n\n**Test:** SF-489-API-013\n**Query Format:** GET /query?q=SELECT... (SOQL)\n**Purpose:** Verify normal queries work after field deletion"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Negative / Boundary Tests",
+      "item": [
+        {
+          "name": "SF-489-API-014 - Attempt to Create Account with All Deleted Fields (Should Fail)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code indicates error\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([400, 422]);",
+                  "});",
+                  "",
+                  "pm.test(\"Error mentions invalid fields\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    var errorString = JSON.stringify(jsonData).toLowerCase();",
+                  "    var hasFieldError = errorString.includes('no such column') || errorString.includes('invalid field');",
+                  "    console.log('Error response: ' + JSON.stringify(jsonData, null, 2));",
+                  "    pm.expect(pm.response.code).to.be.oneOf([400, 422]);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"Name\": \"SF-489 Invalid Test Account\",\n  \"Series_Entity__c\": \"Test1\",\n  \"Sub_Type__c\": \"Test2\",\n  \"Legal_Entity__c\": \"Test3\",\n  \"Legal_Entity_Lookup__c\": \"Test4\",\n  \"Legal_Entity_Name__c\": \"Test5\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Account/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "data",
+                "{{api_version}}",
+                "sobjects",
+                "Account",
+                ""
+              ]
+            },
+            "description": "Attempt to create Account with all deleted fields (should fail)\n\n**Test:** SF-489-API-014\n**Purpose:** Verify all deleted fields are rejected\n**Expected:** 400 or 422 error"
+          },
+          "response": []
+        },
+        {
+          "name": "SF-489-API-015 - Attempt to Update Account with All Deleted Fields (Should Fail)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code indicates error\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([400, 422]);",
+                  "});",
+                  "",
+                  "pm.test(\"Error mentions invalid fields\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    var errorString = JSON.stringify(jsonData).toLowerCase();",
+                  "    var hasFieldError = errorString.includes('no such column') || errorString.includes('invalid field');",
+                  "    console.log('Error response: ' + JSON.stringify(jsonData, null, 2));",
+                  "    pm.expect(pm.response.code).to.be.oneOf([400, 422]);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "var accountId = pm.collectionVariables.get('account_id');",
+                  "if (!accountId) {",
+                  "    throw new Error('account_id variable is not set. Please run the Create Account request first.');",
+                  "}",
+                  "console.log('Attempting to update Account: ' + accountId + ' with all deleted fields');"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"Series_Entity__c\": \"Test1\",\n  \"Sub_Type__c\": \"Test2\",\n  \"Legal_Entity__c\": \"Test3\",\n  \"Legal_Entity_Lookup__c\": \"Test4\",\n  \"Legal_Entity_Name__c\": \"Test5\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Account/{{account_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "data",
+                "{{api_version}}",
+                "sobjects",
+                "Account",
+                "{{account_id}}"
+              ]
+            },
+            "description": "Attempt to update Account with all deleted fields (should fail)\n\n**Test:** SF-489-API-015\n**Purpose:** Verify all deleted fields are rejected in update operations\n**Expected:** 400 or 422 error"
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

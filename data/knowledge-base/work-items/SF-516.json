@@ -1,0 +1,44 @@
+{
+  "key": "SF-516",
+  "summary": "Autonumber for Account Team Members",
+  "type": "Story",
+  "status": "In QA",
+  "priority": "Medium",
+  "description": {
+    "raw": "As a Salesforce administrator / integration analyst I want an auto-incrementing hidden identifier on the  Account Team Member  object So that each record has a unique, sequential reference (prefixed  IC-000000 ) for integration downstream, while remaining hidden from users on the UI. Scenario 1: Create hidden auto-number field on Account Team Member   Given the Account Team Member object exists   When a new field with API name \"Internal_Contact_Master_ID__c\" and Label Name “Internal Contact Master ID” is created   Then it must use the Auto Number data type   And follow the display format \"IC- {000000}\"   And auto-increment sequentially for each new record created Scenario 2: Field visibility   Given a user views or edits any Account Team Member record in Salesforce   Then the \"Internal_Contact_Master_ID__c\" field must not be visible on any page layout   And the field must not be editable by users Scenario 3: Integration availability   Given integration or reporting users query the Account Team Member object (API, MuleSoft, etc.)   Then the \"Internal_Contact_Master_ID__c\" field must be available in the API and exportable downstream Scenario 4: Continuation from Dataverse numbering   Given the last number generated in Dataverse was known   When the Salesforce auto-number field is configured   Then the starting number in Salesforce must continue from that sequence   And subsequent records must increment sequentially from that point   Example:     | Last Dataverse Value | Next Salesforce Value |     | IC-000257             | IC-000258            | Scenario 5: Uniqueness and immutability   Given a record already has an Internal Contact Master ID value   When any user or system attempts to update it   Then the field must remain read-only and unchangeable after creation",
+    "parsed": {
+      "sentences": [
+        "As a Salesforce administrator / integration analyst I want an auto-incrementing hidden identifier on the  Account Team Member  object So that each record has a unique, sequential reference (prefixed  IC-000000 ) for integration downstream, while remaining hidden from users on the UI",
+        "Scenario 1: Create hidden auto-number field on Account Team Member   Given the Account Team Member object exists   When a new field with API name \"Internal_Contact_Master_ID__c\" and Label Name “Internal Contact Master ID” is created   Then it must use the Auto Number data type   And follow the display format \"IC- {000000}\"   And auto-increment sequentially for each new record created Scenario 2: Field visibility   Given a user views or edits any Account Team Member record in Salesforce   Then the \"Internal_Contact_Master_ID__c\" field must not be visible on any page layout   And the field must not be editable by users Scenario 3: Integration availability   Given integration or reporting users query the Account Team Member object (API, MuleSoft, etc.)   Then the \"Internal_Contact_Master_ID__c\" field must be available in the API and exportable downstream Scenario 4: Continuation from Dataverse numbering   Given the last number generated in Dataverse was known   When the Salesforce auto-number field is configured   Then the starting number in Salesforce must continue from that sequence   And subsequent records must increment sequentially from that point   Example:     | Last Dataverse Value | Next Salesforce Value |     | IC-000257             | IC-000258            | Scenario 5: Uniqueness and immutability   Given a record already has an Internal Contact Master ID value   When any user or system attempts to update it   Then the field must remain read-only and unchangeable after creation"
+      ],
+      "entities": [
+        "Account",
+        "Contact"
+      ],
+      "fields": [
+        "Internal_Contact_Master_ID__c"
+      ],
+      "actions": [
+        "display",
+        "create",
+        "update"
+      ]
+    }
+  },
+  "acceptanceCriteria": [],
+  "comments": [],
+  "relatedIssues": [],
+  "fieldDefinitions": {
+    "Internal_Contact_Master_ID__c": {
+      "type": "Custom",
+      "required": false,
+      "description": "Field: Internal_Contact_Master_ID__c"
+    }
+  },
+  "generatedFeatures": {
+    "ui": "src/features/ui/SF/SF-516.feature",
+    "api": "src/features/api/SF/SF-516.feature"
+  },
+  "qaReviewedFeatures": {},
+  "extractedAt": "2025-12-17T18:40:41.984Z"
+}

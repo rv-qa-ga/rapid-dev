@@ -1,0 +1,1079 @@
+{
+	"info": {
+		"_postman_id": "work-item-sf-726-demo",
+		"name": "SF-726-Demo - Salesforce API Tests",
+		"description": "API - SF-726 Demo - Member and Non-Member MGA Account Status lifecycle\n\n══════════════════════════════════════════════════════════════════════════════\nDescription: Account Status values (Prospect, Onboarding, Contracted, Active,\nRunoff, Offboarded, Invalid) with validation rules per lifecycle stage.\nNotes: Invalid handling governed by SF-759.\n══════════════════════════════════════════════════════════════════════════════\n# ══════════════════════════════════════════════════════════════════════════\n# Scenario 1: Lead Conversion defaults to Prospect\n# ══════════════════\n\nGenerated from: C:\\Automation\\src\\features\\api\\SF\\SF-726-Demo.feature\n\n## Setup Instructions:\n1. Import this collection into Postman\n2. Create a new environment (or use existing Salesforce QA environment)\n3. Set the following environment variables:\n   - `sf_client_id`: Your Connected App Consumer Key\n   - `sf_client_secret`: Your Connected App Consumer Secret\n   - `sf_username`: Your Salesforce username\n   - `sf_password`: Your Salesforce password\n   - `sf_security_token`: Your Salesforce security token\n   - `sf_login_url`: Your Salesforce login URL (e.g., https://login.salesforce.com or https://test.salesforce.com)\n   - `sf_api_version`: API version (e.g., v60.0)\n\n## Authentication:\n1. Run the \"🔐 Get Salesforce Access Token\" request first\n2. The access token and instance URL will be automatically saved to collection variables\n3. All subsequent requests will use this token via Bearer authentication",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{sf_access_token}}",
+				"type": "string"
+			}
+		]
+	},
+	"variable": [
+		{
+			"key": "sf_access_token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "sf_instance_url",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "base_url",
+			"value": "{{sf_instance_url}}",
+			"type": "string"
+		},
+		{
+			"key": "api_version",
+			"value": "{{sf_api_version}}",
+			"type": "string"
+		},
+		{
+			"key": "record_id",
+			"value": "",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "🔐 Get Salesforce Access Token",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response contains access_token\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property(\"access_token\");",
+							"    pm.expect(jsonData.access_token).to.not.be.empty;",
+							"    pm.expect(jsonData).to.have.property(\"instance_url\");",
+							"    ",
+							"    // Save token and instance URL to collection variables",
+							"    pm.collectionVariables.set(\"sf_access_token\", jsonData.access_token);",
+							"    pm.collectionVariables.set(\"sf_instance_url\", jsonData.instance_url);",
+							"    pm.collectionVariables.set(\"sf_base_url\", jsonData.instance_url);",
+							"    ",
+							"    console.log(\"✅ Access token saved to collection variable: sf_access_token\");",
+							"    console.log(\"✅ Instance URL saved: \" + jsonData.instance_url);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "grant_type",
+							"value": "password",
+							"type": "text"
+						},
+						{
+							"key": "client_id",
+							"value": "{{sf_client_id}}",
+							"type": "text"
+						},
+						{
+							"key": "client_secret",
+							"value": "{{sf_client_secret}}",
+							"type": "text"
+						},
+						{
+							"key": "username",
+							"value": "{{sf_username}}",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "{{sf_password}}{{sf_security_token}}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{sf_login_url}}/services/oauth2/token",
+					"host": [
+						"{{sf_login_url}}"
+					],
+					"path": [
+						"services",
+						"oauth2",
+						"token"
+					]
+				},
+				"description": "Obtains a Salesforce access token using OAuth2 Username/Password flow.\n\n**Required Environment Variables:**\n- `sf_client_id`: Your Connected App Consumer Key\n- `sf_client_secret`: Your Connected App Consumer Secret\n- `sf_username`: Your Salesforce username\n- `sf_password`: Your Salesforce password\n- `sf_security_token`: Your Salesforce security token (appended to password)\n- `sf_login_url`: Your Salesforce login URL (e.g., https://login.salesforce.com or https://test.salesforce.com)\n\n**Response:**\nReturns `access_token`, `instance_url`, and other OAuth details. The access token and instance URL are automatically saved to collection variables for use in subsequent requests."
+			},
+			"response": []
+		},
+		{
+			"name": "API - Accounts created via Lead Conversion must default to Prospect",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response contains records\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property(\"records\");",
+							"    pm.expect(jsonData.records).to.be.an(\"array\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/services/data/{{api_version}}/query/?q=SELECT%20Id%2C%20Name%2C%20Account_Status__c%2C%20Type%20FROM%20Account%20LIMIT%2010",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"services",
+						"data",
+						"{{api_version}}",
+						"query"
+					],
+					"query": [
+						{
+							"key": "q",
+							"value": "SELECT Id, Name, Account_Status__c, Type FROM Account LIMIT 10"
+						}
+					]
+				},
+				"description": "**Scenario:** API - Accounts created via Lead Conversion must default to Prospect\n\n**Test ID:** SF-726-API-001\n**Priority:** p1\n**Tags:** @smoke\n\n**Feature:** API - SF-726 Demo - Member and Non-Member MGA Account Status lifecycle\n\n---\n**Steps:**\n- Given a Lead is being converted into an Account via API\n- And the Account Type is \"Member\" or \"Non-Member MGA\"\n- When the Account is created by Lead Conversion\n- Then the API response must indicate success\n- And the Account Status in the response must be \"Prospect\"\n"
+			},
+			"response": []
+		},
+		{
+			"name": "API - Account can be created directly without an associated Lead",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"pm.test(\"Response contains record ID\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property(\"id\");",
+							"    pm.expect(jsonData.id).to.not.be.empty;",
+							"    pm.collectionVariables.set(\"record_id\", jsonData.id);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Account/",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"services",
+						"data",
+						"{{api_version}}",
+						"sobjects",
+						"Account"
+					]
+				},
+				"description": "**Scenario:** API - Account can be created directly without an associated Lead\n\n**Test ID:** SF-726-API-002\n**Priority:** p2\n\n**Feature:** API - SF-726 Demo - Member and Non-Member MGA Account Status lifecycle\n\n---\n**Steps:**\n- Given I create an Account via API with Type \"Member\" or \"Non-Member MGA\"\n- When I save the Account without an associated Lead\n- Then the API must allow the Account to be created successfully\n",
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"Name\": \"Test Account via API\",\n  \"Type\": \"Agency\"\n}"
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "API - Account created directly defaults to Prospect",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"pm.test(\"Response contains record ID\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property(\"id\");",
+							"    pm.expect(jsonData.id).to.not.be.empty;",
+							"    pm.collectionVariables.set(\"record_id\", jsonData.id);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Account/",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"services",
+						"data",
+						"{{api_version}}",
+						"sobjects",
+						"Account"
+					]
+				},
+				"description": "**Scenario:** API - Account created directly defaults to Prospect\n\n**Test ID:** SF-726-API-003\n**Priority:** p1\n\n**Feature:** API - SF-726 Demo - Member and Non-Member MGA Account Status lifecycle\n\n---\n**Steps:**\n- Given I create a new Account via API with Type \"Member\" or \"Non-Member MGA\"\n- When I save the Account without setting Account Status\n- Then the API response must indicate success\n- And the Account Status in the response must be \"Prospect\"\n",
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"Name\": \"Test Account via API\",\n  \"Type\": \"Agency\"\n}"
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "API - Account can be created as Onboarding if Prospect validations are met",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"pm.test(\"Response contains record ID\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property(\"id\");",
+							"    pm.expect(jsonData.id).to.not.be.empty;",
+							"    pm.collectionVariables.set(\"record_id\", jsonData.id);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Account/",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"services",
+						"data",
+						"{{api_version}}",
+						"sobjects",
+						"Account"
+					]
+				},
+				"description": "**Scenario:** API - Account can be created as Onboarding if Prospect validations are met\n\n**Test ID:** SF-726-API-004\n**Priority:** p2\n\n**Feature:** API - SF-726 Demo - Member and Non-Member MGA Account Status lifecycle\n\n---\n**Steps:**\n- Given I create a new Account via API with Type \"Member\" or \"Non-Member MGA\"\n- And I set Account Status to \"Onboarding\"\n- And all validation rules required for \"Prospect\" are satisfied\n- When I save the Account via API\n- Then the API must return success\n- And the Account Status in the response must be \"Onboarding\"\n",
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"Name\": \"Test Account via API\",\n  \"Type\": \"Agency\",\n  \"Account_Status__c\": \"Onboarding\"\n}"
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "API - Account creation as Onboarding blocked when Prospect validations not met",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"pm.test(\"Response contains record ID\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property(\"id\");",
+							"    pm.expect(jsonData.id).to.not.be.empty;",
+							"    pm.collectionVariables.set(\"record_id\", jsonData.id);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Account/",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"services",
+						"data",
+						"{{api_version}}",
+						"sobjects",
+						"Account"
+					]
+				},
+				"description": "**Scenario:** API - Account creation as Onboarding blocked when Prospect validations not met\n\n**Priority:** p2\n\n**Feature:** API - SF-726 Demo - Member and Non-Member MGA Account Status lifecycle\n\n---\n**Steps:**\n- Given I create a new Account via API with Type \"Member\" or \"Non-Member MGA\"\n- And I set Account Status to \"Onboarding\"\n- And one or more Prospect validation rules are not satisfied\n- When I attempt to save the Account via API\n- Then the API must return a validation error\n- And the response must include the relevant validation error message(s)\n",
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"Name\": \"Test Account via API\",\n  \"Type\": \"Agency\",\n  \"Account_Status__c\": \"Onboarding\"\n}"
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "API - Account can be created as Contracted if Prospect and Onboarding validation",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"pm.test(\"Response contains record ID\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property(\"id\");",
+							"    pm.expect(jsonData.id).to.not.be.empty;",
+							"    pm.collectionVariables.set(\"record_id\", jsonData.id);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Account/",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"services",
+						"data",
+						"{{api_version}}",
+						"sobjects",
+						"Account"
+					]
+				},
+				"description": "**Scenario:** API - Account can be created as Contracted if Prospect and Onboarding validations are met\n\n**Test ID:** SF-726-API-005\n**Priority:** p2\n\n**Feature:** API - SF-726 Demo - Member and Non-Member MGA Account Status lifecycle\n\n---\n**Steps:**\n- Given I create a new Account via API with Type \"Member\" or \"Non-Member MGA\"\n- And I set Account Status to \"Contracted\"\n- And all Prospect and Onboarding validation rules are satisfied\n- When I save the Account via API\n- Then the API must return success\n- And the Account Status in the response must be \"Contracted\"\n",
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"Name\": \"Test Account via API\",\n  \"Type\": \"Agency\",\n  \"Account_Status__c\": \"Contracted\"\n}"
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "API - Account creation as Contracted blocked when Onboarding validations not met",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"pm.test(\"Response contains record ID\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property(\"id\");",
+							"    pm.expect(jsonData.id).to.not.be.empty;",
+							"    pm.collectionVariables.set(\"record_id\", jsonData.id);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Account/",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"services",
+						"data",
+						"{{api_version}}",
+						"sobjects",
+						"Account"
+					]
+				},
+				"description": "**Scenario:** API - Account creation as Contracted blocked when Onboarding validations not met\n\n**Priority:** p2\n\n**Feature:** API - SF-726 Demo - Member and Non-Member MGA Account Status lifecycle\n\n---\n**Steps:**\n- Given I create a new Account via API with Type \"Member\" or \"Non-Member MGA\"\n- And I set Account Status to \"Contracted\"\n- And Onboarding validations are not satisfied\n- When I attempt to save the Account via API\n- Then the API must return a validation error\n- And the response must include the relevant validation error message(s)\n",
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"Name\": \"Test Account via API\",\n  \"Type\": \"Agency\",\n  \"Account_Status__c\": \"Contracted\"\n}"
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "API - Account can be created as Active if Prospect, Onboarding and Contracted va",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"pm.test(\"Response contains record ID\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property(\"id\");",
+							"    pm.expect(jsonData.id).to.not.be.empty;",
+							"    pm.collectionVariables.set(\"record_id\", jsonData.id);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Account/",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"services",
+						"data",
+						"{{api_version}}",
+						"sobjects",
+						"Account"
+					]
+				},
+				"description": "**Scenario:** API - Account can be created as Active if Prospect, Onboarding and Contracted validations are met\n\n**Test ID:** SF-726-API-006\n**Priority:** p2\n\n**Feature:** API - SF-726 Demo - Member and Non-Member MGA Account Status lifecycle\n\n---\n**Steps:**\n- Given I create a new Account via API with Type \"Member\" or \"Non-Member MGA\"\n- And I set Account Status to \"Active\"\n- And all Prospect, Onboarding and Contracted validation rules are satisfied\n- When I save the Account via API\n- Then the API must return success\n- And the Account Status in the response must be \"Active\"\n",
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"Name\": \"Test Account via API\",\n  \"Type\": \"Agency\",\n  \"Account_Status__c\": \"Active\"\n}"
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "API - Account creation as Active blocked when any prior validations not met",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"pm.test(\"Response contains record ID\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property(\"id\");",
+							"    pm.expect(jsonData.id).to.not.be.empty;",
+							"    pm.collectionVariables.set(\"record_id\", jsonData.id);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Account/",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"services",
+						"data",
+						"{{api_version}}",
+						"sobjects",
+						"Account"
+					]
+				},
+				"description": "**Scenario:** API - Account creation as Active blocked when any prior validations not met\n\n**Priority:** p2\n\n**Feature:** API - SF-726 Demo - Member and Non-Member MGA Account Status lifecycle\n\n---\n**Steps:**\n- Given I create a new Account via API with Type \"Member\" or \"Non-Member MGA\"\n- And I set Account Status to \"Active\"\n- And one or more of Prospect, Onboarding or Contracted validations are not satisfied\n- When I attempt to save the Account via API\n- Then the API must return a validation error\n- And the response must include the relevant validation error message(s)\n",
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"Name\": \"Test Account via API\",\n  \"Type\": \"Agency\",\n  \"Account_Status__c\": \"Active\"\n}"
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "API - Prospect can move to Contracted if Onboarding validations are met",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 204\", function () {",
+							"    pm.response.to.have.status(204);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Account/{{record_id}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"services",
+						"data",
+						"{{api_version}}",
+						"sobjects",
+						"Account",
+						"{{record_id}}"
+					]
+				},
+				"description": "**Scenario:** API - Prospect can move to Contracted if Onboarding validations are met\n\n**Test ID:** SF-726-API-007\n**Priority:** p2\n\n**Feature:** API - SF-726 Demo - Member and Non-Member MGA Account Status lifecycle\n\n---\n**Steps:**\n- Given an Account exists via API with Account Status \"Prospect\"\n- And all Onboarding validation requirements are met\n- When I update the Account via API to set Account Status to \"Contracted\"\n- Then the API must return success\n- And the Account Status in the response must be \"Contracted\"\n",
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"Account_Status__c\": \"Contracted\"\n}"
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "API - Prospect to Contracted blocked when Onboarding validations not met",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 204\", function () {",
+							"    pm.response.to.have.status(204);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Account/{{record_id}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"services",
+						"data",
+						"{{api_version}}",
+						"sobjects",
+						"Account",
+						"{{record_id}}"
+					]
+				},
+				"description": "**Scenario:** API - Prospect to Contracted blocked when Onboarding validations not met\n\n**Priority:** p2\n\n**Feature:** API - SF-726 Demo - Member and Non-Member MGA Account Status lifecycle\n\n---\n**Steps:**\n- Given an Account exists via API with Account Status \"Prospect\"\n- And Onboarding validations are not met\n- When I attempt to update the Account via API to set Account Status to \"Contracted\"\n- Then the API must return a validation error\n- And the response must include the relevant validation message(s)\n",
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"Account_Status__c\": \"Contracted\"\n}"
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "API - Prospect can move to Active if Onboarding and Contracted validations are m",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 204\", function () {",
+							"    pm.response.to.have.status(204);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Account/{{record_id}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"services",
+						"data",
+						"{{api_version}}",
+						"sobjects",
+						"Account",
+						"{{record_id}}"
+					]
+				},
+				"description": "**Scenario:** API - Prospect can move to Active if Onboarding and Contracted validations are met\n\n**Test ID:** SF-726-API-008\n**Priority:** p2\n\n**Feature:** API - SF-726 Demo - Member and Non-Member MGA Account Status lifecycle\n\n---\n**Steps:**\n- Given an Account exists via API with Account Status \"Prospect\"\n- And all Onboarding and Contracted validation requirements are met\n- When I update the Account via API to set Account Status to \"Active\"\n- Then the API must return success\n- And the Account Status in the response must be \"Active\"\n",
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"Account_Status__c\": \"Active\"\n}"
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "API - Prospect to Active blocked when validations not met",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 204\", function () {",
+							"    pm.response.to.have.status(204);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Account/{{record_id}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"services",
+						"data",
+						"{{api_version}}",
+						"sobjects",
+						"Account",
+						"{{record_id}}"
+					]
+				},
+				"description": "**Scenario:** API - Prospect to Active blocked when validations not met\n\n**Priority:** p2\n\n**Feature:** API - SF-726 Demo - Member and Non-Member MGA Account Status lifecycle\n\n---\n**Steps:**\n- Given an Account exists via API with Account Status \"Prospect\"\n- And one or more Onboarding or Contracted validations are not met\n- When I attempt to update the Account via API to set Account Status to \"Active\"\n- Then the API must return a validation error\n- And the response must include the relevant validation message(s)\n",
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"Account_Status__c\": \"Active\"\n}"
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "API - Onboarding can move to Active if Contracted validations are met",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 204\", function () {",
+							"    pm.response.to.have.status(204);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Account/{{record_id}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"services",
+						"data",
+						"{{api_version}}",
+						"sobjects",
+						"Account",
+						"{{record_id}}"
+					]
+				},
+				"description": "**Scenario:** API - Onboarding can move to Active if Contracted validations are met\n\n**Test ID:** SF-726-API-009\n**Priority:** p2\n\n**Feature:** API - SF-726 Demo - Member and Non-Member MGA Account Status lifecycle\n\n---\n**Steps:**\n- Given an Account exists via API with Account Status \"Onboarding\"\n- And all Contracted validation requirements are met\n- When I update the Account via API to set Account Status to \"Active\"\n- Then the API must return success\n- And the Account Status in the response must be \"Active\"\n",
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"Account_Status__c\": \"Active\"\n}"
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "API - Onboarding to Active blocked when Contracted validations not met",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 204\", function () {",
+							"    pm.response.to.have.status(204);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Account/{{record_id}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"services",
+						"data",
+						"{{api_version}}",
+						"sobjects",
+						"Account",
+						"{{record_id}}"
+					]
+				},
+				"description": "**Scenario:** API - Onboarding to Active blocked when Contracted validations not met\n\n**Priority:** p2\n\n**Feature:** API - SF-726 Demo - Member and Non-Member MGA Account Status lifecycle\n\n---\n**Steps:**\n- Given an Account exists via API with Account Status \"Onboarding\"\n- And Contracted validations are not met\n- When I attempt to update the Account via API to set Account Status to \"Active\"\n- Then the API must return a validation error\n- And the response must include the relevant validation message(s)\n",
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"Account_Status__c\": \"Active\"\n}"
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "API - Onboarding can move back to Prospect without Data Governance approval",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 204\", function () {",
+							"    pm.response.to.have.status(204);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Account/{{record_id}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"services",
+						"data",
+						"{{api_version}}",
+						"sobjects",
+						"Account",
+						"{{record_id}}"
+					]
+				},
+				"description": "**Scenario:** API - Onboarding can move back to Prospect without Data Governance approval\n\n**Test ID:** SF-726-API-010\n**Priority:** p2\n\n**Feature:** API - SF-726 Demo - Member and Non-Member MGA Account Status lifecycle\n\n---\n**Steps:**\n- Given an Account exists via API with Account Status \"Onboarding\"\n- When I update the Account via API to set Account Status to \"Prospect\"\n- Then the API must return success\n- And the Account Status in the response must be \"Prospect\"\n- And no Data Governance approval must be required\n",
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"Account_Status__c\": \"Prospect\"\n}"
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "API - Runoff blocked when Account is not Active",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 204\", function () {",
+							"    pm.response.to.have.status(204);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Account/{{record_id}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"services",
+						"data",
+						"{{api_version}}",
+						"sobjects",
+						"Account",
+						"{{record_id}}"
+					]
+				},
+				"description": "**Scenario:** API - Runoff blocked when Account is not Active\n\n**Test ID:** SF-726-API-011\n**Priority:** p2\n\n**Feature:** API - SF-726 Demo - Member and Non-Member MGA Account Status lifecycle\n\n---\n**Steps:**\n- Given an Account exists via API with Account Status not \"Active\"\n- When I attempt to update the Account via API to set Account Status to \"Runoff\"\n- Then the API must return a validation error\n- And the error message must state \"An Account must be Active before it can move to Runoff.\"\n",
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"Account_Status__c\": \"Runoff\"\n}"
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "API - Offboarded blocked when Account is not Runoff",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 204\", function () {",
+							"    pm.response.to.have.status(204);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Account/{{record_id}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"services",
+						"data",
+						"{{api_version}}",
+						"sobjects",
+						"Account",
+						"{{record_id}}"
+					]
+				},
+				"description": "**Scenario:** API - Offboarded blocked when Account is not Runoff\n\n**Test ID:** SF-726-API-012\n**Priority:** p2\n\n**Feature:** API - SF-726 Demo - Member and Non-Member MGA Account Status lifecycle\n\n---\n**Steps:**\n- Given an Account exists via API with Account Status not \"Runoff\"\n- When I attempt to update the Account via API to set Account Status to \"Offboarded\"\n- Then the API must return a validation error\n- And the error message must state \"An Account must be in Runoff before it can move to Offboarded.\"\n",
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"Account_Status__c\": \"Offboarded\"\n}"
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "API - Moving backwards from Contracted or later requires Data Governance approva",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 204\", function () {",
+							"    pm.response.to.have.status(204);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Account/{{record_id}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"services",
+						"data",
+						"{{api_version}}",
+						"sobjects",
+						"Account",
+						"{{record_id}}"
+					]
+				},
+				"description": "**Scenario:** API - Moving backwards from Contracted or later requires Data Governance approval (SF-759)\n\n**Test ID:** SF-726-API-013\n**Priority:** p2\n\n**Feature:** API - SF-726 Demo - Member and Non-Member MGA Account Status lifecycle\n\n---\n**Steps:**\n- Given an Account exists via API with Account Type \"Member\" or \"Non-Member MGA\"\n- And the Account Status is \"Contracted\" or \"Active\" or \"Runoff\" or \"Offboarded\"\n- When I attempt to update the Account via API to an earlier lifecycle status\n- Then the behaviour is governed by Data Governance approval and is covered by SF-759\n",
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"Name\": \"Updated Account Name\"\n}"
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "API - Moving Account to Invalid requires Data Team sign-off (SF-759)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 204\", function () {",
+							"    pm.response.to.have.status(204);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Account/{{record_id}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"services",
+						"data",
+						"{{api_version}}",
+						"sobjects",
+						"Account",
+						"{{record_id}}"
+					]
+				},
+				"description": "**Scenario:** API - Moving Account to Invalid requires Data Team sign-off (SF-759)\n\n**Test ID:** SF-726-API-014\n**Priority:** p2\n\n**Feature:** API - SF-726 Demo - Member and Non-Member MGA Account Status lifecycle\n\n---\n**Steps:**\n- Given an Account exists via API with any Account Type\n- When I attempt to update the Account via API to set Account Status to \"Invalid\"\n- Then the behaviour requires data team sign-off and is covered by SF-759\n",
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"Account_Status__c\": \"Invalid\"\n}"
+				}
+			},
+			"response": []
+		}
+	]
+}

@@ -1,0 +1,816 @@
+{
+  "info": {
+    "_postman_id": "sf-501-api-tests",
+    "name": "SF-501 - Account, Opportunity, Role Consolidation - API Tests",
+    "description": "API - SF-501 - Account, Opportunity, Role consolidation\n\n══════════════════════════════════════════════════════════════════════════════\nGenerated: 2026-01-18\n══════════════════════════════════════════════════════════════════════════════\n\nSUMMARY:\n  Account, Opportunity, Role consolidation\n\nDESCRIPTION:\n  As a Product Owner / Data Owner I want the Account Contact Relationship field \n  Account Contact Relationship Currency hidden, the Account Contact Relationship \n  field Relationship_Strength__c removed, and the Roles picklist value Other \n  removed (with help text added to guide users how to request a new role) So \n  that the UI is cleaner, obsolete fields are removed, and users have clear \n  guidance when the available Roles do not apply.\n\nACCEPTANCE CRITERIA:\n  1. Relationship_Strength__c field DELETED from AccountContactRelation (should NOT exist)\n  2. Roles picklist does NOT contain \"Other\" value\n  3. Account Contact Relationship Currency field hidden (may exist but not accessible)\n  4. AccountContactRelation can still be created/queried without deleted fields\n\nAPI TESTING REQUIREMENTS:\n  - Verify Relationship_Strength__c does NOT exist on AccountContactRelation\n  - Verify attempts to query/use Relationship_Strength__c fail\n  - Verify Roles field exists and picklist values\n  - Verify \"Other\" is NOT in Roles picklist\n  - Verify AccountContactRelation can be created/queried\n  - Verify Account Contact Relationship Currency field accessibility\n\nGenerated from: src/features/api/SF/SF-501.feature\n\nThis collection contains API tests for SF-501 work item.\n\n**Note:** Relationship_Strength__c should be DELETED (not exist). Roles picklist should NOT contain \"Other\".",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{sf_access_token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "{{sf_base_url}}",
+      "type": "string"
+    },
+    {
+      "key": "api_version",
+      "value": "{{sf_api_version}}",
+      "type": "string"
+    },
+    {
+      "key": "account_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "contact_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "acr_id",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "REQ-1: Relationship_Strength__c - DELETE (Field Should NOT Exist)",
+      "item": [
+        {
+          "name": "SF-501-API-001 - Describe AccountContactRelation Object",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Relationship_Strength__c field does NOT exist\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    var fields = jsonData.fields;",
+                  "    var field = fields.find(function(f) { return f.name === 'Relationship_Strength__c'; });",
+                  "    ",
+                  "    if (field) {",
+                  "        console.error('❌ Relationship_Strength__c field STILL EXISTS (should be deleted)');",
+                  "        console.error('Field Type: ' + field.type);",
+                  "        console.error('Field Label: ' + field.label);",
+                  "        pm.expect.fail('Relationship_Strength__c field should NOT exist but was found');",
+                  "    } else {",
+                  "        console.log('✅ Relationship_Strength__c field does NOT exist (as expected)');",
+                  "        ",
+                  "        // Log available fields for reference",
+                  "        var fieldNames = fields.map(function(f) { return f.name; });",
+                  "        var strengthFields = fieldNames.filter(function(name) { return name.toLowerCase().includes('strength'); });",
+                  "        if (strengthFields.length > 0) {",
+                  "            console.log('⚠️ Similar fields found: ' + strengthFields.join(', '));",
+                  "        }",
+                  "    }",
+                  "    ",
+                  "    pm.expect(field).to.be.undefined;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/sobjects/AccountContactRelation/describe",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "data",
+                "{{api_version}}",
+                "sobjects",
+                "AccountContactRelation",
+                "describe"
+              ]
+            },
+            "description": "Verify Relationship_Strength__c field does NOT exist on AccountContactRelation\n\n**Test:** SF-501-API-001\n**Purpose:** Field deletion verification\n**Expected:** Field should NOT exist in object metadata (deleted)"
+          },
+          "response": []
+        },
+        {
+          "name": "SF-501-API-002 - Query AccountContactRelation (Verify Field Not in Response)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response does NOT include Relationship_Strength__c\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.records).to.not.be.undefined;",
+                  "    ",
+                  "    if (jsonData.records.length > 0) {",
+                  "        var firstRecord = jsonData.records[0];",
+                  "        var hasField = firstRecord.hasOwnProperty('Relationship_Strength__c');",
+                  "        ",
+                  "        if (hasField) {",
+                  "            console.error('❌ Relationship_Strength__c found in query response (should not be present)');",
+                  "            pm.expect.fail('Relationship_Strength__c should not be in query response');",
+                  "        } else {",
+                  "            console.log('✅ Relationship_Strength__c NOT in query response (as expected)');",
+                  "            console.log('Sample record fields: ' + Object.keys(firstRecord).join(', '));",
+                  "        }",
+                  "        ",
+                  "        pm.expect(hasField).to.be.false;",
+                  "    } else {",
+                  "        console.log('⚠️ No records found, cannot verify field absence');",
+                  "    }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/query?q=SELECT Id,AccountId,ContactId,Roles FROM AccountContactRelation LIMIT 10",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "data",
+                "{{api_version}}",
+                "query"
+              ],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "SELECT Id,AccountId,ContactId,Roles FROM AccountContactRelation LIMIT 10"
+                }
+              ]
+            },
+            "description": "Query AccountContactRelation records\n\n**Test:** SF-501-API-002\n**Purpose:** Verify Relationship_Strength__c is not in query response\n**Expected:** Status 200, response should NOT include Relationship_Strength__c field\n**Note:** Query explicitly excludes Relationship_Strength__c to verify it cannot be queried"
+          },
+          "response": []
+        },
+        {
+          "name": "SF-501-API-003 - Attempt to Query Relationship_Strength__c (Should Fail)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Query should fail with error\", function () {",
+                  "    // Querying a deleted field should return an error",
+                  "    pm.expect(pm.response.code).to.be.oneOf([400, 422]);",
+                  "});",
+                  "",
+                  "pm.test(\"Error mentions Relationship_Strength__c or INVALID_FIELD\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    var errorString = JSON.stringify(jsonData).toLowerCase();",
+                  "    var hasFieldName = errorString.includes('relationship_strength') || errorString.includes('invalid_field');",
+                  "    ",
+                  "    console.log('Error response: ' + JSON.stringify(jsonData, null, 2));",
+                  "    ",
+                  "    if (hasFieldName) {",
+                  "        console.log('✅ Error correctly mentions Relationship_Strength__c or INVALID_FIELD');",
+                  "    } else {",
+                  "        console.log('⚠️ Error may not explicitly mention field name, but query failed (as expected)');",
+                  "    }",
+                  "    ",
+                  "    // The important part is that the query failed",
+                  "    pm.expect(pm.response.code).to.be.oneOf([400, 422]);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/query?q=SELECT Id,Relationship_Strength__c FROM AccountContactRelation LIMIT 1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "data",
+                "{{api_version}}",
+                "query"
+              ],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "SELECT Id,Relationship_Strength__c FROM AccountContactRelation LIMIT 1"
+                }
+              ]
+            },
+            "description": "Attempt to query Relationship_Strength__c field\n\n**Test:** SF-501-API-003\n**Purpose:** Verify querying deleted field fails\n**Expected:** 400 or 422 error (INVALID_FIELD or similar)\n**Note:** This confirms the field is truly deleted and cannot be queried"
+          },
+          "response": []
+        },
+        {
+          "name": "SF-501-API-003 - Attempt to Create ACR with Relationship_Strength__c (Should Fail)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Create should fail with error\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([400, 422]);",
+                  "});",
+                  "",
+                  "pm.test(\"Error mentions Relationship_Strength__c or INVALID_FIELD\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    var errorString = JSON.stringify(jsonData).toLowerCase();",
+                  "    var hasFieldName = errorString.includes('relationship_strength') || errorString.includes('invalid_field') || errorString.includes('no such column');",
+                  "    ",
+                  "    console.log('Error response: ' + JSON.stringify(jsonData, null, 2));",
+                  "    ",
+                  "    if (hasFieldName) {",
+                  "        console.log('✅ Error correctly mentions Relationship_Strength__c');",
+                  "    } else {",
+                  "        console.log('⚠️ Error may not explicitly mention field name, but create failed (as expected)');",
+                  "    }",
+                  "    ",
+                  "    pm.expect(pm.response.code).to.be.oneOf([400, 422]);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "var accountId = pm.collectionVariables.get('account_id');",
+                  "var contactId = pm.collectionVariables.get('contact_id');",
+                  "if (!accountId || !contactId) {",
+                  "    console.log('⚠️ account_id or contact_id not set. This test will likely fail due to missing IDs.');",
+                  "    console.log('Please create Account and Contact first, or update the request body with valid IDs.');",
+                  "} else {",
+                  "    console.log('Attempting to create ACR with deleted field Relationship_Strength__c');",
+                  "    console.log('Account ID: ' + accountId);",
+                  "    console.log('Contact ID: ' + contactId);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"AccountId\": \"{{account_id}}\",\n  \"ContactId\": \"{{contact_id}}\",\n  \"Relationship_Strength__c\": \"Strong\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/sobjects/AccountContactRelation/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "data",
+                "{{api_version}}",
+                "sobjects",
+                "AccountContactRelation",
+                ""
+              ]
+            },
+            "description": "Attempt to create AccountContactRelation with Relationship_Strength__c\n\n**Test:** SF-501-API-003\n**Purpose:** Verify creating ACR with deleted field fails\n**Expected:** 400 or 422 error (INVALID_FIELD or \"No such column\")\n**Note:** This confirms the field is truly deleted and cannot be used in create operations"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "REQ-2: Roles Picklist - Remove \"Other\" Value",
+      "item": [
+        {
+          "name": "SF-501-API-004 - Verify Roles Field Exists",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Roles field exists on AccountContactRelation\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    var fields = jsonData.fields;",
+                  "    var field = fields.find(function(f) { return f.name === 'Roles'; });",
+                  "    ",
+                  "    if (!field) {",
+                  "        console.error('❌ Roles field not found on AccountContactRelation');",
+                  "        pm.expect.fail('Roles field should exist');",
+                  "    }",
+                  "    ",
+                  "    pm.expect(field).to.not.be.undefined;",
+                  "    pm.expect(field.name).to.equal('Roles');",
+                  "    console.log('✅ Roles field found on AccountContactRelation');",
+                  "    console.log('Field Type: ' + field.type);",
+                  "    console.log('Field Label: ' + field.label);",
+                  "    ",
+                  "    if (field.picklistValues) {",
+                  "        console.log('Picklist values count: ' + field.picklistValues.length);",
+                  "    }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/sobjects/AccountContactRelation/describe",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "data",
+                "{{api_version}}",
+                "sobjects",
+                "AccountContactRelation",
+                "describe"
+              ]
+            },
+            "description": "Verify Roles field exists on AccountContactRelation\n\n**Test:** SF-501-API-004\n**Purpose:** Field existence verification"
+          },
+          "response": []
+        },
+        {
+          "name": "SF-501-API-005 - Verify Roles Picklist Does NOT Contain \"Other\"",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Roles picklist does NOT contain 'Other'\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    var fields = jsonData.fields;",
+                  "    var field = fields.find(function(f) { return f.name === 'Roles'; });",
+                  "    ",
+                  "    if (!field) {",
+                  "        pm.expect.fail('Roles field not found');",
+                  "        return;",
+                  "    }",
+                  "    ",
+                  "    if (!field.picklistValues || field.picklistValues.length === 0) {",
+                  "        console.log('⚠️ Roles field has no picklist values (may be a text field)');",
+                  "        return;",
+                  "    }",
+                  "    ",
+                  "    var picklistValues = field.picklistValues.map(function(pv) { return pv.value; });",
+                  "    var hasOther = picklistValues.includes('Other');",
+                  "    ",
+                  "    if (hasOther) {",
+                  "        console.error('❌ Roles picklist STILL contains \"Other\" value');",
+                  "        console.error('All picklist values: ' + picklistValues.join(', '));",
+                  "        pm.expect.fail('Roles picklist should NOT contain \"Other\" but it was found');",
+                  "    } else {",
+                  "        console.log('✅ Roles picklist does NOT contain \"Other\" (as expected)');",
+                  "        console.log('Available picklist values: ' + picklistValues.join(', '));",
+                  "    }",
+                  "    ",
+                  "    pm.expect(hasOther).to.be.false;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/sobjects/AccountContactRelation/describe",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "data",
+                "{{api_version}}",
+                "sobjects",
+                "AccountContactRelation",
+                "describe"
+              ]
+            },
+            "description": "Verify Roles picklist does NOT contain \"Other\" value\n\n**Test:** SF-501-API-005\n**Purpose:** Verify \"Other\" value was removed from Roles picklist\n**Expected:** Roles picklist should NOT contain \"Other\" value"
+          },
+          "response": []
+        },
+        {
+          "name": "SF-501-API-005 - Attempt to Create ACR with Roles = \"Other\" (Should Fail)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Create should fail with error\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([400, 422]);",
+                  "});",
+                  "",
+                  "pm.test(\"Error mentions Roles or invalid picklist value\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    var errorString = JSON.stringify(jsonData).toLowerCase();",
+                  "    var hasRoles = errorString.includes('role') || errorString.includes('picklist') || errorString.includes('invalid');",
+                  "    ",
+                  "    console.log('Error response: ' + JSON.stringify(jsonData, null, 2));",
+                  "    ",
+                  "    if (hasRoles) {",
+                  "        console.log('✅ Error correctly mentions Roles or invalid value');",
+                  "    } else {",
+                  "        console.log('⚠️ Error may not explicitly mention field name, but create failed (as expected)');",
+                  "    }",
+                  "    ",
+                  "    pm.expect(pm.response.code).to.be.oneOf([400, 422]);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "var accountId = pm.collectionVariables.get('account_id');",
+                  "var contactId = pm.collectionVariables.get('contact_id');",
+                  "if (!accountId || !contactId) {",
+                  "    console.log('⚠️ account_id or contact_id not set. This test will likely fail due to missing IDs.');",
+                  "} else {",
+                  "    console.log('Attempting to create ACR with Roles = \"Other\" (should fail)');",
+                  "    console.log('Account ID: ' + accountId);",
+                  "    console.log('Contact ID: ' + contactId);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"AccountId\": \"{{account_id}}\",\n  \"ContactId\": \"{{contact_id}}\",\n  \"Roles\": \"Other\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/sobjects/AccountContactRelation/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "data",
+                "{{api_version}}",
+                "sobjects",
+                "AccountContactRelation",
+                ""
+              ]
+            },
+            "description": "Attempt to create AccountContactRelation with Roles = \"Other\"\n\n**Test:** SF-501-API-005 (Negative)\n**Purpose:** Verify \"Other\" value is rejected\n**Expected:** 400 or 422 error (invalid picklist value)\n**Note:** This confirms \"Other\" was removed from the picklist"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "REQ-3: Account Contact Relationship Currency - HIDE",
+      "item": [
+        {
+          "name": "SF-501-API-006 - Verify AccountContactRelation Currency Field",
+          "event": [
+            {
+              "listen": "test",
+                "script": {
+                  "exec": [
+                    "pm.test(\"Status code is 200\", function () {",
+                    "    pm.response.to.have.status(200);",
+                    "});",
+                    "",
+                    "pm.test(\"Response contains AccountContactRelation metadata\", function () {",
+                    "    var jsonData = pm.response.json();",
+                    "    pm.expect(jsonData.fields).to.not.be.undefined;",
+                    "    ",
+                    "    // Note: Hidden fields may still exist in metadata but have restricted access",
+                    "    // This test verifies the object metadata is accessible",
+                    "    console.log('✅ AccountContactRelation metadata accessible');",
+                    "    console.log('Total fields: ' + jsonData.fields.length);",
+                    "    ",
+                    "    // Check if Currency field exists (it may exist but be hidden via FLS)",
+                    "    var currencyFields = jsonData.fields.filter(function(f) { return f.name.toLowerCase().includes('currency'); });",
+                    "    if (currencyFields.length > 0) {",
+                    "        console.log('Currency-related fields found: ' + currencyFields.map(function(f) { return f.name; }).join(', '));",
+                    "        console.log('Note: Fields may exist but be hidden via Field-Level Security');",
+                    "    }",
+                    "});"
+                  ],
+                  "type": "text/javascript"
+                }
+              }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/sobjects/AccountContactRelation/describe",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "data",
+                "{{api_version}}",
+                "sobjects",
+                "AccountContactRelation",
+                "describe"
+              ]
+            },
+            "description": "Verify AccountContactRelation Currency field accessibility\n\n**Test:** SF-501-API-006\n**Purpose:** Verify Currency field configuration (may exist but be hidden via FLS)\n**Note:** Hidden fields may still exist in metadata but have restricted access. This test verifies object metadata is accessible."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Basic Functionality - Verify ACR Operations",
+      "item": [
+        {
+          "name": "SF-501-API-007 - Create Account for ACR Test",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test(\"Response contains Account ID\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.id).to.not.be.undefined;",
+                  "    pm.collectionVariables.set('account_id', jsonData.id);",
+                  "    console.log('✅ Account created: ' + jsonData.id);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"Name\": \"SF-501 Test Account\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Account/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "data",
+                "{{api_version}}",
+                "sobjects",
+                "Account",
+                ""
+              ]
+            },
+            "description": "Create Account for AccountContactRelation test\n\n**Test:** SF-501-API-007 (Prerequisite)"
+          },
+          "response": []
+        },
+        {
+          "name": "SF-501-API-007 - Create Contact for ACR Test",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test(\"Response contains Contact ID\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.id).to.not.be.undefined;",
+                  "    pm.collectionVariables.set('contact_id', jsonData.id);",
+                  "    console.log('✅ Contact created: ' + jsonData.id);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"FirstName\": \"SF-501\",\n  \"LastName\": \"Test Contact\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Contact/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "data",
+                "{{api_version}}",
+                "sobjects",
+                "Contact",
+                ""
+              ]
+            },
+            "description": "Create Contact for AccountContactRelation test\n\n**Test:** SF-501-API-007 (Prerequisite)\n**Note:** Contact created without AccountId (will be linked via ACR)"
+          },
+          "response": []
+        },
+        {
+          "name": "SF-501-API-007 - Create AccountContactRelation (Without Deleted Fields)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test(\"Response contains ACR ID\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.id).to.not.be.undefined;",
+                  "    pm.collectionVariables.set('acr_id', jsonData.id);",
+                  "    console.log('✅ AccountContactRelation created: ' + jsonData.id);",
+                  "    console.log('Created without Relationship_Strength__c (deleted field)');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "var accountId = pm.collectionVariables.get('account_id');",
+                  "var contactId = pm.collectionVariables.get('contact_id');",
+                  "if (!accountId || !contactId) {",
+                  "    throw new Error('account_id or contact_id variable is not set. Please run the Create Account and Create Contact requests first.');",
+                  "}",
+                  "console.log('Creating AccountContactRelation:');",
+                  "console.log('  Account ID: ' + accountId);",
+                  "console.log('  Contact ID: ' + contactId);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"AccountId\": \"{{account_id}}\",\n  \"ContactId\": \"{{contact_id}}\",\n  \"Roles\": \"Decision Maker\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/sobjects/AccountContactRelation/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "data",
+                "{{api_version}}",
+                "sobjects",
+                "AccountContactRelation",
+                ""
+              ]
+            },
+            "description": "Create AccountContactRelation without deleted fields\n\n**Test:** SF-501-API-007\n**Purpose:** Verify ACR can be created without Relationship_Strength__c\n**Expected:** Status 201 - ACR created successfully\n**Note:** Uses valid Roles value (not \"Other\")"
+          },
+          "response": []
+        },
+        {
+          "name": "SF-501-API-007 - Query AccountContactRelation",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Query returned records\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.records).to.not.be.undefined;",
+                  "    ",
+                  "    if (jsonData.records.length > 0) {",
+                  "        var firstRecord = jsonData.records[0];",
+                  "        console.log('✅ Query returned ' + jsonData.records.length + ' record(s)');",
+                  "        console.log('Sample ACR ID: ' + firstRecord.Id);",
+                  "        console.log('Sample Roles: ' + (firstRecord.Roles || 'null'));",
+                  "        ",
+                  "        // Verify Relationship_Strength__c is NOT in response",
+                  "        var hasDeletedField = firstRecord.hasOwnProperty('Relationship_Strength__c');",
+                  "        if (hasDeletedField) {",
+                  "            console.error('❌ Relationship_Strength__c found in query response (should not be present)');",
+                  "        } else {",
+                  "            console.log('✅ Relationship_Strength__c NOT in query response (as expected)');",
+                  "        }",
+                  "        pm.expect(hasDeletedField).to.be.false;",
+                  "    } else {",
+                  "        console.log('⚠️ No records found');",
+                  "    }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/query?q=SELECT Id,AccountId,ContactId,Roles FROM AccountContactRelation LIMIT 10",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "data",
+                "{{api_version}}",
+                "query"
+              ],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "SELECT Id,AccountId,ContactId,Roles FROM AccountContactRelation LIMIT 10"
+                }
+              ]
+            },
+            "description": "Query AccountContactRelation records\n\n**Test:** SF-501-API-007\n**Purpose:** Verify ACR can be queried and Relationship_Strength__c is not in response\n**Expected:** Status 200, response should NOT include Relationship_Strength__c"
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,47 @@
+{
+  "key": "SF-503",
+  "summary": "Remove Sub_Type__c from Lead page layout and make it non-required",
+  "type": "Story",
+  "status": "In QA",
+  "priority": "Medium",
+  "description": {
+    "raw": "User Story As a Product Owner / Sales Ops I want the Lead field  Sub_Type__c  removed from the Lead page layout and ensured to be non-required So that users no longer see the field when creating or editing Leads and the field is not enforced as mandatory by the UI or automation Description / Scope Remove  Sub_Type__c  from all Lead page layouts used by business users (Lightning and Classic as applicable). Ensure  Sub_Type__c  is  not required  anywhere: remove any page-layout-level required setting, validation rules, Flow/Apex enforcement, and any Process Builder checks that make it mandatory. Do  not  delete the field from the schema unless a separate request is made — simply remove it from the UI and stop treating it as required. Ensure integrations and automated jobs are not forced to provide the field (i.e., remove required enforcement from server-side rules) Acceptance Criteria (GIVEN / WHEN / THEN) Page layout removal GIVEN a standard user opens or edits a Lead in Lightning Experience WHEN they view Lead record pages THEN Sub_Type__c is not visible anywhere on the page  Not required in UI GIVEN a user creates or edits a Lead where Sub_Type__c is blank WHEN they save the Lead THEN the save succeeds and no UI error requests Sub_Type__c be populated Not required by automation GIVEN Flows, Validation Rules, Process Builders, Apex or other server-side automation that previously enforced Sub_Type__c as required WHEN those automations run after the change THEN none of them block Lead creation/update for a missing Sub_Type__c; any enforcement is removed or updated API / Integrations GIVEN an integration or API client that creates/updates Leads without Sub_Type__c WHEN the integration runs THEN requests are accepted and not rejected for missing Sub_Type__c (unless other business rules apply)",
+    "parsed": {
+      "sentences": [
+        "User Story As a Product Owner / Sales Ops I want the Lead field  Sub_Type__c  removed from the Lead page layout and ensured to be non-required So that users no longer see the field when creating or editing Leads and the field is not enforced as mandatory by the UI or automation Description / Scope Remove  Sub_Type__c  from all Lead page layouts used by business users (Lightning and Classic as applicable)",
+        "Ensure  Sub_Type__c  is  not required  anywhere: remove any page-layout-level required setting, validation rules, Flow/Apex enforcement, and any Process Builder checks that make it mandatory",
+        "Do  not  delete the field from the schema unless a separate request is made — simply remove it from the UI and stop treating it as required",
+        "Ensure integrations and automated jobs are not forced to provide the field (i.e., remove required enforcement from server-side rules) Acceptance Criteria (GIVEN / WHEN / THEN) Page layout removal GIVEN a standard user opens or edits a Lead in Lightning Experience WHEN they view Lead record pages THEN Sub_Type__c is not visible anywhere on the page  Not required in UI GIVEN a user creates or edits a Lead where Sub_Type__c is blank WHEN they save the Lead THEN the save succeeds and no UI error requests Sub_Type__c be populated Not required by automation GIVEN Flows, Validation Rules, Process Builders, Apex or other server-side automation that previously enforced Sub_Type__c as required WHEN those automations run after the change THEN none of them block Lead creation/update for a missing Sub_Type__c; any enforcement is removed or updated API / Integrations GIVEN an integration or API client that creates/updates Leads without Sub_Type__c WHEN the integration runs THEN requests are accepted and not rejected for missing Sub_Type__c (unless other business rules apply)"
+      ],
+      "entities": [
+        "Lead",
+        "Product"
+      ],
+      "fields": [
+        "Sub_Type__c"
+      ],
+      "actions": [
+        "create",
+        "update",
+        "delete",
+        "populate"
+      ]
+    }
+  },
+  "acceptanceCriteria": [],
+  "comments": [],
+  "relatedIssues": [],
+  "fieldDefinitions": {
+    "Sub_Type__c": {
+      "type": "Picklist",
+      "required": false,
+      "description": "Field: Sub_Type__c"
+    }
+  },
+  "generatedFeatures": {
+    "ui": "src/features/ui/SF/SF-503.feature",
+    "api": "src/features/api/SF/SF-503.feature"
+  },
+  "qaReviewedFeatures": {},
+  "extractedAt": "2025-12-17T18:40:31.000Z"
+}

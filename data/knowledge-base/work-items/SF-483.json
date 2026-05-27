@@ -1,0 +1,40 @@
+{
+  "key": "SF-483",
+  "summary": "Make Upsell Opportunity field visible only on Member and Non-Member MGA accounts",
+  "type": "Story",
+  "status": "In QA",
+  "priority": "Medium",
+  "description": {
+    "raw": "User Story: As a Product Owner / Business Analyst I want the Upsell Opportunity field to be visible on Account records only when the Account is classified as Member MGA or Non-Member MGA So that users only see and interact with the field on MGA accounts and the Account page is simplified for other account types Description / Scope: Show the Upsell Opportunity field on Account record pages and other UI surfaces only for Accounts that meet the MGA criteria (Member MGA or Non-Member MGA). Do not delete the field. Ensure reporting, API, automations and integrations continue to function and are not broken by the visibility change. The visibility rule should be based on account classification in the org (for example: Account record types Member MGA and Non-Member MGA, or Account Type / Account Segment picklist values “Member MGA” and “Non-Member MGA”).  Acceptance Criteria (GIVEN / WHEN / THEN): Account page visibility — Member MGA GIVEN an Account classified as Member MGA  WHEN a user opens the Account in Lightning and Classic  THEN Upsell Opportunity is visible on the Account detail page for that Account Account page visibility — Non-Member MGA GIVEN an Account classified as Non-Member MGA WHEN a user opens the Account in Lightning and Classic  THEN Upsell Opportunity is visible on the Account detail page for that Account Account page visibility — other Account types GIVEN an Account that is not Member MGA or Non-Member MGA WHEN a user opens the Account THEN Upsell Opportunity is not visible anywhere on the Account page (detail, dynamic form sections, inline edit, related components) Admin / support visibility GIVEN a System Administrator or approved support profile WHEN they view any Account record regardless of classification THEN Upsell Opportunity remains visible for those admin/support users Reports & dashboards GIVEN a report that includes Accounts of multiple types WHEN a non-MGA Account appears in the report results THEN Upsell Opportunity is empty/not shown for non-MGA Accounts; for MGA Accounts the field value is visible in the report results. Admins may still include the field in reports.",
+    "parsed": {
+      "sentences": [
+        "User Story: As a Product Owner / Business Analyst I want the Upsell Opportunity field to be visible on Account records only when the Account is classified as Member MGA or Non-Member MGA So that users only see and interact with the field on MGA accounts and the Account page is simplified for other account types Description / Scope: Show the Upsell Opportunity field on Account record pages and other UI surfaces only for Accounts that meet the MGA criteria (Member MGA or Non-Member MGA)",
+        "Do not delete the field",
+        "Ensure reporting, API, automations and integrations continue to function and are not broken by the visibility change",
+        "The visibility rule should be based on account classification in the org (for example: Account record types Member MGA and Non-Member MGA, or Account Type / Account Segment picklist values “Member MGA” and “Non-Member MGA”)",
+        "Acceptance Criteria (GIVEN / WHEN / THEN): Account page visibility — Member MGA GIVEN an Account classified as Member MGA  WHEN a user opens the Account in Lightning and Classic  THEN Upsell Opportunity is visible on the Account detail page for that Account Account page visibility — Non-Member MGA GIVEN an Account classified as Non-Member MGA WHEN a user opens the Account in Lightning and Classic  THEN Upsell Opportunity is visible on the Account detail page for that Account Account page visibility — other Account types GIVEN an Account that is not Member MGA or Non-Member MGA WHEN a user opens the Account THEN Upsell Opportunity is not visible anywhere on the Account page (detail, dynamic form sections, inline edit, related components) Admin / support visibility GIVEN a System Administrator or approved support profile WHEN they view any Account record regardless of classification THEN Upsell Opportunity remains visible for those admin/support users Reports & dashboards GIVEN a report that includes Accounts of multiple types WHEN a non-MGA Account appears in the report results THEN Upsell Opportunity is empty/not shown for non-MGA Accounts; for MGA Accounts the field value is visible in the report results",
+        "Admins may still include the field in reports."
+      ],
+      "entities": [
+        "Account",
+        "Opportunity",
+        "Product"
+      ],
+      "fields": [],
+      "actions": [
+        "show",
+        "delete"
+      ]
+    }
+  },
+  "acceptanceCriteria": [],
+  "comments": [],
+  "relatedIssues": [],
+  "fieldDefinitions": {},
+  "generatedFeatures": {
+    "ui": "src/features/ui/SF/SF-483.feature",
+    "api": "src/features/api/SF/SF-483.feature"
+  },
+  "qaReviewedFeatures": {},
+  "extractedAt": "2025-12-17T18:40:34.650Z"
+}

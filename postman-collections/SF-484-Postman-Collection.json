@@ -1,0 +1,340 @@
+{
+	"info": {
+		"_postman_id": "sf-484-api-tests",
+		"name": "SF-484 - Hide Investment_Status_c on Account - API Tests",
+		"description": "Postman collection for SF-484 API tests. Tests for hiding Investment_Status_c__c field on Account.\n\n## Setup Instructions:\n1. Import this collection into Postman\n2. Create a new environment (or use existing Salesforce QA environment)\n3. Set the following environment variables:\n   - `sf_base_url`: https://arx--qa.sandbox.my.salesforce.com\n   - `sf_api_version`: v60.0\n   - `sf_access_token`: Your Salesforce access token (get via OAuth or JWT)\n   - `sf_instance_url`: Your Salesforce instance URL\n   - `account_id`: Account ID for update/query operations\n\n## Authentication:\nThis collection uses Bearer Token authentication. Obtain an access token via:\n- OAuth 2.0 flow\n- JWT Bearer Token flow\n- Username/Password flow\n\n## Test Scenarios:\n- Verify Investment_Status_c__c field exists\n- Create Account\n- Update Investment_Status_c__c on Account\n- Query Account by Investment_Status_c\n- Reject invalid Investment_Status_c__c values",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{sf_access_token}}",
+				"type": "string"
+			}
+		]
+	},
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "{{sf_base_url}}",
+			"type": "string"
+		},
+		{
+			"key": "api_version",
+			"value": "{{sf_api_version}}",
+			"type": "string"
+		},
+		{
+			"key": "account_id",
+			"value": "",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "SF-484-API-001 - Verify Investment_Status_c__c field exists",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Investment_Status_c__c field exists\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.fields).to.be.an('array');",
+							"    var field = jsonData.fields.find(f => f.name === 'Investment_Status_c__c');",
+							"    pm.expect(field).to.not.be.undefined;",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Account/describe",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"services",
+						"data",
+						"{{api_version}}",
+						"sobjects",
+						"Account",
+						"describe"
+					]
+				},
+				"description": "API - Verify Investment_Status_c__c field exists on Account\n\n**Test ID:** SF-484-API-001\n**Priority:** p1\n**Tags:** @smoke @field-exists"
+			},
+			"response": []
+		},
+		{
+			"name": "SF-484-API-002 - Create Account with Investment_Status_c",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"pm.test(\"Response contains Account ID\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property('id');",
+							"    pm.expect(jsonData.id).to.not.be.empty;",
+							"    pm.collectionVariables.set('account_id', jsonData.id);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"Name\": \"API Test Account\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Account/",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"services",
+						"data",
+						"{{api_version}}",
+						"sobjects",
+						"Account",
+						""
+					]
+				},
+				"description": "API - Create Account with Investment_Status_c\n\n**Test ID:** SF-484-API-002\n**Priority:** p1\n**Tags:** @api-create"
+			},
+			"response": []
+		},
+		{
+			"name": "SF-484-API-003 - Update Investment_Status_c__c on Account",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 204\", function () {",
+							"    pm.response.to.have.status(204);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"Investment_Status_c__c\": \"Updated Value\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Account/{{account_id}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"services",
+						"data",
+						"{{api_version}}",
+						"sobjects",
+						"Account",
+						"{{account_id}}"
+					]
+				},
+				"description": "API - Update Investment_Status_c__c on Account\n\n**Test ID:** SF-484-API-003\n**Priority:** p1\n**Tags:** @api-update\n\n**Prerequisite:** Requires an existing Account record (set account_id variable)"
+			},
+			"response": []
+		},
+		{
+			"name": "SF-484-API-004 - Query Account by Investment_Status_c",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response contains records\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property('records');",
+							"    pm.expect(jsonData.records).to.be.an('array');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/services/data/{{api_version}}/query/?q=SELECT Id, Name, Investment_Status_c__c FROM Account LIMIT 10",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"services",
+						"data",
+						"{{api_version}}",
+						"query",
+						""
+					],
+					"query": [
+						{
+							"key": "q",
+							"value": "SELECT Id, Name, Investment_Status_c__c FROM Account LIMIT 10"
+						}
+					]
+				},
+				"description": "API - Query Account by Investment_Status_c\n\n**Test ID:** SF-484-API-004\n**Priority:** p2\n**Tags:** @api-query\n\n**Prerequisite:** Requires an existing Account record"
+			},
+			"response": []
+		},
+		{
+			"name": "SF-484-API-005 - Reject invalid Investment_Status_c__c value",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code indicates error\", function () {",
+							"    pm.expect(pm.response.code).to.be.oneOf([400, 422]);",
+							"});",
+							"",
+							"pm.test(\"Error response mentions Investment_Status_c\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    var errorText = JSON.stringify(jsonData);",
+							"    pm.expect(errorText.toLowerCase()).to.include('investment_status_c');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"Name\": \"Invalid Test Account\",\n  \"Investment_Status_c__c\": \"INVALID_VALUE_###\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Account/",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"services",
+						"data",
+						"{{api_version}}",
+						"sobjects",
+						"Account",
+						""
+					]
+				},
+				"description": "API - Reject invalid Investment_Status_c__c value\n\n**Test ID:** SF-484-API-005\n**Priority:** p2\n**Tags:** @negative @invalid-value\n\n**Expected:** API should reject invalid Investment_Status_c__c value and return error mentioning \"Investment_Status_c\""
+			},
+			"response": []
+		},
+		{
+			"name": "SF-484-API-006 - Handle null Investment_Status_c__c value",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Investment_Status_c__c is null or empty\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    if (jsonData.records && jsonData.records.length > 0) {",
+							"        var record = jsonData.records[0];",
+							"        pm.expect(record.Investment_Status_c__c === null || record.Investment_Status_c__c === '' || record.Investment_Status_c__c === undefined).to.be.true;",
+							"    }",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/services/data/{{api_version}}/query/?q=SELECT Id, Name, Investment_Status_c__c FROM Account WHERE Investment_Status_c__c = null LIMIT 1",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"services",
+						"data",
+						"{{api_version}}",
+						"query",
+						""
+					],
+					"query": [
+						{
+							"key": "q",
+							"value": "SELECT Id, Name, Investment_Status_c__c FROM Account WHERE Investment_Status_c__c = null LIMIT 1"
+						}
+					]
+				},
+				"description": "API - Handle null Investment_Status_c__c value\n\n**Test ID:** SF-484-API-006\n**Priority:** p2\n**Tags:** @negative @null-value\n\n**Prerequisite:** Requires a test Account created via API without Investment_Status_c"
+			},
+			"response": []
+		}
+	]
+}
+

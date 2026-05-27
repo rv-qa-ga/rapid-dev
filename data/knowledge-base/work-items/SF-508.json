@@ -1,0 +1,30 @@
+{
+  "key": "SF-508",
+  "summary": "Opportunity 'Win Reason' Validation Rules Update",
+  "type": "Story",
+  "status": "In QA",
+  "priority": "Medium",
+  "description": {
+    "raw": "Opportunity Record: GIVEN I am an MRD who wants to define a win reason for an opportunity that is not listed in the picklist values WHEN i specify that the win reason is ‘Other’ THEN i must be forced to input a value in the Win reason details field before i can save the record",
+    "parsed": {
+      "sentences": [
+        "Opportunity Record: GIVEN I am an MRD who wants to define a win reason for an opportunity that is not listed in the picklist values WHEN i specify that the win reason is ‘Other’ THEN i must be forced to input a value in the Win reason details field before i can save the record"
+      ],
+      "entities": [
+        "Opportunity"
+      ],
+      "fields": [],
+      "actions": []
+    }
+  },
+  "acceptanceCriteria": [],
+  "comments": [],
+  "relatedIssues": [],
+  "fieldDefinitions": {},
+  "generatedFeatures": {
+    "ui": "src/features/ui/SF/SF-508.feature",
+    "api": "src/features/api/SF/SF-508.feature"
+  },
+  "qaReviewedFeatures": {},
+  "extractedAt": "2025-12-17T18:40:29.775Z"
+}

@@ -1,0 +1,46 @@
+{
+  "key": "SF-484",
+  "summary": "Hide Investment_Status_c on Account",
+  "type": "Story",
+  "status": "In QA",
+  "priority": "Medium",
+  "description": {
+    "raw": "User Story: As a Product Owner / Business Analyst I want the Investment_Status_c field on the Account object hidden from non-admin users So that standard users do not see or interact with the field while System Administrators and approved support roles retain visibility for troubleshooting and reporting Description / Scope: Hide the Investment_Status_c field on Account record pages and all UI surfaces for non-admin users while keeping it visible to System Administrators and any explicitly approved support profiles. This is a visibility change only — do not delete the field or change stored data or business logic that depends on the field.  Validate that hiding the field does not break automations, integrations, formulas, validation rules or reports that depend on the field for admin/system users. Acceptance Criteria (GIVEN / WHEN / THEN): Account detail page (UI) GIVEN a non-admin user WHEN they open any Account record in Lightning THEN Investment_Status_c is not visible anywhere on the page  and cannot be added through personalization GIVEN a System Administrator or approved support role WHEN they open any Account record THEN Investment_Status_c remains visible Lightning Record Page / Dynamic Forms & Components GIVEN the Account record page uses Dynamic Forms or custom Lightning components WHEN a non-admin user views the page THEN the field is not rendered and no errors occur; admin/support users still see the field Reports & Dashboards GIVEN a non-admin user builds or views reports & dashboards WHEN they try to add or view Investment_Status_c THEN the field is not available in the field picker and does not appear in report results for that user; admins retain reporting capability",
+    "parsed": {
+      "sentences": [
+        "User Story: As a Product Owner / Business Analyst I want the Investment_Status_c field on the Account object hidden from non-admin users So that standard users do not see or interact with the field while System Administrators and approved support roles retain visibility for troubleshooting and reporting Description / Scope: Hide the Investment_Status_c field on Account record pages and all UI surfaces for non-admin users while keeping it visible to System Administrators and any explicitly approved support profiles",
+        "This is a visibility change only — do not delete the field or change stored data or business logic that depends on the field",
+        "Validate that hiding the field does not break automations, integrations, formulas, validation rules or reports that depend on the field for admin/system users",
+        "Acceptance Criteria (GIVEN / WHEN / THEN): Account detail page (UI) GIVEN a non-admin user WHEN they open any Account record in Lightning THEN Investment_Status_c is not visible anywhere on the page  and cannot be added through personalization GIVEN a System Administrator or approved support role WHEN they open any Account record THEN Investment_Status_c remains visible Lightning Record Page / Dynamic Forms & Components GIVEN the Account record page uses Dynamic Forms or custom Lightning components WHEN a non-admin user views the page THEN the field is not rendered and no errors occur; admin/support users still see the field Reports & Dashboards GIVEN a non-admin user builds or views reports & dashboards WHEN they try to add or view Investment_Status_c THEN the field is not available in the field picker and does not appear in report results for that user; admins retain reporting capability"
+      ],
+      "entities": [
+        "Account",
+        "Product"
+      ],
+      "fields": [
+        "Reports"
+      ],
+      "actions": [
+        "validate",
+        "hide",
+        "delete"
+      ]
+    }
+  },
+  "acceptanceCriteria": [],
+  "comments": [],
+  "relatedIssues": [],
+  "fieldDefinitions": {
+    "Reports": {
+      "type": "Text",
+      "required": false,
+      "description": "Field: Reports"
+    }
+  },
+  "generatedFeatures": {
+    "ui": "src/features/ui/SF/SF-484.feature",
+    "api": "src/features/api/SF/SF-484.feature"
+  },
+  "qaReviewedFeatures": {},
+  "extractedAt": "2025-12-17T18:40:34.255Z"
+}

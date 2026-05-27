@@ -1,0 +1,205 @@
+{
+  "info": {
+    "name": "Verify State_Province__c Field",
+    "description": "Postman collection to verify if State_Province__c field exists in Salesforce Account object.\n\n## How to Get Access Token\n\n### Method 1: Using PowerShell Script (Recommended)\n```powershell\n# From project root directory\nnode scripts/get-access-token.js\n```\n\n### Method 2: Using Node.js directly\n```bash\n# Set environment (optional, defaults to 'qa')\n$env:ENV = 'qa'\n\n# Run the script\nnode scripts/get-access-token.js\n```\n\n### Method 3: Using TypeScript\n```bash\n# Using ts-node\nnpx ts-node -e \"import { SalesforceJWTAuth } from './src/utils/jwt-auth'; SalesforceJWTAuth.authenticate().then(r => console.log(r.accessToken));\"\n```\n\nThe script will output:\n- Access Token (copy this to {{accessToken}} variable)\n- Instance URL (copy this to {{instanceUrl}} variable)\n\n### Prerequisites\n- JWT credentials configured in `src/config/env/.env.qa`:\n  - SF_JWT_CLIENT_ID (or SF_CLIENT_ID)\n  - SF_JWT_USERNAME (or SF_USERNAME)\n  - SF_CERT_PATH (defaults to certs/server.key)\n\n### Setting Variables in Postman\n1. Click on the collection name\n2. Go to 'Variables' tab\n3. Set `accessToken` to the token from the script output\n4. Set `instanceUrl` if different from default\n\n## Collection Requests\n1. **Describe Account Object** - Get all fields, search for State_Province__c\n2. **Query Account** - Test if field can be queried\n3. **Create Account WITHOUT State_Province__c** - Test validation rule\n4. **Create Account WITH State_Province__c** - Test if field exists\n5. **Get Account by ID** - Get specific record with field",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "0. Get Access Token (Instructions)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "https://example.com",
+          "protocol": "https",
+          "host": ["example", "com"]
+        },
+        "description": "## How to Get Access Token\n\n### Quick Method:\n```bash\n# From project root\nnode scripts/get-access-token.js\n```\n\n### What You Need:\n- JWT credentials in `src/config/env/.env.qa`:\n  - `SF_JWT_CLIENT_ID` (Consumer Key from Connected App)\n  - `SF_JWT_USERNAME` (Salesforce username)\n  - `SF_CERT_PATH` (path to private key, default: `certs/server.key`)\n\n### Steps:\n1. Run: `node scripts/get-access-token.js`\n2. Copy the `accessToken` from output\n3. In Postman, go to Collection → Variables\n4. Paste token into `accessToken` variable\n5. Update `instanceUrl` if needed\n\n### Alternative: Manual JWT Flow\nIf you prefer to get token manually:\n1. Create JWT assertion using your private key\n2. POST to: `{{instanceUrl}}/services/oauth2/token`\n3. Body: `grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer&assertion=<JWT>`\n\n**Note:** This request is just for documentation. It won't execute."
+      }
+    },
+    {
+      "name": "1. Describe Account Object",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{accessToken}}",
+            "type": "text"
+          },
+          {
+            "key": "Accept",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{instanceUrl}}/services/data/{{apiVersion}}/sobjects/Account/describe",
+          "host": ["{{instanceUrl}}"],
+          "path": ["services", "data", "{{apiVersion}}", "sobjects", "Account", "describe"]
+        },
+        "description": "Get all fields available on Account object via REST API.\n\n**What to check:**\n1. Search response JSON for `\"name\": \"State_Province__c\"`\n2. If found, check these properties:\n   - `createable`: Should be `true`\n   - `updateable`: Should be `true`\n   - `accessible`: Should be `true` (Field-Level Security)\n   - `nillable`: If `false`, field is required\n\n**If field NOT found:**\n- Field doesn't exist in this org\n- OR field has different API name\n- Check for similar fields: `BillingState`, `BillingStateCode`, etc."
+      }
+    },
+    {
+      "name": "2. Query Account with State_Province__c",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{accessToken}}",
+            "type": "text"
+          },
+          {
+            "key": "Accept",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{instanceUrl}}/services/data/{{apiVersion}}/query/?q=SELECT Id, Name, State_Province__c, Region__c FROM Account LIMIT 1",
+          "host": ["{{instanceUrl}}"],
+          "path": ["services", "data", "{{apiVersion}}", "query", ""],
+          "query": [
+            {
+              "key": "q",
+              "value": "SELECT Id, Name, State_Province__c, Region__c FROM Account LIMIT 1"
+            }
+          ]
+        },
+        "description": "Test if State_Province__c can be queried via SOQL.\n\n**Expected Results:**\n- **Success**: Field exists and is accessible\n- **Error `INVALID_FIELD`**: Field doesn't exist or isn't accessible\n\n**If error occurs:**\n- Check Field-Level Security settings\n- Verify field API name is correct\n- Check if field is deployed to this org"
+      }
+    },
+    {
+      "name": "3. Create Account WITHOUT State_Province__c",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{accessToken}}",
+            "type": "text"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          },
+          {
+            "key": "Accept",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"Name\": \"Test Account - No State\",\n  \"Region__c\": \"US\",\n  \"Type\": \"Agency\",\n  \"Account_Status__c\": \"Prospect\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{instanceUrl}}/services/data/{{apiVersion}}/sobjects/Account",
+          "host": ["{{instanceUrl}}"],
+          "path": ["services", "data", "{{apiVersion}}", "sobjects", "Account"]
+        },
+        "description": "Test if validation rule requires State_Province__c when Region is US.\n\n**Expected Results:**\n- **Success (201)**: Validation rule doesn't require field (or rule doesn't exist)\n- **Error `FIELD_CUSTOM_VALIDATION_EXCEPTION`**: Validation rule requires field\n  - Message: \"State/Province is required when Region is US\"\n  - This means rule exists but field might not be accessible\n\n**If validation error:**\n- Validation rule exists and checks for State/Province\n- But field might not exist or isn't accessible\n- Check if rule uses different field name (e.g., `BillingState`)"
+      }
+    },
+    {
+      "name": "4. Create Account WITH State_Province__c",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{accessToken}}",
+            "type": "text"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          },
+          {
+            "key": "Accept",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"Name\": \"Test Account - With State\",\n  \"Region__c\": \"US\",\n  \"Type\": \"Agency\",\n  \"Account_Status__c\": \"Prospect\",\n  \"State_Province__c\": \"New York\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{instanceUrl}}/services/data/{{apiVersion}}/sobjects/Account",
+          "host": ["{{instanceUrl}}"],
+          "path": ["services", "data", "{{apiVersion}}", "sobjects", "Account"]
+        },
+        "description": "Test if Account can be created WITH State_Province__c field.\n\n**Expected Results:**\n- **Success (201)**: Field exists and can be set\n- **Error `INVALID_FIELD`**: Field doesn't exist\n- **Error `FIELD_CUSTOM_VALIDATION_EXCEPTION`**: Validation rule issue\n\n**If `INVALID_FIELD` error:**\n- Field `State_Province__c` doesn't exist in this org\n- Field may need to be deployed\n- Check if field has different API name"
+      }
+    },
+    {
+      "name": "5. Get Account by ID with Fields",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{accessToken}}",
+            "type": "text"
+          },
+          {
+            "key": "Accept",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{instanceUrl}}/services/data/{{apiVersion}}/sobjects/Account/{{accountId}}?fields=Id,Name,State_Province__c,Region__c",
+          "host": ["{{instanceUrl}}"],
+          "path": ["services", "data", "{{apiVersion}}", "sobjects", "Account", "{{accountId}}"],
+          "query": [
+            {
+              "key": "fields",
+              "value": "Id,Name,State_Province__c,Region__c"
+            }
+          ]
+        },
+        "description": "Get specific Account record with State_Province__c field.\n\n**Usage:**\n1. Replace `{{accountId}}` with actual Account ID (e.g., `001XX000004XXXXXX`)\n2. Or set `accountId` variable in collection\n\n**Expected Results:**\n- **Success**: Returns Account with State_Province__c value\n- **Error `INVALID_FIELD`**: Field doesn't exist or isn't accessible\n\n**To get Account ID:**\n- Create an Account first (request #3 or #4)\n- Copy the `id` from response\n- Use it in this request"
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "instanceUrl",
+      "value": "https://arx--qa.sandbox.my.salesforce.com",
+      "type": "string"
+    },
+    {
+      "key": "apiVersion",
+      "value": "v58.0",
+      "type": "string"
+    },
+    {
+      "key": "accessToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "accountId",
+      "value": "",
+      "type": "string"
+    }
+  ]
+}
+

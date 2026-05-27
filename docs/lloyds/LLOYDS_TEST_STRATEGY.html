@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lloyd's Syndicate Finance – QA Testing Strategy</title>
+  <style type="text/css">
+    body { font-family: Arial, sans-serif; line-height: 1.5; color: #333; max-width: 900px; margin: 0 auto; padding: 20px; }
+    h1 { color: #172b4d; border-bottom: 2px solid #0052cc; padding-bottom: 8px; font-size: 1.75em; }
+    h2 { color: #172b4d; margin-top: 24px; font-size: 1.35em; }
+    h3 { color: #42526e; margin-top: 16px; font-size: 1.15em; }
+    p { margin: 8px 0; }
+    ul { margin: 8px 0; padding-left: 24px; }
+    li { margin: 4px 0; }
+    table { border-collapse: collapse; width: 100%; margin: 12px 0; font-size: 14px; }
+    th, td { border: 1px solid #dfe1e6; padding: 8px 12px; text-align: left; }
+    th { background: #f4f5f7; color: #172b4d; font-weight: 600; }
+    tr:nth-child(even) { background: #fafafa; }
+    .meta { background: #f4f5f7; padding: 12px 16px; border-radius: 4px; margin: 16px 0; font-size: 14px; }
+    .note { font-style: italic; color: #5e6c84; margin: 8px 0; }
+    a { color: #0052cc; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    hr { border: none; border-top: 1px solid #dfe1e6; margin: 24px 0; }
+    code { background: #f4f5f7; padding: 2px 6px; border-radius: 3px; font-size: 13px; }
+    .mermaid { margin: 16px 0; text-align: center; }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <script>mermaid.initialize({ startOnLoad: true, theme: 'neutral' });</script>
+</head>
+<body>
+
+<h1>Lloyd's Syndicate Finance – QA Testing Strategy</h1>
+
+<div class="meta">
+  <strong>Programme:</strong> Lloyd's (Lloyds Syndicate Finance – D365 F&O WBX Journals &amp; Lloyds XML Workflow)<br />
+  <strong>Automation:</strong> Dedicated Lloyd's section in the E2E automation framework<br />
+  <strong>Last updated:</strong> 2026-03-05<br />
+  <strong>Status:</strong> Living document – refine as the pipeline and documentation evolve
+</div>
+
+<h2>1. Purpose and scope</h2>
+<p>This document is the <strong>QA testing strategy</strong> for the Lloyd's Syndicate Finance pipeline. It describes <em>how</em> we test the data flows and integrations, what is in and out of scope for the current phase, and how testing will evolve over time. It is <strong>not</strong> a backlog or a list of work items: requirements, epics, and stories are maintained in <strong>Confluence</strong> and <strong>JIRA</strong>. New work will be added to the pipeline over time; this strategy applies to current and future deliverables in the same data flow.</p>
+<p><strong>Sources of requirements:</strong> Lloyds Syndicate Finance Requirements (D365 F&O WBX Journals) and Lloyds XML Workflow are documented in Confluence, with sub-pages for detail. JIRA holds the backlog and work items. The strategy is informed by these sources but stays generic so it remains valid as the backlog changes.</p>
+<p><strong>In scope for this strategy:</strong> The Lloyd's data flows (WBX → ADP → MuleSoft → TDS/TAGETIK/D365; Lloyds XML workflow for journal posting to D365/ODS), the testing approach for MuleSoft (black-box first, then grey-box with logs), and the automation framework's Lloyd's section.</p>
+
+<hr />
+
+<h2>2. References</h2>
+<table>
+  <thead>
+    <tr><th>Purpose</th><th>Location</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Requirements and process</strong></td>
+      <td>Confluence – Lloyds Syndicate Finance Requirements (D365 F&O WBX Journals); Lloyds XML Workflow. Use these for flow detail, acceptance criteria, and process steps.</td>
+    </tr>
+    <tr>
+      <td><strong>Confluence – Tagetik flow (MuleSoft)</strong></td>
+      <td><a href="https://accelins.atlassian.net/wiki/spaces/ISDE/pages/2938961970/Lloyds+-+MuleSoft+Integration+TAGETIK+IAE+Actuals">Lloyds - MuleSoft Integration TAGETIK IAE Actuals</a> (ISDE space, page 2938961970). Canonical source for WBX Written → ADP → MuleSoft → TDS-TAGETIK loader → Tagetik. Use this page and its <strong>sub-pages</strong> for detailed acceptance criteria and process steps when designing test scenarios for the Tagetik flow.</td>
+    </tr>
+    <tr>
+      <td><strong>Backlog and traceability</strong></td>
+      <td>JIRA. Work items (epics, stories, sub-stories) for the Lloyd's pipeline are tracked here. Test scenarios should be linked to the relevant requirements or work items at test-design and execution time.</td>
+    </tr>
+    <tr>
+      <td><strong>Automation – Lloyd's tests</strong></td>
+      <td>Framework section <code>src/features/lloyds/</code>. Feature files and tags for Lloyd's pipeline tests.</td>
+    </tr>
+    <tr>
+      <td><strong>Automation – MuleSoft</strong></td>
+      <td>Existing MuleSoft API client and log steps; MuleSoft access and setup documented in the framework.</td>
+    </tr>
+  </tbody>
+</table>
+<p class="note">The strategy does not enumerate specific JIRA keys; those belong in the backlog and in test-case traceability, not in the strategy itself. <strong>Review Confluence sub-pages</strong> under the Tagetik IAE Actuals page for any additional flows or acceptance criteria not yet reflected in this document.</p>
+
+<hr />
+
+<h2>3. Data division and flow diagrams</h2>
+<p>Company data is organised into <strong>four main flows</strong>: <strong>Tagetik flow</strong> (Lloyd's), <strong>Dynamics F&O Flow</strong> (Lloyd's), <strong>ResQ flow</strong>, and <strong>Non-Lloyds Flow</strong>. QA tests the Lloyd's flows (Tagetik, Dynamics F&O) and ResQ flow, and regression on the Non-Lloyds path.</p>
+
+<h3>3.1 Four main flows: Tagetik, Dynamics F&O, ResQ, and Non-Lloyds</h3>
+<table>
+  <thead>
+    <tr><th>Flow</th><th>Description</th><th>Path</th><th>QA focus</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Tagetik flow</strong></td>
+      <td>Lloyd's – WBX Written data to Tagetik</td>
+      <td><strong>ADP</strong> → <strong>MuleSoft</strong> → TDS (Tagetik loader table) → <strong>Tagetik system</strong></td>
+      <td>Source/target verification; integration points ADP↔MuleSoft, MuleSoft↔TDS Tagetik loader; target = Tagetik system.</td>
+    </tr>
+    <tr>
+      <td><strong>Dynamics F&O Flow</strong></td>
+      <td>Lloyd's – journal posting to D365/ODS</td>
+      <td>ADP → MuleSoft → Kafka/D365/ODS; status via D365 CRM, PowerApps, Operational workflow</td>
+      <td>Source/target; ODS Repository ID status = Work Item Complete; status/workflow integrations.</td>
+    </tr>
+    <tr>
+      <td><strong>ResQ flow</strong></td>
+      <td>ResQ underwriting data</td>
+      <td><strong>ADP</strong> → <strong>MuleSoft</strong> → TDS (ResQ loader table) → <strong>ResQ system</strong></td>
+      <td>Same shape as Tagetik: source/target; integration points ADP↔MuleSoft, MuleSoft↔TDS ResQ loader; target = ResQ system.</td>
+    </tr>
+    <tr>
+      <td><strong>Non-Lloyds Flow</strong></td>
+      <td>All other (non-Lloyds) data</td>
+      <td><strong>ODS</strong> → <strong>TDS</strong> → <strong>D365 F&O</strong></td>
+      <td>Regression: path must stay stable; Lloyd's data must NOT appear here.</td>
+    </tr>
+  </tbody>
+</table>
+<p><strong>Regression requirement:</strong> Lloyd's data (Tagetik, Dynamics F&O) must <strong>not</strong> appear in the Non-Lloyds Flow (ODS/TDS). ResQ and Non-Lloyds data must continue to flow on their respective paths and remain stable.</p>
+
+<h3>3.2 Flow diagram – Non-Lloyds Flow (regression)</h3>
+<pre style="background:#f4f5f7; padding:12px; overflow:auto;">Non-Lloyds Flow: Sources → ODS → TDS → D365 F&O
+                 ↑
+                 └── QA regression: this path must stay stable
+                     QA verifies: Lloyd's data does NOT appear in ODS or TDS</pre>
+<p><strong>QA test points (regression):</strong></p>
+<ul>
+  <li><strong>Integration points QA tests:</strong> ODS → TDS, TDS → D365 F&O (existing behaviour) for <strong>Non-Lloyds Flow</strong>.</li>
+  <li><strong>Assertions:</strong> (1) Lloyd's data is <strong>excluded</strong> from ODS and TDS. (2) Non-Lloyds data <strong>continues to flow</strong> to TDS and downstream. (3) Non-Lloyds path remains unchanged.</li>
+</ul>
+<div class="mermaid">flowchart LR
+  subgraph NonLloyds["Non-Lloyds Flow (regression)"]
+    ODS[ODS] --> TDS[TDS]
+    TDS --> D365[D365 F&O]
+  end
+  QA1["QA: Lloyd's data NOT in ODS/TDS"]
+  QA2["QA: Non-Lloyds Flow still stable"]</div>
+
+<h3>3.3 Flow diagram – Tagetik flow, Dynamics F&O Flow, ResQ flow</h3>
+<pre style="background:#f4f5f7; padding:12px; overflow:auto;">Tagetik flow:       ADP (Lloyds) → MuleSoft → TDS (Tagetik loader table) → Tagetik system
+ResQ flow:           ADP → MuleSoft → TDS (ResQ loader table) → ResQ system
+Dynamics F&O Flow:   ADP → MuleSoft → Kafka / D365 / ODS (Repository ID status)
+     │              │
+     │              ├── QA: source (ADP) + target (TDS loaders, Tagetik/ResQ systems, D365, ODS Repository ID)
+     │              └── Integration points: ADP↔MuleSoft, MuleSoft↔TDS, MuleSoft↔Kafka/D365
+     └── Status/workflow: D365 CRM, PowerApps, Operational workflow app (Bdx status changes)</pre>
+<p><strong>QA test points (Lloyd's and ResQ):</strong></p>
+<ul>
+  <li><strong>Source:</strong> ADP (data products, status) before MuleSoft runs.</li>
+  <li><strong>Targets:</strong> TDS-TAGETIK loader → Tagetik system; TDS-ResQ loader → ResQ system; D365 F&O (Dynamics F&O Flow); ODS Repository ID = Work Item Complete; Kafka events.</li>
+  <li><strong>Integration points QA tests:</strong> ADP ↔ MuleSoft; MuleSoft ↔ TDS (Tagetik loader, ResQ loader); MuleSoft ↔ Kafka; MuleSoft ↔ D365; MuleSoft ↔ blob/ADP API (Dynamics F&O Flow).</li>
+</ul>
+<div class="mermaid">flowchart LR
+  subgraph TagetikFlow["Tagetik flow"]
+    ADP1[ADP] --> MS1[MuleSoft]
+    MS1 --> TDS_T[TDS Tagetik loader]
+    TDS_T --> TagetikSys[Tagetik system]
+  end
+  subgraph ResQFlow["ResQ flow"]
+    ADP2[ADP] --> MS2[MuleSoft]
+    MS2 --> TDS_R[TDS ResQ loader]
+    TDS_R --> ResQSys[ResQ system]
+  end
+  subgraph D365Flow["Dynamics F&O Flow"]
+    ADP3[ADP] --> MS3[MuleSoft]
+    MS3 --> Kafka[Kafka]
+    MS3 --> D365[D365 F&O]
+    MS3 --> ODS_R[ODS Repository ID]
+  end
+  subgraph StatusWorkflow["Status / workflow – same system"]
+    D365CRM[D365 CRM module]
+    PowerApps[PowerApps]
+    OpsWorkflow[Operational workflow app - Bdx status]
+  end</div>
+
+<h3>3.4 Lloyd's status / workflow integrations (D365 CRM, PowerApps, Operational workflow)</h3>
+<p>Lloyd's flows use the <strong>same system</strong> for <strong>status changes</strong> and workflow:</p>
+<ul>
+  <li><strong>Dynamics 365 CRM module</strong> – the underlying system.</li>
+  <li><strong>PowerApps</strong> – the solution built on D365 CRM.</li>
+  <li><strong>Operational workflow</strong> – the name of the app where <strong>Bordereaux (Bdx) status changes</strong> happen.</li>
+</ul>
+<p>QA should include scenarios where status transitions depend on this system (e.g. Bdx status updates, approval steps, status visible in D365/ODS). Detailed acceptance criteria remain in Confluence.</p>
+
+<h3>3.5 Where QA tests – summary</h3>
+<table>
+  <thead>
+    <tr><th>Area</th><th>What QA tests</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><strong>Non-Lloyds Flow (regression)</strong></td><td>ODS → TDS → D365 F&O; Lloyd's data excluded from ODS/TDS; Non-Lloyds path unchanged.</td></tr>
+    <tr><td><strong>Tagetik flow</strong></td><td>Source (ADP), targets (TDS Tagetik loader table, <strong>Tagetik system</strong>); integration points ADP↔MuleSoft, MuleSoft↔TDS Tagetik loader.</td></tr>
+    <tr><td><strong>ResQ flow</strong></td><td>Source (ADP), targets (TDS ResQ loader table, <strong>ResQ system</strong>); integration points ADP↔MuleSoft, MuleSoft↔TDS ResQ loader.</td></tr>
+    <tr><td><strong>Dynamics F&O Flow</strong></td><td>Source (ADP), targets (D365, ODS Repository ID status, Kafka); integration points ADP↔MuleSoft, MuleSoft↔Kafka/D365/blob.</td></tr>
+    <tr><td><strong>Status / workflow</strong></td><td>D365 CRM, PowerApps, Operational workflow app (Bdx status changes) where they affect the flow.</td></tr>
+  </tbody>
+</table>
+
+<hr />
+
+<h2>4. System context: data flows under test</h2>
+<p>Testing is organised around the <strong>data flows</strong> that move Lloyd's data from source systems through MuleSoft to targets. Detailed requirements and acceptance criteria are in Confluence.</p>
+
+<h3>4.1 WBX / TAGETIK IAE flow (Written data to Tagetik)</h3>
+<ul>
+  <li><strong>WBX file</strong> → <strong>ADP Written Ingestion</strong> → <strong>ADP Core Finance Data Product</strong> (integrity checks, TDS Written D365 pre/post checks).</li>
+  <li><strong>ADP Written TAGETIK IAE Data Product</strong> (actuals and exception flag; Repository ID-level status <em>Work Item Complete</em> when posted to D365).</li>
+  <li><strong>MuleSoft TAGETIK IAE Integration – Actuals</strong> (ingestion into new TDS-TAGETIK loader tables for Written). For the current phase, <strong>actuals are in scope</strong>; <strong>exceptions integration via MuleSoft is out of scope</strong>.</li>
+  <li><strong>TDS.TAGETIK Written</strong> (Lloyds actuals in new loader; RnA views updated for Lloyds; non-Lloyds path unchanged).</li>
+  <li><strong>Reporting RnA TAGETIK views</strong> → <strong>Tagetik system</strong> (entity setup, IAE config, ETL, earnings journals; agency postings are handled via Tagetik, not directly in D365 F&O in this flow).</li>
+</ul>
+
+<h3>4.2 Dynamics F&O Flow (Lloyds XML workflow – journal posting to D365/ODS)</h3>
+<ul>
+  <li>D365 Finance status (In Progress) → ADP Re-Finance (Journal) Data Product → <strong>MuleSoft</strong> (scheduled cycle; validation, including D365 checksum).</li>
+  <li>On success: MuleSoft generates agency XML, loads to blob, notifies via ADP API; Kafka event <code>xmlGenerated</code>.</li>
+  <li>D365 F&O enrichment and approval → SFTP → Kafka <code>xmlApproved</code> → MuleSoft (XSD validation, conversion to D365 journal XML, service bus to Dynamics).</li>
+  <li>Azure SQL and MuleSoft drive status progression → journal posted; SFTP FMO confirmation → Kafka <code>JournalPosted</code> → D365 F&O / ODS → <strong>Repository ID status = Work Item Complete</strong>.</li>
+</ul>
+<p><strong>Implications for testing:</strong> Flows are asynchronous; tests must poll or wait for status changes. Important verification points include source state before the flow, target state after the flow, and (where applicable) intermediate statuses such as <code>xmlGenerated</code>, <code>xmlApproved</code>, <code>D365_COMPLETE</code>, and <strong>Repository ID = Work Item Complete</strong>.</p>
+
+<hr />
+
+<h2>5. Scope and traceability</h2>
+<p><strong>What we test:</strong> Functionality on the Lloyd's data flows described in §4, within the phase boundaries (see §6). For each flow or capability, we verify <strong>source</strong> and <strong>target</strong> (and, in later phases, MuleSoft behaviour). We do not define scope by listing work items; we define it by flows and phase.</p>
+<p><strong>Current phase (Phase 1):</strong> In-scope is limited to the flows and endpoints described in the Lloyd's flow diagrams. <strong>Tagetik</strong> and <strong>DCR</strong> integrations are explicitly <strong>out of scope</strong> for Phase 1; they will be brought into scope in later phases. <strong>Regression</strong> is in scope: (1) <strong>Lloyd's data must not</strong> flow to ODS or TDS; (2) <strong>non-Lloyds (e.g. ResQ) data</strong> must still flow to TDS and to D365 F&O and that path must remain stable.</p>
+<p><strong>Traceability:</strong> Individual test cases and scenarios should be linked to the relevant Confluence pages or JIRA work items when tests are designed and executed. The strategy does not list those items; the backlog and Confluence do. As new stories are added to the pipeline, they are tested according to this same strategy and linked in the test repository or test management tool.</p>
+
+<hr />
+
+<h2>6. MuleSoft testing approach (Phase 1 and long-term)</h2>
+<p>The Lloyd's pipeline is a <strong>long-term programme</strong> with multiple projects in the same data flow. Phase 1 is constrained by time; later phases will deepen automation and observability.</p>
+
+<h3>6.1 Phase 1 – Black-box MuleSoft, source/target verification</h3>
+<ul>
+  <li><strong>MuleSoft as black box:</strong> For the first level of testing, treat MuleSoft as a <strong>black box</strong>. We do not assert behaviour inside MuleSoft; we verify <strong>source and target</strong> for each in-scope functionality.</li>
+  <li><strong>What we verify:</strong> <strong>Source</strong> – test data and state at the upstream system before the flow runs. <strong>Target</strong> – expected data and state at the downstream system (e.g. TDS loader tables, Tagetik system, ResQ system, ODS Repository ID status, D365 journal posted) after the flow has run.</li>
+  <li><strong>Scope:</strong> As in §4, restricted to the flow diagrams; Tagetik and DCR are out of scope for Phase 1.</li>
+  <li><strong>MuleSoft logs:</strong> If time permits, we may inspect MuleSoft logs (e.g. by correlation ID). This is <strong>optional</strong> for Phase 1; black-box source/target verification is sufficient for sign-off.</li>
+  <li><strong>Automation:</strong> Prefer <strong>API and automated tests</strong> so execution is faster and manual effort is reduced.</li>
+</ul>
+
+<h3>6.2 Long-term – API-driven automation and MuleSoft Connected App</h3>
+<ul>
+  <li><strong>MuleSoft Connected App:</strong> In a later phase, a MuleSoft Anypoint Connected App (or equivalent) will allow the automation framework to retrieve logs when a flow is triggered, so we can confirm MuleSoft ran as expected in addition to source/target checks.</li>
+  <li><strong>End-to-end automation:</strong> Trigger flow → wait for completion → verify source and target via API/data checks → optionally verify MuleSoft via logs. All automated; minimal manual steps.</li>
+  <li><strong>Future scope:</strong> Later phases will include Tagetik and DCR in the same pipeline. Phase 1 does not.</li>
+</ul>
+
+<h3>6.3 Summary</h3>
+<table>
+  <thead>
+    <tr><th>Aspect</th><th>Phase 1</th><th>Long-term</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><strong>MuleSoft</strong></td><td>Black box only</td><td>Grey-box: Connected App + log retrieval by framework</td></tr>
+    <tr><td><strong>Verification</strong></td><td>Source + target for each functionality</td><td>Source + target + MuleSoft logs (when flow triggered)</td></tr>
+    <tr><td><strong>Logs</strong></td><td>Optional, if time permits</td><td>Integrated: framework retrieves logs and asserts success</td></tr>
+    <tr><td><strong>Automation</strong></td><td>Prefer API/automated tests; reduce manual effort</td><td>Full API-driven automation; minimal manual steps</td></tr>
+    <tr><td><strong>Scope</strong></td><td>Flow diagrams only; no Tagetik/DCR</td><td>Extend to Tagetik, DCR, and further pipeline projects</td></tr>
+    <tr><td><strong>Speed</strong></td><td>Faster via API/automation where possible</td><td>Maximise speed through full automation and API checks</td></tr>
+  </tbody>
+</table>
+
+<hr />
+
+<h2>7. Test levels and types</h2>
+<table>
+  <thead>
+    <tr><th>Level</th><th>Focus</th><th>Approach</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Integration</td><td>ADP ↔ MuleSoft, MuleSoft ↔ Kafka/D365/ODS, TDS loader, RnA views</td><td>API and automated tests where possible; reuse framework integration patterns; Lloyd's-specific scenarios in the Lloyd's section.</td></tr>
+    <tr><td>API / contract</td><td>Source/target APIs, D365/ADP/ODS APIs (where exposed)</td><td><strong>Primary focus</strong> for speed and less manual effort.</td></tr>
+    <tr><td>Data validation</td><td>ODS/TDS tables, TAGETIK loader, Bordereaux/Lloyds views, Repository ID status</td><td>Database and API checks using existing SQL Server/ODS and data patterns.</td></tr>
+    <tr><td>E2E</td><td>WBX through to Tagetik system; Dynamics F&O Flow through to Repository ID = Work Item Complete; ResQ through to ResQ system</td><td>Lloyd's feature files; asynchronous waits and status polling.</td></tr>
+    <tr><td>Regression</td><td>Lloyd's data must <strong>not</strong> reach ODS or TDS; non-Lloyds (ResQ) data <strong>must still</strong> flow to TDS and to D365 F&O; path must remain stable</td><td>Explicit scenarios for “Lloyds only” vs “non-Lloyds unchanged”.</td></tr>
+  </tbody>
+</table>
+
+<hr />
+
+<h2>8. Automation framework – Lloyd's section</h2>
+<ul>
+  <li><strong>Feature files:</strong> Stored under the framework's Lloyd's section (e.g. <code>src/features/lloyds/</code>). Organisation may be by theme or flat with tags.</li>
+  <li><strong>Tags:</strong> A common project tag (e.g. Lloyd's) and optional theme tags for filtering. Individual test cases may also carry tags for traceability to requirements or work items when needed.</li>
+  <li><strong>Steps and clients:</strong> Reuse existing MuleSoft, SQL Server, and API steps and clients; add Lloyd's-specific steps only when no reusable step exists.</li>
+  <li><strong>Config / env:</strong> Lloyd's-specific configuration is documented in the framework's Lloyd's docs and env config.</li>
+  <li><strong>Traceability:</strong> Link test cases to Confluence pages or JIRA work items as part of test design and execution; the strategy does not list specific keys.</li>
+</ul>
+
+<hr />
+
+<h2>9. Test data and environments</h2>
+<ul>
+  <li><strong>Unknowns (to be decided later):</strong>
+    <ul>
+      <li><strong>Environments:</strong> Which environment(s) will be used for Lloyd's testing (e.g. QA, UAT) has <strong>not yet been decided</strong>. Once decided, document which environments run the Lloyd's flows and which systems (MuleSoft, Kafka, D365, ODS, D365 CRM, PowerApps, Operational workflow) are available. Keep this in the framework's Lloyd's and env documentation.</li>
+      <li><strong>Test data:</strong> What test data will be used for testing the Lloyd's flows has <strong>not yet been decided</strong>. This needs to be agreed (with BA/dev) later. Lloyd's-specific data (e.g. WBX files, RepoID, syndicate/entity data) should be defined; avoid hardcoding in tests; use data factory or config where possible.</li>
+    </ul>
+  </li>
+  <li><strong>Repository ID / Work Item Complete:</strong> Tests that assert on “Work Item Complete” need a stable way to create or identify test Repository IDs and to wait for terminal status (polling or similar). This depends on environment and test data decisions above.</li>
+</ul>
+
+<hr />
+
+<h2>10. Open points and evolution</h2>
+<ul>
+  <li>Use Confluence sub-pages for acceptance criteria and process steps so test scenarios can be aligned with requirements.</li>
+  <li>When more granular flow descriptions are available (“day in the life” / data flow detail), add them (e.g. under §4) and use them to derive concrete test scenarios and assertion points.</li>
+  <li>Clarify test data ownership (who provides Lloyd's test data and in what format/environment).</li>
+  <li><strong>Environments and test data:</strong> Confirm which environment(s) will be used and what test data will be used for Lloyd's testing (currently unknown; see §9).</li>
+  <li>As the pipeline grows (e.g. Tagetik, DCR, new flows), update this document to reflect scope and approach; keep it generic and avoid listing work items.</li>
+</ul>
+
+<hr />
+
+<h2>11. Summary</h2>
+<table>
+  <thead>
+    <tr><th>Area</th><th>Direction</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><strong>Programme</strong></td><td>Lloyd's Syndicate Finance pipeline (WBX/Tagetik flow, Dynamics F&O Flow, ResQ flow, Non-Lloyds regression).</td></tr>
+    <tr><td><strong>Scope (Phase 1)</strong></td><td>Flows as per flow diagrams; actuals in scope; exceptions via MuleSoft and Tagetik/DCR out of scope.</td></tr>
+    <tr><td><strong>Requirements &amp; backlog</strong></td><td>Confluence for requirements and process; JIRA for work items and traceability. Strategy applies to current and future pipeline work; it does not list stories.</td></tr>
+    <tr><td><strong>MuleSoft</strong></td><td><strong>Phase 1:</strong> Black-box; verify source and target only; logs optional if time permits. <strong>Long-term:</strong> Connected App for log retrieval; API-driven automation; extend to Tagetik/DCR.</td></tr>
+    <tr><td><strong>Test levels</strong></td><td>Integration, API, data validation, E2E, regression; prefer API and automation.</td></tr>
+    <tr><td><strong>Regression</strong></td><td>Lloyd's data must <strong>not</strong> reach ODS/TDS (Non-Lloyds Flow); Non-Lloyds path ODS → TDS → D365 F&O must remain stable.</td></tr>
+    <tr><td><strong>Automation</strong></td><td>Dedicated Lloyd's section in the framework; reuse existing steps and clients; link tests to Confluence/JIRA as needed.</td></tr>
+    <tr><td><strong>Test data &amp; env</strong></td><td><strong>Unknowns:</strong> Environment(s) and test data for Lloyd's testing not yet decided; to be decided later (see §9).</td></tr>
+  </tbody>
+</table>
+
+<p class="note">This is a <strong>QA testing strategy</strong>: it describes how we test and what we scope, not which work items we implement. Requirements and backlog live in Confluence and JIRA and will grow over time; the strategy remains applicable as new stories are added.</p>
+
+</body>
+</html>

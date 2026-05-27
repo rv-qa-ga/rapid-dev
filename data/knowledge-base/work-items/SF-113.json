@@ -1,0 +1,49 @@
+{
+  "key": "SF-113",
+  "summary": "Require Account.Region Field",
+  "type": "Story",
+  "status": "In QA",
+  "priority": "Medium",
+  "description": {
+    "raw": "As a:  Compliance User I want to:  ensure Region is a required field when creating any Account So that I can:  enforce regulatory routing, compliance visibility, and proper team assignment Acceptance Criteria A  Region__c picklist field  must exist with these values: US CAN UK EU ROW Region must be  mandatory  when creating Accounts via the Salesforce UI. Validation is bypassed for  data imports and API operations  to allow flexibility for data migrations and integrations where Region may be set later. Region drives downstream logic (e.g., filtering State/Province values, team assignments). Scenario 1: Prevent Account creation without Region (UI only) Given I am creating a new Account record in the Salesforce UI When I fill in all required fields except  Region__c And I click  Save Then the save is prevented And an error message appears directly under the Region field stating: “Region is required.” And the Account is not created. Scenario 2: Successful Account creation with Region Given I am creating a new Account record in the Salesforce UI When I fill in all required fields including  Region__c And I click  Save Then the Account is created successfully And the Region value is stored And no validation errors appear. Scenario 3: State filtered by Region selection Given I am creating a new Account record in the Salesforce UI When I select  US  as the Region Then the  State/Province picklist  must show only US States And provinces from other Regions must not be available for selection And I must select a valid State from the filtered list before saving. ✅  Business Value: Ensures every Account is tied to a  Region  for regulatory compliance. Enables  accurate routing and team assignment  based on geography. Provides  data governance  by requiring Region on all UI-created Accounts, while still allowing flexibility for bulk data operations and integrations.",
+    "parsed": {
+      "sentences": [
+        "As a:  Compliance User I want to:  ensure Region is a required field when creating any Account So that I can:  enforce regulatory routing, compliance visibility, and proper team assignment Acceptance Criteria A  Region__c picklist field  must exist with these values: US CAN UK EU ROW Region must be  mandatory  when creating Accounts via the Salesforce UI",
+        "Validation is bypassed for  data imports and API operations  to allow flexibility for data migrations and integrations where Region may be set later",
+        "Region drives downstream logic (e.g., filtering State/Province values, team assignments)",
+        "Scenario 1: Prevent Account creation without Region (UI only) Given I am creating a new Account record in the Salesforce UI When I fill in all required fields except  Region__c And I click  Save Then the save is prevented And an error message appears directly under the Region field stating: “Region is required.” And the Account is not created",
+        "Scenario 2: Successful Account creation with Region Given I am creating a new Account record in the Salesforce UI When I fill in all required fields including  Region__c And I click  Save Then the Account is created successfully And the Region value is stored And no validation errors appear",
+        "Scenario 3: State filtered by Region selection Given I am creating a new Account record in the Salesforce UI When I select  US  as the Region Then the  State/Province picklist  must show only US States And provinces from other Regions must not be available for selection And I must select a valid State from the filtered list before saving",
+        "✅  Business Value: Ensures every Account is tied to a  Region  for regulatory compliance",
+        "Enables  accurate routing and team assignment  based on geography",
+        "Provides  data governance  by requiring Region on all UI-created Accounts, while still allowing flexibility for bulk data operations and integrations."
+      ],
+      "entities": [
+        "Account"
+      ],
+      "fields": [
+        "Region__c"
+      ],
+      "actions": [
+        "show",
+        "create"
+      ]
+    }
+  },
+  "acceptanceCriteria": [],
+  "comments": [],
+  "relatedIssues": [],
+  "fieldDefinitions": {
+    "Region__c": {
+      "type": "Custom",
+      "required": false,
+      "description": "Field: Region__c"
+    }
+  },
+  "generatedFeatures": {
+    "ui": "src/features/ui/SF/SF-113.feature",
+    "api": "src/features/api/SF/SF-113.feature"
+  },
+  "qaReviewedFeatures": {},
+  "extractedAt": "2025-12-17T18:40:39.494Z"
+}

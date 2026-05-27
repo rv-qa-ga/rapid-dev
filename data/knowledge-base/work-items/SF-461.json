@@ -1,0 +1,48 @@
+{
+  "key": "SF-461",
+  "summary": "Validation check updates to Accounts page",
+  "type": "Story",
+  "status": "In QA",
+  "priority": "Medium",
+  "description": {
+    "raw": "As an MRD  I want field validations in place So that I can be sure the data I input is accurate Acceptance Criteria: The ‘Affiliate_Non_Affiliate_c’ field on the accounts tab is mandatory when the account type field is \"Member\", \"Insurer\", \"Insurer Branch\", \"Group\" and the status is Active or Onboarding. The ‘Data Source - Claims’ field on the accounts tab is mandatory when the account type field is TPA  - covered by this story  [SF-510] Data Source and Effective From Fields – Visibility and Validation Rules - Jira The ‘Data Source - Written’ field on the accounts tab is mandatory when the account type field is Member  - covered by this story  [SF-510] Data Source and Effective From Fields – Visibility and Validation Rules - Jira The data type on ‘member previously known as name’ on the accounts tab is limited to 100 characters  The label name for ‘member_previously_known_as_name_c’ should be changed to ‘Party Previously Known As Name’  Scenarios:  Scenario 1: 'Affiliate_Non_Affiliate_c' field is mandatory for specific account types   Given the Account Type is one of the following: Member Insurer Insurer Branch Group    And   the Status is either \"Active\" or \"Onboarding\"   When the user attempts to save the Account record   Then the system must require the \"Affiliate_Non_Affiliate__c\" field to be completed   And if the field is blank   Then the system must prevent the record from being saved   And display a validation message explaining that this field is required for the specified Account Types and Statuses   Scenario 2: 'Member Previously Known As Name' field limited to 100 characters     Given the user enters a value in the ‘Member Previously Known As Name’ field     When the user enters more than 100 characters     Then the system prevents additional characters from being entered     Or displays an error message indicating the character limit has been exceeded Scenario 3: Update field label for 'member_previously_known_as_name__c' across all Account types   Given any Account record is displayed   And the Account Type can be any of the configured record types   When the system renders the field currently labelled \"Member Previously Known as Name\"   Then the field label must be displayed as \"Party Previously Known as Name\"   And this updated label must appear consistently across all account types",
+    "parsed": {
+      "sentences": [
+        "As an MRD  I want field validations in place So that I can be sure the data I input is accurate Acceptance Criteria: The ‘Affiliate_Non_Affiliate_c’ field on the accounts tab is mandatory when the account type field is \"Member\", \"Insurer\", \"Insurer Branch\", \"Group\" and the status is Active or Onboarding",
+        "The ‘Data Source - Claims’ field on the accounts tab is mandatory when the account type field is TPA  - covered by this story  [SF-510] Data Source and Effective From Fields – Visibility and Validation Rules - Jira The ‘Data Source - Written’ field on the accounts tab is mandatory when the account type field is Member  - covered by this story  [SF-510] Data Source and Effective From Fields – Visibility and Validation Rules - Jira The data type on ‘member previously known as name’ on the accounts tab is limited to 100 characters  The label name for ‘member_previously_known_as_name_c’ should be changed to ‘Party Previously Known As Name’  Scenarios:  Scenario 1: 'Affiliate_Non_Affiliate_c' field is mandatory for specific account types   Given the Account Type is one of the following: Member Insurer Insurer Branch Group    And   the Status is either \"Active\" or \"Onboarding\"   When the user attempts to save the Account record   Then the system must require the \"Affiliate_Non_Affiliate__c\" field to be completed   And if the field is blank   Then the system must prevent the record from being saved   And display a validation message explaining that this field is required for the specified Account Types and Statuses   Scenario 2: 'Member Previously Known As Name' field limited to 100 characters     Given the user enters a value in the ‘Member Previously Known As Name’ field     When the user enters more than 100 characters     Then the system prevents additional characters from being entered     Or displays an error message indicating the character limit has been exceeded Scenario 3: Update field label for 'member_previously_known_as_name__c' across all Account types   Given any Account record is displayed   And the Account Type can be any of the configured record types   When the system renders the field currently labelled \"Member Previously Known as Name\"   Then the field label must be displayed as \"Party Previously Known as Name\"   And this updated label must appear consistently across all account types"
+      ],
+      "entities": [
+        "Account"
+      ],
+      "fields": [
+        "Affiliate_Non_Affiliate__c",
+        "When"
+      ],
+      "actions": [
+        "display",
+        "update"
+      ]
+    }
+  },
+  "acceptanceCriteria": [],
+  "comments": [],
+  "relatedIssues": [],
+  "fieldDefinitions": {
+    "Affiliate_Non_Affiliate__c": {
+      "type": "Custom",
+      "required": false,
+      "description": "Field: Affiliate_Non_Affiliate__c"
+    },
+    "When": {
+      "type": "Text",
+      "required": false,
+      "description": "Field: When"
+    }
+  },
+  "generatedFeatures": {
+    "ui": "src/features/ui/SF/SF-461.feature",
+    "api": "src/features/api/SF/SF-461.feature"
+  },
+  "qaReviewedFeatures": {},
+  "extractedAt": "2025-12-17T18:40:44.035Z"
+}

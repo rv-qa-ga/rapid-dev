@@ -1,0 +1,42 @@
+{
+  "key": "SF-493",
+  "summary": "Unhide and delete fields in opportunity - consolidation",
+  "type": "Story",
+  "status": "In QA",
+  "priority": "Medium",
+  "description": {
+    "raw": "Title: Unhide Annual_GWP_Estimate_Year_1_c and Incumbent_Carrier_c; Delete Probability_Confidence_c, Target_ULR_Ultimate_Loss_Ratio_c, Actuary_assigned_c, Underwriter_assigned_c, ProgramClass_c and ProgramName_c from Opportunity User Story: As a Product Owner / Data Owner I want the Opportunity fields Annual_GWP_Estimate_Year_1_c and Incumbent_Carrier_c unhidden for the appropriate user profiles, and I want the fields Probability_Confidence_c, Target_ULR_Ultimate_Loss_Ratio_c, Actuary_assigned_c, Underwriter_assigned_c, ProgramClass_c and ProgramName_c removed from the Opportunity object only So that users can see the required GWP and incumbent carrier information while obsolete fields are safely removed without causing downstream breakage Description / Scope: Two related actions on the Opportunity object: Unhide  Annual_GWP_Estimate_Year_1_c and Incumbent_Carrier_c so they are visible (and editable where appropriate) to non-admin users who need them (for example Sales, Underwriting, or any named profiles). This requires changes to Field-Level Security (FLS), page layouts, Lightning record pages / Dynamic Forms, compact layouts, search layouts, list views, reports, and API access. Verify integrations and automations continue to work. Delete  Probability_Confidence_c, Target_ULR_Ultimate_Loss_Ratio_c, Actuary_assigned_c, Underwriter_assigned_c, ProgramClass_c and ProgramName_c from the Opportunity object only. Do NOT delete fields with the same API names on other objects. Before deletion perform a full org-wide and external-systems impact analysis, export and archive field data, remediate or retire references (Apex, Flows, Process Builder, Validation Rules, Formula Fields, Roll-ups, Duplicate Rules, Page Layouts, List Views, Reports, Dashboards, Permission Sets, Profiles, scheduled jobs, integrations and managed packages). Acceptance Criteria (GIVEN / WHEN / THEN): A — Unhide Acceptance Criteria Field visibility (UI) GIVEN a non-admin user in an approved profile WHEN they open any Opportunity record in Lightning Experience THEN Annual_GWP_Estimate_Year_1_c and Incumbent_Carrier_c appear on the record page (detail / dynamic form sections) and are available for the intended CRUD operations per business need Field-Level Security & permission sets GIVEN org profiles and permission sets WHEN FLS is updated THEN the two fields are readable (and editable where appropriate) for approved non-admin profiles and remain visible to System Administrators and support roles Lightning pages, compact layouts & search GIVEN dynamic forms or page layouts exist WHEN standard users view or search records THEN the two fields appear in the configured record pages, compact highlights and search results for eligible accounts; no component errors occur Reports & API access GIVEN standard users with reporting/API access WHEN they build reports or run API queries (with credentials that have FLS) THEN the two fields are available in report field pickers and returned in API responses per FLS B — Delete Acceptance Criteria Opportunity-only deletion GIVEN the change is deployed WHEN I inspect object schemas across the org THEN Probability_Confidence_c, Target_ULR_Ultimate_Loss_Ratio_c, Actuary_assigned_c, Underwriter_assigned_c, ProgramClass_c and ProgramName_c are removed from the Opportunity object only; fields with the same API names on other objects remain unchanged",
+    "parsed": {
+      "sentences": [
+        "Title: Unhide Annual_GWP_Estimate_Year_1_c and Incumbent_Carrier_c; Delete Probability_Confidence_c, Target_ULR_Ultimate_Loss_Ratio_c, Actuary_assigned_c, Underwriter_assigned_c, ProgramClass_c and ProgramName_c from Opportunity User Story: As a Product Owner / Data Owner I want the Opportunity fields Annual_GWP_Estimate_Year_1_c and Incumbent_Carrier_c unhidden for the appropriate user profiles, and I want the fields Probability_Confidence_c, Target_ULR_Ultimate_Loss_Ratio_c, Actuary_assigned_c, Underwriter_assigned_c, ProgramClass_c and ProgramName_c removed from the Opportunity object only So that users can see the required GWP and incumbent carrier information while obsolete fields are safely removed without causing downstream breakage Description / Scope: Two related actions on the Opportunity object: Unhide  Annual_GWP_Estimate_Year_1_c and Incumbent_Carrier_c so they are visible (and editable where appropriate) to non-admin users who need them (for example Sales, Underwriting, or any named profiles)",
+        "This requires changes to Field-Level Security (FLS), page layouts, Lightning record pages / Dynamic Forms, compact layouts, search layouts, list views, reports, and API access",
+        "Verify integrations and automations continue to work",
+        "Delete  Probability_Confidence_c, Target_ULR_Ultimate_Loss_Ratio_c, Actuary_assigned_c, Underwriter_assigned_c, ProgramClass_c and ProgramName_c from the Opportunity object only",
+        "Do NOT delete fields with the same API names on other objects",
+        "Before deletion perform a full org-wide and external-systems impact analysis, export and archive field data, remediate or retire references (Apex, Flows, Process Builder, Validation Rules, Formula Fields, Roll-ups, Duplicate Rules, Page Layouts, List Views, Reports, Dashboards, Permission Sets, Profiles, scheduled jobs, integrations and managed packages)",
+        "Acceptance Criteria (GIVEN / WHEN / THEN): A — Unhide Acceptance Criteria Field visibility (UI) GIVEN a non-admin user in an approved profile WHEN they open any Opportunity record in Lightning Experience THEN Annual_GWP_Estimate_Year_1_c and Incumbent_Carrier_c appear on the record page (detail / dynamic form sections) and are available for the intended CRUD operations per business need Field-Level Security & permission sets GIVEN org profiles and permission sets WHEN FLS is updated THEN the two fields are readable (and editable where appropriate) for approved non-admin profiles and remain visible to System Administrators and support roles Lightning pages, compact layouts & search GIVEN dynamic forms or page layouts exist WHEN standard users view or search records THEN the two fields appear in the configured record pages, compact highlights and search results for eligible accounts; no component errors occur Reports & API access GIVEN standard users with reporting/API access WHEN they build reports or run API queries (with credentials that have FLS) THEN the two fields are available in report field pickers and returned in API responses per FLS B — Delete Acceptance Criteria Opportunity-only deletion GIVEN the change is deployed WHEN I inspect object schemas across the org THEN Probability_Confidence_c, Target_ULR_Ultimate_Loss_Ratio_c, Actuary_assigned_c, Underwriter_assigned_c, ProgramClass_c and ProgramName_c are removed from the Opportunity object only; fields with the same API names on other objects remain unchanged"
+      ],
+      "entities": [
+        "Account",
+        "Opportunity",
+        "Product"
+      ],
+      "fields": [],
+      "actions": [
+        "hide",
+        "update",
+        "delete"
+      ]
+    }
+  },
+  "acceptanceCriteria": [],
+  "comments": [],
+  "relatedIssues": [],
+  "fieldDefinitions": {},
+  "generatedFeatures": {
+    "ui": "src/features/ui/SF/SF-493.feature",
+    "api": "src/features/api/SF/SF-493.feature"
+  },
+  "qaReviewedFeatures": {},
+  "extractedAt": "2025-12-17T18:40:42.793Z"
+}

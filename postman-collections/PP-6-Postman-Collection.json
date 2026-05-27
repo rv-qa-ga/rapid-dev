@@ -1,0 +1,550 @@
+{
+	"info": {
+		"_postman_id": "work-item-pp-6",
+		"name": "PP-6 - Dynamics 365 API Tests",
+		"description": "API - PP-6 - Create a Master Lloyd's Agreement and Link Underlying UMRs\n\n══════════════════════════════════════════════════════════════════════════════\nGenerated: 2026-01-27T18:53:25.466Z (FeatureGenerator v3.1)\nUpdated: 2026-01-27 (Based on BA/Dev conversation and CMT structure)\n══════════════════════════════════════════════════════════════════════════════\n\n## Setup Instructions:\n1. Import this collection into Postman\n2. Create a new environment (or use existing Dynamics QA environment)\n3. Set the following environment variables:\n   - `d365_tenant_id`: Your Azure AD Tenant ID\n   - `d365_client_id`: Your Azure AD App Registration Client ID\n   - `d365_client_secret`: Your Azure AD App Registration Client Secret\n   - `d365_scope`: API scope (e.g., https://accelinsqatest.crm11.dynamics.com/.default)\n   - `d365_base_url`: Your Dynamics 365 instance URL (e.g., https://accelinsqatest.crm11.dynamics.com)\n   - `d365_api_version`: API version (e.g., v9.2)\n\n## Authentication:\n1. Run the \"🔐 Get Dynamics 365 Access Token\" request first\n2. The access token will be automatically saved to the `d365_access_token` collection variable\n3. All subsequent requests will use this token via Bearer authentication\n\n## Entity Sets:\n- Master Agreements: `accelins_masteragreements`\n- Contracts (CMT UMRs): `accelins_contracts` (or appropriate entity set name)\n\n## API Endpoints:\n- Base URL: `{{d365_base_url}}/api/data/{{d365_api_version}}/`\n- Create: POST `/accelins_masteragreements`\n- Get: GET `/accelins_masteragreements(<guid>)`\n- Update: PATCH `/accelins_masteragreements(<guid>)`\n- Query: GET `/accelins_masteragreements?$filter=...`",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{d365_access_token}}",
+				"type": "string"
+			}
+		]
+	},
+	"variable": [
+		{
+			"key": "d365_access_token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "d365_token_type",
+			"value": "Bearer",
+			"type": "string"
+		},
+		{
+			"key": "base_url",
+			"value": "{{d365_base_url}}/api/data/{{d365_api_version}}",
+			"type": "string"
+		},
+		{
+			"key": "api_version",
+			"value": "{{d365_api_version}}",
+			"type": "string"
+		},
+		{
+			"key": "record_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "master_agreement_id",
+			"value": "",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "🔐 Get Dynamics 365 Access Token",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response contains access_token\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property(\"access_token\");",
+							"    pm.expect(jsonData.access_token).to.not.be.empty;",
+							"    ",
+							"    // Save token to collection variable",
+							"    pm.collectionVariables.set(\"d365_access_token\", jsonData.access_token);",
+							"    pm.collectionVariables.set(\"d365_token_type\", jsonData.token_type || \"Bearer\");",
+							"    ",
+							"    console.log(\"✅ Access token saved to collection variable: d365_access_token\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "client_id",
+							"value": "{{d365_client_id}}",
+							"type": "text"
+						},
+						{
+							"key": "client_secret",
+							"value": "{{d365_client_secret}}",
+							"type": "text"
+						},
+						{
+							"key": "scope",
+							"value": "{{d365_scope}}",
+							"type": "text"
+						},
+						{
+							"key": "grant_type",
+							"value": "client_credentials",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "https://login.microsoftonline.com/{{d365_tenant_id}}/oauth2/v2.0/token",
+					"protocol": "https",
+					"host": [
+						"login",
+						"microsoftonline",
+						"com"
+					],
+					"path": [
+						"{{d365_tenant_id}}",
+						"oauth2",
+						"v2.0",
+						"token"
+					]
+				},
+				"description": "Obtains a Dynamics 365 access token using OAuth2 Client Credentials flow.\n\n**Required Environment Variables:**\n- `d365_tenant_id`: Your Azure AD Tenant ID\n- `d365_client_id`: Your Azure AD App Registration Client ID\n- `d365_client_secret`: Your Azure AD App Registration Client Secret\n- `d365_scope`: API scope (e.g., https://accelinsqatest.crm11.dynamics.com/.default)\n\n**Response:**\nReturns `access_token`, `token_type`, and `expires_in`. The access token is automatically saved to the `d365_access_token` collection variable for use in subsequent requests."
+			},
+			"response": []
+		},
+		{
+			"name": "PP-6-API-001: Create Master Agreement (Minimum Fields)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"pm.test(\"Response contains Master Agreement ID\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    // Dynamics returns ID in response body or @odata.id",
+							"    var recordId = jsonData.accelins_masteragreementid || jsonData.id;",
+							"    if (!recordId) {",
+							"        // Try to extract from @odata.id",
+							"        var odataId = jsonData['@odata.id'];",
+							"        if (odataId) {",
+							"            var match = odataId.match(/\\(([a-f0-9-]{36})\\)/i);",
+							"            if (match) {",
+							"                recordId = match[1];",
+							"            }",
+							"        }",
+							"    }",
+							"    pm.expect(recordId).to.not.be.empty;",
+							"    pm.collectionVariables.set(\"master_agreement_id\", recordId);",
+							"    pm.collectionVariables.set(\"record_id\", recordId);",
+							"    console.log(\"✅ Master Agreement ID saved: \" + recordId);",
+							"});",
+							"",
+							"pm.test(\"Response contains Master Agreement Master ID\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property(\"accelins_masteragreementmasterid\");",
+							"    console.log(\"✅ Master Agreement Master ID: \" + jsonData.accelins_masteragreementmasterid);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "OData-MaxVersion",
+						"value": "4.0",
+						"type": "text"
+					},
+					{
+						"key": "OData-Version",
+						"value": "4.0",
+						"type": "text"
+					},
+					{
+						"key": "Prefer",
+						"value": "return=representation",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"accelins_masteragreementumr\": \"LLOYD-UMR-API-001\",\n  \"accelins_description\": \"API Test Master Agreement\",\n  \"accelins_masteragreementstartdate\": \"2024-01-01\",\n  \"accelins_masteragreementenddate\": \"2024-12-31\",\n  \"statecode\": 0\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/accelins_masteragreements",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"accelins_masteragreements"
+					]
+				},
+				"description": "**Test ID:** PP-6-API-001\n**Priority:** p1\n**Tags:** @smoke @positive @api-create @master-agreement-creation\n\nCreates a new Master Lloyd's Agreement with minimum required fields:\n- Master Agreement UMR\n- Description\n- Master Agreement Start Date (Inception Date)\n- Master Agreement End Date (Expiry Date)\n- Status (statecode)"
+			},
+			"response": []
+		},
+		{
+			"name": "PP-6-API-002: Create Master Agreement (With Status Reason)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"pm.test(\"Response contains statuscode field\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property(\"statuscode\");",
+							"    var recordId = jsonData.accelins_masteragreementid || jsonData.id;",
+							"    if (recordId) {",
+							"        pm.collectionVariables.set(\"master_agreement_id\", recordId);",
+							"    }",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "OData-MaxVersion",
+						"value": "4.0"
+					},
+					{
+						"key": "OData-Version",
+						"value": "4.0"
+					},
+					{
+						"key": "Prefer",
+						"value": "return=representation"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"accelins_masteragreementumr\": \"LLOYD-UMR-API-002\",\n  \"accelins_description\": \"API Test with Status Reason\",\n  \"accelins_masteragreementstartdate\": \"2024-01-01\",\n  \"accelins_masteragreementenddate\": \"2024-12-31\",\n  \"statecode\": 0,\n  \"statuscode\": 1\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/accelins_masteragreements",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"accelins_masteragreements"
+					]
+				},
+				"description": "**Test ID:** PP-6-API-002\n**Priority:** p1\n**Tags:** @positive @api-create @status-reason\n\nCreates a Master Agreement with Status Reason field populated."
+			},
+			"response": []
+		},
+		{
+			"name": "PP-6-API-007: Reject Creation Without Required Fields",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 400\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"",
+							"pm.test(\"Error response mentions required fields\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    var errorText = JSON.stringify(jsonData).toLowerCase();",
+							"    pm.expect(errorText).to.include(\"required\") || pm.expect(errorText).to.include(\"mandatory\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "OData-MaxVersion",
+						"value": "4.0"
+					},
+					{
+						"key": "OData-Version",
+						"value": "4.0"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"accelins_description\": \"Test without required fields\"\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/accelins_masteragreements",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"accelins_masteragreements"
+					]
+				},
+				"description": "**Test ID:** PP-6-API-007\n**Priority:** p1\n**Tags:** @negative @required-fields\n\nAttempts to create a Master Agreement without required fields to verify validation."
+			},
+			"response": []
+		},
+		{
+			"name": "PP-6-API-008: Reject Invalid Date Range",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 400\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"",
+							"pm.test(\"Error response mentions date validation\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    var errorText = JSON.stringify(jsonData).toLowerCase();",
+							"    pm.expect(errorText).to.include(\"date\") || pm.expect(errorText).to.include(\"validation\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "OData-MaxVersion",
+						"value": "4.0"
+					},
+					{
+						"key": "OData-Version",
+						"value": "4.0"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"accelins_masteragreementumr\": \"LLOYD-UMR-API-INVALID\",\n  \"accelins_description\": \"Invalid Date Range Test\",\n  \"accelins_masteragreementstartdate\": \"2024-12-31\",\n  \"accelins_masteragreementenddate\": \"2024-01-01\",\n  \"statecode\": 0\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/accelins_masteragreements",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"accelins_masteragreements"
+					]
+				},
+				"description": "**Test ID:** PP-6-API-008\n**Priority:** p2\n**Tags:** @negative @date-validation\n\nAttempts to create a Master Agreement with End Date before Start Date to verify date validation."
+			},
+			"response": []
+		},
+		{
+			"name": "PP-6-API-010: Query Master Agreement by UMR",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response contains Master Agreement records\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property(\"value\");",
+							"    pm.expect(jsonData.value).to.be.an(\"array\");",
+							"    if (jsonData.value.length > 0) {",
+							"        var recordId = jsonData.value[0].accelins_masteragreementid || jsonData.value[0].id;",
+							"        if (recordId) {",
+							"            pm.collectionVariables.set(\"master_agreement_id\", recordId);",
+							"        }",
+							"    }",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "OData-MaxVersion",
+						"value": "4.0"
+					},
+					{
+						"key": "OData-Version",
+						"value": "4.0"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/accelins_masteragreements?$filter=accelins_masteragreementumr eq 'LLOYD-UMR-API-001'&$select=accelins_masteragreementid,accelins_masteragreementumr,accelins_description,accelins_masteragreementstartdate,accelins_masteragreementenddate,statecode,statuscode",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"accelins_masteragreements"
+					],
+					"query": [
+						{
+							"key": "$filter",
+							"value": "accelins_masteragreementumr eq 'LLOYD-UMR-API-001'",
+							"disable": true
+						},
+						{
+							"key": "$select",
+							"value": "accelins_masteragreementid,accelins_masteragreementumr,accelins_description,accelins_masteragreementstartdate,accelins_masteragreementenddate,statecode,statuscode",
+							"disable": true
+						}
+					]
+				},
+				"description": "**Test ID:** PP-6-API-010\n**Priority:** p2\n**Tags:** @api-query\n\nQueries Master Agreements filtered by Master Agreement UMR using OData $filter."
+			},
+			"response": []
+		},
+		{
+			"name": "PP-6-API-012: Update Master Agreement",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 204\", function () {",
+							"    pm.response.to.have.status(204);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "OData-MaxVersion",
+						"value": "4.0"
+					},
+					{
+						"key": "OData-Version",
+						"value": "4.0"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"accelins_description\": \"Updated Description\"\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/accelins_masteragreements({{master_agreement_id}})",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"accelins_masteragreements({{master_agreement_id}})"
+					]
+				},
+				"description": "**Test ID:** PP-6-API-012\n**Priority:** p2\n**Tags:** @api-update\n\nUpdates a Master Agreement record. Ensure `master_agreement_id` collection variable is set before running this request."
+			},
+			"response": []
+		},
+		{
+			"name": "Get Master Agreement by ID",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response contains Master Agreement data\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property(\"accelins_masteragreementid\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "OData-MaxVersion",
+						"value": "4.0"
+					},
+					{
+						"key": "OData-Version",
+						"value": "4.0"
+					},
+					{
+						"key": "Prefer",
+						"value": "odata.include-annotations=\"*\""
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/accelins_masteragreements({{master_agreement_id}})?$select=accelins_masteragreementid,accelins_masteragreementumr,accelins_description,accelins_masteragreementstartdate,accelins_masteragreementenddate,accelins_masteragreementmasterid,statecode,statuscode",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"accelins_masteragreements({{master_agreement_id}})"
+					],
+					"query": [
+						{
+							"key": "$select",
+							"value": "accelins_masteragreementid,accelins_masteragreementumr,accelins_description,accelins_masteragreementstartdate,accelins_masteragreementenddate,accelins_masteragreementmasterid,statecode,statuscode",
+							"disable": true
+						}
+					]
+				},
+				"description": "Retrieves a Master Agreement record by ID. Ensure `master_agreement_id` collection variable is set before running this request."
+			},
+			"response": []
+		}
+	]
+}

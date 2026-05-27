@@ -1,0 +1,80 @@
+{
+  "key": "SF-510",
+  "summary": "Data Source and Effective From Fields – Visibility and Validation Rules",
+  "type": "Story",
+  "status": "In QA",
+  "priority": "Medium",
+  "description": {
+    "raw": "As an MRD I want the Data Source and Effective From fields for Written and Claims data to be visible across all Account types, with clear mandatory conditions based on Account Type and Status So that the correct data source and effective-from information are consistently captured for onboarding Members and TPAs. Scenario 1: Data_Source_Written__c field visible on all Accounts   Given an Account record of any type   When the user views or edits the record   Then the \"Data_Source_Written__c\" field must be visible Scenario 2: Data_Source_Written__c mandatory for onboarding Members   Given an Account with Account_Type__c = \"Member\"   And Status__c = \"Onboarding\"   When the user attempts to save the record   Then \"Data_Source_Written__c\" must be populated   And if it is blank, the save is blocked with the message:     \"Data Source (Written) is required when Account Type = Member and Status = Onboarding.\" Scenario 3: Data_Source_Claims__c field visible on all Accounts   Given an Account record of any type   When the user views or edits the record   Then the \"Data_Source_Claims__c\" field must be visible Scenario 4: Data_Source_Claims__c mandatory for onboarding TPAs   Given an Account with Account_Type__c = \"TPA\"   And Status__c = \"Onboarding\"   When the user attempts to save the record   Then \"Data_Source_Claims__c\" must be populated   And if it is blank, the save is blocked with the message:     \"Data Source (Claims) is required when Account Type = TPA and Status = Onboarding.\" Scenario 5: Create and show Written Accounting Period Effective From field   Given the Account object   When the field \"Written_Accounting_Period_Effective_From__c\" is created   Then it must be of type Date   And visible on all Account types Scenario 6: Written Accounting Period Effective From required when Data Source Written = Platform   Given an Account where \"Data_Source_Written__c\" = \"Platform\"   When the user attempts to save the record   Then \"Written_Accounting_Period_Effective_From__c\" must be populated   And if it is blank, the save is blocked with the message:     \"Written Accounting Period Effective From is required when Data Source (Written) = Platform.\" Scenario 7: Create and show Claims Production Period Effective From field   Given the Account object   When the field \"Claims_Production_Period_Effective_From__c\" is created   Then it must be of type Date   And visible on all Account types Scenario 8: Claims Production Period Effective From required when Data Source Claims = Platform   Given an Account where \"Data_Source_Claims__c\" = \"Platform\"   When the user attempts to save the record   Then \"Claims_Production_Period_Effective_From__c\" must be populated   And if it is blank, the save is blocked with the message:     \"Claims Production Period Effective From is required when Data Source (Claims) = Platform.\"",
+    "parsed": {
+      "sentences": [
+        "As an MRD I want the Data Source and Effective From fields for Written and Claims data to be visible across all Account types, with clear mandatory conditions based on Account Type and Status So that the correct data source and effective-from information are consistently captured for onboarding Members and TPAs",
+        "Scenario 1: Data_Source_Written__c field visible on all Accounts   Given an Account record of any type   When the user views or edits the record   Then the \"Data_Source_Written__c\" field must be visible Scenario 2: Data_Source_Written__c mandatory for onboarding Members   Given an Account with Account_Type__c = \"Member\"   And Status__c = \"Onboarding\"   When the user attempts to save the record   Then \"Data_Source_Written__c\" must be populated   And if it is blank, the save is blocked with the message:     \"Data Source (Written) is required when Account Type = Member and Status = Onboarding.\" Scenario 3: Data_Source_Claims__c field visible on all Accounts   Given an Account record of any type   When the user views or edits the record   Then the \"Data_Source_Claims__c\" field must be visible Scenario 4: Data_Source_Claims__c mandatory for onboarding TPAs   Given an Account with Account_Type__c = \"TPA\"   And Status__c = \"Onboarding\"   When the user attempts to save the record   Then \"Data_Source_Claims__c\" must be populated   And if it is blank, the save is blocked with the message:     \"Data Source (Claims) is required when Account Type = TPA and Status = Onboarding.\" Scenario 5: Create and show Written Accounting Period Effective From field   Given the Account object   When the field \"Written_Accounting_Period_Effective_From__c\" is created   Then it must be of type Date   And visible on all Account types Scenario 6: Written Accounting Period Effective From required when Data Source Written = Platform   Given an Account where \"Data_Source_Written__c\" = \"Platform\"   When the user attempts to save the record   Then \"Written_Accounting_Period_Effective_From__c\" must be populated   And if it is blank, the save is blocked with the message:     \"Written Accounting Period Effective From is required when Data Source (Written) = Platform.\" Scenario 7: Create and show Claims Production Period Effective From field   Given the Account object   When the field \"Claims_Production_Period_Effective_From__c\" is created   Then it must be of type Date   And visible on all Account types Scenario 8: Claims Production Period Effective From required when Data Source Claims = Platform   Given an Account where \"Data_Source_Claims__c\" = \"Platform\"   When the user attempts to save the record   Then \"Claims_Production_Period_Effective_From__c\" must be populated   And if it is blank, the save is blocked with the message:     \"Claims Production Period Effective From is required when Data Source (Claims) = Platform.\""
+      ],
+      "entities": [
+        "Account",
+        "Product"
+      ],
+      "fields": [
+        "Data_Source_Written__c",
+        "Account_Type__c",
+        "Status__c",
+        "Data_Source_Claims__c",
+        "Written_Accounting_Period_Effective_From__c",
+        "Claims_Production_Period_Effective_From__c",
+        "Given"
+      ],
+      "actions": [
+        "show",
+        "create",
+        "populate"
+      ]
+    }
+  },
+  "acceptanceCriteria": [],
+  "comments": [],
+  "relatedIssues": [],
+  "fieldDefinitions": {
+    "Data_Source_Written__c": {
+      "type": "Custom",
+      "required": false,
+      "description": "Field: Data_Source_Written__c"
+    },
+    "Account_Type__c": {
+      "type": "Picklist",
+      "required": false,
+      "description": "Field: Account_Type__c"
+    },
+    "Status__c": {
+      "type": "Picklist",
+      "required": false,
+      "description": "Field: Status__c"
+    },
+    "Data_Source_Claims__c": {
+      "type": "Custom",
+      "required": false,
+      "description": "Field: Data_Source_Claims__c"
+    },
+    "Written_Accounting_Period_Effective_From__c": {
+      "type": "Custom",
+      "required": false,
+      "description": "Field: Written_Accounting_Period_Effective_From__c"
+    },
+    "Claims_Production_Period_Effective_From__c": {
+      "type": "Custom",
+      "required": false,
+      "description": "Field: Claims_Production_Period_Effective_From__c"
+    },
+    "Given": {
+      "type": "Text",
+      "required": false,
+      "description": "Field: Given"
+    }
+  },
+  "generatedFeatures": {
+    "ui": "src/features/ui/SF/SF-510.feature",
+    "api": "src/features/api/SF/SF-510.feature"
+  },
+  "qaReviewedFeatures": {},
+  "extractedAt": "2025-12-17T18:40:37.898Z"
+}

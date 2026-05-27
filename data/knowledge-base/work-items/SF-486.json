@@ -1,0 +1,37 @@
+{
+  "key": "SF-486",
+  "summary": "Make Affiliate Status and Party Code mandatory when Account Type = Reinsurer and Ownership = Owned",
+  "type": "Story",
+  "status": "Ready for QA",
+  "priority": "Medium",
+  "description": {
+    "raw": "User Story: As a Product Owner / Data Owner I want Affiliate/Non-Affiliate and Party Code to be mandatory on Account records when Account Type = Reinsurer and Ownership = Owned So that every Owned Reinsurer account has required identity data for processing, reporting and downstream systems and no such account can be saved without both values Description / Scope: When an Account is classified as Reinsurer (Account Type = Reinsurer) AND Ownership = Owned, the fields Affiliate/Non-Affiliate and Party Code must be required. This applies to creates and updates via UI, API, integrations and automated processes.  Acceptance Criteria (GIVEN / WHEN / THEN): Mandatory on Create (UI) GIVEN a user creates a new Account WHEN Account Type = Reinsurer AND Ownership = Owned AND Affiliate/Non-Affiliate or Party Code is blank THEN the save is blocked and the user sees the error: \"Affiliate/Non-Affiliate Status and Party Code are required for Owned Reinsurer accounts.\" Mandatory on Edit (UI) GIVEN an existing Account where Account Type = Reinsurer AND Ownership = Owned WHEN a user attempts to save the record with Affiliate/Non-Affiliate or Party Code blank THEN the save is blocked and the user sees the same error message. Mandatory on API / Integrations / Automation GIVEN an API call, integration or automated job attempts to create or update an Account with Account Type = Reinsurer AND Ownership = Owned and Affiliate/Non-Affiliate or Party Code is blank WHEN the operation runs THEN the operation is rejected with a validation error and the event is logged; integrations must provide both fields or run under a controlled bypass.",
+    "parsed": {
+      "sentences": [
+        "User Story: As a Product Owner / Data Owner I want Affiliate/Non-Affiliate and Party Code to be mandatory on Account records when Account Type = Reinsurer and Ownership = Owned So that every Owned Reinsurer account has required identity data for processing, reporting and downstream systems and no such account can be saved without both values Description / Scope: When an Account is classified as Reinsurer (Account Type = Reinsurer) AND Ownership = Owned, the fields Affiliate/Non-Affiliate and Party Code must be required",
+        "This applies to creates and updates via UI, API, integrations and automated processes",
+        "Acceptance Criteria (GIVEN / WHEN / THEN): Mandatory on Create (UI) GIVEN a user creates a new Account WHEN Account Type = Reinsurer AND Ownership = Owned AND Affiliate/Non-Affiliate or Party Code is blank THEN the save is blocked and the user sees the error: \"Affiliate/Non-Affiliate Status and Party Code are required for Owned Reinsurer accounts.\" Mandatory on Edit (UI) GIVEN an existing Account where Account Type = Reinsurer AND Ownership = Owned WHEN a user attempts to save the record with Affiliate/Non-Affiliate or Party Code blank THEN the save is blocked and the user sees the same error message",
+        "Mandatory on API / Integrations / Automation GIVEN an API call, integration or automated job attempts to create or update an Account with Account Type = Reinsurer AND Ownership = Owned and Affiliate/Non-Affiliate or Party Code is blank WHEN the operation runs THEN the operation is rejected with a validation error and the event is logged; integrations must provide both fields or run under a controlled bypass."
+      ],
+      "entities": [
+        "Account",
+        "Product"
+      ],
+      "fields": [],
+      "actions": [
+        "create",
+        "update"
+      ]
+    }
+  },
+  "acceptanceCriteria": [],
+  "comments": [],
+  "relatedIssues": [],
+  "fieldDefinitions": {},
+  "generatedFeatures": {
+    "ui": "src/features/ui/SF/SF-486.feature",
+    "api": "src/features/api/SF/SF-486.feature"
+  },
+  "qaReviewedFeatures": {},
+  "extractedAt": "2025-12-17T18:40:33.370Z"
+}

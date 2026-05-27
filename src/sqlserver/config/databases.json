@@ -1,0 +1,75 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "description": "Mapping of logical database names to actual SQL Server database names (sql-tst-uks-02.accelins.com)",
+  "databases": {
+    "Reference": {
+      "name": "Reference",
+      "description": "Reference/Master data (Party, etc.)"
+    },
+    "Reporting": {
+      "name": "Reporting",
+      "description": "Reporting database for analytics and reporting"
+    },
+    "Claims": {
+      "name": "Claims",
+      "description": "Claims data"
+    },
+    "Underwriting": {
+      "name": "Underwriting",
+      "description": "Underwriting data"
+    },
+    "FinancialDataMart": {
+      "name": "FinancialDataMart",
+      "description": "Financial data mart for financial reporting"
+    },
+    "USDataMart": {
+      "name": "USDataMart",
+      "description": "US-specific data mart"
+    },
+    "Warehouse": {
+      "name": "VIPR-Warehouse",
+      "description": "VIPR data warehouse for historical data"
+    },
+    "DataImport": {
+      "name": "DataImport",
+      "description": "Data import staging area"
+    },
+    "D365Lake": {
+      "name": "d365lake",
+      "description": "Dynamics 365 data lake"
+    },
+    "Logging": {
+      "name": "Logging",
+      "description": "Application and system logging"
+    },
+    "Intrali": {
+      "name": "Intrali",
+      "description": "Intrali system data"
+    },
+    "Tagetik": {
+      "name": "Tagetik",
+      "description": "Tagetik financial planning data"
+    },
+    "TDS": {
+      "name": "TDS",
+      "description": "TDS system data"
+    },
+    "TestDataManagement": {
+      "name": "TestDataManagment",
+      "description": "Test data management"
+    },
+    "IntelligentIngestion": {
+      "name": "IntelligentIngestionEngine",
+      "description": "Intelligent data ingestion engine"
+    },
+    "Admin": {
+      "name": "Admin",
+      "description": "Administrative database"
+    },
+    "DBA": {
+      "name": "DBA",
+      "description": "DBA utilities and maintenance"
+    }
+  }
+}
+

@@ -1,0 +1,38 @@
+{
+  "key": "SF-498",
+  "summary": "Map Region from Lead or Account to Opportunity",
+  "type": "Story",
+  "status": "Blocked",
+  "priority": "Medium",
+  "description": {
+    "raw": "As an MRD I want the  Region  field on an Opportunity to be automatically populated from either the originating Lead or Account So that the correct regional information is consistently applied across Opportunities for reporting, assignment, and integration. Scenario 1: Region mapped from Lead during conversion   Given a Lead record with the Region field populated   When the Lead is converted to an Opportunity   Then the Region value from the Lead must populate automatically on the Opportunity   And the value must match exactly what was on the Lead Scenario 2: Region mapped from Account when Opportunity is created directly   Given a user creates a new Opportunity directly from an Account   And the Account has a Region value populated   When the Opportunity is created   Then the Region field on the Opportunity must be populated with the same Region value from the Account Scenario 3: Region blank on source record   Given the Lead or Account has no Region value   When the Opportunity is created   Then the Region field on the Opportunity must remain blank Scenario 4: Consistent Region behaviour across all creation methods   Given Opportunities can be created from either a Lead conversion or directly from an Account   When comparing Region values across related records   Then the Region must always match its source record   And there must be no conflict or overwrite between mappings Scenario 5: Region not editable after creation (if required by governance)   Given the Region value is populated on the Opportunity   When a user views or edits the Opportunity record   Then the Region field must be visible but not editable   So that regional classification remains consistent with its source",
+    "parsed": {
+      "sentences": [
+        "As an MRD I want the  Region  field on an Opportunity to be automatically populated from either the originating Lead or Account So that the correct regional information is consistently applied across Opportunities for reporting, assignment, and integration",
+        "Scenario 1: Region mapped from Lead during conversion   Given a Lead record with the Region field populated   When the Lead is converted to an Opportunity   Then the Region value from the Lead must populate automatically on the Opportunity   And the value must match exactly what was on the Lead Scenario 2: Region mapped from Account when Opportunity is created directly   Given a user creates a new Opportunity directly from an Account   And the Account has a Region value populated   When the Opportunity is created   Then the Region field on the Opportunity must be populated with the same Region value from the Account Scenario 3: Region blank on source record   Given the Lead or Account has no Region value   When the Opportunity is created   Then the Region field on the Opportunity must remain blank Scenario 4: Consistent Region behaviour across all creation methods   Given Opportunities can be created from either a Lead conversion or directly from an Account   When comparing Region values across related records   Then the Region must always match its source record   And there must be no conflict or overwrite between mappings Scenario 5: Region not editable after creation (if required by governance)   Given the Region value is populated on the Opportunity   When a user views or edits the Opportunity record   Then the Region field must be visible but not editable   So that regional classification remains consistent with its source"
+      ],
+      "entities": [
+        "Account",
+        "Opportunity",
+        "Lead"
+      ],
+      "fields": [],
+      "actions": [
+        "create",
+        "populate",
+        "map",
+        "convert"
+      ]
+    }
+  },
+  "acceptanceCriteria": [],
+  "comments": [],
+  "relatedIssues": [],
+  "fieldDefinitions": {},
+  "generatedFeatures": {
+    "ui": "src/features/ui/SF/SF-498.feature",
+    "api": "src/features/api/SF/SF-498.feature"
+  },
+  "qaReviewedFeatures": {},
+  "extractedAt": "2025-12-17T18:40:28.562Z"
+}

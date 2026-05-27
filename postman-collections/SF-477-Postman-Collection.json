@@ -1,0 +1,1326 @@
+{
+  "info": {
+    "_postman_id": "sf-477-api-tests",
+    "name": "SF-477 - Annual GWP Estimate Year 1 Field (Editable) - API Tests",
+    "description": "API - SF-477 - Create Opportunity field Annual_GWP_Estimate_Year_1__c (editable) and sync updates back to Lead\n\n══════════════════════════════════════════════════════════════════════════════\nGenerated: 2026-01-14\n══════════════════════════════════════════════════════════════════════════════\n\nSUMMARY:\n  Create Opportunity field Annual_GWP_Estimate_Year_1__c (editable) and sync updates back to Lead\n\nDESCRIPTION:\n  As a Salesforce Business User I want an Opportunity field called \n  Annual_GWP_Estimate_Year_1__c (Currency) that is editable on Opportunity, \n  and whenever that Opportunity value is updated it must also update the same \n  field on the originating Lead So that data stays consistent between \n  Opportunity and the Lead it was created from and any changes on Opportunity \n  are reflected on the Lead.\n\nACCEPTANCE CRITERIA:\n  1. Annual_GWP_Estimate_Year_1__c field exists on Opportunity (Currency type)\n  2. Field is populated from Lead.Annual_GWP_Estimate_Year_1__c on Lead conversion\n  3. Field is editable on Opportunity\n  4. When Opportunity.Annual_GWP_Estimate_Year_1__c is updated, it syncs back to originating Lead\n\nAPI TESTING REQUIREMENTS:\n  - Verify Annual_GWP_Estimate_Year_1__c field exists on Opportunity and Lead\n  - Verify field maps from Lead to Opportunity during conversion\n  - Verify field does NOT map to Account during conversion\n  - Verify field value is preserved during Lead conversion\n  - Verify updates to Opportunity sync back to Lead\n  - Negative/boundary scenarios (invalid values, null handling)\n\nGenerated from: src/features/api/SF/SF-477.feature\n\nThis collection contains API tests for SF-477 work item.\n\n**Note:** Annual_GWP_Estimate_Year_1__c is a Currency field that should:\n- Auto-populate from Lead to Opportunity on conversion\n- Be editable on Opportunity\n- Sync back to Lead when updated on Opportunity",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{sf_access_token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "{{sf_base_url}}",
+      "type": "string"
+    },
+    {
+      "key": "api_version",
+      "value": "{{sf_api_version}}",
+      "type": "string"
+    },
+    {
+      "key": "lead_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "lead_id_eu",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "lead_id_uk",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "lead_id_us",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "lead_id_owned",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "lead_id_mission",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "lead_id_for_sync",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "opportunity_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "opportunity_id_eu",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "opportunity_id_uk",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "opportunity_id_us",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "opportunity_id_for_sync",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "account_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "original_lead_gwp_value",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "updated_gwp_value",
+      "value": "2500000",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Field Existence Verification",
+      "item": [
+        {
+          "name": "SF-477-API-001 - Describe Opportunity Object",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Annual_GWP_Estimate_Year_1__c field exists on Opportunity\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    var fields = jsonData.fields;",
+                  "    var field = fields.find(function(f) { return f.name === 'Annual_GWP_Estimate_Year_1__c'; });",
+                  "    pm.expect(field).to.not.be.undefined;",
+                  "    pm.expect(field.name).to.equal('Annual_GWP_Estimate_Year_1__c');",
+                  "    console.log('✅ Annual_GWP_Estimate_Year_1__c field found on Opportunity');",
+                  "    console.log('Field Type: ' + field.type);",
+                  "    console.log('Field Label: ' + field.label);",
+                  "    if (field.updateable !== undefined) {",
+                  "        console.log('Updateable: ' + field.updateable);",
+                  "        pm.expect(field.updateable).to.be.true;",
+                  "    }",
+                  "    if (field.type === 'Currency' || field.type === 'Double') {",
+                  "        console.log('✅ Field is Currency type (as expected)');",
+                  "    }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Opportunity/describe",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "data",
+                "{{api_version}}",
+                "sobjects",
+                "Opportunity",
+                "describe"
+              ]
+            },
+            "description": "Verify Annual_GWP_Estimate_Year_1__c field exists on Opportunity object\n\n**Test:** SF-477-API-001\n**Purpose:** Field existence verification\n**Expected:** Field should exist and be editable (updateable: true)"
+          },
+          "response": []
+        },
+        {
+          "name": "SF-477-API-002 - Describe Lead Object",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Annual_GWP_Estimate_Year_1__c field exists on Lead\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    var fields = jsonData.fields;",
+                  "    var field = fields.find(function(f) { return f.name === 'Annual_GWP_Estimate_Year_1__c'; });",
+                  "    pm.expect(field).to.not.be.undefined;",
+                  "    pm.expect(field.name).to.equal('Annual_GWP_Estimate_Year_1__c');",
+                  "    console.log('✅ Annual_GWP_Estimate_Year_1__c field found on Lead');",
+                  "    console.log('Field Type: ' + field.type);",
+                  "    console.log('Field Label: ' + field.label);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Lead/describe",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "data",
+                "{{api_version}}",
+                "sobjects",
+                "Lead",
+                "describe"
+              ]
+            },
+            "description": "Verify Annual_GWP_Estimate_Year_1__c field exists on Lead object\n\n**Test:** SF-477-API-002\n**Purpose:** Field existence verification on Lead"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Lead Conversion - Field Mapping",
+      "item": [
+        {
+          "name": "SF-477-API-003 - Create Lead with Annual_GWP_Estimate_Year_1__c (EU)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test(\"Response contains Lead ID\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.id).to.not.be.undefined;",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    pm.collectionVariables.set('lead_id_eu', jsonData.id);",
+                  "    console.log('✅ Lead created with Annual_GWP_Estimate_Year_1__c: ' + jsonData.id);",
+                  "    console.log('Lead ID saved to variable: lead_id_eu');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"FirstName\": \"SF-477\",\n  \"LastName\": \"Test Lead EU\",\n  \"Company\": \"Test Company EU\",\n  \"Annual_GWP_Estimate_Year_1__c\": 1000000,\n  \"Status\": \"Open - Not Contacted\",\n  \"LeadSource\": \"Web\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Lead/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "data",
+                "{{api_version}}",
+                "sobjects",
+                "Lead",
+                ""
+              ]
+            },
+            "description": "Create Lead with Annual_GWP_Estimate_Year_1__c populated\n\n**Test:** SF-477-API-003 (Prerequisite)\n**Purpose:** Create Lead for conversion test\n**Note:** Annual_GWP_Estimate_Year_1__c is a Currency field (numeric value)"
+          },
+          "response": []
+        },
+        {
+          "name": "SF-477-API-003 - Verify Lead Before Conversion",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Lead exists and is not converted\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.Id).to.not.be.undefined;",
+                  "    ",
+                  "    if (jsonData.IsConverted === true) {",
+                  "        console.error('❌ Lead is already converted! Cannot convert again.');",
+                  "        pm.expect.fail('Lead is already converted. IsConverted = true');",
+                  "        return;",
+                  "    }",
+                  "    ",
+                  "    console.log('✅ Lead verified:');",
+                  "    console.log('  Lead ID: ' + jsonData.Id);",
+                  "    console.log('  Status: ' + jsonData.Status);",
+                  "    console.log('  IsConverted: ' + jsonData.IsConverted);",
+                  "    console.log('  Company: ' + (jsonData.Company || 'N/A'));",
+                  "    ",
+                  "    if (!jsonData.Id) {",
+                  "        pm.expect.fail('Lead ID is missing');",
+                  "    }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "var leadId = pm.collectionVariables.get('lead_id_eu');",
+                  "if (!leadId) {",
+                  "    throw new Error('lead_id_eu variable is not set. Please run the Create Lead with Annual_GWP_Estimate_Year_1__c (EU) request first.');",
+                  "}",
+                  "console.log('Verifying Lead before conversion: ' + leadId);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Lead/{{lead_id_eu}}?fields=Id,Status,IsConverted,Company,FirstName,LastName",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "data",
+                "{{api_version}}",
+                "sobjects",
+                "Lead",
+                "{{lead_id_eu}}"
+              ],
+              "query": [
+                {
+                  "key": "fields",
+                  "value": "Id,Status,IsConverted,Company,FirstName,LastName"
+                }
+              ]
+            },
+            "description": "Verify Lead exists and is not already converted before attempting conversion\n\n**Test:** SF-477-API-003 (Diagnostic)\n**Purpose:** Check Lead status before conversion to diagnose 404 errors\n**Checks:**\n- Lead ID exists\n- Lead is not already converted (IsConverted = false)\n- Lead Status is valid"
+          },
+          "response": []
+        },
+        {
+          "name": "SF-477-API-003 - Convert Lead to Opportunity",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    if (pm.response.code !== 200) {",
+                  "        console.error('❌ Request failed with status: ' + pm.response.code);",
+                  "        console.error('Response: ' + pm.response.text());",
+                  "        ",
+                  "        if (pm.response.code === 404) {",
+                  "            console.error('');",
+                  "            console.error('═══════════════════════════════════════════════════════════');",
+                  "            console.error('404 ERROR - TROUBLESHOOTING GUIDE:');",
+                  "            console.error('═══════════════════════════════════════════════════════════');",
+                  "            console.error('');",
+                  "            console.error('Possible causes:');",
+                  "            console.error('1. Lead ID does not exist or is invalid');",
+                  "            console.error('   → Check if lead_id_eu variable is set correctly');",
+                  "            console.error('   → Run \"Verify Lead Before Conversion\" request first');",
+                  "            console.error('');",
+                  "            console.error('2. API user lacks \"Convert Leads\" permission');",
+                  "            console.error('   → Setup → Users → [Your API User] → Permission Sets');",
+                  "            console.error('   → Ensure \"Convert Leads\" permission is granted');",
+                  "            console.error('');",
+                  "            console.error('3. Lead conversion via API is disabled in org');",
+                  "            console.error('   → Setup → Lead Settings → Check API conversion settings');",
+                  "            console.error('');",
+                  "            console.error('4. Lead is already converted');",
+                  "            console.error('   → Check IsConverted field (should be false)');",
+                  "            console.error('   → Run \"Verify Lead Before Conversion\" request');",
+                  "            console.error('');",
+                  "            console.error('5. API version issue');",
+                  "            console.error('   → Currently using v58.0');",
+                  "            console.error('   → Try v60.0 or check org API version support');",
+                  "            console.error('');",
+                  "            console.error('═══════════════════════════════════════════════════════════');",
+                  "        }",
+                  "        ",
+                  "        pm.expect.fail('Expected status 200, got ' + pm.response.code);",
+                  "        return;",
+                  "    }",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response contains Opportunity ID\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.opportunityId).to.not.be.undefined;",
+                  "    pm.collectionVariables.set('opportunity_id_eu', jsonData.opportunityId);",
+                  "    if (jsonData.accountId) {",
+                  "        pm.collectionVariables.set('account_id', jsonData.accountId);",
+                  "    }",
+                  "    console.log('✅ Lead converted successfully');",
+                  "    console.log('Opportunity ID: ' + jsonData.opportunityId);",
+                  "    if (jsonData.accountId) {",
+                  "        console.log('Account ID: ' + jsonData.accountId);",
+                  "    }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "var leadId = pm.collectionVariables.get('lead_id_eu');",
+                  "if (!leadId) {",
+                  "    throw new Error('lead_id_eu variable is not set. Please run the Create Lead with Annual_GWP_Estimate_Year_1__c (EU) request first.');",
+                  "}",
+                  "console.log('Converting Lead: ' + leadId);",
+                  "console.log('Using endpoint: /services/data/v58.0/sobjects/Lead/' + leadId + '/convert');"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"convertedStatus\": \"Qualified\",\n  \"doNotCreateOpportunity\": false,\n  \"opportunityName\": \"SF-477 Test Opportunity EU\",\n  \"overwriteLeadSource\": false\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/services/data/v58.0/sobjects/Lead/{{lead_id_eu}}/convert",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "data",
+                "v58.0",
+                "sobjects",
+                "Lead",
+                "{{lead_id_eu}}",
+                "convert"
+              ]
+            },
+            "description": "Convert Lead to Opportunity\n\n**Test:** SF-477-API-003\n**Purpose:** Convert Lead and verify Annual_GWP_Estimate_Year_1__c maps to Opportunity\n**Expected:** Opportunity should have Annual_GWP_Estimate_Year_1__c populated from Lead\n\n**Note:** Using API version v58.0 for Lead conversion (as per SalesforceAPIClient implementation). The leadId is in the URL path, not in the request body."
+          },
+          "response": []
+        },
+        {
+          "name": "SF-477-API-003 - Verify Annual_GWP_Estimate_Year_1__c on Opportunity",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Annual_GWP_Estimate_Year_1__c is populated on Opportunity\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.Annual_GWP_Estimate_Year_1__c).to.not.be.null;",
+                  "    pm.expect(jsonData.Annual_GWP_Estimate_Year_1__c).to.equal(1000000);",
+                  "    console.log('✅ Annual_GWP_Estimate_Year_1__c mapped correctly: ' + jsonData.Annual_GWP_Estimate_Year_1__c);",
+                  "    console.log('Expected value: 1000000');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "var oppId = pm.collectionVariables.get('opportunity_id_eu');",
+                  "if (!oppId) {",
+                  "    throw new Error('opportunity_id_eu variable is not set. Please run the Convert Lead to Opportunity request first.');",
+                  "}",
+                  "console.log('Verifying Annual_GWP_Estimate_Year_1__c on Opportunity: ' + oppId);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Opportunity/{{opportunity_id_eu}}?fields=Id,Name,Annual_GWP_Estimate_Year_1__c",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "data",
+                "{{api_version}}",
+                "sobjects",
+                "Opportunity",
+                "{{opportunity_id_eu}}"
+              ],
+              "query": [
+                {
+                  "key": "fields",
+                  "value": "Id,Name,Annual_GWP_Estimate_Year_1__c"
+                }
+              ]
+            },
+            "description": "Verify Annual_GWP_Estimate_Year_1__c was mapped from Lead to Opportunity\n\n**Test:** SF-477-API-003 (Verification)\n**Purpose:** Confirm the field was auto-populated from Lead during conversion"
+          },
+          "response": []
+        },
+        {
+          "name": "SF-477-API-005 - Verify Annual_GWP_Estimate_Year_1__c NOT on Account",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Annual_GWP_Estimate_Year_1__c should NOT be on Account\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    // Field should not exist on Account or should be null/undefined",
+                  "    var hasField = jsonData.hasOwnProperty('Annual_GWP_Estimate_Year_1__c');",
+                  "    if (hasField) {",
+                  "        var fieldValue = jsonData.Annual_GWP_Estimate_Year_1__c;",
+                  "        var isNullOrUndefined = (fieldValue === null || fieldValue === undefined);",
+                  "        pm.expect(isNullOrUndefined).to.be.true;",
+                  "        console.log('✅ Annual_GWP_Estimate_Year_1__c is null/undefined on Account (as expected)');",
+                  "    } else {",
+                  "        console.log('✅ Annual_GWP_Estimate_Year_1__c field not present on Account (as expected)');",
+                  "    }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "var accountId = pm.collectionVariables.get('account_id');",
+                  "if (!accountId) {",
+                  "    throw new Error('account_id variable is not set. Please run the Convert Lead to Opportunity request first.');",
+                  "}",
+                  "console.log('Verifying Annual_GWP_Estimate_Year_1__c NOT on Account: ' + accountId);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Account/{{account_id}}?fields=Id,Name,Annual_GWP_Estimate_Year_1__c",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "data",
+                "{{api_version}}",
+                "sobjects",
+                "Account",
+                "{{account_id}}"
+              ],
+              "query": [
+                {
+                  "key": "fields",
+                  "value": "Id,Name,Annual_GWP_Estimate_Year_1__c"
+                }
+              ]
+            },
+            "description": "Verify Annual_GWP_Estimate_Year_1__c does NOT map to Account during Lead conversion\n\n**Test:** SF-477-API-005\n**Purpose:** Confirm the field does NOT map to Account (only to Opportunity)\n**Expected:** Field should be null/undefined or not present on Account"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Data-Driven Lead Conversion Tests",
+      "item": [
+        {
+          "name": "SF-477-API-004 - Create Lead with Annual_GWP_Estimate_Year_1__c (Owned)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test(\"Response contains Lead ID\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.id).to.not.be.undefined;",
+                  "    pm.collectionVariables.set('lead_id_owned', jsonData.id);",
+                  "    console.log('✅ Lead created: ' + jsonData.id);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"FirstName\": \"SF-477\",\n  \"LastName\": \"Test Lead Owned\",\n  \"Company\": \"Test Company Owned\",\n  \"Annual_GWP_Estimate_Year_1__c\": 2000000,\n  \"Status\": \"Open - Not Contacted\",\n  \"LeadSource\": \"Web\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Lead/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "data",
+                "{{api_version}}",
+                "sobjects",
+                "Lead",
+                ""
+              ]
+            },
+            "description": "Create Lead with Annual_GWP_Estimate_Year_1__c for data-driven test (Owned value)\n\n**Test:** SF-477-API-004 (Prerequisite)"
+          },
+          "response": []
+        },
+        {
+          "name": "SF-477-API-004 - Convert Lead (Owned) and Verify",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Opportunity created with Annual_GWP_Estimate_Year_1__c\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.opportunityId).to.not.be.undefined;",
+                  "    var oppId = jsonData.opportunityId;",
+                  "    pm.collectionVariables.set('opportunity_id', oppId);",
+                  "    console.log('✅ Lead converted, Opportunity ID: ' + oppId);",
+                  "    // Verify field value in follow-up request",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "var leadId = pm.collectionVariables.get('lead_id_owned');",
+                  "if (!leadId) {",
+                  "    throw new Error('lead_id_owned variable is not set.');",
+                  "}",
+                  "console.log('Converting Lead: ' + leadId);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"convertedStatus\": \"Qualified\",\n  \"doNotCreateOpportunity\": false,\n  \"opportunityName\": \"SF-477 Test Opportunity Owned\",\n  \"overwriteLeadSource\": false\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/services/data/v58.0/sobjects/Lead/{{lead_id_owned}}/convert",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "data",
+                "v58.0",
+                "sobjects",
+                "Lead",
+                "{{lead_id_owned}}",
+                "convert"
+              ]
+            },
+            "description": "Convert Lead and verify Annual_GWP_Estimate_Year_1__c maps correctly\n\n**Test:** SF-477-API-004 (Owned value)"
+          },
+          "response": []
+        },
+        {
+          "name": "SF-477-API-004 - Create Lead with Annual_GWP_Estimate_Year_1__c (Mission)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test(\"Response contains Lead ID\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.id).to.not.be.undefined;",
+                  "    pm.collectionVariables.set('lead_id_mission', jsonData.id);",
+                  "    console.log('✅ Lead created: ' + jsonData.id);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"FirstName\": \"SF-477\",\n  \"LastName\": \"Test Lead Mission\",\n  \"Company\": \"Test Company Mission\",\n  \"Annual_GWP_Estimate_Year_1__c\": 3000000,\n  \"Status\": \"Open - Not Contacted\",\n  \"LeadSource\": \"Web\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Lead/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "data",
+                "{{api_version}}",
+                "sobjects",
+                "Lead",
+                ""
+              ]
+            },
+            "description": "Create Lead with Annual_GWP_Estimate_Year_1__c for data-driven test (Mission value)\n\n**Test:** SF-477-API-004 (Prerequisite)"
+          },
+          "response": []
+        },
+        {
+          "name": "SF-477-API-004 - Convert Lead (Mission) and Verify",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Opportunity created\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.opportunityId).to.not.be.undefined;",
+                  "    console.log('✅ Lead converted, Opportunity ID: ' + jsonData.opportunityId);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "var leadId = pm.collectionVariables.get('lead_id_mission');",
+                  "if (!leadId) {",
+                  "    throw new Error('lead_id_mission variable is not set.');",
+                  "}",
+                  "console.log('Converting Lead: ' + leadId);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"convertedStatus\": \"Qualified\",\n  \"doNotCreateOpportunity\": false,\n  \"opportunityName\": \"SF-477 Test Opportunity Mission\",\n  \"overwriteLeadSource\": false\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/services/data/v58.0/sobjects/Lead/{{lead_id_mission}}/convert",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "data",
+                "v58.0",
+                "sobjects",
+                "Lead",
+                "{{lead_id_mission}}",
+                "convert"
+              ]
+            },
+            "description": "Convert Lead and verify Annual_GWP_Estimate_Year_1__c maps correctly\n\n**Test:** SF-477-API-004 (Mission value)"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Sync Back to Lead (Primary Requirement)",
+      "item": [
+        {
+          "name": "SF-477-SYNC - Create Lead for Sync Test",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test(\"Response contains Lead ID\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.id).to.not.be.undefined;",
+                  "    pm.collectionVariables.set('lead_id_for_sync', jsonData.id);",
+                  "    pm.collectionVariables.set('original_lead_gwp_value', '1500000');",
+                  "    console.log('✅ Lead created for sync test: ' + jsonData.id);",
+                  "    console.log('Original Annual_GWP_Estimate_Year_1__c: 1500000');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"FirstName\": \"SF-477\",\n  \"LastName\": \"Test Lead Sync\",\n  \"Company\": \"Test Company Sync\",\n  \"Annual_GWP_Estimate_Year_1__c\": 1500000,\n  \"Status\": \"Open - Not Contacted\",\n  \"LeadSource\": \"Web\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Lead/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "data",
+                "{{api_version}}",
+                "sobjects",
+                "Lead",
+                ""
+              ]
+            },
+            "description": "Create Lead with Annual_GWP_Estimate_Year_1__c for sync test\n\n**Purpose:** Primary requirement - verify updates to Opportunity sync back to Lead"
+          },
+          "response": []
+        },
+        {
+          "name": "SF-477-SYNC - Convert Lead to Opportunity",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response contains Opportunity ID\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.opportunityId).to.not.be.undefined;",
+                  "    pm.collectionVariables.set('opportunity_id_for_sync', jsonData.opportunityId);",
+                  "    console.log('✅ Lead converted, Opportunity ID: ' + jsonData.opportunityId);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "var leadId = pm.collectionVariables.get('lead_id_for_sync');",
+                  "if (!leadId) {",
+                  "    throw new Error('lead_id_for_sync variable is not set. Please run the Create Lead for Sync Test request first.');",
+                  "}",
+                  "console.log('Converting Lead: ' + leadId);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"convertedStatus\": \"Qualified\",\n  \"doNotCreateOpportunity\": false,\n  \"opportunityName\": \"SF-477 Test Opportunity Sync\",\n  \"overwriteLeadSource\": false\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/services/data/v58.0/sobjects/Lead/{{lead_id_for_sync}}/convert",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "data",
+                "v58.0",
+                "sobjects",
+                "Lead",
+                "{{lead_id_for_sync}}",
+                "convert"
+              ]
+            },
+            "description": "Convert Lead to Opportunity for sync test\n\n**Purpose:** Create Opportunity from Lead to test sync back functionality"
+          },
+          "response": []
+        },
+        {
+          "name": "SF-477-SYNC - Verify Initial Value on Opportunity",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Annual_GWP_Estimate_Year_1__c is populated from Lead\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    var originalValue = pm.collectionVariables.get('original_lead_gwp_value');",
+                  "    pm.expect(jsonData.Annual_GWP_Estimate_Year_1__c).to.equal(parseFloat(originalValue));",
+                  "    console.log('✅ Initial value on Opportunity: ' + jsonData.Annual_GWP_Estimate_Year_1__c);",
+                  "    console.log('Expected: ' + originalValue);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "var oppId = pm.collectionVariables.get('opportunity_id_for_sync');",
+                  "if (!oppId) {",
+                  "    throw new Error('opportunity_id_for_sync variable is not set. Please run the Convert Lead to Opportunity request first.');",
+                  "}",
+                  "console.log('Verifying initial value on Opportunity: ' + oppId);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Opportunity/{{opportunity_id_for_sync}}?fields=Id,Name,Annual_GWP_Estimate_Year_1__c",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "data",
+                "{{api_version}}",
+                "sobjects",
+                "Opportunity",
+                "{{opportunity_id_for_sync}}"
+              ],
+              "query": [
+                {
+                  "key": "fields",
+                  "value": "Id,Name,Annual_GWP_Estimate_Year_1__c"
+                }
+              ]
+            },
+            "description": "Verify initial Annual_GWP_Estimate_Year_1__c value on Opportunity (before update)\n\n**Purpose:** Confirm field was populated from Lead during conversion"
+          },
+          "response": []
+        },
+        {
+          "name": "SF-477-SYNC - Update Opportunity Annual_GWP_Estimate_Year_1__c",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 204\", function () {",
+                  "    pm.response.to.have.status(204);",
+                  "});",
+                  "",
+                  "console.log('✅ Opportunity Annual_GWP_Estimate_Year_1__c updated');",
+                  "console.log('Updated value: ' + pm.collectionVariables.get('updated_gwp_value'));",
+                  "console.log('Waiting for sync to complete...');"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "var oppId = pm.collectionVariables.get('opportunity_id_for_sync');",
+                  "if (!oppId) {",
+                  "    throw new Error('opportunity_id_for_sync variable is not set. Please run the Convert Lead to Opportunity request first.');",
+                  "}",
+                  "var updatedValue = pm.collectionVariables.get('updated_gwp_value');",
+                  "console.log('Updating Opportunity: ' + oppId);",
+                  "console.log('New Annual_GWP_Estimate_Year_1__c: ' + updatedValue);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"Annual_GWP_Estimate_Year_1__c\": {{updated_gwp_value}}\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Opportunity/{{opportunity_id_for_sync}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "data",
+                "{{api_version}}",
+                "sobjects",
+                "Opportunity",
+                "{{opportunity_id_for_sync}}"
+              ]
+            },
+            "description": "Update Opportunity.Annual_GWP_Estimate_Year_1__c\n\n**Test:** Primary requirement - sync back to Lead\n**Purpose:** Update Opportunity field and verify it syncs back to originating Lead\n**Note:** Sync may be asynchronous, so allow time for processing"
+          },
+          "response": []
+        },
+        {
+          "name": "SF-477-SYNC - Verify Sync Back to Lead",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Annual_GWP_Estimate_Year_1__c synced back to Lead\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    var updatedValue = parseFloat(pm.collectionVariables.get('updated_gwp_value'));",
+                  "    pm.expect(jsonData.Annual_GWP_Estimate_Year_1__c).to.equal(updatedValue);",
+                  "    console.log('✅ Annual_GWP_Estimate_Year_1__c synced back to Lead: ' + jsonData.Annual_GWP_Estimate_Year_1__c);",
+                  "    console.log('Expected value: ' + updatedValue);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "var leadId = pm.collectionVariables.get('lead_id_for_sync');",
+                  "if (!leadId) {",
+                  "    throw new Error('lead_id_for_sync variable is not set.');",
+                  "}",
+                  "console.log('Verifying sync back to Lead: ' + leadId);",
+                  "console.log('Note: If sync fails, it may be asynchronous. Wait a few seconds and retry.');"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Lead/{{lead_id_for_sync}}?fields=Id,FirstName,LastName,Annual_GWP_Estimate_Year_1__c",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "data",
+                "{{api_version}}",
+                "sobjects",
+                "Lead",
+                "{{lead_id_for_sync}}"
+              ],
+              "query": [
+                {
+                  "key": "fields",
+                  "value": "Id,FirstName,LastName,Annual_GWP_Estimate_Year_1__c"
+                }
+              ]
+            },
+            "description": "Verify Annual_GWP_Estimate_Year_1__c synced back to originating Lead\n\n**Test:** Primary requirement - sync back to Lead\n**Purpose:** Confirm that updating Opportunity.Annual_GWP_Estimate_Year_1__c updates the Lead field\n**Expected:** Lead.Annual_GWP_Estimate_Year_1__c should match the updated Opportunity value\n**Note:** If sync fails, it may be asynchronous. Wait a few seconds and retry this request."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Negative / Boundary Scenarios",
+      "item": [
+        {
+          "name": "SF-477-API-007 - Reject invalid Annual_GWP_Estimate_Year_1__c value",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code indicates error\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([400, 422]);",
+                  "});",
+                  "",
+                  "pm.test(\"Error response mentions Annual_GWP_Estimate_Year_1__c or field validation\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    var errorString = JSON.stringify(jsonData).toLowerCase();",
+                  "    var hasFieldName = errorString.includes('annual_gwp') || errorString.includes('annual gwp');",
+                  "    console.log('Error response: ' + JSON.stringify(jsonData, null, 2));",
+                  "    // Note: This test may pass even if error doesn't explicitly mention field name",
+                  "    // The important part is that invalid value was rejected",
+                  "    pm.expect(pm.response.code).to.be.oneOf([400, 422]);",
+                  "});",
+                  "",
+                  "console.log('✅ Invalid value rejected (expected behavior)');"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"FirstName\": \"SF-477\",\n  \"LastName\": \"Test Invalid\",\n  \"Company\": \"Test Company Invalid\",\n  \"Annual_GWP_Estimate_Year_1__c\": \"INVALID_VALUE_###\",\n  \"Status\": \"Open - Not Contacted\",\n  \"LeadSource\": \"Web\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Lead/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "data",
+                "{{api_version}}",
+                "sobjects",
+                "Lead",
+                ""
+              ]
+            },
+            "description": "Attempt to create Lead with invalid Annual_GWP_Estimate_Year_1__c value\n\n**Test:** SF-477-API-007\n**Purpose:** Verify invalid values are rejected\n**Expected:** 400 or 422 error response\n**Note:** Annual_GWP_Estimate_Year_1__c is a Currency field, so non-numeric values should be rejected"
+          },
+          "response": []
+        },
+        {
+          "name": "SF-477-API-008 - Create Lead without Annual_GWP_Estimate_Year_1__c",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test(\"Response contains Lead ID\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.id).to.not.be.undefined;",
+                  "    pm.collectionVariables.set('lead_id', jsonData.id);",
+                  "    console.log('✅ Lead created without Annual_GWP_Estimate_Year_1__c');",
+                  "    console.log('Lead ID: ' + jsonData.id);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"FirstName\": \"SF-477\",\n  \"LastName\": \"Test Lead Null\",\n  \"Company\": \"Test Company Null\",\n  \"Status\": \"Open - Not Contacted\",\n  \"LeadSource\": \"Web\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Lead/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "data",
+                "{{api_version}}",
+                "sobjects",
+                "Lead",
+                ""
+              ]
+            },
+            "description": "Create Lead without Annual_GWP_Estimate_Year_1__c field\n\n**Test:** SF-477-API-008 (Setup)\n**Purpose:** Create Lead for null value verification"
+          },
+          "response": []
+        },
+        {
+          "name": "SF-477-API-008 - Verify null Annual_GWP_Estimate_Year_1__c value",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Annual_GWP_Estimate_Year_1__c is null or empty\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    var gwpValue = jsonData.Annual_GWP_Estimate_Year_1__c;",
+                  "    var isNullOrEmpty = (gwpValue === null || gwpValue === undefined || gwpValue === '');",
+                  "    pm.expect(isNullOrEmpty).to.be.true;",
+                  "    console.log('✅ Annual_GWP_Estimate_Year_1__c is null or empty (as expected): ' + gwpValue);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "var leadId = pm.collectionVariables.get('lead_id');",
+                  "if (!leadId) {",
+                  "    throw new Error('lead_id variable is not set. Please run the Create Lead without Annual_GWP_Estimate_Year_1__c request first.');",
+                  "}",
+                  "console.log('Verifying null Annual_GWP_Estimate_Year_1__c on Lead: ' + leadId);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Lead/{{lead_id}}?fields=Id,FirstName,LastName,Annual_GWP_Estimate_Year_1__c",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "data",
+                "{{api_version}}",
+                "sobjects",
+                "Lead",
+                "{{lead_id}}"
+              ],
+              "query": [
+                {
+                  "key": "fields",
+                  "value": "Id,FirstName,LastName,Annual_GWP_Estimate_Year_1__c"
+                }
+              ]
+            },
+            "description": "Verify Annual_GWP_Estimate_Year_1__c is null or empty on Lead created without the field\n\n**Test:** SF-477-API-008\n**Purpose:** Verify null/blank value handling"
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

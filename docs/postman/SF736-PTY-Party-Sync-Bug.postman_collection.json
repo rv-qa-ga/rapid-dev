@@ -1,0 +1,589 @@
+{
+  "info": {
+    "_postman_id": "sf736-pty-party-sync-bug",
+    "name": "SF736 — PTY / Party Sync Bug Repro",
+    "description": "Recreate Salesforce Account → MuleSoft → Dynamics Party PTY mismatch (BDS_1001 / accelins_partymasterid).\n\n## Field mapping\n| Salesforce | Dynamics |\n|------------|----------|\n| `PTY_Code__c` | `accelins_partymasterid` |\n| `Dataverse_ID__c` | `accelins_partyid` (GUID) |\n\n## Setup\n1. Import this collection + `SF736-qamerge-qatest2.postman_environment.json`\n2. Fill secrets in the environment (from `src/config/env/.env.qamerge`)\n3. **Salesforce token** — either:\n   - Run `ENV=qamerge npx ts-node scripts/postman-sf-jwt-token.ts` and paste `access_token` → `sf_access_token`, `instance_url` → `sf_instance_url`\n   - Or configure Postman OAuth 2.0 JWT Bearer (Consumer Key + `certs/server.key` + username)\n4. Run folder **0 — Auth** then **1 — Reproduce** in order\n\n## Expected bug\n- GUID sync OK: `sf_dataverse_id` = Dynamics `accelins_partyid`\n- PTY mismatch: `sf_pty_code` ≠ Dynamics `accelins_partymasterid`\n- MuleSoft log: `BDS_1001 - A record with the specified key values does not exist in accelins_party entity`\n\n## SQL verify (optional)\n```sql\nSELECT accelins_partymasterid, accelins_partyid, accelins_name\nFROM [dbo].[accelins_party]\nWHERE accelins_partyid = '<sf_dataverse_id>'\n   OR accelins_partymasterid = '<sf_pty_code>'\n```",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "wait_seconds", "value": "15" }
+  ],
+  "item": [
+    {
+      "name": "0 — Auth",
+      "item": [
+        {
+          "name": "Dynamics — Client credentials token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Token received', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.environment.set('d365_access_token', j.access_token);",
+                  "console.log('d365_access_token set (expires in ' + j.expires_in + 's)');"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/x-www-form-urlencoded" }],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                { "key": "grant_type", "value": "client_credentials" },
+                { "key": "client_id", "value": "{{d365_client_id}}" },
+                { "key": "client_secret", "value": "{{d365_client_secret}}" },
+                { "key": "scope", "value": "{{d365_scope}}" }
+              ]
+            },
+            "url": {
+              "raw": "https://login.microsoftonline.com/{{d365_tenant_id}}/oauth2/v2.0/token",
+              "protocol": "https",
+              "host": ["login", "microsoftonline", "com"],
+              "path": ["{{d365_tenant_id}}", "oauth2", "v2.0", "token"]
+            },
+            "description": "Uses D365 SPN from `.env.qamerge`. Saves `d365_access_token`."
+          }
+        },
+        {
+          "name": "Salesforce — Paste token (run scripts/postman-sf-jwt-token.mjs)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{sf_access_token}}" }
+            ],
+            "url": {
+              "raw": "{{sf_instance_url}}/services/data/{{sf_api_version}}/limits",
+              "host": ["{{sf_instance_url}}"],
+              "path": ["services", "data", "{{sf_api_version}}", "limits"]
+            },
+            "description": "Smoke-check `sf_access_token`. Generate token:\n```bash\nENV=qamerge npx ts-node scripts/postman-sf-jwt-token.ts\n```\nCopy `access_token` and `instance_url` into environment variables."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('SF token valid', () => pm.response.to.have.status(200));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "MuleSoft — Connected app token (optional, for logs)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  pm.environment.set('mulesoft_access_token', pm.response.json().access_token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/x-www-form-urlencoded" }],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                { "key": "grant_type", "value": "client_credentials" },
+                { "key": "client_id", "value": "{{mulesoft_client_id}}" },
+                { "key": "client_secret", "value": "{{mulesoft_client_secret}}" }
+              ]
+            },
+            "url": {
+              "raw": "{{mulesoft_base_url}}/accounts/api/v2/oauth2/token",
+              "host": ["{{mulesoft_base_url}}"],
+              "path": ["accounts", "api", "v2", "oauth2", "token"]
+            },
+            "description": "Optional. See docs/setup/MULESOFT_ACCESS_REQUIREMENTS.md"
+          }
+        }
+      ]
+    },
+    {
+      "name": "1 — Reproduce (SF Account → Party PTY check)",
+      "item": [
+        {
+          "name": "1. SF — Create Account (Prospect)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const ts = Date.now();",
+                  "pm.environment.set('account_name_unique', pm.environment.get('account_name') + ' ' + ts);"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Account created', () => pm.response.to.have.status(201));",
+                  "const id = pm.response.headers.get('Location').split('/').pop();",
+                  "pm.environment.set('sf_account_id', id);",
+                  "console.log('sf_account_id =', id);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{sf_access_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"Name\": \"{{account_name_unique}}\",\n  \"Type\": \"Customer\",\n  \"Account_Status__c\": \"Prospect\",\n  \"Reporting_Region__c\": \"US\",\n  \"BillingStreet\": \"123 Postman Test St\",\n  \"BillingCity\": \"New York\",\n  \"BillingState\": \"New York\",\n  \"BillingPostalCode\": \"10001\",\n  \"BillingCountry\": \"United States\",\n  \"Phone\": \"555-010-0200\"\n}"
+            },
+            "url": {
+              "raw": "{{sf_instance_url}}/services/data/{{sf_api_version}}/sobjects/Account",
+              "host": ["{{sf_instance_url}}"],
+              "path": ["services", "data", "{{sf_api_version}}", "sobjects", "Account"]
+            }
+          }
+        },
+        {
+          "name": "2. SF — Query Account (Prospect — PTY + Dataverse)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Account found', () => pm.response.to.have.status(200));",
+                  "const rec = pm.response.json().records[0];",
+                  "pm.environment.set('sf_pty_code', rec.PTY_Code__c || '');",
+                  "pm.environment.set('sf_party_code', rec.Party_Code__c || '');",
+                  "pm.environment.set('sf_dataverse_id', rec.Dataverse_ID__c || '');",
+                  "console.log('PTY_Code__c:', rec.PTY_Code__c);",
+                  "console.log('Party_Code__c:', rec.Party_Code__c);",
+                  "console.log('Dataverse_ID__c:', rec.Dataverse_ID__c);",
+                  "pm.test('PTY_Code__c populated', () => pm.expect(rec.PTY_Code__c).to.be.a('string').and.not.empty);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{sf_access_token}}" }],
+            "url": {
+              "raw": "{{sf_instance_url}}/services/data/{{sf_api_version}}/query?q=SELECT+Id,Name,PTY_Code__c,Party_Code__c,Dataverse_ID__c,Account_Status__c+FROM+Account+WHERE+Id+=+'{{sf_account_id}}'",
+              "host": ["{{sf_instance_url}}"],
+              "path": ["services", "data", "{{sf_api_version}}", "query"],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "SELECT Id,Name,PTY_Code__c,Party_Code__c,Dataverse_ID__c,Account_Status__c FROM Account WHERE Id = '{{sf_account_id}}'"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "3. SF — Update Account Status → Active (triggers MuleSoft)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status updated or contract error documented', () => {",
+                  "  // 204 = success; 400 may mean contract required on qamerge",
+                  "  pm.expect([204, 400]).to.include(pm.response.code);",
+                  "});",
+                  "if (pm.response.code !== 204) {",
+                  "  console.warn('Active update failed — activate via UI or upload contract. Error:', pm.response.text());",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{sf_access_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"Account_Status__c\": \"Active\"\n}"
+            },
+            "url": {
+              "raw": "{{sf_instance_url}}/services/data/{{sf_api_version}}/sobjects/Account/{{sf_account_id}}",
+              "host": ["{{sf_instance_url}}"],
+              "path": ["services", "data", "{{sf_api_version}}", "sobjects", "Account", "{{sf_account_id}}"]
+            },
+            "description": "Triggers Account Platform Event → MuleSoft sf-accounts-papi-qa.\n\nIf this returns 400 (contract required), activate the account in Salesforce UI, then continue from step 4."
+          }
+        },
+        {
+          "name": "4. Wait for MuleSoft sync",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const sec = parseInt(pm.collectionVariables.get('wait_seconds') || '15', 10);",
+                  "console.log('Waiting ' + sec + 's for MuleSoft...');",
+                  "const start = Date.now();",
+                  "while (Date.now() - start < sec * 1000) {}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{sf_access_token}}" }],
+            "url": "{{sf_instance_url}}/services/data/{{sf_api_version}}/limits"
+          }
+        },
+        {
+          "name": "5. SF — Query Account (after sync — PTY + Dataverse)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Account found', () => pm.response.to.have.status(200));",
+                  "const rec = pm.response.json().records[0];",
+                  "pm.environment.set('sf_pty_code', rec.PTY_Code__c || '');",
+                  "pm.environment.set('sf_party_code', rec.Party_Code__c || '');",
+                  "pm.environment.set('sf_dataverse_id', rec.Dataverse_ID__c || '');",
+                  "console.log('After sync — PTY:', rec.PTY_Code__c, 'Dataverse:', rec.Dataverse_ID__c);",
+                  "pm.test('Dataverse_ID__c populated after Active', () => pm.expect(rec.Dataverse_ID__c).to.be.a('string').and.not.empty);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{sf_access_token}}" }],
+            "url": {
+              "raw": "{{sf_instance_url}}/services/data/{{sf_api_version}}/query?q=SELECT+Id,Name,PTY_Code__c,Party_Code__c,Dataverse_ID__c,Account_Status__c+FROM+Account+WHERE+Id+=+'{{sf_account_id}}'",
+              "host": ["{{sf_instance_url}}"],
+              "path": ["services", "data", "{{sf_api_version}}", "query"],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "SELECT Id,Name,PTY_Code__c,Party_Code__c,Dataverse_ID__c,Account_Status__c FROM Account WHERE Id = '{{sf_account_id}}'"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "6. D365 — Party by GUID (accelins_partyid)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Party query OK', () => pm.response.to.have.status(200));",
+                  "const rows = pm.response.json().value || [];",
+                  "pm.test('Party row exists for Dataverse GUID', () => pm.expect(rows.length).to.be.above(0));",
+                  "if (rows.length) {",
+                  "  const p = rows[0];",
+                  "  pm.environment.set('d365_party_master_id', p.accelins_partymasterid || '');",
+                  "  console.log('Dynamics accelins_partyid:', p.accelins_partyid);",
+                  "  console.log('Dynamics accelins_partymasterid:', p.accelins_partymasterid);",
+                  "  console.log('Dynamics accelins_name:', p.accelins_name);",
+                  "  const sfPty = pm.environment.get('sf_pty_code');",
+                  "  const sfDv = pm.environment.get('sf_dataverse_id');",
+                  "  pm.test('GUID match (sync OK)', () => pm.expect(p.accelins_partyid).to.eql(sfDv));",
+                  "  if (p.accelins_partymasterid !== sfPty) {",
+                  "    console.error('BUG: PTY mismatch SF', sfPty, 'vs D365 partymasterid', p.accelins_partymasterid);",
+                  "  }",
+                  "  pm.test('PTY match (accelins_partymasterid = PTY_Code__c)', () => {",
+                  "    pm.expect(p.accelins_partymasterid).to.eql(sfPty);",
+                  "  });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{d365_access_token}}" },
+              { "key": "Accept", "value": "application/json" },
+              { "key": "OData-MaxVersion", "value": "4.0" },
+              { "key": "OData-Version", "value": "4.0" }
+            ],
+            "url": {
+              "raw": "{{d365_web_api}}/accelins_parties?$filter=accelins_partyid eq '{{sf_dataverse_id}}'&$select=accelins_partyid,accelins_partymasterid,accelins_name",
+              "host": ["{{d365_web_api}}"],
+              "path": ["accelins_parties"],
+              "query": [
+                { "key": "$filter", "value": "accelins_partyid eq '{{sf_dataverse_id}}'" },
+                { "key": "$select", "value": "accelins_partyid,accelins_partymasterid,accelins_name" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "7. D365 — Party by PTY (accelins_partymasterid) — BDS lookup path",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Query OK', () => pm.response.to.have.status(200));",
+                  "const rows = pm.response.json().value || [];",
+                  "const sfPty = pm.environment.get('sf_pty_code');",
+                  "const sfDv = pm.environment.get('sf_dataverse_id');",
+                  "console.log('Rows for partymasterid', sfPty, ':', rows.length);",
+                  "if (rows.length === 0) {",
+                  "  console.error('BUG: No Party found by SF PTY_Code__c — matches BDS_1001');",
+                  "}",
+                  "if (rows.length > 0 && rows[0].accelins_partyid !== sfDv) {",
+                  "  console.error('BUG: PTY lookup returns different Party GUID than Dataverse_ID__c');",
+                  "  console.log('Lookup partyid:', rows[0].accelins_partyid, 'SF Dataverse:', sfDv);",
+                  "}",
+                  "pm.test('Party found by SF PTY_Code__c', () => pm.expect(rows.length).to.be.above(0));",
+                  "if (rows.length) {",
+                  "  pm.test('Same Party GUID as Account', () => pm.expect(rows[0].accelins_partyid).to.eql(sfDv));",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{d365_access_token}}" },
+              { "key": "Accept", "value": "application/json" },
+              { "key": "OData-MaxVersion", "value": "4.0" },
+              { "key": "OData-Version", "value": "4.0" }
+            ],
+            "url": {
+              "raw": "{{d365_web_api}}/accelins_parties?$filter=accelins_partymasterid eq '{{sf_pty_code}}'&$select=accelins_partyid,accelins_partymasterid,accelins_name",
+              "host": ["{{d365_web_api}}"],
+              "path": ["accelins_parties"],
+              "query": [
+                { "key": "$filter", "value": "accelins_partymasterid eq '{{sf_pty_code}}'" },
+                { "key": "$select", "value": "accelins_partyid,accelins_partymasterid,accelins_name" }
+              ]
+            },
+            "description": "Simulates MuleSoft lookup by PTY / Party Master ID.\n\n**Expected bug:** 0 rows OR wrong GUID — `BDS_1001 - record does not exist in accelins_party entity`"
+          }
+        },
+        {
+          "name": "8. D365 — Party by Dynamics partymasterid (from step 6)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Query OK', () => pm.response.to.have.status(200));",
+                  "const rows = pm.response.json().value || [];",
+                  "console.log('Lookup by D365 partymasterid', pm.environment.get('d365_party_master_id'), '→', rows.length, 'row(s)');"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{d365_access_token}}" },
+              { "key": "Accept", "value": "application/json" },
+              { "key": "OData-MaxVersion", "value": "4.0" },
+              { "key": "OData-Version", "value": "4.0" }
+            ],
+            "url": {
+              "raw": "{{d365_web_api}}/accelins_parties?$filter=accelins_partymasterid eq '{{d365_party_master_id}}'&$select=accelins_partyid,accelins_partymasterid,accelins_name",
+              "host": ["{{d365_web_api}}"],
+              "path": ["accelins_parties"],
+              "query": [
+                { "key": "$filter", "value": "accelins_partymasterid eq '{{d365_party_master_id}}'" },
+                { "key": "$select", "value": "accelins_partyid,accelins_partymasterid,accelins_name" }
+              ]
+            },
+            "description": "Shows which PTY MuleSoft likely stored vs what SF has."
+          }
+        }
+      ],
+      "description": "Run steps 1–8 in order after auth. Step 6 vs 7 comparison proves the PTY bug."
+    },
+    {
+      "name": "2 — MuleSoft logs (optional)",
+      "item": [
+        {
+          "name": "Get deployment logs — sf-accounts-papi-qa",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{mulesoft_access_token}}" },
+              { "key": "X-ANYPNT-ORG-ID", "value": "{{mulesoft_org_id}}" },
+              { "key": "X-ANYPNT-ENV-ID", "value": "{{mulesoft_env_id}}" }
+            ],
+            "url": {
+              "raw": "{{mulesoft_base_url}}/amc/application-manager/api/v2/organizations/{{mulesoft_org_id}}/environments/{{mulesoft_env_id}}/deployments/{{mulesoft_deployment_id}}/logs?limit=100",
+              "host": ["{{mulesoft_base_url}}"],
+              "path": [
+                "amc",
+                "application-manager",
+                "api",
+                "v2",
+                "organizations",
+                "{{mulesoft_org_id}}",
+                "environments",
+                "{{mulesoft_env_id}}",
+                "deployments",
+                "{{mulesoft_deployment_id}}",
+                "logs"
+              ],
+              "query": [{ "key": "limit", "value": "100" }]
+            },
+            "description": "Search response for `BDS_1001` or `accelins_party`. Set `mulesoft_deployment_id` from Runtime Manager."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const text = pm.response.text();",
+                  "if (text.includes('BDS_1001')) console.log('Found BDS_1001 in logs');",
+                  "if (text.includes('accelins_party')) console.log('Found accelins_party reference in logs');"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Search logs for correlation ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{mulesoft_access_token}}" },
+              { "key": "X-ANYPNT-ORG-ID", "value": "{{mulesoft_org_id}}" },
+              { "key": "X-ANYPNT-ENV-ID", "value": "{{mulesoft_env_id}}" }
+            ],
+            "url": {
+              "raw": "{{mulesoft_base_url}}/amc/application-manager/api/v2/organizations/{{mulesoft_org_id}}/environments/{{mulesoft_env_id}}/deployments/{{mulesoft_deployment_id}}/logs?limit=200",
+              "host": ["{{mulesoft_base_url}}"],
+              "path": [
+                "amc",
+                "application-manager",
+                "api",
+                "v2",
+                "organizations",
+                "{{mulesoft_org_id}}",
+                "environments",
+                "{{mulesoft_env_id}}",
+                "deployments",
+                "{{mulesoft_deployment_id}}",
+                "logs"
+              ],
+              "query": [{ "key": "limit", "value": "200" }]
+            },
+            "description": "Set `mulesoft_correlation_id` from MuleSoft UI, then search response body manually for that ID."
+          }
+        }
+      ]
+    },
+    {
+      "name": "3 — Existing record (HOLDINGS EXCEL style)",
+      "item": [
+        {
+          "name": "SF — Query Account by name",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const rec = pm.response.json().records[0];",
+                  "if (rec) {",
+                  "  pm.environment.set('sf_account_id', rec.Id);",
+                  "  pm.environment.set('sf_pty_code', rec.PTY_Code__c || '');",
+                  "  pm.environment.set('sf_dataverse_id', rec.Dataverse_ID__c || '');",
+                  "  console.log(rec);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{sf_access_token}}" }],
+            "url": {
+              "raw": "{{sf_instance_url}}/services/data/{{sf_api_version}}/query?q=SELECT+Id,Name,PTY_Code__c,Party_Code__c,Dataverse_ID__c+FROM+Account+WHERE+Name+=+'HOLDINGS+EXCEL'+LIMIT+1",
+              "host": ["{{sf_instance_url}}"],
+              "path": ["services", "data", "{{sf_api_version}}", "query"],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "SELECT Id,Name,PTY_Code__c,Party_Code__c,Dataverse_ID__c FROM Account WHERE Name = 'HOLDINGS EXCEL' LIMIT 1"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "D365 — Party by SF PTY (HOLDINGS EXCEL)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{d365_access_token}}" },
+              { "key": "Accept", "value": "application/json" },
+              { "key": "OData-MaxVersion", "value": "4.0" },
+              { "key": "OData-Version", "value": "4.0" }
+            ],
+            "url": {
+              "raw": "{{d365_web_api}}/accelins_parties?$filter=accelins_partymasterid eq '{{sf_pty_code}}'&$select=accelins_partyid,accelins_partymasterid,accelins_name",
+              "host": ["{{d365_web_api}}"],
+              "path": ["accelins_parties"],
+              "query": [
+                { "key": "$filter", "value": "accelins_partymasterid eq '{{sf_pty_code}}'" },
+                { "key": "$select", "value": "accelins_partyid,accelins_partymasterid,accelins_name" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "D365 — Party by GUID (HOLDINGS EXCEL)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{d365_access_token}}" },
+              { "key": "Accept", "value": "application/json" },
+              { "key": "OData-MaxVersion", "value": "4.0" },
+              { "key": "OData-Version", "value": "4.0" }
+            ],
+            "url": {
+              "raw": "{{d365_web_api}}/accelins_parties?$filter=accelins_partyid eq '{{sf_dataverse_id}}'&$select=accelins_partyid,accelins_partymasterid,accelins_name",
+              "host": ["{{d365_web_api}}"],
+              "path": ["accelins_parties"],
+              "query": [
+                { "key": "$filter", "value": "accelins_partyid eq '{{sf_dataverse_id}}'" },
+                { "key": "$select", "value": "accelins_partyid,accelins_partymasterid,accelins_name" }
+              ]
+            }
+          }
+        }
+      ],
+      "description": "Re-check an existing record like HOLDINGS EXCEL / PTY-001313 from your screenshot."
+    }
+  ]
+}

@@ -1,0 +1,75 @@
+h1. Month-End Process
+
+*Source:* {{docs/planning/Month-End-Close-Process.pptx}} (in repo)
+
+
+----
+
+h2. Current Status
+
+
+h3. What it is
+
+The month-end close is a critical, recurring operational cycle where Accelerant processes, validates, and reconciles all financial data across multiple systems, regions, and entities — culminating in consolidated financial statements for that month. It runs at the end of each month and involves executing a sequenced set of stored procedures that generate CSV files consumed by downstream finance, reinsurance, and reporting systems.
+
+
+h3. Teams involved
+
+|| Team || Role ||
+|Operations|Stops BDX loading ~1 week before close per the month-end calendar|
+|Production Support (Stacey's team)|Runs the month-end process in production every month|
+|Finance (EU / US / CA)|Reviews, approves, and posts journal entries to the ledger|
+|Data Engineering|Maintains ODS, TDS, and Data Products pipelines|
+|Enterprise Technology|System availability — Dynamics 365, Tagetik, infrastructure|
+|QA Engineering|Tests process changes; validates new insurers and regions|
+
+
+h3. End-to-end system flow
+
+BDX Sources → ADP Ingestion → ODS Enrich → TDS Transform → D365 GL / SL → Tagetik and DCR → Close & Report
+
+
+h3. QA team's role in month-end
+
+QA does *not* run the month-end process in production. Production Support executes it monthly. QA is engaged when changes are made to stored procedures, mappings, or when new insurers / contract types / regions are onboarded.
+
+* *Change testing:* Stored procedure modifications; new/updated field mappings; schema or table changes; new fee codes or LOB mappings
+* *Output validation:* CSV file generation verification; file format & schema compliance; control totals & row counts; data completeness checks
+* *New contract type / insurer / region:* End-to-end data flow for new entity; reference data alignment (RDM / CMT); downstream system acceptance; DCR mapping validation
+* *Test types:* Smoke (system readiness); Integration (multi-hop data flows); Regression (monthly validation pack)
+
+_Goal: Catch issues before they reach production — reduce multi-day resolution cycles during the live close window._
+
+
+h3. Pain points (production challenges)
+
+|| Area || Risk || Root cause ||
+|DCR / Tagetik alignment|HIGH|Late-arriving data, mismatched mappings, missing reference values|
+|File load failures|HIGH|BDX format mismatches, schema drift, missing fields|
+|Historical data fixes|HIGH|Manual fix scripts per region / insurer before every snapshot|
+|Posting & journal errors|MED|Dynamics mismatches, incorrect mappings, missing RDM values|
+|Approvals (EU / US)|MED|SLA variance, inconsistent thresholds, manual routing delays|
+|IC reconciliations|LOW|Minor timing differences, reference mismatches|
+
+
+h3. Business impact
+
+* Multi-day resolution cycles every month-end close
+* 4 regions (EU, UK, US, CA) all impacted simultaneously
+* 6+ systems (Finance, DCR, Tagetik) blocked downstream
+* Public company reporting deadlines are non-negotiable
+
+
+h3. Strategic options under evaluation
+
+Short-term, Mid-term, and Long-term options. Long-term includes *Re-architecture evaluation*: assess complete re-architecture of the stored procedure chain — modernise pipelines to eliminate structural failures.
+
+
+----
+
+h2. Plan to Improve (Next Quarters)
+
+
+---
+*Last updated: February 2025*
+*Parent:* [BSGQA Next-Version Planning Hub – Overview]

@@ -1,0 +1,224 @@
+{
+	"info": {
+		"_postman_id": "a1b2c3d4-e5f6-7890-abcd-ef9739739730",
+		"name": "SF-973 - Product Map field history (REST)",
+		"description": "JIRA SF-973 — Validates API access to **Product_Map__History** (field history for Product_Map__c).\n\nMirrors the Cucumber scenario in `src/features/api/SF/SF-973.feature`.\n\n## Setup\n1. Import this collection.\n2. Select an environment that defines the same variables as other Salesforce collections (see `Salesforce-QA-Environment.json`), or create one with:\n   - `sf_client_id`, `sf_client_secret`, `sf_username`, `sf_password`, `sf_security_token`, `sf_login_url`\n   - `sf_api_version` (e.g. `v60.0`)\n3. Run **Get Salesforce Access Token** first (password flow). Token and instance URL are saved to **collection** variables.\n\n## Integration user\nUse credentials (or JWT outside Postman) for the integration/API identity you need to prove. Password flow in Postman uses the username/password you set in the environment.\n\n## Namespaced orgs\nIf the object is namespaced, change `Product_Map__History` in the request URLs / query to your API name (e.g. `Ns__Product_Map__History`).",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{sf_access_token}}",
+				"type": "string"
+			}
+		]
+	},
+	"variable": [
+		{
+			"key": "sf_access_token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "sf_instance_url",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "base_url",
+			"value": "{{sf_instance_url}}",
+			"type": "string"
+		},
+		{
+			"key": "api_version",
+			"value": "{{sf_api_version}}",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "🔐 Get Salesforce Access Token",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response contains access_token\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property(\"access_token\");",
+							"    pm.expect(jsonData.access_token).to.not.be.empty;",
+							"    pm.expect(jsonData).to.have.property(\"instance_url\");",
+							"    pm.collectionVariables.set(\"sf_access_token\", jsonData.access_token);",
+							"    pm.collectionVariables.set(\"sf_instance_url\", jsonData.instance_url);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "grant_type",
+							"value": "password",
+							"type": "text"
+						},
+						{
+							"key": "client_id",
+							"value": "{{sf_client_id}}",
+							"type": "text"
+						},
+						{
+							"key": "client_secret",
+							"value": "{{sf_client_secret}}",
+							"type": "text"
+						},
+						{
+							"key": "username",
+							"value": "{{sf_username}}",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "{{sf_password}}{{sf_security_token}}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{sf_login_url}}/services/oauth2/token",
+					"host": [
+						"{{sf_login_url}}"
+					],
+					"path": [
+						"services",
+						"oauth2",
+						"token"
+					]
+				},
+				"description": "OAuth2 username-password flow. Requires Connected App with secret and allowed flow."
+			},
+			"response": []
+		},
+		{
+			"name": "SF-973 — Describe Product_Map__History",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"History object has audit-related fields\", function () {",
+							"    var j = pm.response.json();",
+							"    pm.expect(j.fields).to.be.an(\"array\");",
+							"    var names = j.fields.map(function (f) { return f.name; });",
+							"    [\"ParentId\", \"Field\", \"OldValue\", \"NewValue\", \"CreatedById\", \"CreatedDate\"].forEach(function (n) {",
+							"        pm.expect(names, \"missing \" + n).to.include(n);",
+							"    });",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Product_Map__History/describe",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"services",
+						"data",
+						"{{api_version}}",
+						"sobjects",
+						"Product_Map__History",
+						"describe"
+					]
+				},
+				"description": "REST describe for the field-history sObject (same as automation `I describe the \"Product_Map__History\" object`)."
+			},
+			"response": []
+		},
+		{
+			"name": "SF-973 — SOQL Product_Map__History (audit columns)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Query envelope is valid\", function () {",
+							"    var j = pm.response.json();",
+							"    pm.expect(j.done).to.eql(true);",
+							"    pm.expect(j.records).to.be.an(\"array\");",
+							"});",
+							"",
+							"pm.test(\"If a row exists, audit columns are present\", function () {",
+							"    var j = pm.response.json();",
+							"    if (j.records && j.records.length > 0) {",
+							"        var r = j.records[0];",
+							"        pm.expect(r).to.have.property(\"Field\");",
+							"        pm.expect(r).to.have.property(\"CreatedById\");",
+							"        pm.expect(r).to.have.property(\"CreatedDate\");",
+							"    }",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/services/data/{{api_version}}/query?q=SELECT Id, ParentId, Field, OldValue, NewValue, CreatedById, CreatedDate FROM Product_Map__History LIMIT 1",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"services",
+						"data",
+						"{{api_version}}",
+						"query"
+					],
+					"query": [
+						{
+							"key": "q",
+							"value": "SELECT Id, ParentId, Field, OldValue, NewValue, CreatedById, CreatedDate FROM Product_Map__History LIMIT 1",
+							"description": "Same SOQL as src/step-definitions/api/salesforce/sf-973.steps.ts"
+						}
+					]
+				},
+				"description": "Proves the API user can **read** field history via REST (empty `records` is valid if no history rows)."
+			},
+			"response": []
+		}
+	]
+}

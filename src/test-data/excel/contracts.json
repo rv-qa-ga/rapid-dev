@@ -1,0 +1,24 @@
+{
+  "_description": "Contract test data - JSON format for version control",
+  "_columns": ["TestCaseID", "AccountName", "Status", "StartDate", "ContractTerm", "Tags"],
+  "data": [
+    {
+      "TestCaseID": "CTR-001",
+      "AccountName": "Test Account - Active",
+      "Status": "Draft",
+      "StartDate": "+1day",
+      "ContractTerm": 12,
+      "Tags": "smoke,positive"
+    },
+    {
+      "TestCaseID": "CTR-002",
+      "AccountName": "Test Account - Active",
+      "Status": "In Approval Process",
+      "StartDate": "+7days",
+      "ContractTerm": 24,
+      "Tags": "regression"
+    }
+  ],
+  "statusValues": ["Draft", "In Approval Process", "Activated", "Expired", "Terminated"]
+}
+

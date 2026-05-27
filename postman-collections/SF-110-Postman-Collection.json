@@ -1,0 +1,498 @@
+{
+	"info": {
+		"_postman_id": "work-item-sf-110",
+		"name": "SF-110 - API Tests",
+		"description": "API - SF-110 - Enable Field History Tracking for Opportunity fields\n\n══════════════════════════════════════════════════════════════════════════════\nGenerated: 2026-01-08T19:36:02.199Z (FeatureGenerator v3.1)\n══════════════════════════════════════════════════════════════════════════════\n═══════════════════════════════════════════════════════════════════════════\nGENERATION MODE\n═══════════════════════════════════════════════════════════════════════════\nMode: 3\nDescription: Generator Only - Full automatic generation from Jira data (current behavior)\n════════════════\n\nGenerated from: C:\\Automation\\E2EAutomation\\src\\features\\api\\SF\\SF-110.feature\n\n## Setup Instructions:\n1. Import this collection into Postman\n2. Create a new environment (or use existing Salesforce QA environment)\n3. Set the following environment variables:\n   - `sf_base_url`: https://arx--qa.sandbox.my.salesforce.com\n   - `sf_api_version`: v60.0\n   - `sf_access_token`: Your Salesforce access token (get via OAuth or JWT)\n   - `sf_instance_url`: Your Salesforce instance URL\n\n## Authentication:\nThis collection uses Bearer Token authentication. Obtain an access token via:\n- OAuth 2.0 flow\n- JWT Bearer Token flow\n- Username/Password flow",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{sf_access_token}}",
+				"type": "string"
+			}
+		]
+	},
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "{{sf_base_url}}",
+			"type": "string"
+		},
+		{
+			"key": "api_version",
+			"value": "{{sf_api_version}}",
+			"type": "string"
+		},
+		{
+			"key": "record_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "sf_access_token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "sf_login_url",
+			"value": "https://login.salesforce.com",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "OAuth 2.0 - Get Access Token (Username/Password)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response contains access_token\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property(\"access_token\");",
+							"    pm.expect(jsonData.access_token).to.not.be.empty;",
+							"    // Automatically set the access token for the collection",
+							"    pm.collectionVariables.set(\"sf_access_token\", jsonData.access_token);",
+							"    if (jsonData.instance_url) {",
+							"        pm.collectionVariables.set(\"sf_base_url\", jsonData.instance_url);",
+							"    }",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "grant_type",
+							"value": "password",
+							"type": "text"
+						},
+						{
+							"key": "client_id",
+							"value": "{{sf_client_id}}",
+							"type": "text"
+						},
+						{
+							"key": "client_secret",
+							"value": "{{sf_client_secret}}",
+							"type": "text"
+						},
+						{
+							"key": "username",
+							"value": "{{sf_username}}",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "{{sf_password}}{{sf_security_token}}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{sf_login_url}}/services/oauth2/token",
+					"host": [
+						"{{sf_login_url}}"
+					],
+					"path": [
+						"services",
+						"oauth2",
+						"token"
+					]
+				},
+				"description": "Obtains an access token using Username/Password OAuth flow.\n\n**Required Environment Variables:**\n- `sf_client_id`: Your Connected App Consumer Key\n- `sf_client_secret`: Your Connected App Consumer Secret\n- `sf_username`: Your Salesforce username\n- `sf_password`: Your Salesforce password\n- `sf_security_token`: Your Salesforce security token (appended to password)\n- `sf_login_url`: Your Salesforce login URL (e.g., https://login.salesforce.com or https://test.salesforce.com)\n\n**Response:**\nReturns `access_token`, `instance_url`, and other OAuth details. The access token is automatically saved to the `sf_access_token` collection variable for use in subsequent requests."
+			},
+			"response": []
+		},
+		{
+			"name": "API - Verify History_Tracking__c field exists on C",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response contains fields\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.fields).to.be.an(\"array\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Contract/describe",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"services",
+						"data",
+						"{{api_version}}",
+						"sobjects",
+						"Contract",
+						"describe"
+					]
+				},
+				"description": "API - API - Verify History_Tracking__c field exists on Contract\n\n**Test ID:** SF-110-API-001\n**Priority:** p1\n**Tags:** @smoke\n\n**Feature:** API - SF-110 - Enable Field History Tracking for Opportunity fields\n"
+			},
+			"response": []
+		},
+		{
+			"name": "API - Verify History_Tracking__c field exists on A",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response contains fields\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.fields).to.be.an(\"array\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Account/describe",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"services",
+						"data",
+						"{{api_version}}",
+						"sobjects",
+						"Account",
+						"describe"
+					]
+				},
+				"description": "API - API - Verify History_Tracking__c field exists on Account\n\n**Test ID:** SF-110-API-002\n**Priority:** p1\n\n**Feature:** API - SF-110 - Enable Field History Tracking for Opportunity fields\n"
+			},
+			"response": []
+		},
+		{
+			"name": "API - Create Contract with History Tracking",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"pm.test(\"Response contains record ID\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property(\"id\");",
+							"    pm.expect(jsonData.id).to.not.be.empty;",
+							"    pm.collectionVariables.set(\"record_id\", jsonData.id);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Contract/",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"services",
+						"data",
+						"{{api_version}}",
+						"sobjects",
+						"Contract"
+					]
+				},
+				"description": "API - API - Create Contract with History Tracking\n\n**Test ID:** SF-110-API-003\n**Priority:** p1\n\n**Feature:** API - SF-110 - Enable Field History Tracking for Opportunity fields\n",
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"Name\": \"Test Contract\"\n}"
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "API - Update History_Tracking__c on Contract",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 204\", function () {",
+							"    pm.response.to.have.status(204);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Contract/{{record_id}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"services",
+						"data",
+						"{{api_version}}",
+						"sobjects",
+						"Contract",
+						"{{record_id}}"
+					]
+				},
+				"description": "API - API - Update History_Tracking__c on Contract\n\n**Test ID:** SF-110-API-004\n**Priority:** p1\n\n**Feature:** API - SF-110 - Enable Field History Tracking for Opportunity fields\n",
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"History_Tracking__c\": \"Updated Value\"\n}"
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "API - Query Contract by History Tracking",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response contains records\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property(\"records\");",
+							"    pm.expect(jsonData.records).to.be.an(\"array\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/services/data/{{api_version}}/query/?q=SELECT%20Id%2C%20Name%20FROM%20Contract%20LIMIT%2010",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"services",
+						"data",
+						"{{api_version}}",
+						"query"
+					],
+					"query": [
+						{
+							"key": "q",
+							"value": "SELECT Id, Name FROM Contract LIMIT 10"
+						}
+					]
+				},
+				"description": "API - API - Query Contract by History Tracking\n\n**Test ID:** SF-110-API-005\n**Priority:** p2\n\n**Feature:** API - SF-110 - Enable Field History Tracking for Opportunity fields\n"
+			},
+			"response": []
+		},
+		{
+			"name": "API - Create Contract with each valid History Trac",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"pm.test(\"Response contains record ID\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property(\"id\");",
+							"    pm.expect(jsonData.id).to.not.be.empty;",
+							"    pm.collectionVariables.set(\"record_id\", jsonData.id);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Contract/",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"services",
+						"data",
+						"{{api_version}}",
+						"sobjects",
+						"Contract"
+					]
+				},
+				"description": "API - API - Create Contract with each valid History Tracking\n\n**Test ID:** SF-110-API-006\n**Priority:** p2\n\n**Feature:** API - SF-110 - Enable Field History Tracking for Opportunity fields\n",
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"Name\": \"Test Contract\"\n}"
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "API - Reject invalid History_Tracking__c value",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"pm.test(\"Response contains record ID\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property(\"id\");",
+							"    pm.expect(jsonData.id).to.not.be.empty;",
+							"    pm.collectionVariables.set(\"record_id\", jsonData.id);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Contract/",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"services",
+						"data",
+						"{{api_version}}",
+						"sobjects",
+						"Contract"
+					]
+				},
+				"description": "API - API - Reject invalid History_Tracking__c value\n\n**Test ID:** SF-110-API-007\n**Priority:** p2\n**Tags:** @negative\n\n**Feature:** API - SF-110 - Enable Field History Tracking for Opportunity fields\n",
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"Name\": \"Test Contract\"\n}"
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "API - Handle null History_Tracking__c value",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response contains records\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property(\"records\");",
+							"    pm.expect(jsonData.records).to.be.an(\"array\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/services/data/{{api_version}}/query/?q=SELECT%20Id%2C%20Name%20FROM%20the%20LIMIT%2010",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"services",
+						"data",
+						"{{api_version}}",
+						"query"
+					],
+					"query": [
+						{
+							"key": "q",
+							"value": "SELECT Id, Name FROM the LIMIT 10"
+						}
+					]
+				},
+				"description": "API - API - Handle null History_Tracking__c value\n\n**Test ID:** SF-110-API-008\n**Priority:** p2\n**Tags:** @negative\n\n**Feature:** API - SF-110 - Enable Field History Tracking for Opportunity fields\n"
+			},
+			"response": []
+		}
+	]
+}

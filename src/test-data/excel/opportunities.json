@@ -1,0 +1,27 @@
+{
+  "_description": "Opportunity test data - JSON format for version control",
+  "_columns": ["TestCaseID", "Name", "AccountName", "Stage", "CloseDate", "Amount", "Type", "Tags"],
+  "data": [
+    {
+      "TestCaseID": "OPP-001",
+      "Name": "Test Opportunity - Pipeline",
+      "AccountName": "Test Account - Active",
+      "Stage": "Pipeline",
+      "CloseDate": "+30days",
+      "Amount": 50000,
+      "Type": "New Business",
+      "Tags": "smoke,positive"
+    },
+    {
+      "TestCaseID": "OPP-002",
+      "Name": "Test Opportunity - Due Diligence",
+      "AccountName": "Test Account - Active",
+      "Stage": "Due Diligence",
+      "CloseDate": "+15days",
+      "Amount": 100000,
+      "Type": "Existing Business",
+      "Tags": "regression"
+    }
+  ],
+  "stageValues": ["Pipeline", "Due Diligence", "Contract", "Go-Live", "Active", "Unqualified"]
+}

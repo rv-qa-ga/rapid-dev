@@ -1,0 +1,1454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MuleSoft Integration - QA Knowledge Document</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f7fa;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 30px;
+        }
+
+        /* Sidebar Navigation */
+        .sidebar {
+            position: sticky;
+            top: 20px;
+            height: fit-content;
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .sidebar h2 {
+            font-size: 18px;
+            margin-bottom: 15px;
+            color: #2c3e50;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+
+        .sidebar nav ul {
+            list-style: none;
+        }
+
+        .sidebar nav ul li {
+            margin: 8px 0;
+        }
+
+        .sidebar nav ul li a {
+            color: #555;
+            text-decoration: none;
+            display: block;
+            padding: 8px 12px;
+            border-radius: 4px;
+            transition: all 0.3s;
+        }
+
+        .sidebar nav ul li a:hover {
+            background: #e8f4f8;
+            color: #3498db;
+            transform: translateX(5px);
+        }
+
+        /* Main Content */
+        .content {
+            background: white;
+            border-radius: 8px;
+            padding: 40px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            color: #2c3e50;
+            font-size: 36px;
+            margin-bottom: 10px;
+            border-bottom: 4px solid #3498db;
+            padding-bottom: 15px;
+        }
+
+        .meta {
+            color: #7f8c8d;
+            font-size: 14px;
+            margin-bottom: 30px;
+            padding: 15px;
+            background: #ecf0f1;
+            border-radius: 6px;
+        }
+
+        h2 {
+            color: #2c3e50;
+            font-size: 28px;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #3498db;
+        }
+
+        h3 {
+            color: #34495e;
+            font-size: 22px;
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+
+        h4 {
+            color: #555;
+            font-size: 18px;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+
+        /* Flow Diagram */
+        .flow-diagram {
+            background: #f8f9fa;
+            border: 2px solid #3498db;
+            border-radius: 8px;
+            padding: 30px;
+            margin: 30px 0;
+            text-align: center;
+        }
+
+        .flow-box {
+            display: inline-block;
+            background: white;
+            border: 2px solid #3498db;
+            border-radius: 8px;
+            padding: 15px 25px;
+            margin: 10px;
+            min-width: 200px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+
+        .flow-box:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .flow-box.sf { background: #00a1e0; color: white; border-color: #00a1e0; }
+        .flow-box.mulesoft { background: #ff6b35; color: white; border-color: #ff6b35; }
+        .flow-box.d365 { background: #0078d4; color: white; border-color: #0078d4; }
+
+        .flow-arrow {
+            font-size: 24px;
+            color: #3498db;
+            margin: 0 10px;
+        }
+
+        /* Architecture Diagram */
+        .architecture-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .arch-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+
+        .arch-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        }
+
+        .arch-card h4 {
+            color: white;
+            margin-top: 0;
+            font-size: 20px;
+        }
+
+        .arch-card.sf { background: linear-gradient(135deg, #00a1e0 0%, #0070d2 100%); }
+        .arch-card.mulesoft { background: linear-gradient(135deg, #ff6b35 0%, #e63946 100%); }
+        .arch-card.d365 { background: linear-gradient(135deg, #0078d4 0%, #106ebe 100%); }
+        .arch-card.metadata { background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%); }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        table th {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        table tr:hover {
+            background: #f8f9fa;
+        }
+
+        table tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Code Blocks */
+        pre {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 20px;
+            border-radius: 6px;
+            overflow-x: auto;
+            margin: 20px 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+        code {
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .gherkin {
+            color: #a6e22e;
+        }
+
+        .keyword {
+            color: #f92672;
+        }
+
+        .string {
+            color: #e6db74;
+        }
+
+        /* Info Boxes */
+        .info-box {
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid;
+        }
+
+        .info-box.success {
+            background: #d4edda;
+            border-color: #28a745;
+            color: #155724;
+        }
+
+        .info-box.warning {
+            background: #fff3cd;
+            border-color: #ffc107;
+            color: #856404;
+        }
+
+        .info-box.error {
+            background: #f8d7da;
+            border-color: #dc3545;
+            color: #721c24;
+        }
+
+        .info-box.info {
+            background: #d1ecf1;
+            border-color: #17a2b8;
+            color: #0c5460;
+        }
+
+        /* Scenario Cards */
+        .scenario-card {
+            background: #f8f9fa;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            padding: 25px;
+            margin: 20px 0;
+            transition: all 0.3s;
+        }
+
+        .scenario-card:hover {
+            border-color: #3498db;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .scenario-card h4 {
+            color: #3498db;
+            margin-top: 0;
+        }
+
+        .scenario-steps {
+            background: white;
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 15px;
+            border-left: 4px solid #3498db;
+        }
+
+        .scenario-steps ol {
+            margin-left: 20px;
+        }
+
+        .scenario-steps li {
+            margin: 8px 0;
+            color: #555;
+        }
+
+        /* Badge/Tags */
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            margin: 2px;
+        }
+
+        .badge.success { background: #28a745; color: white; }
+        .badge.warning { background: #ffc107; color: #333; }
+        .badge.info { background: #17a2b8; color: white; }
+        .badge.danger { background: #dc3545; color: white; }
+
+        /* Quick Reference Cards */
+        .quick-ref-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .ref-card {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .ref-card h4 {
+            color: #3498db;
+            margin-top: 0;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+
+        /* Entity Flow Diagram */
+        .entity-flow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin: 40px 0;
+            padding: 30px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 10px;
+        }
+
+        .entity-box {
+            background: white;
+            padding: 20px 30px;
+            border-radius: 8px;
+            margin: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            min-width: 200px;
+            text-align: center;
+        }
+
+        .entity-box h4 {
+            color: #2c3e50;
+            margin: 0 0 10px 0;
+            font-size: 18px;
+        }
+
+        .entity-box p {
+            color: #7f8c8d;
+            font-size: 14px;
+            margin: 0;
+        }
+
+        .arrow-right {
+            font-size: 32px;
+            color: #3498db;
+            margin: 0 15px;
+        }
+
+        /* Status Mapping Table */
+        .status-table {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .status-table th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .status-row.eligible {
+            background: #d4edda;
+        }
+
+        .status-row.not-eligible {
+            background: #f8d7da;
+        }
+
+        /* Collapsible Sections */
+        .collapsible {
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .collapsible::before {
+            content: '▶ ';
+            display: inline-block;
+            transition: transform 0.3s;
+        }
+
+        .collapsible.active::before {
+            transform: rotate(90deg);
+        }
+
+        .collapsible-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+
+        .collapsible-content.active {
+            max-height: 2000px;
+        }
+
+        /* Print Styles */
+        @media print {
+            .sidebar {
+                display: none;
+            }
+            .container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+            .sidebar {
+                position: relative;
+                margin-bottom: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <h2>📚 Navigation</h2>
+            <nav>
+                <ul>
+                    <li><a href="#overview">Overview</a></li>
+                    <li><a href="#architecture">Integration Architecture</a></li>
+                    <li><a href="#testing">Testing Approach</a></li>
+                    <li><a href="#test-data">Test Data Management</a></li>
+                    <li><a href="#scenarios">Common Test Scenarios</a></li>
+                    <li><a href="#steps">Step Definitions</a></li>
+                    <li><a href="#troubleshooting">Troubleshooting</a></li>
+                    <li><a href="#best-practices">Best Practices</a></li>
+                    <li><a href="#quick-ref">Quick Reference</a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="content">
+            <h1>🚀 MuleSoft Integration - QA Knowledge Document</h1>
+            <div class="meta">
+                <strong>Last Updated:</strong> 2026-01-16<br>
+                <strong>Purpose:</strong> Comprehensive QA guide for testing Salesforce ↔ Dynamics 365 integration via MuleSoft<br>
+                <strong>Audience:</strong> QA Engineers, Test Automation Engineers
+            </div>
+
+            <!-- Overview Section -->
+            <section id="overview">
+                <h2>📋 Overview</h2>
+                
+                <h3>What We're Testing</h3>
+                <p>End-to-end integration between Salesforce and Dynamics 365 via MuleSoft, where:</p>
+                <ul style="margin: 15px 0 15px 30px; line-height: 2;">
+                    <li><strong>Salesforce</strong> is the source of truth for Account, Contact, AccountTeamMember, and Country records</li>
+                    <li><strong>MuleSoft</strong> is the integration layer (treated as black box)</li>
+                    <li><strong>Dynamics 365</strong> is the target system where data is synchronized</li>
+                </ul>
+
+                <h3>Integration Flow</h3>
+                <div class="flow-diagram">
+                    <div class="flow-box sf">Salesforce Record</div>
+                    <span class="flow-arrow">→</span>
+                    <div class="flow-box mulesoft">Platform Event</div>
+                    <span class="flow-arrow">→</span>
+                    <div class="flow-box mulesoft">MuleSoft</div>
+                    <span class="flow-arrow">→</span>
+                    <div class="flow-box d365">Dynamics</div>
+                    <span class="flow-arrow">→</span>
+                    <div class="flow-box sf">Dataverse_ID__c Updated</div>
+                </div>
+
+                <h3>Key Principles</h3>
+                <div class="info-box info">
+                    <strong>1. Black Box Testing:</strong> We don't test MuleSoft directly - we verify end-to-end behavior<br><br>
+                    <strong>2. Event-Driven:</strong> Integration is triggered by Platform Events<br><br>
+                    <strong>3. Asynchronous:</strong> Processing happens asynchronously (wait 3-10 seconds)<br><br>
+                    <strong>4. Correlation:</strong> Use Party MasterId for linking records across systems
+                </div>
+            </section>
+
+            <!-- Integration Architecture Section -->
+            <section id="architecture">
+                <h2>🏗️ Integration Architecture</h2>
+
+                <h3>System Components</h3>
+                <div class="architecture-grid">
+                    <div class="arch-card sf">
+                        <h4>Salesforce</h4>
+                        <p><strong>Role:</strong> Source System</p>
+                        <p><strong>Access:</strong> ✅ Full API/UI</p>
+                    </div>
+                    <div class="arch-card mulesoft">
+                        <h4>MuleSoft</h4>
+                        <p><strong>Role:</strong> Integration Layer</p>
+                        <p><strong>Access:</strong> ⚠️ Logs (manual)</p>
+                    </div>
+                    <div class="arch-card d365">
+                        <h4>Dynamics 365</h4>
+                        <p><strong>Role:</strong> Target System</p>
+                        <p><strong>Access:</strong> ✅ Full API</p>
+                    </div>
+                    <div class="arch-card metadata">
+                        <h4>Custom Metadata</h4>
+                        <p><strong>Role:</strong> Mapping Storage</p>
+                        <p><strong>Access:</strong> ✅ Queryable</p>
+                    </div>
+                </div>
+
+                <h3>Entity Mappings</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Salesforce</th>
+                            <th>Dynamics 365</th>
+                            <th>Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Account</strong></td>
+                            <td>accelins_party</td>
+                            <td>Primary entity</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Contact</strong></td>
+                            <td>contact</td>
+                            <td>External contacts</td>
+                        </tr>
+                        <tr>
+                            <td><strong>AccountTeamMember</strong></td>
+                            <td>accelins_internal_contact</td>
+                            <td>Internal contacts</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Country__c</strong></td>
+                            <td>accelins_country</td>
+                            <td>Reference data</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>Correlation Keys</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Entity</th>
+                            <th>Salesforce Field</th>
+                            <th>Dynamics Field</th>
+                            <th>Usage</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Account/Party</strong></td>
+                            <td><code>Party_MasterId__c</code></td>
+                            <td><code>accelins_partyid</code></td>
+                            <td>Primary correlation key</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Account/Party</strong></td>
+                            <td><code>Dataverse_ID__c</code></td>
+                            <td><code>accelins_partyid</code> (GUID)</td>
+                            <td>Stores Dynamics GUID</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Contact</strong></td>
+                            <td><code>Dataverse_ID__c</code></td>
+                            <td>Contact GUID</td>
+                            <td>Stores Dynamics GUID</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Internal Contact</strong></td>
+                            <td>User <code>Azure_AD_Object_ID__c</code></td>
+                            <td>systemuser alternate key</td>
+                            <td>User mapping</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>Complete Integration Flow Diagram</h3>
+                <div class="flow-diagram" style="text-align: left; padding: 40px;">
+                    <svg width="100%" height="400" viewBox="0 0 1000 400" style="max-width: 100%;">
+                        <!-- Salesforce Box -->
+                        <rect x="50" y="150" width="180" height="100" rx="10" fill="#00a1e0" stroke="#0070d2" stroke-width="2"/>
+                        <text x="140" y="195" text-anchor="middle" fill="white" font-size="16" font-weight="bold">Salesforce</text>
+                        <text x="140" y="215" text-anchor="middle" fill="white" font-size="12">Account/Contact</text>
+                        <text x="140" y="230" text-anchor="middle" fill="white" font-size="12">Created/Updated</text>
+
+                        <!-- Platform Event -->
+                        <rect x="280" y="150" width="180" height="100" rx="10" fill="#ff6b35" stroke="#e63946" stroke-width="2"/>
+                        <text x="370" y="195" text-anchor="middle" fill="white" font-size="16" font-weight="bold">Platform Event</text>
+                        <text x="370" y="215" text-anchor="middle" fill="white" font-size="12">Published</text>
+                        <text x="370" y="230" text-anchor="middle" fill="white" font-size="12">(SF-596/599/600)</text>
+
+                        <!-- MuleSoft -->
+                        <rect x="510" y="100" width="180" height="200" rx="10" fill="#ff6b35" stroke="#e63946" stroke-width="2"/>
+                        <text x="600" y="140" text-anchor="middle" fill="white" font-size="16" font-weight="bold">MuleSoft</text>
+                        <text x="600" y="165" text-anchor="middle" fill="white" font-size="12">1. Subscribe Event</text>
+                        <text x="600" y="185" text-anchor="middle" fill="white" font-size="12">2. Query IDs</text>
+                        <text x="600" y="205" text-anchor="middle" fill="white" font-size="12">3. Transform</text>
+                        <text x="600" y="225" text-anchor="middle" fill="white" font-size="12">4. Call API</text>
+                        <text x="600" y="245" text-anchor="middle" fill="white" font-size="12">5. Update SF</text>
+                        <text x="600" y="265" text-anchor="middle" fill="white" font-size="12">(SF-593/594/595)</text>
+                        <text x="600" y="285" text-anchor="middle" fill="white" font-size="12">Custom Metadata</text>
+
+                        <!-- Dynamics -->
+                        <rect x="740" y="150" width="180" height="100" rx="10" fill="#0078d4" stroke="#106ebe" stroke-width="2"/>
+                        <text x="830" y="195" text-anchor="middle" fill="white" font-size="16" font-weight="bold">Dynamics 365</text>
+                        <text x="830" y="215" text-anchor="middle" fill="white" font-size="12">Create/Update</text>
+                        <text x="830" y="230" text-anchor="middle" fill="white" font-size="12">Return GUID</text>
+
+                        <!-- Arrows -->
+                        <path d="M 230 200 L 280 200" stroke="#3498db" stroke-width="3" fill="none" marker-end="url(#arrowhead)"/>
+                        <path d="M 460 200 L 510 200" stroke="#3498db" stroke-width="3" fill="none" marker-end="url(#arrowhead)"/>
+                        <path d="M 690 200 L 740 200" stroke="#3498db" stroke-width="3" fill="none" marker-end="url(#arrowhead)"/>
+                        <path d="M 830 200 L 880 200" stroke="#3498db" stroke-width="3" fill="none" marker-end="url(#arrowhead)"/>
+
+                        <!-- Feedback Loop -->
+                        <path d="M 920 200 Q 950 150 920 100 Q 890 50 600 50" stroke="#2ecc71" stroke-width="2" fill="none" stroke-dasharray="5,5"/>
+                        <text x="750" y="40" fill="#2ecc71" font-size="12" font-weight="bold">Update Dataverse_ID__c</text>
+
+                        <!-- Arrow marker definition -->
+                        <defs>
+                            <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                                <polygon points="0 0, 10 3, 0 6" fill="#3498db"/>
+                            </marker>
+                        </defs>
+                    </svg>
+                </div>
+            </section>
+
+            <!-- Testing Approach Section -->
+            <section id="testing">
+                <h2>🧪 Testing Approach</h2>
+
+                <h3>Test Strategy</h3>
+                <div class="scenario-card">
+                    <div class="scenario-steps">
+                        <ol>
+                            <li><strong>Create Test Data in Salesforce</strong>
+                                <ul style="margin-top: 5px; margin-left: 20px;">
+                                    <li>Use existing step definitions from <code>src/step-definitions/common/data-factory.steps.ts</code></li>
+                                    <li>Create Account, Contact, AccountTeamMember records</li>
+                                </ul>
+                            </li>
+                            <li><strong>Trigger Integration</strong>
+                                <ul style="margin-top: 5px; margin-left: 20px;">
+                                    <li>Update Account Status to "Active" or "Onboarding"</li>
+                                    <li>Create Contact (requires parent Account with <code>Dataverse_ID__c</code>)</li>
+                                    <li>Add AccountTeamMember (requires parent Account with <code>Dataverse_ID__c</code>)</li>
+                                </ul>
+                            </li>
+                            <li><strong>Wait for Processing</strong>
+                                <ul style="margin-top: 5px; margin-left: 20px;">
+                                    <li>Wait 3 seconds for MuleSoft processing</li>
+                                    <li>Use polling strategy (check every 3 seconds, max 10 seconds)</li>
+                                </ul>
+                            </li>
+                            <li><strong>Verify in Dynamics</strong>
+                                <ul style="margin-top: 5px; margin-left: 20px;">
+                                    <li>Query Dynamics using Party MasterId (<code>accelins_partyid</code>)</li>
+                                    <li>Verify field mappings</li>
+                                    <li>Verify <code>Dataverse_ID__c</code> is populated in Salesforce</li>
+                                </ul>
+                            </li>
+                        </ol>
+                    </div>
+                </div>
+
+                <h3>Test Types</h3>
+                
+                <div class="scenario-card">
+                    <h4>1. End-to-End Integration Tests</h4>
+                    <p><strong>Location:</strong> <code>src/features/integration/mulesoft/</code></p>
+                    <ul style="margin: 10px 0 10px 20px;">
+                        <li>Test complete flow: Salesforce → MuleSoft → Dynamics</li>
+                        <li>Verify data integrity and field mappings</li>
+                        <li>Test create, update, delete scenarios</li>
+                    </ul>
+                    <div class="info-box success">
+                        <strong>Example Scenario:</strong>
+                        <pre><code><span class="gherkin">@INT-UI-001 @smoke @positive @integration
+Scenario: Create Account with Active status and sync to Dynamics Party
+  Given I have a test Account name "Integration Test Account SF-001"
+  When I create an Account in Salesforce with:
+    | Name | Integration Test Account SF-001 |
+    | Type | Customer |
+    | Account_Status__c | Prospect |
+  Then the Account should be created with a SalesforceID
+  And the Account should have PTY_Code__c auto-generated
+  And the Account should have Dataverse_ID__c as null
+  When I update the Account Status to "Active" to trigger integration
+  And I wait 3 seconds for MuleSoft processing
+  Then the Account should have Dataverse_ID__c populated
+  And I retrieve the Party from Dynamics using Party MasterId
+  And the Party should exist in Dynamics with matching Party MasterId</span></code></pre>
+                    </div>
+                </div>
+
+                <div class="scenario-card">
+                    <h4>2. Platform Event Tests</h4>
+                    <p><strong>Location:</strong> <code>src/features/api/SF/SF-596.feature</code>, <code>SF-599.feature</code>, <code>SF-600.feature</code>, <code>SF-606.feature</code></p>
+                    <ul style="margin: 10px 0 10px 20px;">
+                        <li>Test Platform Event publishing</li>
+                        <li>Verify events are published when records become eligible</li>
+                        <li>Test event payload structure</li>
+                    </ul>
+                </div>
+
+                <div class="scenario-card">
+                    <h4>3. Dataverse Identifier Tests</h4>
+                    <p><strong>Location:</strong> <code>src/features/api/SF/SF-593.feature</code>, <code>SF-594.feature</code>, <code>SF-595.feature</code>, <code>SF-605.feature</code></p>
+                    <ul style="margin: 10px 0 10px 20px;">
+                        <li>Test Dataverse field identifier availability</li>
+                        <li>Verify Custom Metadata queries</li>
+                        <li>Test field mapping resolution</li>
+                    </ul>
+                </div>
+
+                <div class="scenario-card">
+                    <h4>4. Salesforce Mastered Record Tests</h4>
+                    <p><strong>Location:</strong> <code>src/features/ui/ST/ST-191.feature</code>, <code>ST-241.feature</code>, <code>ST-242.feature</code></p>
+                    <ul style="margin: 10px 0 10px 20px;">
+                        <li>Test complete integration flow for Salesforce-mastered records</li>
+                        <li>Verify create, update, status change, delete scenarios</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Test Data Management Section -->
+            <section id="test-data">
+                <h2>📊 Test Data Management</h2>
+
+                <h3>Creating Test Accounts</h3>
+                <div class="info-box info">
+                    <strong>Using Common Steps:</strong>
+                    <pre><code><span class="gherkin">Given I have a test Account name "Test Account Name"
+When I create an Account in Salesforce with:
+  | Name | Test Account Name |
+  | Type | Customer |
+  | Account_Status__c | Prospect |</span></code></pre>
+                    <strong>Using Data Factory:</strong>
+                    <pre><code><span class="gherkin">Given I have a test Account created via API with Type "Customer"</span></code></pre>
+                </div>
+
+                <h3>Creating Test Contacts</h3>
+                <div class="info-box warning">
+                    <strong>Prerequisites:</strong>
+                    <ul style="margin: 10px 0 10px 20px;">
+                        <li>Parent Account must exist</li>
+                        <li>Parent Account must have <code>Dataverse_ID__c</code> populated (for integration)</li>
+                    </ul>
+                </div>
+                <pre><code><span class="gherkin">Given I have a parent Account in Salesforce with Status "Active" and Dataverse_ID__c populated
+And I have captured the Account SalesforceID and Dataverse_ID__c
+When I create an External Contact in Salesforce with:
+  | FirstName | Test |
+  | LastName | Contact |
+  | Email | test@example.com |
+  | AccountId | &lt;parentAccountId&gt; |</span></code></pre>
+
+                <h3>Creating Test AccountTeamMembers</h3>
+                <div class="info-box warning">
+                    <strong>Prerequisites:</strong>
+                    <ul style="margin: 10px 0 10px 20px;">
+                        <li>Parent Account must have <code>Dataverse_ID__c</code> populated</li>
+                        <li>User must have <code>Azure_AD_Object_ID__c</code> populated</li>
+                    </ul>
+                </div>
+                <pre><code><span class="gherkin">Given I have a parent Account in Salesforce with Status "Active" and Dataverse_ID__c populated
+And I have a Salesforce User with Azure_AD_Object_ID__c populated
+When I add an AccountTeamMember to the Account with:
+  | UserId | &lt;userId&gt; |
+  | TeamMemberRole | Member Relationship Director |</span></code></pre>
+
+                <h3>Test Data Cleanup</h3>
+                <div class="info-box success">
+                    <strong>Best Practice:</strong>
+                    <ul style="margin: 10px 0 10px 20px;">
+                        <li>Use unique test data names (timestamp-based)</li>
+                        <li>Clean up test data after test execution</li>
+                        <li>Delete from Salesforce (may trigger delete in Dynamics)</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Common Test Scenarios Section -->
+            <section id="scenarios">
+                <h2>🎯 Common Test Scenarios</h2>
+
+                <div class="scenario-card">
+                    <h4>Scenario 1: Account Create & Sync</h4>
+                    <div class="scenario-steps">
+                        <ol>
+                            <li>Create Account with Status "Prospect"</li>
+                            <li>Verify <code>Dataverse_ID__c</code> is null</li>
+                            <li>Update Status to "Active"</li>
+                            <li>Wait 3 seconds</li>
+                            <li>Verify <code>Dataverse_ID__c</code> is populated</li>
+                            <li>Query Dynamics using Party MasterId</li>
+                            <li>Verify Party exists and fields match</li>
+                        </ol>
+                    </div>
+                    <p><strong>Test File:</strong> <code>src/features/integration/mulesoft/account-party-integration.feature</code></p>
+                </div>
+
+                <div class="scenario-card">
+                    <h4>Scenario 2: Contact Create & Sync</h4>
+                    <div class="scenario-steps">
+                        <ol>
+                            <li>Create Account with Status "Active"</li>
+                            <li>Wait for Account sync (verify <code>Dataverse_ID__c</code> populated)</li>
+                            <li>Create Contact linked to Account</li>
+                            <li>Wait 3 seconds</li>
+                            <li>Verify Contact <code>Dataverse_ID__c</code> is populated</li>
+                            <li>Query Dynamics Contact using Party MasterId</li>
+                            <li>Verify Contact exists and parent Party lookup matches</li>
+                        </ol>
+                    </div>
+                    <p><strong>Test File:</strong> <code>src/features/integration/mulesoft/contact-external.feature</code></p>
+                </div>
+
+                <div class="scenario-card">
+                    <h4>Scenario 3: AccountTeamMember Create & Sync</h4>
+                    <div class="scenario-steps">
+                        <ol>
+                            <li>Create Account with Status "Active"</li>
+                            <li>Wait for Account sync</li>
+                            <li>Add AccountTeamMember</li>
+                            <li>Wait 3 seconds</li>
+                            <li>Query Dynamics Internal Contact</li>
+                            <li>Verify Internal Contact exists with status "Active"</li>
+                            <li>Delete AccountTeamMember</li>
+                            <li>Wait 3 seconds</li>
+                            <li>Verify Internal Contact status = "Inactive"</li>
+                        </ol>
+                    </div>
+                    <p><strong>Test File:</strong> <code>src/features/integration/mulesoft/contact-internal.feature</code></p>
+                </div>
+
+                <div class="scenario-card">
+                    <h4>Scenario 4: Field Mapping Validation</h4>
+                    <div class="scenario-steps">
+                        <ol>
+                            <li>Create Account with specific field values</li>
+                            <li>Trigger integration</li>
+                            <li>Query Dynamics Party</li>
+                            <li>Verify field mappings match expected values</li>
+                            <li>Verify picklist value mappings (via Custom Metadata)</li>
+                        </ol>
+                    </div>
+                    <p><strong>Test File:</strong> <code>src/features/integration/mulesoft/account-billingcountry.feature</code></p>
+                </div>
+
+                <div class="scenario-card">
+                    <h4>Scenario 5: Negative Scenarios</h4>
+                    <div class="info-box error">
+                        <strong>Invalid Data:</strong>
+                        <ul style="margin: 10px 0 10px 20px;">
+                            <li>Account with invalid Country (no mapping)</li>
+                            <li>Contact with invalid email format</li>
+                            <li>Contact with missing FirstName</li>
+                            <li>AccountTeamMember with User missing Azure AD Object ID</li>
+                        </ul>
+                        <strong>Expected Behavior:</strong>
+                        <ul style="margin: 10px 0 10px 20px;">
+                            <li>Record not synced to Dynamics</li>
+                            <li><code>Dataverse_ID__c</code> remains null</li>
+                            <li>Exception logged (to be verified)</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Step Definitions Section -->
+            <section id="steps">
+                <h2>📝 Step Definitions Reference</h2>
+
+                <h3>Account Steps</h3>
+                <p><strong>From:</strong> <code>src/step-definitions/integration/mulesoft-integration.steps.ts</code></p>
+                <pre><code><span class="gherkin"># Account Creation
+Given I have a test Account name "{string}"
+When I create an Account in Salesforce with:
+  | Field | Value |
+Then the Account should be created with a SalesforceID
+And the Account should have PTY_Code__c auto-generated
+And the Account should have Dataverse_ID__c as null
+
+# Account Status Update (Triggers Integration)
+When I update the Account Status to "{string}" to trigger integration
+
+# Account Field Update
+When I update the Account in Salesforce with:
+  | Field | Value |
+
+# Account Verification
+Then the Account should have Dataverse_ID__c populated
+Then the Account should still have Dataverse_ID__c as null</span></code></pre>
+
+                <h3>Contact Steps</h3>
+                <pre><code><span class="gherkin"># Contact Creation
+Given I have a test External Contact name "{string}"
+When I create an External Contact in Salesforce with:
+  | Field | Value |
+Then the Contact should be created with a SalesforceID
+Then the Contact should have Dataverse_ID__c populated
+
+# Contact Update
+When I update the External Contact in Salesforce with:
+  | Field | Value |</span></code></pre>
+
+                <h3>AccountTeamMember Steps</h3>
+                <pre><code><span class="gherkin"># AccountTeamMember Creation
+Given I have a Salesforce User with Azure_AD_Object_ID__c populated
+When I add an AccountTeamMember to the Account with:
+  | Field | Value |
+Then the AccountTeamMember should be created with a SalesforceID
+
+# AccountTeamMember Deletion
+When I delete the AccountTeamMember from Salesforce</span></code></pre>
+
+                <h3>Dynamics Verification Steps</h3>
+                <pre><code><span class="gherkin"># Party Retrieval
+When I retrieve the Party from Dynamics using Party MasterId
+Then the Party should exist in Dynamics with matching Party MasterId
+Then the Party should have PTY Code matching Salesforce Account
+Then the Party should not exist in Dynamics for this Party MasterId
+
+# Contact Retrieval
+When I retrieve the Contact from Dynamics using Party MasterId
+Then the Contact should exist in Dynamics with matching Party MasterId
+Then the Contact should have parent Party lookup matching Account Dataverse_ID__c
+
+# Internal Contact Retrieval
+When I retrieve the Internal Contact from Dynamics using AccountTeamMember Party MasterId
+Then the Internal Contact should exist in Dynamics with matching Party MasterId
+Then the Internal Contact should have status "{string}"</span></code></pre>
+
+                <h3>Field Mapping Validation Steps</h3>
+                <pre><code><span class="gherkin"># Field Matching
+Then all mapped fields should match between Salesforce Account and Dynamics Party
+Then the following critical fields should match:
+  | Salesforce Field | Dynamics Field | Expected Value |
+
+# Picklist Value Mapping
+Then the picklist value should be mapped correctly:
+  | Salesforce Field | Salesforce Value | Dynamics Field | Dynamics Value |
+
+# Status Code Mapping
+Then the status code mapping should be correct:
+  | Salesforce Field | Salesforce Value | Dynamics statecode | Dynamics statuscode |</span></code></pre>
+
+                <h3>Wait Steps</h3>
+                <pre><code><span class="gherkin"># Wait for MuleSoft Processing
+When I wait {int} seconds for MuleSoft processing</span></code></pre>
+            </section>
+
+            <!-- Troubleshooting Section -->
+            <section id="troubleshooting">
+                <h2>🔧 Troubleshooting Guide</h2>
+
+                <div class="scenario-card">
+                    <h4>Issue: Dataverse_ID__c Not Populated</h4>
+                    <div class="info-box error">
+                        <strong>Possible Causes:</strong>
+                        <ol style="margin: 10px 0 10px 20px;">
+                            <li>Account Status not eligible (must be "Active" or "Onboarding" for Member)</li>
+                            <li>Missing field mappings (Country, State, etc.)</li>
+                            <li>MuleSoft processing error</li>
+                            <li>Insufficient wait time</li>
+                        </ol>
+                        <strong>Debugging Steps:</strong>
+                        <ol style="margin: 10px 0 10px 20px;">
+                            <li>Verify Account Status is eligible</li>
+                            <li>Check Custom Metadata for required mappings</li>
+                            <li>Increase wait time to 10 seconds</li>
+                            <li>Check MuleSoft logs (if accessible)</li>
+                            <li>Verify Platform Event was published</li>
+                        </ol>
+                    </div>
+                </div>
+
+                <div class="scenario-card">
+                    <h4>Issue: Contact Not Syncing</h4>
+                    <div class="info-box error">
+                        <strong>Possible Causes:</strong>
+                        <ol style="margin: 10px 0 10px 20px;">
+                            <li>Parent Account <code>Dataverse_ID__c</code> is null</li>
+                            <li>Invalid email format</li>
+                            <li>Missing FirstName or LastName</li>
+                            <li>Parent Account not synced yet</li>
+                        </ol>
+                        <strong>Debugging Steps:</strong>
+                        <ol style="margin: 10px 0 10px 20px;">
+                            <li>Verify parent Account has <code>Dataverse_ID__c</code> populated</li>
+                            <li>Check Contact email format</li>
+                            <li>Verify FirstName and LastName are present</li>
+                            <li>Ensure parent Account was synced first</li>
+                        </ol>
+                    </div>
+                </div>
+
+                <div class="scenario-card">
+                    <h4>Issue: Internal Contact Not Syncing</h4>
+                    <div class="info-box error">
+                        <strong>Possible Causes:</strong>
+                        <ol style="margin: 10px 0 10px 20px;">
+                            <li>Parent Account <code>Dataverse_ID__c</code> is null</li>
+                            <li>User missing <code>Azure_AD_Object_ID__c</code></li>
+                            <li>AccountTeamMember not eligible</li>
+                        </ol>
+                        <strong>Debugging Steps:</strong>
+                        <ol style="margin: 10px 0 10px 20px;">
+                            <li>Verify parent Account has <code>Dataverse_ID__c</code> populated</li>
+                            <li>Check User has <code>Azure_AD_Object_ID__c</code> populated</li>
+                            <li>Verify AccountTeamMember was created successfully</li>
+                        </ol>
+                    </div>
+                </div>
+
+                <div class="scenario-card">
+                    <h4>Issue: Field Mappings Don't Match</h4>
+                    <div class="info-box error">
+                        <strong>Possible Causes:</strong>
+                        <ol style="margin: 10px 0 10px 20px;">
+                            <li>Custom Metadata mapping missing</li>
+                            <li>Incorrect field value in Salesforce</li>
+                            <li>Transformation logic issue</li>
+                        </ol>
+                        <strong>Debugging Steps:</strong>
+                        <ol style="margin: 10px 0 10px 20px;">
+                            <li>Query Custom Metadata to verify mapping exists</li>
+                            <li>Verify Salesforce field value</li>
+                            <li>Check Integration Design Document for transformation rules</li>
+                            <li>Verify Dynamics field value format</li>
+                        </ol>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Best Practices Section -->
+            <section id="best-practices">
+                <h2>✅ Best Practices</h2>
+
+                <div class="quick-ref-grid">
+                    <div class="ref-card">
+                        <h4>1. Test Data Isolation</h4>
+                        <ul style="margin: 10px 0 10px 20px;">
+                            <li>Use unique test data names (timestamp-based)</li>
+                            <li>Clean up test data after execution</li>
+                            <li>Avoid reusing test data across scenarios</li>
+                        </ul>
+                    </div>
+
+                    <div class="ref-card">
+                        <h4>2. Wait Strategy</h4>
+                        <ul style="margin: 10px 0 10px 20px;">
+                            <li>Always wait 3 seconds after triggering integration</li>
+                            <li>Use polling if needed (check every 3 seconds, max 10 seconds)</li>
+                            <li>Don't assume immediate synchronization</li>
+                        </ul>
+                    </div>
+
+                    <div class="ref-card">
+                        <h4>3. Correlation Key Usage</h4>
+                        <ul style="margin: 10px 0 10px 20px;">
+                            <li><strong>Always use Party MasterId</strong> (<code>Party_MasterId__c</code> / <code>accelins_partyid</code>) for correlation</li>
+                            <li>Don't use SalesforceID for Dynamics queries</li>
+                            <li>Verify <code>Dataverse_ID__c</code> is populated before querying Dynamics</li>
+                        </ul>
+                    </div>
+
+                    <div class="ref-card">
+                        <h4>4. Field Mapping Validation</h4>
+                        <ul style="margin: 10px 0 10px 20px;">
+                            <li>Use existing step definitions for field validation</li>
+                            <li>Reference Custom Metadata for expected mappings</li>
+                            <li>Test both positive and negative scenarios</li>
+                        </ul>
+                    </div>
+
+                    <div class="ref-card">
+                        <h4>5. Error Handling</h4>
+                        <ul style="margin: 10px 0 10px 20px;">
+                            <li>Test negative scenarios (invalid data, missing mappings)</li>
+                            <li>Verify exception handling (records not synced)</li>
+                            <li>Document expected behavior for error cases</li>
+                        </ul>
+                    </div>
+
+                    <div class="ref-card">
+                        <h4>6. Code Reusability</h4>
+                        <ul style="margin: 10px 0 10px 20px;">
+                            <li>Use common step definitions from <code>src/step-definitions/common/</code></li>
+                            <li>Reuse MuleSoft integration steps</li>
+                            <li>Follow existing patterns in feature files</li>
+                        </ul>
+                    </div>
+
+                    <div class="ref-card">
+                        <h4>7. Test Organization</h4>
+                        <ul style="margin: 10px 0 10px 20px;">
+                            <li>Group related scenarios in same feature file</li>
+                            <li>Use descriptive scenario names</li>
+                            <li>Add unique test case IDs (e.g., <code>@INT-UI-001</code>)</li>
+                            <li>Tag scenarios appropriately</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Quick Reference Section -->
+            <section id="quick-ref">
+                <h2>⚡ Quick Reference</h2>
+
+                <div class="quick-ref-grid">
+                    <div class="ref-card">
+                        <h4>Eligibility Rules</h4>
+                        <table style="margin-top: 15px;">
+                            <thead>
+                                <tr>
+                                    <th>Entity</th>
+                                    <th>Eligibility Criteria</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Account</strong></td>
+                                    <td>Status = "Onboarding" (Type=Member) OR "Active" (other types)</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Contact</strong></td>
+                                    <td>Parent Account has <code>Dataverse_ID__c</code> populated</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>AccountTeamMember</strong></td>
+                                    <td>Parent Account has <code>Dataverse_ID__c</code> AND User has <code>Azure_AD_Object_ID__c</code></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="ref-card">
+                        <h4>Wait Times</h4>
+                        <ul style="margin: 15px 0 10px 20px; line-height: 2;">
+                            <li><strong>Initial Wait:</strong> 3 seconds</li>
+                            <li><strong>Polling Interval:</strong> 3 seconds</li>
+                            <li><strong>Maximum Wait:</strong> 10 seconds</li>
+                        </ul>
+                    </div>
+
+                    <div class="ref-card">
+                        <h4>Correlation Keys</h4>
+                        <ul style="margin: 15px 0 10px 20px; line-height: 2;">
+                            <li><strong>Account/Party:</strong> <code>Party_MasterId__c</code> (SF) ↔ <code>accelins_partyid</code> (D365)</li>
+                            <li><strong>Contact:</strong> Parent Account <code>Dataverse_ID__c</code> → Party lookup</li>
+                            <li><strong>Internal Contact:</strong> User <code>Azure_AD_Object_ID__c</code> → systemuser lookup</li>
+                        </ul>
+                    </div>
+
+                    <div class="ref-card">
+                        <h4>Key Fields</h4>
+                        <ul style="margin: 15px 0 10px 20px; line-height: 2;">
+                            <li><strong>Account:</strong> <code>Party_MasterId__c</code>, <code>Dataverse_ID__c</code>, <code>Account_Status__c</code></li>
+                            <li><strong>Contact:</strong> <code>Dataverse_ID__c</code>, <code>AccountId</code></li>
+                            <li><strong>AccountTeamMember:</strong> <code>AccountId</code>, <code>UserId</code></li>
+                            <li><strong>User:</strong> <code>Azure_AD_Object_ID__c</code></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <h3>Status Mapping Reference</h3>
+                <div class="status-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Salesforce Status</th>
+                                <th>Dataverse Status</th>
+                                <th>Statecode</th>
+                                <th>Statuscode</th>
+                                <th>Eligible</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="status-row not-eligible">
+                                <td>New</td>
+                                <td>N/A</td>
+                                <td>N/A</td>
+                                <td>N/A</td>
+                                <td><span class="badge danger">No</span></td>
+                            </tr>
+                            <tr class="status-row not-eligible">
+                                <td>Prospect</td>
+                                <td>N/A</td>
+                                <td>N/A</td>
+                                <td>N/A</td>
+                                <td><span class="badge danger">No</span></td>
+                            </tr>
+                            <tr class="status-row eligible">
+                                <td>Onboarding</td>
+                                <td>Onboarding</td>
+                                <td>0</td>
+                                <td>376140001</td>
+                                <td><span class="badge success">Yes</span></td>
+                            </tr>
+                            <tr class="status-row eligible">
+                                <td>Contracted</td>
+                                <td>Onboarding</td>
+                                <td>0</td>
+                                <td>376140001</td>
+                                <td><span class="badge success">Yes</span></td>
+                            </tr>
+                            <tr class="status-row eligible">
+                                <td>Active</td>
+                                <td>Active</td>
+                                <td>0</td>
+                                <td>1</td>
+                                <td><span class="badge success">Yes</span></td>
+                            </tr>
+                            <tr class="status-row eligible">
+                                <td>Runoff</td>
+                                <td>Offboarded</td>
+                                <td>0</td>
+                                <td>376140002</td>
+                                <td><span class="badge success">Yes</span></td>
+                            </tr>
+                            <tr class="status-row eligible">
+                                <td>Offboarded</td>
+                                <td>Offboarded</td>
+                                <td>0</td>
+                                <td>376140002</td>
+                                <td><span class="badge success">Yes</span></td>
+                            </tr>
+                            <tr class="status-row eligible">
+                                <td>Inactive</td>
+                                <td>Inactive</td>
+                                <td>1</td>
+                                <td>2</td>
+                                <td><span class="badge success">Yes</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Entity Flow Diagrams -->
+            <section>
+                <h2>🔄 Entity Integration Flows</h2>
+
+                <h3>Account → Party Flow</h3>
+                <div class="entity-flow">
+                    <div class="entity-box">
+                        <h4>1. Create Account</h4>
+                        <p>Status: "Prospect"<br>Dataverse_ID__c: null</p>
+                    </div>
+                    <span class="arrow-right">→</span>
+                    <div class="entity-box">
+                        <h4>2. Update Status</h4>
+                        <p>Status: "Active"<br>Triggers Platform Event</p>
+                    </div>
+                    <span class="arrow-right">→</span>
+                    <div class="entity-box">
+                        <h4>3. MuleSoft</h4>
+                        <p>Processes Event<br>Queries Mappings</p>
+                    </div>
+                    <span class="arrow-right">→</span>
+                    <div class="entity-box">
+                        <h4>4. Dynamics</h4>
+                        <p>Creates Party<br>Returns GUID</p>
+                    </div>
+                    <span class="arrow-right">→</span>
+                    <div class="entity-box">
+                        <h4>5. Update SF</h4>
+                        <p>Dataverse_ID__c<br>Populated</p>
+                    </div>
+                </div>
+
+                <h3>Contact → Contact Flow</h3>
+                <div class="entity-flow">
+                    <div class="entity-box">
+                        <h4>1. Account Ready</h4>
+                        <p>Dataverse_ID__c<br>Populated</p>
+                    </div>
+                    <span class="arrow-right">→</span>
+                    <div class="entity-box">
+                        <h4>2. Create Contact</h4>
+                        <p>Linked to Account<br>Triggers Event</p>
+                    </div>
+                    <span class="arrow-right">→</span>
+                    <div class="entity-box">
+                        <h4>3. MuleSoft</h4>
+                        <p>Gets Account<br>Dataverse_ID__c</p>
+                    </div>
+                    <span class="arrow-right">→</span>
+                    <div class="entity-box">
+                        <h4>4. Dynamics</h4>
+                        <p>Creates Contact<br>Links to Party</p>
+                    </div>
+                    <span class="arrow-right">→</span>
+                    <div class="entity-box">
+                        <h4>5. Update SF</h4>
+                        <p>Contact<br>Dataverse_ID__c</p>
+                    </div>
+                </div>
+
+                <h3>AccountTeamMember → Internal Contact Flow</h3>
+                <div class="entity-flow">
+                    <div class="entity-box">
+                        <h4>1. Account Ready</h4>
+                        <p>Dataverse_ID__c<br>Populated</p>
+                    </div>
+                    <span class="arrow-right">→</span>
+                    <div class="entity-box">
+                        <h4>2. Add Team Member</h4>
+                        <p>User with<br>Azure AD ID</p>
+                    </div>
+                    <span class="arrow-right">→</span>
+                    <div class="entity-box">
+                        <h4>3. MuleSoft</h4>
+                        <p>Maps User via<br>Azure AD ID</p>
+                    </div>
+                    <span class="arrow-right">→</span>
+                    <div class="entity-box">
+                        <h4>4. Dynamics</h4>
+                        <p>Creates Internal<br>Contact (Active)</p>
+                    </div>
+                    <span class="arrow-right">→</span>
+                    <div class="entity-box">
+                        <h4>5. Delete ATM</h4>
+                        <p>Internal Contact<br>→ Inactive</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Related Documentation -->
+            <section>
+                <h2>📚 Related Documentation</h2>
+                <div class="info-box info">
+                    <ul style="margin: 10px 0 10px 20px; line-height: 2;">
+                        <li><a href="../integration/MULESOFT_INTEGRATION_COMPLETE_OVERVIEW.md" target="_blank">Complete Integration Overview</a></li>
+                        <li><a href="../confluence/integration-design-document.md" target="_blank">Integration Design Document</a></li>
+                        <li><a href="../setup/MULESOFT_ACCESS_REQUIREMENTS.md" target="_blank">MuleSoft Access Requirements</a></li>
+                        <li><a href="../../src/features/integration/mulesoft/README.md" target="_blank">MuleSoft Integration Feature Files</a></li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Support Section -->
+            <section>
+                <h2>💬 Support & Questions</h2>
+                <div class="info-box success">
+                    <p>For questions or issues:</p>
+                    <ol style="margin: 10px 0 10px 20px;">
+                        <li>Review Integration Design Document</li>
+                        <li>Check existing feature files for examples</li>
+                        <li>Review step definitions for available steps</li>
+                        <li>Consult MuleSoft architect for integration-specific questions</li>
+                    </ol>
+                </div>
+            </section>
+
+            <footer style="margin-top: 60px; padding-top: 20px; border-top: 2px solid #e0e0e0; text-align: center; color: #7f8c8d;">
+                <p>MuleSoft Integration - QA Knowledge Document | Last Updated: 2026-01-16</p>
+            </footer>
+        </main>
+    </div>
+
+    <script>
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Highlight current section in navigation
+        const sections = document.querySelectorAll('section[id]');
+        const navLinks = document.querySelectorAll('.sidebar nav a');
+
+        window.addEventListener('scroll', () => {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (window.scrollY >= (sectionTop - 200)) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navLinks.forEach(link => {
+                link.style.background = '';
+                link.style.color = '';
+                if (link.getAttribute('href') === `#${current}`) {
+                    link.style.background = '#3498db';
+                    link.style.color = 'white';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,46 @@
+{
+  "key": "SF-500",
+  "summary": "More Opportunity consolidation",
+  "type": "Story",
+  "status": "In QA",
+  "priority": "Medium",
+  "description": {
+    "raw": "Title: Rename label for Current_Program_Expiration_Date_c → \"Current Program Expiration Date\" Add Submission_folder_link_c to Opportunity page and auto-populate from Lead User Story: As a Product Owner / Sales Ops Owner I want the Opportunity field Current_Program_Expiration_Date_c to show the label  \"Current Program Expiration Date\"  (instead of \"Proposed Expiration Date\") and I want Submission_folder_link_c visible on Opportunity pages and automatically populated from the Lead it was created from So that the UI is clearer about which expiration date is tracked and Opportunities reliably display the submission folder link created on the Lead without manual copying Description / Scope: Label change Change the UI label for Current_Program_Expiration_Date_c from \"Proposed Expiration Date\" to \"Current Program Expiration Date\". This is strictly a label/help-text change — do not change the API name or data type. Update help text where present to clarify the meaning. Submission folder link on Opportunity Ensure Submission_folder_link_c is visible on Opportunity page layout(s) used by business users (or rendered by a small Lightning component that respects FLS). Configure Lead → Opportunity mapping for Submission_folder_link_c for standard lead conversion. Acceptance Criteria (GIVEN / WHEN / THEN) A — Field label change GIVEN the Opportunity object WHEN I view Current_Program_Expiration_Date_c on any Opportunity record or in field pickers/reports THEN the label displays as  \"Current Program Expiration Date\"  and the API name/data type remain unchanged B — Submission_folder_link_c behavior GIVEN a Lead with Submission_folder_link_c populated WHEN that Lead is converted to an Opportunity (standard conversion) THEN Opportunity.Submission_folder_link_c is populated with the Lead value immediately as part of conversion",
+    "parsed": {
+      "sentences": [
+        "Title: Rename label for Current_Program_Expiration_Date_c → \"Current Program Expiration Date\" Add Submission_folder_link_c to Opportunity page and auto-populate from Lead User Story: As a Product Owner / Sales Ops Owner I want the Opportunity field Current_Program_Expiration_Date_c to show the label  \"Current Program Expiration Date\"  (instead of \"Proposed Expiration Date\") and I want Submission_folder_link_c visible on Opportunity pages and automatically populated from the Lead it was created from So that the UI is clearer about which expiration date is tracked and Opportunities reliably display the submission folder link created on the Lead without manual copying Description / Scope: Label change Change the UI label for Current_Program_Expiration_Date_c from \"Proposed Expiration Date\" to \"Current Program Expiration Date\"",
+        "This is strictly a label/help-text change — do not change the API name or data type",
+        "Update help text where present to clarify the meaning",
+        "Submission folder link on Opportunity Ensure Submission_folder_link_c is visible on Opportunity page layout(s) used by business users (or rendered by a small Lightning component that respects FLS)",
+        "Configure Lead → Opportunity mapping for Submission_folder_link_c for standard lead conversion",
+        "Acceptance Criteria (GIVEN / WHEN / THEN) A — Field label change GIVEN the Opportunity object WHEN I view Current_Program_Expiration_Date_c on any Opportunity record or in field pickers/reports THEN the label displays as  \"Current Program Expiration Date\"  and the API name/data type remain unchanged B — Submission_folder_link_c behavior GIVEN a Lead with Submission_folder_link_c populated WHEN that Lead is converted to an Opportunity (standard conversion) THEN Opportunity.Submission_folder_link_c is populated with the Lead value immediately as part of conversion"
+      ],
+      "entities": [
+        "Opportunity",
+        "Lead",
+        "Product"
+      ],
+      "fields": [],
+      "actions": [
+        "display",
+        "show",
+        "create",
+        "update",
+        "populate",
+        "auto-populate",
+        "map",
+        "convert"
+      ]
+    }
+  },
+  "acceptanceCriteria": [],
+  "comments": [],
+  "relatedIssues": [],
+  "fieldDefinitions": {},
+  "generatedFeatures": {
+    "ui": "src/features/ui/SF/SF-500.feature",
+    "api": "src/features/api/SF/SF-500.feature"
+  },
+  "qaReviewedFeatures": {},
+  "extractedAt": "2025-12-17T18:40:42.381Z"
+}

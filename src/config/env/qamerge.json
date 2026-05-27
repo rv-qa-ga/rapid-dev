@@ -1,0 +1,41 @@
+{
+  "name": "qamerge",
+  "description": "QA merge / Salesforce qamerge sandbox",
+  "salesforce": {
+    "baseUrl": "https://arx--qamerge.sandbox.my.salesforce.com/",
+    "apiVersion": "v60.0",
+    "loginUrl": "https://arx--qamerge.sandbox.my.salesforce.com/"
+  },
+  "dynamics": {
+    "baseUrl": "https://accelinsqatest.crm11.dynamics.com",
+    "webApiBaseUrl": "https://accelinsqatest.crm11.dynamics.com/api/data/v9.2/",
+    "apiVersion": "v9.2"
+  },
+  "sqlserver": {
+    "host": "your-sql-server.example.com",
+    "port": 1433,
+    "defaultDatabase": "master",
+    "options": {
+      "encrypt": true,
+      "trustServerCertificate": false,
+      "enableArithAbort": true
+    }
+  },
+  "mulesoft": {
+    "baseUrl": "https://eu1.anypoint.mulesoft.com",
+    "apiBaseUrl": "https://eu1.anypoint.mulesoft.com/amc/application-manager/api/v2"
+  },
+  "jira": {
+    "baseUrl": "https://accelins.atlassian.net/",
+    "projectKey": "SF"
+  },
+  "zephyr": {
+    "baseUrl": "https://accelins.atlassian.net/",
+    "projectKey": "SF"
+  },
+  "timeouts": {
+    "navigation": 30000,
+    "element": 10000,
+    "api": 30000
+  }
+}

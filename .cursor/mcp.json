@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "atlassian-rovo": {
+      "command": "node",
+      "args": ["scripts/run-atlassian-mcp-from-env.mjs"]
+    }
+  }
+}

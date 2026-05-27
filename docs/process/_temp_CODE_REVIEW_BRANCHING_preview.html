@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Preview — Code review & branching diagrams (Confluence draft)</title>
+  <style>
+    :root {
+      --bg: #f6f8fa;
+      --text: #1f2328;
+      --muted: #57606a;
+      --border: #d0d7de;
+      --card: #fff;
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: "Segoe UI", system-ui, sans-serif;
+      line-height: 1.55;
+      color: var(--text);
+      background: var(--bg);
+      margin: 0;
+      padding: 1.5rem 1.25rem 3rem;
+      max-width: 56rem;
+      margin-inline: auto;
+    }
+    .banner {
+      background: linear-gradient(135deg, #1a365d 0%, #2c5282 100%);
+      color: #fff;
+      padding: 1rem 1.25rem;
+      border-radius: 8px;
+      margin-bottom: 1.5rem;
+    }
+    .banner h1 { margin: 0 0 0.35rem; font-size: 1.35rem; font-weight: 600; }
+    .banner p { margin: 0; opacity: 0.92; font-size: 0.9rem; }
+    section {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.25rem 1.35rem;
+      margin-bottom: 1.25rem;
+    }
+    section h2 {
+      margin: 0 0 0.75rem;
+      font-size: 1.1rem;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 0.5rem;
+    }
+    section h3 { margin: 1.25rem 0 0.5rem; font-size: 1rem; }
+    p, li { color: var(--text); font-size: 0.95rem; }
+    .muted { color: var(--muted); font-size: 0.88rem; }
+    .diagram {
+      overflow-x: auto;
+      padding: 1rem 0;
+      min-height: 4rem;
+    }
+    .diagram svg { max-width: 100%; height: auto; }
+    footer {
+      margin-top: 2rem;
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+    code { background: #eef1f4; padding: 0.12em 0.35em; border-radius: 4px; font-size: 0.88em; }
+    ul { padding-left: 1.25rem; }
+  </style>
+</head>
+<body>
+  <div class="banner">
+    <h1>Code review &amp; branching — visual diagrams</h1>
+    <p>
+      <strong>Temporary preview</strong> for review before Confluence upload.
+      Source of truth in repo: <code>docs/process/CODE_REVIEW_AND_BRANCHING_DIAGRAMS.md</code>
+      (also <code>CODE_REVIEW_AND_CONTRIBUTION.md</code>, <code>GIT_SYNC_WITH_MAIN.md</code>).
+    </p>
+  </div>
+
+  <p class="muted">
+    Diagrams render below using Mermaid (requires network for first load). If blank, open with internet access or paste blocks into
+    <a href="https://mermaid.live" target="_blank" rel="noopener">mermaid.live</a>.
+  </p>
+
+  <section>
+    <h2>1. Code review process (PR to <code>main</code>)</h2>
+    <div id="fig1" class="diagram mermaid-anchor"></div>
+    <p><strong>Notes (not in diagram):</strong> no secrets in repo; reuse framework patterns in review; optional biweekly office hours instead of standing review meetings.</p>
+  </section>
+
+  <section>
+    <h2>2. Keeping your branch current with <code>main</code> (team workflow)</h2>
+    <p>Each contributor works on a <strong>feature branch</strong> while <strong><code>main</code></strong> moves forward as others merge PRs. Periodically bring <strong><code>origin/main</code></strong> into your branch.</p>
+    <div id="fig2" class="diagram mermaid-anchor"></div>
+    <h3>Same idea as a timeline (simplified)</h3>
+    <div id="fig3" class="diagram mermaid-anchor"></div>
+  </section>
+
+  <section>
+    <h2>3. If you are on <code>main</code> locally (quick reference)</h2>
+    <div id="fig4" class="diagram mermaid-anchor"></div>
+    <p>For feature-branch detail and rebase cautions, see <code>GIT_SYNC_WITH_MAIN.md</code> in the repo.</p>
+  </section>
+
+  <footer>
+    Diagrams last updated March 2026. Delete or replace this file after Confluence upload if you do not want it in the repo.
+  </footer>
+
+  <script type="module">
+    import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs";
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: "neutral",
+      securityLevel: "loose",
+      flowchart: { htmlLabels: true, curve: "basis" },
+    });
+
+    const fig1 = `flowchart TB
+    subgraph Prep["Author — before PR"]
+        M[("main on GitHub")]
+        B["Create branch\\nfeature/<JIRA>-description"]
+        W["Work locally\\nGPG-signed commits"]
+        V["Run local checks\\nbuild, lint, validate:steps, targeted tests"]
+        P[Push branch to origin]
+        M --> B --> W --> V --> P
+    end
+    subgraph PR["Pull request"]
+        O["Open PR + template\\nJira key, sprint, validation notes"]
+        R["Reviewer(s)\\ncount set by GitHub admin"]
+        Q{Changes\\nrequested?}
+        F["Author pushes updates\\nsigned commits"]
+        A[Approve]
+        O --> R --> Q
+        Q -->|Yes| F --> R
+        Q -->|No| A
+    end
+    subgraph Close["Merge & hygiene"]
+        MG["Merge to main\noften squash — admin policy"]
+        CL[Branch delete when practical]
+        A --> MG --> CL
+    end
+    P --> O
+    MG --> M
+    style M fill:#e8f4fc
+    style MG fill:#d4edda
+    style V fill:#fff3cd`;
+
+    const fig2 = `flowchart TB
+    subgraph GitHub["GitHub"]
+        MAIN[("main")]
+        FB1[feature/SF-100-...]
+        FB2[feature/SF-200-...]
+    end
+    subgraph DevA["Developer A"]
+        A1[Commits on SF-100 branch]
+        A2["git fetch origin"]
+        A3["git merge origin/main\\n(or rebase if team agrees)"]
+        A4[Resolve conflicts if any]
+        A5[Push branch → open/update PR]
+        A1 --> A2 --> A3 --> A4 --> A5
+    end
+    subgraph DevB["Developer B"]
+        B1[Merges PR → updates main]
+    end
+    MAIN -->|branch from| FB1
+    MAIN -->|branch from| FB2
+    B1 -->|advances| MAIN
+    MAIN -->|fetch sees new commits| A2
+    A5 --> FB1
+    style MAIN fill:#e8f4fc
+    style A3 fill:#fff3cd`;
+
+    const fig3 = `sequenceDiagram
+    participant Main as origin/main
+    participant Dev as Your feature branch
+    Note over Main,Dev: You create feature/SF-xxx from main
+    Dev->>Dev: commit, commit (GPG signed)
+    Main->>Main: Other PRs merge — main moves
+    Dev->>Main: git fetch origin
+    Dev->>Dev: git merge origin/main
+    Note over Dev: fix conflicts if needed
+    Dev->>Dev: commit merge (if merge commit)
+    Dev->>Main: git push → PR stays mergeable`;
+
+    const fig4 = `flowchart LR
+    U[Uncommitted work?] -->|Yes| ST[git stash]
+    ST --> PL[git pull origin main]
+    PL --> POP[git stash pop]
+    U -->|No| PL2[git pull origin main]`;
+
+    const mounts = [
+      { id: "fig1", text: fig1 },
+      { id: "fig2", text: fig2 },
+      { id: "fig3", text: fig3 },
+      { id: "fig4", text: fig4 },
+    ];
+
+    for (const { id, text } of mounts) {
+      const el = document.getElementById(id);
+      const wrap = document.createElement("div");
+      wrap.className = "mermaid";
+      wrap.textContent = text;
+      el.appendChild(wrap);
+    }
+    await mermaid.run({ querySelector: ".mermaid" });
+  </script>
+</body>
+</html>

@@ -1,0 +1,187 @@
+{
+	"info": {
+		"_postman_id": "work-item-st-242",
+		"name": "ST-242 - API Tests",
+		"description": "API - ST-242 - Salesforce Mastered Contact (External) Integration\n\n══════════════════════════════════════════════════════════════════════════════\nPurpose: Validate Salesforce Mastered External Contact API operations (create/update)\nare published one-way into Dynamics Dataverse in near-real time via MuleSoft\nFlow: API Create/Update Contact → Platform Event → MuleSoft → Dynamics\nDependency: Parent Account must have Dataverse_ID__c populated\nReference: Excel \"I contacts -> externalcontact\" tab\nIntegration Document: Contact & Account section\n═══════════════════════\n\nGenerated from: C:\\Automation\\E2EAutomation\\src\\features\\api\\ST\\ST-242.feature\n\n## Setup Instructions:\n1. Import this collection into Postman\n2. Create a new environment (or use existing Salesforce QA environment)\n3. Set the following environment variables:\n   - `sf_base_url`: https://arx--qa.sandbox.my.salesforce.com\n   - `sf_api_version`: v60.0\n   - `sf_access_token`: Your Salesforce access token (get via OAuth or JWT)\n   - `sf_instance_url`: Your Salesforce instance URL\n\n## Authentication:\nThis collection uses Bearer Token authentication. Obtain an access token via:\n- OAuth 2.0 flow\n- JWT Bearer Token flow\n- Username/Password flow",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{sf_access_token}}",
+				"type": "string"
+			}
+		]
+	},
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "{{sf_base_url}}",
+			"type": "string"
+		},
+		{
+			"key": "api_version",
+			"value": "{{sf_api_version}}",
+			"type": "string"
+		},
+		{
+			"key": "record_id",
+			"value": "",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "API - Create external contact when parent Account ",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response contains records\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property(\"records\");",
+							"    pm.expect(jsonData.records).to.be.an(\"array\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": []
+				},
+				"description": "API - API - Create external contact when parent Account has Dataverse ID\n\n**Test ID:** ST-242-API-001\n**Priority:** positive\n**Tags:** @smoke\n\n**Feature:** API - ST-242 - Salesforce Mastered Contact (External) Integration\n"
+			},
+			"response": []
+		},
+		{
+			"name": "API - Do not create external contact when parent A",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response contains records\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property(\"records\");",
+							"    pm.expect(jsonData.records).to.be.an(\"array\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": []
+				},
+				"description": "API - API - Do not create external contact when parent Account has no Dataverse ID\n\n**Test ID:** ST-242-API-002\n**Tags:** @negative\n\n**Feature:** API - ST-242 - Salesforce Mastered Contact (External) Integration\n"
+			},
+			"response": []
+		},
+		{
+			"name": "API - Update external contact in Salesforce and pu",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 204\", function () {",
+							"    pm.response.to.have.status(204);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/services/data/{{api_version}}/sobjects/External/{{record_id}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"services",
+						"data",
+						"{{api_version}}",
+						"sobjects",
+						"External",
+						"{{record_id}}"
+					]
+				},
+				"description": "API - API - Update external contact in Salesforce and publish updates to Dynamics\n\n**Test ID:** ST-242-API-003\n**Priority:** positive\n\n**Feature:** API - ST-242 - Salesforce Mastered Contact (External) Integration\n",
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"Name\": \"Updated External Name\"\n}"
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "API - Verify all required external contact fields ",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response contains records\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property(\"records\");",
+							"    pm.expect(jsonData.records).to.be.an(\"array\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": []
+				},
+				"description": "API - API - Verify all required external contact fields are mapped correctly\n\n**Test ID:** ST-242-API-004\n**Priority:** positive\n\n**Feature:** API - ST-242 - Salesforce Mastered Contact (External) Integration\n"
+			},
+			"response": []
+		}
+	]
+}

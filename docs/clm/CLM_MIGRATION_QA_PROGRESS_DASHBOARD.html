@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CLM Migration &amp; Integration — QA Progress (INT / Preprod)</title>
+  <style>
+    :root {
+      --bg: #0f1419;
+      --surface: #1a2332;
+      --surface2: #243044;
+      --border: #2d3a4f;
+      --text: #e8edf4;
+      --muted: #8b9cb3;
+      --pass: #22c55e;
+      --fail: #ef4444;
+      --warn: #f59e0b;
+      --pending: #64748b;
+      --blocked: #a855f7;
+      --active: #3b82f6;
+      --accent: #06b6d4;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      padding: 2rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    header {
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    h1 { font-size: 1.5rem; font-weight: 600; margin-bottom: 0.25rem; }
+    .meta { color: var(--muted); font-size: 0.875rem; }
+    .meta a { color: var(--accent); }
+    h2 {
+      font-size: 1rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      margin: 2rem 0 1rem;
+    }
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+      font-size: 0.8rem;
+    }
+    .legend span { display: flex; align-items: center; gap: 0.35rem; }
+    .dot {
+      width: 10px; height: 10px; border-radius: 50%;
+    }
+    /* Phase pipeline */
+    .pipeline {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      align-items: stretch;
+      margin-bottom: 1rem;
+    }
+    .phase-card {
+      flex: 1 1 140px;
+      min-width: 120px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .phase-card::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+    }
+    .phase-card.pass::before { background: var(--pass); }
+    .phase-card.partial::before { background: var(--warn); }
+    .phase-card.active::before { background: var(--active); }
+    .phase-card.blocked::before { background: var(--blocked); }
+    .phase-card.pending::before { background: var(--pending); }
+    .phase-id { font-size: 0.7rem; color: var(--muted); font-weight: 600; }
+    .phase-name { font-size: 0.85rem; font-weight: 600; margin: 0.2rem 0; }
+    .phase-status {
+      font-size: 0.75rem;
+      font-weight: 600;
+      margin-top: 0.35rem;
+    }
+    .phase-pct { font-size: 1.25rem; font-weight: 700; margin-top: 0.25rem; }
+    .phase-card.pass .phase-status { color: var(--pass); }
+    .phase-card.partial .phase-status { color: var(--warn); }
+    .phase-card.active .phase-status { color: var(--active); }
+    .phase-card.blocked .phase-status { color: var(--blocked); }
+    .phase-card.pending .phase-status { color: var(--pending); }
+    .arrow { color: var(--muted); align-self: center; font-size: 1.25rem; }
+    /* Progress bars */
+    .bar-row { margin-bottom: 0.75rem; }
+    .bar-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      margin-bottom: 0.25rem;
+    }
+    .bar-track {
+      height: 8px;
+      background: var(--surface2);
+      border-radius: 4px;
+      overflow: hidden;
+      display: flex;
+    }
+    .bar-seg { height: 100%; }
+    .bar-seg.pass { background: var(--pass); }
+    .bar-seg.fail { background: var(--fail); }
+    .bar-seg.pending { background: var(--pending); }
+    /* Entity grid */
+    .entity-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 0.5rem;
+    }
+    .entity-cell {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 0.5rem 0.65rem;
+      font-size: 0.75rem;
+    }
+    .entity-cell .jira { color: var(--muted); font-size: 0.65rem; }
+    .entity-cell .name { font-weight: 600; margin: 0.15rem 0; }
+    .badges { display: flex; gap: 0.25rem; flex-wrap: wrap; margin-top: 0.35rem; }
+    .badge {
+      font-size: 0.6rem;
+      font-weight: 700;
+      padding: 0.1rem 0.35rem;
+      border-radius: 3px;
+      text-transform: uppercase;
+    }
+    .badge.pass { background: rgba(34,197,94,0.2); color: var(--pass); }
+    .badge.fail { background: rgba(239,68,68,0.2); color: var(--fail); }
+    .badge.na { background: rgba(100,116,139,0.3); color: var(--muted); }
+    /* Phase B table */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.8rem;
+      background: var(--surface);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    th, td {
+      padding: 0.6rem 0.75rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+    th { background: var(--surface2); color: var(--muted); font-weight: 600; }
+    tr:last-child td { border-bottom: none; }
+    .note {
+      background: var(--surface);
+      border-left: 3px solid var(--accent);
+      padding: 0.75rem 1rem;
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-top: 1.5rem;
+      border-radius: 0 6px 6px 0;
+    }
+    .summary-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+    }
+    .summary-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem;
+      text-align: center;
+    }
+    .summary-card .num { font-size: 1.75rem; font-weight: 700; }
+    .summary-card .lbl { font-size: 0.7rem; color: var(--muted); margin-top: 0.25rem; }
+    @media print {
+      body { background: #fff; color: #111; padding: 1rem; }
+      .phase-card, .entity-cell, table, .summary-card { border-color: #ccc; background: #f9f9f9; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>CLM Migration &amp; Integration — QA Progress</h1>
+    <p class="meta">
+      Environment: <strong>INT / Preprod</strong> ·
+      SOURCE: <a href="https://accelinspreprod.crm11.dynamics.com">accelinspreprod</a> ·
+      TARGET: <a href="https://arx--int.sandbox.my.salesforce.com">arx--int</a> ·
+      Last run: <strong>2026-05-25</strong> · Read-only validation
+    </p>
+  </header>
+
+  <div class="legend">
+    <span><i class="dot" style="background:var(--pass)"></i> Pass / complete</span>
+    <span><i class="dot" style="background:var(--warn)"></i> In progress / partial</span>
+    <span><i class="dot" style="background:var(--fail)"></i> Fail / gaps</span>
+    <span><i class="dot" style="background:var(--blocked)"></i> Blocked</span>
+    <span><i class="dot" style="background:var(--pending)"></i> Not started</span>
+  </div>
+
+  <h2>Programme phase pipeline</h2>
+  <div class="pipeline">
+    <div class="phase-card partial">
+      <div class="phase-id">ACCESS</div>
+      <div class="phase-name">Connectivity</div>
+      <div class="phase-pct">~75%</div>
+      <div class="phase-status">Partial — SF + D365 OK; MuleSoft 401</div>
+    </div>
+    <span class="arrow">→</span>
+    <div class="phase-card active">
+      <div class="phase-id">PHASE A</div>
+      <div class="phase-name">Migration validation</div>
+      <div class="phase-pct">72%</div>
+      <div class="phase-status">Active — automation complete; sign-off pending</div>
+    </div>
+    <span class="arrow">→</span>
+    <div class="phase-card blocked">
+      <div class="phase-id">PHASE B</div>
+      <div class="phase-name">Lifecycle (SF→D365)</div>
+      <div class="phase-pct">~15%</div>
+      <div class="phase-status">Blocked — MuleSoft + B-L2 gap</div>
+    </div>
+    <span class="arrow">→</span>
+    <div class="phase-card pending">
+      <div class="phase-id">PHASE C</div>
+      <div class="phase-name">ADP / Data Cloud</div>
+      <div class="phase-pct">0%</div>
+      <div class="phase-status">Pending — manual spec only</div>
+    </div>
+    <span class="arrow">→</span>
+    <div class="phase-card pending">
+      <div class="phase-id">PHASE D</div>
+      <div class="phase-name">Downstream</div>
+      <div class="phase-pct">0%</div>
+      <div class="phase-status">Pending</div>
+    </div>
+    <span class="arrow">→</span>
+    <div class="phase-card pending">
+      <div class="phase-id">PHASE E</div>
+      <div class="phase-name">Bordereaux</div>
+      <div class="phase-pct">0%</div>
+      <div class="phase-status">Pending</div>
+    </div>
+  </div>
+
+  <div class="summary-cards">
+    <div class="summary-card">
+      <div class="num" style="color:var(--pass)">18/18</div>
+      <div class="lbl">Entities loaded on INT</div>
+    </div>
+    <div class="summary-card">
+      <div class="num" style="color:var(--warn)">17/18</div>
+      <div class="lbl">Count match (A2)</div>
+    </div>
+    <div class="summary-card">
+      <div class="num" style="color:var(--fail)">8/18</div>
+      <div class="lbl">All-fields Pass (A3)</div>
+    </div>
+    <div class="summary-card">
+      <div class="num" style="color:var(--blocked)">2/9</div>
+      <div class="lbl">Phase B scenarios runnable</div>
+    </div>
+    <div class="summary-card">
+      <div class="num" style="color:var(--pending)">0/14</div>
+      <div class="lbl">Phase C–E automated</div>
+    </div>
+  </div>
+
+  <h2>Phase A — migration validation (detail)</h2>
+  <div class="bar-row">
+    <div class="bar-label"><span>A1 API smoke</span><span>100% Pass</span></div>
+    <div class="bar-track"><div class="bar-seg pass" style="width:100%"></div></div>
+  </div>
+  <div class="bar-row">
+    <div class="bar-label"><span>A2 Record counts</span><span>94% (17/18)</span></div>
+    <div class="bar-track">
+      <div class="bar-seg pass" style="width:94%"></div>
+      <div class="bar-seg fail" style="width:6%"></div>
+    </div>
+  </div>
+  <div class="bar-row">
+    <div class="bar-label"><span>A3 Field validation (all mapped fields)</span><span>44% Pass (8/18)</span></div>
+    <div class="bar-track">
+      <div class="bar-seg pass" style="width:44%"></div>
+      <div class="bar-seg fail" style="width:56%"></div>
+    </div>
+  </div>
+  <div class="bar-row">
+    <div class="bar-label"><span>A4 Data Cloud RDM visibility</span><span>Pending (manual)</span></div>
+    <div class="bar-track"><div class="bar-seg pending" style="width:100%"></div></div>
+  </div>
+
+  <h2>Phase A — per-entity outcome (18 entities)</h2>
+  <div class="entity-grid" id="entity-grid"></div>
+
+  <h2>Phase B — lifecycle integration (CLM-GL-INT-001)</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Scenario</th>
+        <th>Automation</th>
+        <th>Outcome</th>
+        <th>Notes</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>INT-001 Integration smoke</td>
+        <td>Implemented</td>
+        <td style="color:var(--warn)">Run when MuleSoft creds OK</td>
+        <td>PE + MuleSoft logs + WhoAmI</td>
+      </tr>
+      <tr>
+        <td>INT-010…014 Per-Jira packs</td>
+        <td>Stub (PENDING)</td>
+        <td style="color:var(--pending)">Manual checklist</td>
+        <td>SF-736/769/788/796/872 run separately</td>
+      </tr>
+      <tr>
+        <td>INT-020 B-L1 New record create</td>
+        <td>@pending-step-def</td>
+        <td style="color:var(--fail)">Not implemented</td>
+        <td>6 entity examples in outline</td>
+      </tr>
+      <tr>
+        <td>INT-021 B-L2 Migrated update</td>
+        <td>@pending-step-def</td>
+        <td style="color:var(--fail)">Programme gap</td>
+        <td>13 entity examples — no step defs</td>
+      </tr>
+      <tr>
+        <td>INT-030 Ineligible Account gate</td>
+        <td>Implemented</td>
+        <td style="color:var(--pass)">Runnable</td>
+        <td>Negative sync gate</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>Phases C · D · E — specification status</h2>
+  <table>
+    <thead>
+      <tr><th>Phase</th><th>Feature</th><th>Scenarios</th><th>Automation</th><th>Outcome</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>C — ADP / Data Cloud</td>
+        <td>CLM-GL-INT-002</td>
+        <td>5 (INT-100…104)</td>
+        <td>0% — all @manual</td>
+        <td style="color:var(--pending)">Pending env (Snowflake, Data Cloud)</td>
+      </tr>
+      <tr>
+        <td>D — Downstream</td>
+        <td>CLM-GL-INT-003</td>
+        <td>5 (INT-200…204)</td>
+        <td>0% — all @manual</td>
+        <td style="color:var(--pending)">Pending ODS/Tagetik/Duck Creek/F&amp;O access</td>
+      </tr>
+      <tr>
+        <td>E — Bordereaux</td>
+        <td>CLM-GL-INT-004</td>
+        <td>5 (INT-300…304)</td>
+        <td>0% — all @manual</td>
+        <td style="color:var(--pending)">Pending test file paths in .env.int</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="note">
+    <strong>Related docs:</strong>
+    <a href="./CLM_MIGRATION_QA_PROGRESS_DETAIL.md">Full entity table &amp; BA clarifications</a> ·
+    <a href="./CLM_MIGRATION_QA_PROGRESS.md">Confluence dashboard source (markdown)</a> ·
+    <a href="https://accelins.atlassian.net/wiki/spaces/SA/pages/3329785980">Confluence page</a>.
+    Regenerate from <code>all-entities-validation-*.json</code> after each INT run.
+  </div>
+
+  <script>
+    const entities = [
+      { jira: "SF-736", name: "Party", load: true, count: true, fields: false },
+      { jira: "SF-738", name: "External contact", load: true, count: true, fields: false },
+      { jira: "SF-737", name: "Internal contact", load: true, count: true, fields: false },
+      { jira: "SF-769", name: "Member map", load: true, count: true, fields: true },
+      { jira: "SF-775", name: "TPA map", load: true, count: true, fields: false },
+      { jira: "SF-739", name: "Country", load: true, count: true, fields: false },
+      { jira: "SF-767", name: "Product map", load: true, count: false, fields: false },
+      { jira: "SF-766", name: "Sub product", load: true, count: true, fields: false },
+      { jira: "SF-785", name: "Product", load: true, count: true, fields: true },
+      { jira: "SF-780", name: "ASLOB", load: true, count: true, fields: false },
+      { jira: "SF-798", name: "OSFI", load: true, count: true, fields: false },
+      { jira: "SF-781", name: "COB", load: true, count: true, fields: true },
+      { jira: "SF-782", name: "LOB", load: true, count: true, fields: true },
+      { jira: "SF-783", name: "BEGAAP", load: true, count: true, fields: true },
+      { jira: "SF-784", name: "Solvency II", load: true, count: true, fields: true },
+      { jira: "SF-779", name: "MPP", load: true, count: true, fields: true },
+      { jira: "SF-872", name: "POG", load: true, count: true, fields: false },
+      { jira: "SF-786", name: "Currency", load: true, count: true, fields: true },
+    ];
+    const grid = document.getElementById("entity-grid");
+    entities.forEach((e) => {
+      const cell = document.createElement("div");
+      cell.className = "entity-cell";
+      const b = (ok, label) =>
+        `<span class="badge ${ok ? "pass" : "fail"}">${label}: ${ok ? "✓" : "✗"}</span>`;
+      cell.innerHTML = `
+        <div class="jira">${e.jira}</div>
+        <div class="name">${e.name}</div>
+        <div class="badges">
+          ${b(e.load, "Load")}
+          ${b(e.count, "Count")}
+          ${b(e.fields, "Fields")}
+        </div>`;
+      grid.appendChild(cell);
+    });
+  </script>
+</body>
+</html>

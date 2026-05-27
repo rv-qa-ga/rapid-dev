@@ -1,0 +1,62 @@
+{
+  "key": "SF-19",
+  "summary": "8099: Display Key Account Fields in Header",
+  "type": "Story",
+  "status": "Ready for QA",
+  "priority": "Medium",
+  "description": {
+    "raw": "As a:  Salesforce User I want to:  see key Account fields at the top of the record page So that I can:  quickly understand a party’s classification and lifecycle status without scrolling Scenario: Configure compact layout with key fields Given I am a Salesforce Admin in  Setup > Object Manager > Account When I create or edit the  Account compact layout Then the following fields must be displayed in order: Field Label API Name Account Status Account_Status__c Account Type Type Party ID (PTY) Party_ID_PTY_Code__c Primary Contact Primary_Contact__c And the compact layout must be assigned to all Account page layouts And it must display consistently across all Account record types Scenario: Verify header visibility for users Given I am viewing an Account record When the page loads Then the compact layout must display in the header section And the values must update immediately when the underlying fields change Notes: These five fields are considered the  most important Account attributes . They must appear in the  header section  at the top of every Account record for easy visibility.",
+    "parsed": {
+      "sentences": [
+        "As a:  Salesforce User I want to:  see key Account fields at the top of the record page So that I can:  quickly understand a party’s classification and lifecycle status without scrolling Scenario: Configure compact layout with key fields Given I am a Salesforce Admin in  Setup > Object Manager > Account When I create or edit the  Account compact layout Then the following fields must be displayed in order: Field Label API Name Account Status Account_Status__c Account Type Type Party ID (PTY) Party_ID_PTY_Code__c Primary Contact Primary_Contact__c And the compact layout must be assigned to all Account page layouts And it must display consistently across all Account record types Scenario: Verify header visibility for users Given I am viewing an Account record When the page loads Then the compact layout must display in the header section And the values must update immediately when the underlying fields change Notes: These five fields are considered the  most important Account attributes",
+        "They must appear in the  header section  at the top of every Account record for easy visibility."
+      ],
+      "entities": [
+        "Account",
+        "Contact"
+      ],
+      "fields": [
+        "Account_Status__c",
+        "Party_ID_PTY_Code__c",
+        "Primary_Contact__c",
+        "Label"
+      ],
+      "actions": [
+        "display",
+        "create",
+        "update"
+      ]
+    }
+  },
+  "acceptanceCriteria": [],
+  "comments": [],
+  "relatedIssues": [],
+  "fieldDefinitions": {
+    "Account_Status__c": {
+      "type": "Picklist",
+      "required": false,
+      "description": "Field: Account_Status__c"
+    },
+    "Party_ID_PTY_Code__c": {
+      "type": "Custom",
+      "required": false,
+      "description": "Field: Party_ID_PTY_Code__c"
+    },
+    "Primary_Contact__c": {
+      "type": "Custom",
+      "required": false,
+      "description": "Field: Primary_Contact__c"
+    },
+    "Label": {
+      "type": "Text",
+      "required": false,
+      "description": "Field: Label"
+    }
+  },
+  "generatedFeatures": {
+    "ui": "src/features/ui/SF/SF-19.feature",
+    "api": "src/features/api/SF/SF-19.feature"
+  },
+  "qaReviewedFeatures": {},
+  "extractedAt": "2025-12-17T18:40:38.709Z"
+}

@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Remote test execution – Current vs Azure (visual)</title>
+  <style>
+    :root {
+      --azure: #0078d4;
+      --azure-dark: #005a9e;
+      --now-bg: #deebff;
+      --now-border: #0052cc;
+      --future-bg: #e3fcef;
+      --future-border: #00875a;
+      --warn: #ff8b00;
+      --text: #323130;
+      --muted: #605e5c;
+      --card: #ffffff;
+      --line: #edebe9;
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: "Segoe UI", Arial, Helvetica, sans-serif;
+      line-height: 1.55;
+      color: var(--text);
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 28px 22px 56px;
+      background: #faf9f8;
+    }
+    h1 {
+      color: #242424;
+      font-size: 1.85rem;
+      font-weight: 600;
+      margin: 0 0 8px;
+      padding-bottom: 12px;
+      border-bottom: 3px solid var(--azure);
+    }
+    h2 {
+      color: #242424;
+      font-size: 1.35rem;
+      margin: 40px 0 16px;
+      font-weight: 600;
+    }
+    h3 { color: #323130; font-size: 1.08rem; margin: 20px 0 10px; font-weight: 600; }
+    p { margin: 10px 0; color: var(--text); }
+    ul { margin: 10px 0; padding-left: 22px; }
+    li { margin: 6px 0; }
+    .lead { font-size: 1.05rem; color: var(--muted); max-width: 72ch; }
+    .meta { font-size: 13px; color: var(--muted); margin-top: 6px; }
+
+    .diagram-wrap {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 20px 16px 12px;
+      margin: 20px 0;
+      box-shadow: 0 1.6px 3.6px rgba(0,0,0,.06), 0 0.3px 0.9px rgba(0,0,0,.04);
+      overflow-x: auto;
+    }
+    .diagram-wrap svg { display: block; margin: 0 auto; max-width: 100%; height: auto; }
+    figcaption {
+      font-size: 13px;
+      color: var(--muted);
+      text-align: center;
+      margin-top: 14px;
+      padding: 0 8px 8px;
+      line-height: 1.45;
+    }
+
+    .banner-now {
+      background: var(--now-bg);
+      border-left: 4px solid var(--now-border);
+      padding: 14px 18px;
+      border-radius: 0 6px 6px 0;
+      margin: 16px 0;
+    }
+    .banner-future {
+      background: var(--future-bg);
+      border-left: 4px solid var(--future-border);
+      padding: 14px 18px;
+      border-radius: 0 6px 6px 0;
+      margin: 16px 0;
+    }
+
+    .split {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+      margin: 20px 0;
+    }
+    @media (max-width: 860px) { .split { grid-template-columns: 1fr; } }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin: 14px 0;
+      font-size: 14px;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      overflow: hidden;
+    }
+    th, td { border-bottom: 1px solid var(--line); padding: 10px 12px; text-align: left; vertical-align: top; }
+    th { background: #f3f2f1; font-weight: 600; }
+    tr:last-child td { border-bottom: none; }
+
+    .toc {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 16px 22px;
+      margin: 22px 0;
+    }
+    .toc ul { list-style: none; padding: 0; margin: 8px 0 0; columns: 2; column-gap: 28px; }
+    @media (max-width: 600px) { .toc ul { columns: 1; } }
+    .toc li { margin: 6px 0; break-inside: avoid; }
+    .toc a { color: var(--azure-dark); text-decoration: none; font-weight: 500; }
+    .toc a:hover { text-decoration: underline; }
+
+    hr { border: none; border-top: 1px solid var(--line); margin: 36px 0; }
+    code { background: #f3f2f1; padding: 2px 6px; border-radius: 3px; font-size: 13px; }
+    .footnote { font-size: 12px; color: var(--muted); margin-top: 32px; }
+  </style>
+</head>
+<body>
+
+<h1>Remote test execution architecture</h1>
+<p class="lead"><strong>Visual summary for infra / leadership.</strong> Today: one self-hosted Linux VM. Target: Azure — Job API, queue, ephemeral workers, Blob evidence. Covers many QAs, many apps (Salesforce, Dynamics, Snowflake, SQL Server, …), many triggers.</p>
+<p class="meta">Document: <code>docs/azure-remote-test-orchestration-recommendations.html</code></p>
+
+<nav class="toc" aria-label="Contents">
+  <strong>Jump to</strong>
+  <ul>
+    <li><a href="#fig-at-a-glance">At a glance</a></li>
+    <li><a href="#fig-now">1. What we have now</a></li>
+    <li><a href="#fig-risks">2. Why one VM hurts</a></li>
+    <li><a href="#fig-future">3. Future Azure flow</a></li>
+    <li><a href="#fig-ephemeral">4. Ephemeral = fresh per run</a></li>
+    <li><a href="#fig-triggers">5. All triggers, one door</a></li>
+    <li><a href="#fig-pools">6. Worker pools</a></li>
+    <li><a href="#fig-azure-map">7. Azure map</a></li>
+    <li><a href="#fig-phasing">8. Rollout phasing</a></li>
+    <li><a href="#tables">Reference tables</a></li>
+  </ul>
+</nav>
+
+<!-- ========== AT A GLANCE ========== -->
+<h2 id="fig-at-a-glance">At a glance — today vs target</h2>
+<figure class="diagram-wrap" aria-label="Comparison diagram">
+  <svg viewBox="0 0 920 280" width="920" height="280" role="img" aria-labelledby="title-compare desc-compare">
+    <title id="title-compare">Today one VM versus future Azure</title>
+    <desc id="desc-compare">Left: many triggers into one server. Right: many triggers into Job API queue and multiple ephemeral workers to Blob storage.</desc>
+    <defs>
+      <marker id="arr" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><polygon points="0 0, 8 4, 0 8" fill="#605e5c" /></marker>
+      <linearGradient id="gNow" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#c7e0f4"/><stop offset="100%" stop-color="#deebff"/></linearGradient>
+      <linearGradient id="gFut" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#b7dfcc"/><stop offset="100%" stop-color="#e3fcef"/></linearGradient>
+    </defs>
+    <text x="230" y="28" text-anchor="middle" font-size="15" font-weight="700" fill="#0052cc">Today</text>
+    <text x="690" y="28" text-anchor="middle" font-size="15" font-weight="700" fill="#00875a">Target (Azure)</text>
+    <!-- Today -->
+    <rect x="40" y="48" width="380" height="200" rx="10" fill="#faf9f8" stroke="#0052cc" stroke-width="2"/>
+    <text x="70" y="78" font-size="12" font-weight="600" fill="#323130">Triggers</text>
+    <rect x="55" y="88" width="72" height="28" rx="4" fill="#fff" stroke="#605e5c"/><text x="91" y="106" text-anchor="middle" font-size="10">Gearset</text>
+    <rect x="135" y="88" width="72" height="28" rx="4" fill="#fff" stroke="#605e5c"/><text x="171" y="106" text-anchor="middle" font-size="10">GitHub</text>
+    <rect x="215" y="88" width="52" height="28" rx="4" fill="#fff" stroke="#605e5c"/><text x="241" y="106" text-anchor="middle" font-size="10">Jira</text>
+    <rect x="275" y="88" width="52" height="28" rx="4" fill="#fff" stroke="#605e5c"/><text x="301" y="106" text-anchor="middle" font-size="10">QA</text>
+    <rect x="335" y="88" width="62" height="28" rx="4" fill="#fff" stroke="#605e5c"/><text x="366" y="106" text-anchor="middle" font-size="10">Cron</text>
+    <line x1="91" y1="130" x2="230" y2="168" stroke="#605e5c" stroke-width="1.5" marker-end="url(#arr)"/>
+    <line x1="171" y1="130" x2="230" y2="168" stroke="#605e5c" stroke-width="1.5" marker-end="url(#arr)"/>
+    <line x1="241" y1="130" x2="230" y2="168" stroke="#605e5c" stroke-width="1.5" marker-end="url(#arr)"/>
+    <line x1="301" y1="130" x2="230" y2="168" stroke="#605e5c" stroke-width="1.5" marker-end="url(#arr)"/>
+    <line x1="366" y1="130" x2="230" y2="168" stroke="#605e5c" stroke-width="1.5" marker-end="url(#arr)"/>
+    <rect x="120" y="168" width="220" height="68" rx="8" fill="url(#gNow)" stroke="#0052cc" stroke-width="2"/>
+    <text x="230" y="198" text-anchor="middle" font-size="14" font-weight="700" fill="#172b4d">One Linux VM</text>
+    <text x="230" y="218" text-anchor="middle" font-size="11" fill="#323130">Self-hosted runner · shared CPU/RAM/disk</text>
+    <text x="230" y="234" text-anchor="middle" font-size="10" fill="#a4262c">Smoke + nightly + QA compete here</text>
+    <!-- Arrow to future -->
+    <text x="460" y="165" text-anchor="middle" font-size="22" fill="#0078d4">→</text>
+    <!-- Future -->
+    <rect x="500" y="48" width="400" height="200" rx="10" fill="#faf9f8" stroke="#00875a" stroke-width="2"/>
+    <text x="530" y="78" font-size="12" font-weight="600" fill="#323130">Same triggers</text>
+    <rect x="515" y="88" width="60" height="24" rx="3" fill="#fff" stroke="#605e5c"/><text x="545" y="104" text-anchor="middle" font-size="9">…</text>
+    <line x1="545" y1="118" x2="620" y2="145" stroke="#605e5c" stroke-width="1.5" marker-end="url(#arr)"/>
+    <rect x="560" y="145" width="120" height="36" rx="6" fill="#0078d4" stroke="#005a9e" stroke-width="1.5"/>
+    <text x="620" y="167" text-anchor="middle" font-size="11" font-weight="600" fill="#fff">Job API</text>
+    <line x1="680" y1="163" x2="720" y2="163" stroke="#605e5c" stroke-width="1.5" marker-end="url(#arr)"/>
+    <rect x="720" y="145" width="100" height="36" rx="6" fill="#8764b8" stroke="#5c2d91" stroke-width="1.5"/>
+    <text x="770" y="167" text-anchor="middle" font-size="11" font-weight="600" fill="#fff">Queue</text>
+    <line x1="770" y1="181" x2="770" y2="200" stroke="#605e5c" stroke-width="1.5" marker-end="url(#arr)"/>
+    <rect x="530" y="200" width="90" height="32" rx="6" fill="url(#gFut)" stroke="#00875a" stroke-width="1.5"/><text x="575" y="220" text-anchor="middle" font-size="10" font-weight="600">UI pool</text>
+    <rect x="640" y="200" width="90" height="32" rx="6" fill="url(#gFut)" stroke="#00875a" stroke-width="1.5"/><text x="685" y="220" text-anchor="middle" font-size="10" font-weight="600">API pool</text>
+    <rect x="750" y="200" width="90" height="32" rx="6" fill="url(#gFut)" stroke="#00875a" stroke-width="1.5"/><text x="795" y="220" text-anchor="middle" font-size="10" font-weight="600">Data pool</text>
+    <line x1="770" y1="181" x2="575" y2="200" stroke="#605e5c" stroke-width="1" opacity="0.7"/>
+    <line x1="770" y1="181" x2="685" y2="200" stroke="#605e5c" stroke-width="1" opacity="0.7"/>
+    <line x1="770" y1="181" x2="795" y2="200" stroke="#605e5c" stroke-width="1" opacity="0.7"/>
+    <text x="800" y="138" text-anchor="end" font-size="10" fill="#0078d4">Ephemeral workers</text>
+  </svg>
+  <figcaption><strong>Left:</strong> every path hits the same machine. <strong>Right:</strong> one intake (Job API + queue), many short-lived workers, evidence in Blob (not shown).</figcaption>
+</figure>
+
+<hr />
+
+<h2 id="fig-now">1. What we have now — detailed picture</h2>
+<div class="banner-now"><strong>Current:</strong> one long-lived <strong>self-hosted Linux VM</strong> — remote QA runs, Gearset deployment smoke, and scheduled regression (e.g. daily Salesforce) share that host.</div>
+
+<figure class="diagram-wrap">
+  <svg viewBox="0 0 800 320" width="800" height="320" role="img" aria-labelledby="t1 d1">
+    <title id="t1">Current architecture with one VM</title>
+    <desc id="d1">Five sources connect to one Linux virtual machine containing smoke tests, Salesforce regression, and QA workloads.</desc>
+    <defs>
+      <marker id="a2" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><polygon points="0 0, 7 3.5, 0 7" fill="#323130" /></marker>
+    </defs>
+    <text x="400" y="26" text-anchor="middle" font-size="16" font-weight="700" fill="#242424">Current — single self-hosted runner</text>
+    <!-- sources row -->
+    <g font-size="11" font-weight="600">
+      <rect x="30" y="52" width="100" height="40" rx="6" fill="#fff" stroke="#0078d4" stroke-width="1.5"/><text x="80" y="77" text-anchor="middle" fill="#242424">Gearset CI/CD</text>
+      <rect x="150" y="52" width="100" height="40" rx="6" fill="#fff" stroke="#0078d4" stroke-width="1.5"/><text x="200" y="77" text-anchor="middle" fill="#242424">GitHub</text>
+      <rect x="270" y="52" width="90" height="40" rx="6" fill="#fff" stroke="#0078d4" stroke-width="1.5"/><text x="315" y="77" text-anchor="middle" fill="#242424">Jira</text>
+      <rect x="380" y="52" width="90" height="40" rx="6" fill="#fff" stroke="#0078d4" stroke-width="1.5"/><text x="425" y="77" text-anchor="middle" fill="#242424">QA / remote</text>
+      <rect x="490" y="52" width="100" height="40" rx="6" fill="#fff" stroke="#0078d4" stroke-width="1.5"/><text x="540" y="77" text-anchor="middle" fill="#242424">Nightly cron</text>
+    </g>
+    <!-- converging lines -->
+    <path d="M80 92 L80 130 L400 130 L400 148" fill="none" stroke="#605e5c" stroke-width="1.2" marker-end="url(#a2)"/>
+    <path d="M200 92 L200 118 L400 118 L400 148" fill="none" stroke="#605e5c" stroke-width="1.2"/>
+    <path d="M315 92 L315 124 L400 124 L400 148" fill="none" stroke="#605e5c" stroke-width="1.2"/>
+    <path d="M425 92 L425 124 L400 124" fill="none" stroke="#605e5c" stroke-width="1.2"/>
+    <path d="M540 92 L540 130 L400 130" fill="none" stroke="#605e5c" stroke-width="1.2"/>
+    <!-- Big VM -->
+    <rect x="120" y="148" width="560" height="155" rx="12" fill="#deebff" stroke="#0052cc" stroke-width="2.5"/>
+    <text x="400" y="178" text-anchor="middle" font-size="15" font-weight="700" fill="#172b4d">Linux VM — self-hosted automation host</text>
+    <text x="400" y="198" text-anchor="middle" font-size="12" fill="#323130">One OS · one disk · one browser stack · shared CPU &amp; memory</text>
+    <rect x="150" y="212" width="150" height="44" rx="6" fill="#fff" stroke="#a4262c" stroke-width="1.2"/>
+    <text x="225" y="232" text-anchor="middle" font-size="11" font-weight="600" fill="#a4262c">Deploy smoke</text>
+    <text x="225" y="248" text-anchor="middle" font-size="9" fill="#605e5c">(Gearset)</text>
+    <rect x="325" y="212" width="150" height="44" rx="6" fill="#fff" stroke="#a4262c" stroke-width="1.2"/>
+    <text x="400" y="232" text-anchor="middle" font-size="11" font-weight="600" fill="#a4262c">Daily regression</text>
+    <text x="400" y="248" text-anchor="middle" font-size="9" fill="#605e5c">(e.g. Salesforce)</text>
+    <rect x="500" y="212" width="150" height="44" rx="6" fill="#fff" stroke="#a4262c" stroke-width="1.2"/>
+    <text x="575" y="232" text-anchor="middle" font-size="11" font-weight="600" fill="#a4262c">Ad-hoc QA runs</text>
+    <text x="575" y="248" text-anchor="middle" font-size="9" fill="#605e5c">(all apps)</text>
+    <text x="400" y="295" text-anchor="middle" font-size="11" fill="#a4262c" font-weight="600">All workloads compete for the same resources</text>
+  </svg>
+  <figcaption>There is <strong>no queue</strong> in front of the machine: bursts go straight to the same capacity. Evidence depends on how outputs are collected from this host.</figcaption>
+</figure>
+
+<hr />
+
+<h2 id="fig-risks">2. Why one shared VM is fragile</h2>
+<figure class="diagram-wrap">
+  <svg viewBox="0 0 780 260" width="780" height="260" role="img">
+    <title>Risks of shared VM</title>
+    <text x="390" y="24" text-anchor="middle" font-size="15" font-weight="700" fill="#242424">One problem on the VM → everyone feels it</text>
+    <rect x="260" y="48" width="260" height="100" rx="10" fill="#fff4ce" stroke="#ff8b00" stroke-width="2"/>
+    <text x="390" y="82" text-anchor="middle" font-size="13" font-weight="700" fill="#8a6116">Single blast radius</text>
+    <text x="390" y="102" text-anchor="middle" font-size="11" fill="#323130">Full disk · bad upgrade · memory leak</text>
+    <text x="390" y="122" text-anchor="middle" font-size="11" fill="#323130">One flaky run affects smoke &amp; regression</text>
+    <polygon points="390,165 340,200 440,200" fill="#fde7e9" stroke="#a4262c" stroke-width="1.5"/>
+    <text x="390" y="228" text-anchor="middle" font-size="11" font-weight="600" fill="#a4262c">Hard to tell: product bug vs. overloaded runner?</text>
+    <!-- side labels -->
+    <text x="80" y="120" font-size="11" fill="#605e5c" transform="rotate(-90 80,120)">Contention</text>
+    <text x="700" y="120" font-size="11" fill="#605e5c" transform="rotate(90 700,120)">Drift over time</text>
+  </svg>
+  <figcaption>As <strong>15 QAs × many applications</strong> grow, informal fairness breaks: release smoke can wait behind long jobs unless you add structure and capacity.</figcaption>
+</figure>
+
+<hr />
+
+<h2 id="fig-future">3. Expected future — Azure (end-to-end)</h2>
+<div class="banner-future"><strong>Target:</strong> <strong>Job API</strong> + <strong>Azure Service Bus</strong> (queue) + <strong>ephemeral workers</strong> (e.g. Container Apps Jobs / AKS Jobs) + <strong>Blob Storage</strong> for reports. Secrets in <strong>Key Vault</strong>; access via <strong>managed identities</strong>.</div>
+
+<figure class="diagram-wrap">
+  <svg viewBox="0 0 900 420" width="900" height="420" role="img" aria-labelledby="t3 d3">
+    <title id="t3">Future Azure test execution flow</title>
+    <desc id="d3">Diagram from triggers through Job API Service Bus workers to blob storage and key vault.</desc>
+    <defs>
+      <marker id="ab" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><polygon points="0 0, 8 4, 0 8" fill="#323130" /></marker>
+    </defs>
+    <text x="450" y="26" text-anchor="middle" font-size="16" font-weight="700" fill="#00875a">Target — Azure orchestrated runs</text>
+    <!-- Triggers -->
+    <text x="450" y="52" text-anchor="middle" font-size="12" font-weight="600" fill="#605e5c">Trigger sources (any of these)</text>
+    <g font-size="10" font-weight="600">
+      <rect x="40" y="62" width="88" height="32" rx="5" fill="#fff" stroke="#0078d4"/><text x="84" y="82" text-anchor="middle">Gearset</text>
+      <rect x="138" y="62" width="88" height="32" rx="5" fill="#fff" stroke="#0078d4"/><text x="182" y="82" text-anchor="middle">GitHub</text>
+      <rect x="236" y="62" width="72" height="32" rx="5" fill="#fff" stroke="#0078d4"/><text x="272" y="82" text-anchor="middle">Jira</text>
+      <rect x="318" y="62" width="72" height="32" rx="5" fill="#fff" stroke="#0078d4"/><text x="354" y="82" text-anchor="middle">QA UI</text>
+      <rect x="400" y="62" width="88" height="32" rx="5" fill="#fff" stroke="#0078d4"/><text x="444" y="82" text-anchor="middle">Schedule</text>
+      <rect x="498" y="62" width="362" height="32" rx="5" fill="#f3f2f1" stroke="#8a8886"/><text x="679" y="82" text-anchor="middle" font-size="10" fill="#605e5c">All use: POST job + standard JSON body</text>
+    </g>
+    <line x1="450" y1="94" x2="450" y2="118" stroke="#323130" stroke-width="1.5" marker-end="url(#ab)"/>
+    <!-- Job API -->
+    <rect x="340" y="118" width="220" height="52" rx="8" fill="#0078d4" stroke="#005a9e" stroke-width="2"/>
+    <text x="450" y="142" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">Job API</text>
+    <text x="450" y="158" text-anchor="middle" font-size="10" fill="#deecf9">Functions or Container App · returns job_id</text>
+    <!-- SB -->
+    <line x1="450" y1="170" x2="450" y2="198" stroke="#323130" stroke-width="1.5" marker-end="url(#ab)"/>
+    <rect x="330" y="198" width="240" height="48" rx="8" fill="#8764b8" stroke="#5c2d91" stroke-width="2"/>
+    <text x="450" y="222" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">Azure Service Bus</text>
+    <text x="450" y="238" text-anchor="middle" font-size="10" fill="#e6deef">Queue · dead-letter · optional priorities</text>
+    <!-- Workers -->
+    <line x1="380" y1="246" x2="280" y2="288" stroke="#323130" stroke-width="1.2" marker-end="url(#ab)"/>
+    <line x1="450" y1="246" x2="450" y2="288" stroke="#323130" stroke-width="1.2" marker-end="url(#ab)"/>
+    <line x1="520" y1="246" x2="620" y2="288" stroke="#323130" stroke-width="1.2" marker-end="url(#ab)"/>
+    <rect x="200" y="288" width="160" height="56" rx="8" fill="#e3fcef" stroke="#00875a" stroke-width="2"/>
+    <text x="280" y="312" text-anchor="middle" font-size="12" font-weight="700" fill="#004578">UI pool</text>
+    <text x="280" y="330" text-anchor="middle" font-size="9" fill="#323130">Playwright / browsers</text>
+    <rect x="370" y="288" width="160" height="56" rx="8" fill="#e3fcef" stroke="#00875a" stroke-width="2"/>
+    <text x="450" y="312" text-anchor="middle" font-size="12" font-weight="700" fill="#004578">API pool</text>
+    <text x="450" y="330" text-anchor="middle" font-size="9" fill="#323130">REST / OData · lighter</text>
+    <rect x="540" y="288" width="160" height="56" rx="8" fill="#e3fcef" stroke="#00875a" stroke-width="2"/>
+    <text x="620" y="312" text-anchor="middle" font-size="12" font-weight="700" fill="#004578">Data pool</text>
+    <text x="620" y="330" text-anchor="middle" font-size="9" fill="#323130">Snowflake · SQL Server</text>
+    <text x="450" y="362" text-anchor="middle" font-size="10" fill="#605e5c">Container Apps Jobs / AKS Jobs · ephemeral (one job → one clean unit)</text>
+    <!-- Blob + KV -->
+    <line x1="560" y1="316" x2="760" y2="200" stroke="#0078d4" stroke-width="1.2" stroke-dasharray="4 3" marker-end="url(#ab)"/>
+    <line x1="340" y="316" x2="140" y2="200" stroke="#0078d4" stroke-width="1.2" stroke-dasharray="4 3" marker-end="url(#ab)"/>
+    <rect x="40" y="168" width="120" height="56" rx="8" fill="#fff" stroke="#0078d4" stroke-width="2"/>
+    <text x="100" y="195" text-anchor="middle" font-size="11" font-weight="700" fill="#0078d4">Key Vault</text>
+    <text x="100" y="212" text-anchor="middle" font-size="9" fill="#323130">Secrets · certs</text>
+    <rect x="740" y="168" width="120" height="56" rx="8" fill="#fff" stroke="#0078d4" stroke-width="2"/>
+    <text x="800" y="195" text-anchor="middle" font-size="11" font-weight="700" fill="#0078d4">Blob Storage</text>
+    <text x="800" y="212" text-anchor="middle" font-size="9" fill="#323130">runs/job_id/…</text>
+    <text x="800" y="400" text-anchor="end" font-size="10" fill="#605e5c">Managed identities read secrets &amp; write reports</text>
+  </svg>
+  <figcaption>Every trigger becomes the <strong>same operation</strong>: enqueue a job. Workers upload <strong>evidence</strong> to Blob; the runner disk is not the system of record.</figcaption>
+</figure>
+
+<hr />
+
+<h2 id="fig-ephemeral">4. “Ephemeral” in one picture</h2>
+<figure class="diagram-wrap">
+  <svg viewBox="0 0 880 200" width="880" height="200" role="img">
+    <title>Ephemeral versus pet server</title>
+    <text x="220" y="28" text-anchor="middle" font-size="14" font-weight="700" fill="#a4262c">Pet VM (today)</text>
+    <text x="660" y="28" text-anchor="middle" font-size="14" font-weight="700" fill="#00875a">Ephemeral workers (target)</text>
+    <rect x="60" y="48" width="320" height="130" rx="10" fill="#fde7e9" stroke="#a4262c" stroke-width="2"/>
+    <text x="220" y="82" text-anchor="middle" font-size="12" fill="#323130">Same machine for months</text>
+    <text x="220" y="102" text-anchor="middle" font-size="11" fill="#605e5c">State piles up · harder to reproduce</text>
+    <rect x="200" y="112" width="40" height="28" rx="3" fill="#fff" stroke="#a4262c"/><text x="220" y="130" text-anchor="middle" font-size="9" fill="#a4262c">VM</text>
+    <text x="220" y="158" text-anchor="middle" font-size="11" font-weight="600" fill="#a4262c">One plate reused</text>
+    <g>
+      <rect x="500" y="48" width="100" height="44" rx="6" fill="#e3fcef" stroke="#00875a" stroke-width="1.5"/><text x="550" y="74" text-anchor="middle" font-size="10" font-weight="600">Run 1</text>
+      <rect x="620" y="48" width="100" height="44" rx="6" fill="#e3fcef" stroke="#00875a" stroke-width="1.5"/><text x="670" y="74" text-anchor="middle" font-size="10" font-weight="600">Run 2</text>
+      <rect x="740" y="48" width="100" height="44" rx="6" fill="#e3fcef" stroke="#00875a" stroke-width="1.5"/><text x="790" y="74" text-anchor="middle" font-size="10" font-weight="600">Run 3</text>
+      <text x="660" y="118" text-anchor="middle" font-size="11" fill="#323130">Each run: start clean → test → upload → discard</text>
+      <text x="660" y="158" text-anchor="middle" font-size="11" font-weight="600" fill="#00875a">New disposable plate every meal</text>
+    </g>
+    <text x="440" y="115" text-anchor="middle" font-size="28" fill="#0078d4">→</text>
+  </svg>
+  <figcaption><strong>Ephemeral</strong> = temporary runner per job so the next run does not inherit junk from the previous one.</figcaption>
+</figure>
+
+<hr />
+
+<h2 id="fig-triggers">5. Many doorbells — one bell (Job API)</h2>
+<figure class="diagram-wrap">
+  <svg viewBox="0 0 820 300" width="820" height="300" role="img">
+    <defs><marker id="ah" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><polygon points="0 0, 7 3.5, 0 7" fill="#005a9e" /></marker></defs>
+    <text x="410" y="26" text-anchor="middle" font-size="15" font-weight="700" fill="#242424">All sources → same Job API (then queue)</text>
+    <rect x="330" y="210" width="160" height="56" rx="10" fill="#0078d4" stroke="#004578" stroke-width="2"/>
+    <text x="410" y="238" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">Job API</text>
+    <text x="410" y="256" text-anchor="middle" font-size="9" fill="#deecf9">Auth + validate + enqueue</text>
+    <!-- spokes -->
+    <g font-size="11" font-weight="600">
+      <rect x="60" y="60" width="110" height="38" rx="6" fill="#fff" stroke="#0078d4"/><text x="115" y="84" text-anchor="middle">Gearset</text>
+      <rect x="60" y="118" width="110" height="38" rx="6" fill="#fff" stroke="#0078d4"/><text x="115" y="142" text-anchor="middle">GitHub</text>
+      <rect x="60" y="176" width="110" height="38" rx="6" fill="#fff" stroke="#0078d4"/><text x="115" y="200" text-anchor="middle">Jira</text>
+      <rect x="650" y="60" width="110" height="38" rx="6" fill="#fff" stroke="#0078d4"/><text x="705" y="84" text-anchor="middle">QA portal</text>
+      <rect x="650" y="118" width="110" height="38" rx="6" fill="#fff" stroke="#0078d4"/><text x="705" y="142" text-anchor="middle">Timer / cron</text>
+    </g>
+    <line x1="170" y1="79" x2="330" y2="230" stroke="#005a9e" stroke-width="1.5" marker-end="url(#ah)"/>
+    <line x1="170" y1="137" x2="360" y2="230" stroke="#005a9e" stroke-width="1.5" marker-end="url(#ah)"/>
+    <line x1="170" y1="195" x2="380" y2="230" stroke="#005a9e" stroke-width="1.5" marker-end="url(#ah)"/>
+    <line x1="650" y1="79" x2="490" y2="230" stroke="#005a9e" stroke-width="1.5" marker-end="url(#ah)"/>
+    <line x1="650" y1="137" x2="460" y2="230" stroke="#005a9e" stroke-width="1.5" marker-end="url(#ah)"/>
+    <text x="410" y="288" text-anchor="middle" font-size="10" fill="#605e5c">Use idempotency_key on webhooks (Jira/GitHub retries) to avoid duplicate runs</text>
+  </svg>
+  <figcaption>Integrations stay <strong>thin</strong>: authenticate, build JSON, POST, receive <code>job_id</code>. Heavy work happens only on workers.</figcaption>
+</figure>
+
+<hr />
+
+<h2 id="fig-pools">6. Worker pools by type of work</h2>
+<figure class="diagram-wrap">
+  <svg viewBox="0 0 860 240" width="860" height="240" role="img">
+    <text x="430" y="26" text-anchor="middle" font-size="15" font-weight="700" fill="#242424">Same platform — different pools (capacity &amp; network)</text>
+    <rect x="40" y="48" width="240" height="175" rx="10" fill="#fff4ce" stroke="#ff8b00" stroke-width="2"/>
+    <text x="160" y="78" text-anchor="middle" font-size="13" font-weight="700" fill="#8a6116">UI pool</text>
+    <text x="160" y="100" text-anchor="middle" font-size="10" fill="#323130">Lower max parallel</text>
+    <text x="160" y="125" text-anchor="middle" font-size="10" fill="#605e5c">Salesforce UI</text>
+    <text x="160" y="142" text-anchor="middle" font-size="10" fill="#605e5c">Dynamics web · F&amp;O web</text>
+    <text x="160" y="175" text-anchor="middle" font-size="10" font-weight="600" fill="#8a6116">Heavy RAM / browser</text>
+    <rect x="310" y="48" width="240" height="175" rx="10" fill="#deebff" stroke="#0052cc" stroke-width="2"/>
+    <text x="430" y="78" text-anchor="middle" font-size="13" font-weight="700" fill="#172b4d">API pool</text>
+    <text x="430" y="100" text-anchor="middle" font-size="10" fill="#323130">Higher density OK</text>
+    <text x="430" y="125" text-anchor="middle" font-size="10" fill="#605e5c">Salesforce REST</text>
+    <text x="430" y="142" text-anchor="middle" font-size="10" fill="#605e5c">Dynamics Web API / OData</text>
+    <text x="430" y="175" text-anchor="middle" font-size="10" font-weight="600" fill="#0052cc">Smaller containers</text>
+    <rect x="580" y="48" width="240" height="175" rx="10" fill="#e8f4fc" stroke="#0078d4" stroke-width="2"/>
+    <text x="700" y="78" text-anchor="middle" font-size="13" font-weight="700" fill="#004578">Data pool</text>
+    <text x="700" y="100" text-anchor="middle" font-size="10" fill="#323130">VNet / private paths</text>
+    <text x="700" y="125" text-anchor="middle" font-size="10" fill="#605e5c">Snowflake</text>
+    <text x="700" y="142" text-anchor="middle" font-size="10" fill="#605e5c">SQL Server · JDBC/ODBC</text>
+    <text x="700" y="175" text-anchor="middle" font-size="10" font-weight="600" fill="#0078d4">Network rules matter</text>
+  </svg>
+  <figcaption>Pools prevent a long F&amp;O or UI run from starving <strong>deployment smoke</strong> (use priorities or separate queues for smoke).</figcaption>
+</figure>
+
+<hr />
+
+<h2 id="fig-azure-map">7. Azure building blocks (diagram)</h2>
+<figure class="diagram-wrap">
+  <svg viewBox="0 0 760 200" width="760" height="200" role="img">
+    <text x="380" y="22" text-anchor="middle" font-size="14" font-weight="700" fill="#242424">Typical Azure mapping</text>
+    <g font-size="10" font-weight="600">
+      <rect x="30" y="45" width="100" height="120" rx="8" fill="#0078d4" stroke="#004578"/><text x="80" y="85" text-anchor="middle" fill="#fff">Job API</text><text x="80" y="102" text-anchor="middle" fill="#deecf9">Functions</text><text x="80" y="118" text-anchor="middle" fill="#deecf9">or CApp</text>
+      <rect x="150" y="45" width="100" height="120" rx="8" fill="#8764b8" stroke="#5c2d91"/><text x="200" y="88" text-anchor="middle" fill="#fff">Service</text><text x="200" y="104" text-anchor="middle" fill="#fff">Bus</text>
+      <rect x="270" y="45" width="110" height="120" rx="8" fill="#008575" stroke="#004b41"/><text x="325" y="88" text-anchor="middle" fill="#fff">Container</text><text x="325" y="104" text-anchor="middle" fill="#fff">Apps Jobs</text><text x="325" y="125" text-anchor="middle" fill="#c8e6e1" font-size="9">or AKS Jobs</text>
+      <rect x="400" y="45" width="100" height="120" rx="8" fill="#50e6ff" stroke="#0078d4"/><text x="450" y="88" text-anchor="middle" fill="#004578">Blob</text><text x="450" y="104" text-anchor="middle" fill="#004578">Storage</text>
+      <rect x="520" y="45" width="100" height="120" rx="8" fill="#ffb900" stroke="#8a6116"/><text x="570" y="88" text-anchor="middle" fill="#323130">Key</text><text x="570" y="104" text-anchor="middle" fill="#323130">Vault</text>
+      <rect x="640" y="45" width="90" height="120" rx="8" fill="#71afe5" stroke="#0078d4"/><text x="685" y="88" text-anchor="middle" fill="#004578">App</text><text x="685" y="104" text-anchor="middle" fill="#004578">Insights</text>
+    </g>
+    <defs><marker id="am" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><polygon points="0 0, 6 3, 0 6" fill="#323130"/></marker></defs>
+    <line x1="130" y1="105" x2="150" y2="105" stroke="#323130" marker-end="url(#am)"/>
+    <line x1="250" y1="105" x2="270" y2="105" stroke="#323130" marker-end="url(#am)"/>
+    <line x1="380" y1="105" x2="400" y2="105" stroke="#323130" marker-end="url(#am)"/>
+    <line x1="325" y1="45" x2="450" y2="45" stroke="#0078d4" stroke-dasharray="3 3" opacity="0.6"/>
+    <line x1="325" y1="45" x2="570" y2="45" stroke="#0078d4" stroke-dasharray="3 3" opacity="0.6"/>
+    <text x="380" y="185" text-anchor="middle" font-size="10" fill="#605e5c">Optional: APIM / Front Door + WAF if Job API is public to SaaS webhooks</text>
+  </svg>
+  <figcaption>Horizontal flow matches how teams usually implement: enqueue → process → persist evidence → observe.</figcaption>
+</figure>
+
+<hr />
+
+<h2 id="fig-phasing">8. Suggested rollout (timeline)</h2>
+<figure class="diagram-wrap">
+  <svg viewBox="0 0 900 120" width="900" height="120" role="img">
+    <text x="450" y="22" text-anchor="middle" font-size="14" font-weight="700" fill="#242424">Phasing — low risk to full cutover</text>
+    <circle cx="90" cy="70" r="28" fill="#deebff" stroke="#0052cc" stroke-width="2"/><text x="90" y="68" text-anchor="middle" font-size="10" font-weight="700" fill="#172b4d">1</text><text x="90" y="82" text-anchor="middle" font-size="8" fill="#323130">Measure</text>
+    <line x1="118" y1="70" x2="162" y2="70" stroke="#605e5c" stroke-width="2"/>
+    <circle cx="190" cy="70" r="28" fill="#deebff" stroke="#0052cc" stroke-width="2"/><text x="190" y="68" text-anchor="middle" font-size="10" font-weight="700" fill="#172b4d">2</text><text x="190" y="82" text-anchor="middle" font-size="8" fill="#323130">MVP Azure</text>
+    <line x1="218" y1="70" x2="262" y2="70" stroke="#605e5c" stroke-width="2"/>
+    <circle cx="290" cy="70" r="28" fill="#fff4ce" stroke="#ff8b00" stroke-width="2"/><text x="290" y="68" text-anchor="middle" font-size="10" font-weight="700" fill="#8a6116">3</text><text x="290" y="82" text-anchor="middle" font-size="8" fill="#323130">Smoke lane</text>
+    <line x1="318" y1="70" x2="362" y2="70" stroke="#605e5c" stroke-width="2"/>
+    <circle cx="390" cy="70" r="28" fill="#e3fcef" stroke="#00875a" stroke-width="2"/><text x="390" y="68" text-anchor="middle" font-size="10" font-weight="700" fill="#004578">4</text><text x="390" y="82" text-anchor="middle" font-size="8" fill="#323130">More pools</text>
+    <line x1="418" y1="70" x2="462" y2="70" stroke="#605e5c" stroke-width="2"/>
+    <circle cx="490" cy="70" r="28" fill="#e3fcef" stroke="#00875a" stroke-width="2"/><text x="490" y="68" text-anchor="middle" font-size="10" font-weight="700" fill="#004578">5</text><text x="490" y="82" text-anchor="middle" font-size="8" fill="#323130">Retire VM</text>
+    <text x="90" y="112" text-anchor="middle" font-size="9" fill="#605e5c">RAM/time</text>
+    <text x="190" y="112" text-anchor="middle" font-size="9" fill="#605e5c">1 trigger</text>
+    <text x="290" y="112" text-anchor="middle" font-size="9" fill="#605e5c">Gearset first</text>
+    <text x="390" y="112" text-anchor="middle" font-size="9" fill="#605e5c">UI/API/Data</text>
+    <text x="490" y="112" text-anchor="middle" font-size="9" fill="#605e5c">Fallback OK</text>
+    <!-- extend line for visual balance -->
+    <line x1="518" y1="70" x2="870" y2="70" stroke="#edebe9" stroke-width="3"/>
+    <text x="700" y="75" text-anchor="middle" font-size="10" fill="#a19f9d">… scale capacity as adoption grows</text>
+  </svg>
+  <figcaption><strong>1</strong> Profile the heaviest suite. <strong>2</strong> Ship Job API + queue + one pool + Blob. <strong>3</strong> Protect release smoke. <strong>4</strong> Split pools / networking. <strong>5</strong> Demote or remove sole dependence on the old VM.</figcaption>
+</figure>
+
+<hr />
+
+<h2 id="tables">Reference — triggers &amp; glossary (compact)</h2>
+<table>
+  <thead><tr><th>Trigger</th><th>Future pattern</th></tr></thead>
+  <tbody>
+    <tr><td>Gearset</td><td>Pipeline POST → Job API, high priority + deployment id</td></tr>
+    <tr><td>GitHub</td><td>OIDC to Azure → POST Job API with <code>sha</code> / run id</td></tr>
+    <tr><td>Jira</td><td>Webhook → Job API; <code>idempotency_key</code></td></tr>
+    <tr><td>QA</td><td>Portal or CLI → Job API, <code>source=qa</code></td></tr>
+    <tr><td>Nightly</td><td>Azure timer / Logic Apps → enqueue</td></tr>
+  </tbody>
+</table>
+
+<table>
+  <thead><tr><th>Term</th><th>Short meaning</th></tr></thead>
+  <tbody>
+    <tr><td>Ephemeral</td><td>Temporary runner per job, then discarded</td></tr>
+    <tr><td>Orchestrator</td><td>Coordinates dequeue, pool choice, limits (can live in workers at MVP)</td></tr>
+    <tr><td>Queue</td><td>Waiting line + backpressure when many people trigger at once</td></tr>
+    <tr><td>Pool</td><td>Group of workers with same image/network/cap limits</td></tr>
+  </tbody>
+</table>
+
+<p class="footnote">Diagrams are inline SVG — print-friendly and work offline. Edit this file in <code>docs/</code> as decisions land with your infra partner.</p>
+
+</body>
+</html>

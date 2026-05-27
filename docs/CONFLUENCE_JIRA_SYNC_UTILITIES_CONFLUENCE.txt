@@ -1,0 +1,455 @@
+h1. Jira Sync Utilities - Complete Guide
+
+h2. Overview
+
+This guide covers all utilities for synchronizing work between Jira, Zephyr Scale, and the automation framework. These utilities enable seamless integration between test case generation, upload, linking, and management.
+
+h2. Utility Categories
+
+* *Jira Work Item Management* - Generate test cases and track work items
+* *Zephyr Test Case Management* - Upload, link, and manage test cases in Zephyr
+* *Diagnostic Tools* - Identify and resolve issues with test cases
+
+h1. Jira Work Item Management
+
+h2. 1. Generate Test Cases from Jira
+
+*Command:* {{npm run jira:generate}}
+
+Generates comprehensive BDD feature files from Jira work items, analyzing requirements, acceptance criteria, and parent/epic context.
+
+h3. Usage
+
+{code}
+# Generate from work items in inputs/jira-work-items.txt
+npm run jira:generate
+
+# Generate for a single work item
+npm run jira:generate -- SF-520
+
+# Generate for multiple work items
+npm run jira:generate -- SF-520 SF-521 SF-522
+
+# Generate with version suffix (create new version)
+npm run jira:generate -- SF-520 --version-all
+
+# Overwrite existing files
+npm run jira:generate -- SF-520 --overwrite-all
+
+# Skip existing files
+npm run jira:generate -- SF-520 --skip-all
+{code}
+
+h3. Features
+
+* *Intelligent Analysis* - Analyzes work item description, acceptance criteria, comments, and parent/epic context
+* *Field Detection* - Automatically identifies Salesforce objects and fields
+* *Test Strategy* - Determines optimal test approach (UI vs API) for each requirement
+* *Coverage Analysis* - Shows which requirements are covered by which test cases
+* *Parent Context* - Includes business objectives and technical notes from parent epics
+
+h3. Output
+
+Creates feature files in:
+* {{src/features/ui/SF/}} - UI test cases
+* {{src/features/api/SF/}} - API test cases
+
+Each feature file includes:
+* Comprehensive scenarios for all acceptance criteria
+* Proper tagging (work item, priority, test type, etc.)
+* Coverage mapping showing which requirements are tested
+* Parent/epic context when available
+
+h2. 2. Find Missing Work Items
+
+*Command:* {{npm run jira:find-missing}}
+
+Identifies Jira work items in "Ready for QA" or "In QA" status that are missing from the {{inputs/jira-work-items.txt}} file.
+
+h3. Usage
+
+{code}
+npm run jira:find-missing
+{code}
+
+h3. Features
+
+* *Status Filtering* - Searches for work items in "Ready for QA" or "In QA" status
+* *File Comparison* - Compares Jira results with local work items file
+* *Detailed Report* - Shows missing work items with summaries and links
+
+h3. Output
+
+Displays:
+* Total work items found in Jira
+* Work items in the local file
+* Missing work items (in Jira but not in file)
+* Summary with Jira links for easy access
+
+h1. Zephyr Test Case Management
+
+h2. 3. Upload Test Cases to Zephyr
+
+*Command:* {{npm run zephyr:UploadTestCase}}
+
+Uploads test cases from feature files to Zephyr Scale, creating or updating test cases as needed.
+
+h3. Usage
+
+{code}
+# Upload all test cases for a work item
+npm run zephyr:UploadTestCase -- --work-item SF-570
+
+# Upload a specific test case
+npm run zephyr:UploadTestCase -- --test-case SF-570-UI-001
+
+# Upload all test cases (from jira-work-items.txt)
+npm run zephyr:UploadTestCase
+{code}
+
+h3. Features
+
+* *Automatic Creation* - Creates new test cases in Zephyr from feature files
+* *Update Existing* - Updates test cases if they already exist
+* *Test Steps Upload* - Uploads Gherkin steps to the Test Script tab
+* *Label Management* - Automatically adds work item and test case ID labels
+* *Duplicate Prevention* - Checks for existing test cases before creating
+
+h3. Output
+
+Creates/updates test cases in Zephyr with:
+* Test case name and description
+* Gherkin test steps
+* Proper labels (work item, test case ID, priority, etc.)
+* Test case key (e.g., SF-T1523)
+
+h2. 4. Upload and Link Test Cases
+
+*Command:* {{npm run zephyr:UploadAndLink}}
+
+Combines test case upload and linking into a single workflow. Uploads test cases to Zephyr and automatically links them to Jira work items.
+
+h3. Usage
+
+{code}
+# Upload and link all test cases for a work item
+npm run zephyr:UploadAndLink -- --work-item SF-570
+
+# Upload and link a specific test case
+npm run zephyr:UploadAndLink -- --test-case SF-570-UI-001
+
+# Upload only (skip linking)
+npm run zephyr:UploadAndLink -- --work-item SF-570 --skip-link
+{code}
+
+h3. Features
+
+* *Two-Step Process* - Uploads test cases, then links them to Jira
+* *Comprehensive Report* - Shows upload and linking results
+* *Pre-Upload Summary* - Displays what will be uploaded before proceeding
+* *User Confirmation* - Prompts for confirmation before uploading
+* *Error Handling* - Continues processing even if some operations fail
+
+h3. Output
+
+Provides detailed report showing:
+* Test cases uploaded (created/updated/skipped)
+* Test cases linked (linked/skipped/failed)
+* Summary statistics
+* Links to view results in Jira and Zephyr
+
+h2. 5. Link Test Cases to Jira
+
+*Command:* {{npm run zephyr:LinkToJira}}
+
+Links existing Zephyr test cases to Jira work items. Optimized for scalability and can handle projects with 1000+ test cases.
+
+h3. Usage
+
+{code}
+# Link all test cases for a work item
+npm run zephyr:LinkToJira -- --work-item SF-570
+
+# Link a specific test case
+npm run zephyr:LinkToJira -- --work-item SF-570 --test-case SF-570-UI-001
+
+# Link by Zephyr key
+npm run zephyr:LinkToJira -- --work-item SF-570 --test-case SF-T1523
+
+# Dry run (preview without making changes)
+npm run zephyr:LinkToJira -- --work-item SF-570 --dry-run
+{code}
+
+h3. Features
+
+* *Automatic Discovery* - Finds test cases by label or name pattern
+* *Pagination Support* - Efficiently handles projects with 1000+ test cases
+* *Streaming Filtering* - Filters test cases during pagination for optimal performance
+* *Duplicate Prevention* - Skips test cases that are already linked
+* *Retry Logic* - Handles Zephyr indexing delays with automatic retries
+* *Dry Run Mode* - Preview what would be linked without making changes
+
+h3. Search Strategy
+
+The utility uses a two-step search:
+
+# *Label Search* - Searches for test cases with the exact work item label (e.g., "SF-570")
+# *Name Pattern Search* - Falls back to searching by name pattern if label search finds no results
+## Matches test case names starting with the work item (e.g., "SF-570-UI-001: ...")
+## Matches test case ID labels (e.g., "SF-570-UI-001", "SF-570-API-001")
+
+h3. Performance Characteristics
+
+* *Small Projects (< 1000 test cases)*: Fast, single API call
+* *Medium Projects (1000-5000 test cases)*: Efficient pagination, typically 2-5 API calls
+* *Large Projects (5000-10000 test cases)*: Handles gracefully with pagination, typically 5-10 API calls
+* *Very Large Projects (> 10000 test cases)*: Safety limit prevents excessive API calls
+
+h3. Output
+
+Shows:
+* Test cases found and linked
+* Test cases already linked (skipped)
+* Test cases that failed to link
+* Summary with links to view in Jira
+
+h1. Diagnostic Tools
+
+h2. 6. Diagnose Duplicate Test Cases
+
+*Command:* {{npm run diagnose:duplicates}}
+
+Identifies duplicate test cases in Zephyr for a given work item, helping you clean up duplicates.
+
+h3. Usage
+
+{code}
+npm run diagnose:duplicates -- SF-570
+{code}
+
+h3. Features
+
+* *Duplicate Detection* - Groups test cases by test case ID
+* *Label Analysis* - Checks for missing work item labels
+* *Detailed Report* - Shows all duplicates with keys, names, and labels
+* *Recommendations* - Suggests which duplicates to keep/remove
+
+h3. Output
+
+Displays:
+* Total test cases found
+* Unique test cases
+* Duplicate groups (with count)
+* Test cases missing work item labels
+* Recommendations for cleanup
+
+h2. 7. Remove Duplicate Test Cases
+
+*Command:* {{npm run zephyr:RemoveDuplicates}}
+
+Identifies and removes duplicate test cases from Zephyr. Note: Direct deletion via API may not be supported; manual deletion in Zephyr UI may be required.
+
+h3. Usage
+
+{code}
+# Remove duplicates, keeping the newest
+npm run zephyr:RemoveDuplicates -- --work-item SF-570 --keep newest
+
+# Remove duplicates, keeping the oldest
+npm run zephyr:RemoveDuplicates -- --work-item SF-570 --keep oldest
+
+# Dry run (preview without deleting)
+npm run zephyr:RemoveDuplicates -- --work-item SF-570 --keep newest --dry-run
+{code}
+
+h3. Features
+
+* *Duplicate Identification* - Finds test cases with the same test case ID
+* *Selection Strategy* - Keeps newest or oldest based on creation date
+* *Dry Run Mode* - Preview what would be deleted
+* *Safety Checks* - Requires confirmation before deletion
+
+h3. Limitations
+
+* Zephyr Scale Cloud API may not support direct deletion (HTTP 405 error)
+* Manual deletion in Zephyr UI may be required for existing duplicates
+* The utility will identify duplicates even if it cannot delete them
+
+h1. Workflow Examples
+
+h2. Complete Workflow: New Work Item
+
+For a new work item that needs test cases:
+
+{code}
+# Step 1: Generate test cases from Jira
+npm run jira:generate -- SF-570
+
+# Step 2: Review and refine generated feature files
+# (Edit files in src/features/ui/SF/ and src/features/api/SF/)
+
+# Step 3: Upload and link test cases to Zephyr
+npm run zephyr:UploadAndLink -- --work-item SF-570
+
+# Step 4: Verify links in Jira
+# (Check the work item in Jira to see linked test cases)
+{code}
+
+h2. Workflow: Existing Test Cases Need Linking
+
+For test cases that already exist in Zephyr but aren't linked:
+
+{code}
+# Step 1: Check for existing test cases
+npm run diagnose:duplicates -- SF-570
+
+# Step 2: Link existing test cases to Jira
+npm run zephyr:LinkToJira -- --work-item SF-570
+
+# Step 3: Verify links in Jira
+{code}
+
+h2. Workflow: Clean Up Duplicates
+
+For cleaning up duplicate test cases:
+
+{code}
+# Step 1: Diagnose duplicates
+npm run diagnose:duplicates -- SF-570
+
+# Step 2: Preview what would be removed (dry run)
+npm run zephyr:RemoveDuplicates -- --work-item SF-570 --keep newest --dry-run
+
+# Step 3: Remove duplicates (if API supports it)
+npm run zephyr:RemoveDuplicates -- --work-item SF-570 --keep newest
+
+# Note: If API deletion fails, manually delete in Zephyr UI
+{code}
+
+h2. Workflow: Find New Work Items
+
+For discovering new work items ready for QA:
+
+{code}
+# Step 1: Find missing work items
+npm run jira:find-missing
+
+# Step 2: Add missing work items to inputs/jira-work-items.txt
+
+# Step 3: Generate test cases for new work items
+npm run jira:generate
+
+# Step 4: Upload and link
+npm run zephyr:UploadAndLink -- --work-item <NEW_WORK_ITEM>
+{code}
+
+h1. Best Practices
+
+h2. Test Case Generation
+
+# *Review Generated Files* - Always review generated feature files before uploading
+# *Refine Scenarios* - Add edge cases and refine scenarios based on your testing needs
+# *Version Control* - Use version suffixes ({{--version-all}}) when regenerating
+# *Parent Context* - Leverage parent/epic context for better test coverage
+
+h2. Upload and Linking
+
+# *Use UploadAndLink* - Prefer {{zephyr:UploadAndLink}} for new work items (combines upload and link)
+# *Dry Run First* - Use {{--dry-run}} to preview what will be linked
+# *Link After Upload* - Link test cases immediately after uploading to Zephyr
+# *Monitor Performance* - For large projects, monitor pagination progress in logs
+
+h2. Duplicate Management
+
+# *Regular Diagnostics* - Run {{diagnose:duplicates}} regularly to catch duplicates early
+# *Prevent Duplicates* - Ensure test cases have proper labels before uploading
+# *Clean Up Promptly* - Remove duplicates as soon as they're identified
+# *Manual Cleanup* - Be prepared to manually delete duplicates in Zephyr UI if API doesn't support it
+
+h2. Work Item Tracking
+
+# *Keep File Updated* - Regularly update {{inputs/jira-work-items.txt}} with new work items
+# *Use Find Missing* - Run {{jira:find-missing}} regularly to discover new work items
+# *Comment Work Items* - Add comments in the file to track status (e.g., "#SF-570 - Uploaded and linked")
+
+h1. Troubleshooting
+
+h2. Test Cases Not Found
+
+If utilities report "No test cases found":
+
+# *Verify Test Cases Exist* - Check Zephyr Scale UI to confirm test cases exist
+# *Check Labels* - Ensure test cases have the work item label (e.g., "SF-570")
+# *Check Name Pattern* - Test case names should start with the work item (e.g., "SF-570-UI-001: ...")
+# *Check Project Key* - Verify test cases are in the correct project (default: "SF")
+# *Wait for Indexing* - Wait a few minutes after creating test cases, then retry
+
+h2. Linking Failures
+
+If linking fails:
+
+# *Verify Jira Work Item* - Ensure the work item exists and is accessible
+# *Check Test Case Keys* - Verify test cases have valid Zephyr keys
+# *Check Existing Links* - Test cases may already be linked (this is expected)
+# *Review Error Messages* - Check error messages for specific issues
+# *Try Dry Run* - Use {{--dry-run}} to see what would be linked
+
+h2. Duplicate Creation
+
+If duplicates are being created:
+
+# *Check Labels* - Ensure test cases have the work item label before uploading
+# *Run Diagnostics* - Use {{diagnose:duplicates}} to identify duplicates
+# *Review Upload Process* - Check if the same file is being processed multiple times
+# *Wait for Indexing* - Zephyr indexing delays can cause duplicate detection to fail
+
+h2. Performance Issues
+
+If utilities are slow:
+
+# *Large Projects* - Projects with 5000+ test cases will take longer due to pagination
+# *Network* - Slow network connections will affect API call performance
+# *Zephyr API* - Zephyr API response times can vary based on server load
+# *Pagination* - Monitor pagination progress in logs to understand performance
+
+h1. Related Commands
+
+* *Upload Test Cases*: {{npm run zephyr:UploadTestCase -- --work-item SF-570}}
+* *Upload Results*: {{npm run zephyr:UploadResult -- --cycle "Sprint-93-QA" --test-case SF-570-UI-001}}
+* *Update Execution*: {{npm run zephyr:update -- --execution <execution-id> --status PASSED}}
+
+h1. Technical Details
+
+h2. API Endpoints Used
+
+* {{GET /testcases?projectKey={projectKey}&startAt={startAt}&maxResults={maxResults}}} - Fetch test cases with pagination
+* {{GET /issues/{issueId}}} - Get Jira issue details
+* {{GET /issues/{issueId}/remotelink}} - Get existing remote links
+* {{POST /testcases/{testCaseKey}/links/issues/{issueId}}} - Create link between test case and Jira issue
+* {{POST /testcases}} - Create test case in Zephyr
+* {{PUT /testcases/{testCaseKey}}} - Update test case in Zephyr
+
+h2. Environment Variables
+
+* {{ZEPHYR_PROJECT_KEY}}: Project key for Zephyr (default: "SF")
+* {{JIRA_BASE_URL}}: Base URL for Jira instance
+* {{JIRA_PROJECT_KEY}}: Project key for Jira (default: "SF")
+* {{ZEPHYR_NON_INTERACTIVE}}: Set to "true" for non-interactive mode
+* {{ATLASSIAN_EMAIL}}: Email for Atlassian API authentication
+* {{ATLASSIAN_API_TOKEN}}: API token for Atlassian authentication
+
+h2. File Locations
+
+* *Work Items File*: {{inputs/jira-work-items.txt}}
+* *Feature Files*: {{src/features/ui/SF/}} and {{src/features/api/SF/}}
+* *Configuration*: {{src/config/env/.env.qa}}
+
+h1. Support
+
+For issues or questions:
+
+# Check the troubleshooting section above
+# Review diagnostic output with {{--dry-run}} flags
+# Use diagnostic utilities: {{npm run diagnose:duplicates -- {WORK_ITEM}}}
+# Check Zephyr and Jira UI to verify test cases and links exist
+

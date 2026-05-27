@@ -1,0 +1,97 @@
+{
+  "objectApiName": "Insurance_Product__c",
+  "generatedAt": "2026-04-08T20:24:39.624Z",
+  "note": "Generated from org describe; SF-872 API tests treat this as the expected field matrix.",
+  "fields": [
+    {
+      "apiName": "CreatedById",
+      "label": "Created By ID",
+      "dataType": "Lookup(User)"
+    },
+    {
+      "apiName": "CreatedDate",
+      "label": "Created Date",
+      "dataType": "Date/Time"
+    },
+    {
+      "apiName": "CurrencyIsoCode",
+      "label": "Currency ISO Code",
+      "dataType": "Picklist"
+    },
+    {
+      "apiName": "IsDeleted",
+      "label": "Deleted",
+      "dataType": "Checkbox"
+    },
+    {
+      "apiName": "Insurance_Product_Name__c",
+      "label": "Insurance Product Name",
+      "dataType": "Text(255)"
+    },
+    {
+      "apiName": "LastActivityDate",
+      "label": "Last Activity Date",
+      "dataType": "Date"
+    },
+    {
+      "apiName": "LastModifiedById",
+      "label": "Last Modified By ID",
+      "dataType": "Lookup(User)"
+    },
+    {
+      "apiName": "LastModifiedDate",
+      "label": "Last Modified Date",
+      "dataType": "Date/Time"
+    },
+    {
+      "apiName": "LastReferencedDate",
+      "label": "Last Referenced Date",
+      "dataType": "Date/Time"
+    },
+    {
+      "apiName": "LastViewedDate",
+      "label": "Last Viewed Date",
+      "dataType": "Date/Time"
+    },
+    {
+      "apiName": "OwnerId",
+      "label": "Owner ID",
+      "dataType": "Lookup(Group, User)"
+    },
+    {
+      "apiName": "Product__c",
+      "label": "Product",
+      "dataType": "Lookup(Product)"
+    },
+    {
+      "apiName": "Name",
+      "label": "Product Master ID",
+      "dataType": "Auto Number"
+    },
+    {
+      "apiName": "Id",
+      "label": "Record ID",
+      "dataType": "Record ID"
+    },
+    {
+      "apiName": "Status__c",
+      "label": "Status",
+      "dataType": "Picklist"
+    },
+    {
+      "apiName": "SystemModstamp",
+      "label": "System Modstamp",
+      "dataType": "Date/Time"
+    },
+    {
+      "apiName": "Valid_From__c",
+      "label": "Valid From",
+      "dataType": "Date"
+    },
+    {
+      "apiName": "Valid_To__c",
+      "label": "Valid To",
+      "dataType": "Date"
+    }
+  ]
+}

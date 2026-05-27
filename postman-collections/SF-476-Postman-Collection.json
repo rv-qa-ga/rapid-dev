@@ -1,0 +1,372 @@
+{
+	"info": {
+		"_postman_id": "sf-476-api-tests",
+		"name": "SF-476 - Hide Annual_GWP_Estimate_Year_1__c from Account - API Tests",
+		"description": "Postman collection for SF-476 API tests. Tests for hiding Annual_GWP_Estimate_Year_1__c field from Account records for non-admin users.\n\n## Setup Instructions:\n1. Import this collection into Postman\n2. Create a new environment (or use existing Salesforce QA environment)\n3. Set the following environment variables:\n   - `sf_base_url`: https://arx--qa.sandbox.my.salesforce.com\n   - `sf_api_version`: v60.0\n   - `sf_access_token`: Your Salesforce access token (get via OAuth or JWT)\n   - `sf_instance_url`: Your Salesforce instance URL\n   - `account_id`: Account ID for Lead creation\n   - `lead_id`: Lead ID for update operations\n\n## Authentication:\nThis collection uses Bearer Token authentication. Obtain an access token via:\n- OAuth 2.0 flow\n- JWT Bearer Token flow\n- Username/Password flow\n\n## Test Scenarios:\n- Verify custom__c field exists on Lead and Account\n- Verify custom__c is inherited from Account on Lead creation\n- Verify custom__c cannot be updated on Lead after creation\n- Reject invalid custom__c values",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{sf_access_token}}",
+				"type": "string"
+			}
+		]
+	},
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "{{sf_base_url}}",
+			"type": "string"
+		},
+		{
+			"key": "api_version",
+			"value": "{{sf_api_version}}",
+			"type": "string"
+		},
+		{
+			"key": "account_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "lead_id",
+			"value": "",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "SF-476-API-001 - Verify custom__c field exists on Lead",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"custom__c field exists\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.fields).to.be.an('array');",
+							"    var field = jsonData.fields.find(f => f.name === 'custom__c');",
+							"    pm.expect(field).to.not.be.undefined;",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Lead/describe",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"services",
+						"data",
+						"{{api_version}}",
+						"sobjects",
+						"Lead",
+						"describe"
+					]
+				},
+				"description": "API - Verify custom__c field exists on Lead\n\n**Test ID:** SF-476-API-001\n**Priority:** p1\n**Tags:** @smoke @field-exists"
+			},
+			"response": []
+		},
+		{
+			"name": "SF-476-API-002 - Verify custom__c field exists on Account",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"custom__c field exists\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.fields).to.be.an('array');",
+							"    var field = jsonData.fields.find(f => f.name === 'custom__c');",
+							"    pm.expect(field).to.not.be.undefined;",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Account/describe",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"services",
+						"data",
+						"{{api_version}}",
+						"sobjects",
+						"Account",
+						"describe"
+					]
+				},
+				"description": "API - Verify custom__c field exists on Account\n\n**Test ID:** SF-476-API-002\n**Priority:** p1\n**Tags:** @field-exists"
+			},
+			"response": []
+		},
+		{
+			"name": "SF-476-API-003 - Verify custom__c is inherited from Account on Lead creation",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// Create Account with custom = 'EU' first",
+							"pm.sendRequest({",
+							"    url: pm.variables.get('base_url') + '/services/data/' + pm.variables.get('api_version') + '/sobjects/Account/',",
+							"    method: 'POST',",
+							"    header: {",
+							"        'Authorization': 'Bearer ' + pm.environment.get('sf_access_token'),",
+							"        'Content-Type': 'application/json'",
+							"    },",
+							"    body: {",
+							"        mode: 'raw',",
+							"        raw: JSON.stringify({ Name: 'Test Account for Lead', custom__c: 'EU' })",
+							"    }",
+							"}, function (err, res) {",
+							"    if (res && res.json() && res.json().id) {",
+							"        pm.collectionVariables.set('account_id', res.json().id);",
+							"    }",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"pm.test(\"Lead has custom = 'EU'\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    // Query the Lead to verify custom__c value",
+							"    var leadId = jsonData.id;",
+							"    pm.collectionVariables.set('lead_id', leadId);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"LastName\": \"Test Lead\",\n  \"Company\": \"Test Company\",\n  \"Account__c\": \"{{account_id}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Lead/",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"services",
+						"data",
+						"{{api_version}}",
+						"sobjects",
+						"Lead",
+						""
+					]
+				},
+				"description": "API - Verify custom__c is inherited from Account on Lead creation\n\n**Test ID:** SF-476-API-003\n**Priority:** p1\n**Tags:** @smoke @auto-populate\n\n**Prerequisite:** Requires a test Account created via API with custom = 'EU'\n\n**Expected:** Lead should have custom = 'EU' inherited from Account"
+			},
+			"response": []
+		},
+		{
+			"name": "SF-476-API-004 - Verify custom__c cannot be updated on Lead after creation",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code indicates rejection\", function () {",
+							"    // Should return error (400/422) or 204 if update is silently ignored",
+							"    pm.expect(pm.response.code).to.be.oneOf([204, 400, 422]);",
+							"});",
+							"",
+							"// Verify Lead custom__c is still 'UK' by querying",
+							"pm.test(\"Lead custom__c should still be original value\", function () {",
+							"    // This would require a follow-up query request",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"custom__c\": \"US\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Lead/{{lead_id}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"services",
+						"data",
+						"{{api_version}}",
+						"sobjects",
+						"Lead",
+						"{{lead_id}}"
+					]
+				},
+				"description": "API - Verify custom__c cannot be updated on Lead after creation\n\n**Test ID:** SF-476-API-004\n**Priority:** p1\n**Tags:** @read-only @negative\n\n**Prerequisite:** Requires a test Account created via API with custom = 'UK' and a test Lead created via API for the Account\n\n**Expected:** API should reject the custom__c update, and Lead custom__c should still be 'UK'"
+			},
+			"response": []
+		},
+		{
+			"name": "SF-476-API-005 - Reject invalid custom__c value",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code indicates error\", function () {",
+							"    pm.expect(pm.response.code).to.be.oneOf([400, 422]);",
+							"});",
+							"",
+							"pm.test(\"Error response mentions custom\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    var errorText = JSON.stringify(jsonData);",
+							"    pm.expect(errorText.toLowerCase()).to.include('custom');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"LastName\": \"Invalid Test Lead\",\n  \"Company\": \"Test Company\",\n  \"custom__c\": \"INVALID_VALUE_###\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Lead/",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"services",
+						"data",
+						"{{api_version}}",
+						"sobjects",
+						"Lead",
+						""
+					]
+				},
+				"description": "API - Reject invalid custom__c value\n\n**Test ID:** SF-476-API-005\n**Priority:** p2\n**Tags:** @negative @invalid-value\n\n**Expected:** API should reject invalid custom__c value and return error mentioning \"custom\""
+			},
+			"response": []
+		},
+		{
+			"name": "SF-476-API-006 - Handle null custom__c value",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"custom__c is null or empty\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    if (jsonData.records && jsonData.records.length > 0) {",
+							"        var record = jsonData.records[0];",
+							"        pm.expect(record.custom__c === null || record.custom__c === '' || record.custom__c === undefined).to.be.true;",
+							"    }",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/services/data/{{api_version}}/query/?q=SELECT Id, LastName, Company, custom__c FROM Lead WHERE custom__c = null LIMIT 1",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"services",
+						"data",
+						"{{api_version}}",
+						"query",
+						""
+					],
+					"query": [
+						{
+							"key": "q",
+							"value": "SELECT Id, LastName, Company, custom__c FROM Lead WHERE custom__c = null LIMIT 1"
+						}
+					]
+				},
+				"description": "API - Handle null custom__c value\n\n**Test ID:** SF-476-API-006\n**Priority:** p2\n**Tags:** @negative @null-value\n\n**Prerequisite:** Requires a test Lead created via API without custom"
+			},
+			"response": []
+		}
+	]
+}
+

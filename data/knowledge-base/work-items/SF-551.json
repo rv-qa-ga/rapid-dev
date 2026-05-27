@@ -1,0 +1,37 @@
+{
+  "key": "SF-551",
+  "summary": "Make the State and Country field on the Address picklists",
+  "type": "Story",
+  "status": "Blocked",
+  "priority": "Medium",
+  "description": {
+    "raw": "As a Data Governance owner I want the  State  and  Country  fields within address details to use controlled picklist values across all objects that store address information So that address data is consistent, validated, and aligned across Salesforce and downstream integrations. Scenario 1: Country field standardised as picklist   Given an object contains standard address fields   When the Country field is displayed or edited   Then the Country field must be a picklist   And the available values must come from the centrally approved Country list   And no free-text entry must be allowed Scenario 2: State/Province field standardised as picklist   Given an object contains standard address fields   When the State or Province field is displayed or edited   Then the State/Province field must be a picklist   And the available values must be restricted to the centrally approved State/Province list for the selected Country   And no free-text entry must be allowed Scenario 3: Standard applies to all objects holding address fields   Given multiple objects in Salesforce contain address fields   When ensuring address consistency   Then the Country and State/Province picklist requirement must apply to all objects, including (but not limited to):     | Lead      |     | Account   |     | Contact   | Scenario 4: State/Province values must depend on Country   Given a user selects a Country in the address details   When choosing a State or Province   Then only the State/Province values that correspond to the selected Country must be available for selection Scenario 5: Picklist values must remain consistent across systems   Given the State and Country fields are picklists populated from a central list   When these fields are referenced in automation, validation rules, reports, or integrations   Then the values must be consistent and aligned with the approved reference data",
+    "parsed": {
+      "sentences": [
+        "As a Data Governance owner I want the  State  and  Country  fields within address details to use controlled picklist values across all objects that store address information So that address data is consistent, validated, and aligned across Salesforce and downstream integrations",
+        "Scenario 1: Country field standardised as picklist   Given an object contains standard address fields   When the Country field is displayed or edited   Then the Country field must be a picklist   And the available values must come from the centrally approved Country list   And no free-text entry must be allowed Scenario 2: State/Province field standardised as picklist   Given an object contains standard address fields   When the State or Province field is displayed or edited   Then the State/Province field must be a picklist   And the available values must be restricted to the centrally approved State/Province list for the selected Country   And no free-text entry must be allowed Scenario 3: Standard applies to all objects holding address fields   Given multiple objects in Salesforce contain address fields   When ensuring address consistency   Then the Country and State/Province picklist requirement must apply to all objects, including (but not limited to):     | Lead      |     | Account   |     | Contact   | Scenario 4: State/Province values must depend on Country   Given a user selects a Country in the address details   When choosing a State or Province   Then only the State/Province values that correspond to the selected Country must be available for selection Scenario 5: Picklist values must remain consistent across systems   Given the State and Country fields are picklists populated from a central list   When these fields are referenced in automation, validation rules, reports, or integrations   Then the values must be consistent and aligned with the approved reference data"
+      ],
+      "entities": [
+        "Account",
+        "Contact",
+        "Lead"
+      ],
+      "fields": [],
+      "actions": [
+        "validate",
+        "display",
+        "populate"
+      ]
+    }
+  },
+  "acceptanceCriteria": [],
+  "comments": [],
+  "relatedIssues": [],
+  "fieldDefinitions": {},
+  "generatedFeatures": {
+    "ui": "src/features/ui/SF/SF-551.feature",
+    "api": "src/features/api/SF/SF-551.feature"
+  },
+  "qaReviewedFeatures": {},
+  "extractedAt": "2025-12-17T18:40:38.308Z"
+}

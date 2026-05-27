@@ -1,0 +1,141 @@
+h1. Automation Testing
+
+
+h2. Current Status
+
+Summary of where the framework and adoption stand today:
+
+|| Area || Status || Notes ||
+| *Framework* | Production-ready | Playwright + Cucumber + TypeScript; UI + API; POM, field registry, test data factory |
+| *Location* | GitHub | Single repo; clone and use per docs |
+| *Documentation* | In repo + Confluence | README, {{docs/}}, Confluence workflow guide |
+| *Adoption* | Mixed | Some QA use it; manual QA adoption is a goal |
+| *Onboarding* | Runbook added | Checklist for getting started; Cursor or VS Code recommended |
+
+
+----
+
+h2. Plan to Improve (Next Quarters)
+
+|| Quarter || Objective || Actions ||
+| Next weeks / Q1 | Socialize runbook | Share Automation Runbook with all manual QA; recommend Cursor and GitHub |
+| Q2 | Confluence and training | Update Confluence strategy + workflow pages; optional "automation 101" sessions |
+| Q3+ | Broader adoption | Target: every QA can run at least one test and interpret results; track adoption |
+
+
+----
+
+h2. Automation Runbook – QA Adoption
+
+*Who this is for:* Manual QA team members getting started with the E2E automation framework.
+
+*What you'll do:* Start with the basics. *No tests are ready to run* when you first get the framework. Follow the checklist in order: (1) get the code and look at framework utilities, (2) create *Gherkin* test cases using Jira generate and upload them to Jira as your *first step*, (3) then automate the steps for your test cases (UI and API) over time.
+
+*IDE:* *Cursor* recommended; *VS Code* can also be used.
+
+*Repo:* [rapid-dev|https://github.com/rv-qa-ga/rapid-dev]
+
+*Track progress:* [QA Onboarding Progress Tracker] — track each resource's progress through the onboarding baby steps.
+
+
+h3. Runbook at a glance
+
+# Prerequisites — request Cursor and GitHub access via ServiceNow; Jira/Zephyr token and .env
+# Get the code and tooling — Node, Git, IDE, clone repo, build
+# Environment configuration — .env.qa and credentials
+# Look at the framework — explore structure, README, Gherkin
+# First step — create Gherkin test cases (Jira generate) and upload to Jira
+# Later — automate the steps (UI/API), then run tests
+
+
+----
+
+h3. Prerequisites
+
+Get access to required tools by raising a ServiceNow ticket (Accelerant Employee Center) *before* installing or cloning:
+
+* [ ] *Cursor access* — [Request via ServiceNow|https://support.accelerant247.com/accelerant?id=sc_cat_item&sys_id=1255ee8e83d676101d4c57e0deaad37c]
+* [ ] *Enterprise GitHub access* — [Request via ServiceNow|https://support.accelerant247.com/accelerant?id=sc_cat_item&table=sc_cat_item&sys_id=0093455c831c32101d4c57e0deaad300&recordUrl=com.glideapp.servicecatalog_cat_item_view.do%3Fv%3D1&sysparm_id=0093455c831c32101d4c57e0deaad300]
+
+*Jira and Zephyr (for generate and upload):* To use Jira to generate test cases or Zephyr to upload them, you need an *Atlassian API token* and must add it to your {{.env.qa}} file (see Environment configuration below). Use your Atlassian account email and the token in {{JIRA_EMAIL}}/{{JIRA_API_TOKEN}} or {{ATLASSIAN_EMAIL}}/{{ATLASSIAN_API_TOKEN}}.
+
+*Help — connect and generate token:*
+* [Manage API tokens for your Atlassian account|https://support.atlassian.com/atlassian-account/docs/manage-api-tokens-for-your-atlassian-account/] — create the token, then set {{JIRA_API_TOKEN}} and {{ZEPHYR_API_TOKEN}} (or {{ATLASSIAN_API_TOKEN}}) in {{src/config/env/.env.qa}}
+* [Jira Cloud REST API overview|https://developer.atlassian.com/cloud/jira/platform/rest/v3/intro/]
+* [Zephyr Scale API documentation|https://support.smartbear.com/zephyr-scale-cloud/api-docs/] (same Atlassian account and token)
+
+*Project keys and base URLs:* Confirm with your lead the Jira project key, Zephyr project key ({{ZEPHYR_PROJECT_KEY}}), and your organisation's Atlassian base URL ({{JIRA_BASE_URL}}, {{ZEPHYR_BASE_URL}}) and set them in {{.env.qa}}.
+
+*Important:* Never commit {{.env.qa}} to the repo — it contains secrets.
+
+Setup guides may be added as sub-pages under [Automation Testing Strategy for End-to-End Workflow|https://accelins.atlassian.net/wiki/spaces/TM/pages/1982333036/Automation+Testing+Strategy+for+End-to-End+Workflow]; check there for the latest.
+
+_Complete these before the code and tooling section below._
+
+
+----
+
+h3. How to use
+
+* [ ] Work through sections in order; check off each item when done.
+* [ ] If something fails, see Troubleshooting below or contact *Ravi Vazhenkhat* (framework owner).
+
+
+h3. 1. Get the code and tooling
+
+* [ ] *1.1* Install Node.js 18+ ([nodejs.org|https://nodejs.org]), Git ([git-scm.com|https://git-scm.com]).
+* [ ] *1.2* (Recommended) Install *Cursor* ([cursor.com|https://cursor.com]) or *VS Code* ([code.visualstudio.com|https://code.visualstudio.com]); open project in Cursor or VS Code.
+* [ ] *1.3* Clone repo: {{git clone https://github.com/rv-qa-ga/rapid-dev}}, {{cd rapid-dev}}, then {{npm install}}, {{npm run build}}.
+
+
+h3. 2. Environment configuration (for Jira generate and upload)
+
+* [ ] *2.1* Copy {{src/config/env/env.sample}} to {{src/config/env/.env.qa}} (do not commit).
+* [ ] *2.2* Get credentials from your lead. For Jira/Zephyr: generate an Atlassian API token (see *Help* under Prerequisites) and set {{JIRA_EMAIL}}, {{JIRA_API_TOKEN}}, {{ZEPHYR_API_TOKEN}} (or {{ATLASSIAN_EMAIL}}/{{ATLASSIAN_API_TOKEN}}) in {{.env.qa}}.
+
+
+h3. 3. Look at the framework
+
+* [ ] *3.1* Explore: UI features {{src/features/ui/}}, API features {{src/features/api/}}, steps {{src/step-definitions/}}.
+* [ ] *3.2* Read README.md; skim docs/framework-documentation.md or Confluence.
+* [ ] *3.3* Understand *Gherkin* format (Given/When/Then); test cases are in {{.feature}} files.
+
+
+h3. 4. First step: Create Gherkin test cases and upload to Jira
+
+* [ ] *4.1* Use *Jira generate* to create Gherkin test cases from a Jira work item: e.g. {{npm run jira:generate -- SF-XXX}}.
+* [ ] *4.2* Review the generated feature files under {{src/features/ui/}} and {{src/features/api/}}.
+* [ ] *4.3* Upload to Jira (e.g. Zephyr): {{npm run zephyr:UploadAndLink -- --work-item SF-XXX}}. See {{docs/planning/AUTOMATION_RUNBOOK_QA_ADOPTION.md}} for full steps.
+
+_This is your first deliverable — get Gherkin test cases into Jira before automating! Congrats if you are here ! 🙂_
+
+
+h3. 5. Later: Automate the steps (UI and API)
+
+* [ ] *5.1* Implement or adjust step definitions in {{src/step-definitions/}} (UI and API as needed).
+* [ ] *5.2* Use branch {{git checkout -b your-name/short-description}}; commit, push, open Pull Request when ready.
+
+_Once steps are automated, you can run tests (e.g. {{npm run test:tag -- --tags @SF-XXX}})._
+
+
+----
+
+h3. Troubleshooting
+
+* *Install or build fails* — Use Node.js 18+. If the repo has a lockfile, try {{npm ci}} instead of {{npm install}}. Run {{npm run build}} from the repo root.
+* *Login or auth errors* — Check {{.env.qa}} (copy from env.sample). Confirm Salesforce URL, username, and password/JWT with your lead.
+* *Tests don't run or wrong environment* — Ensure {{.env.qa}} exists and is filled; set {{ENV=qa}} if required.
+* *Jira or Zephyr errors* — Verify credentials and project key in {{.env.qa}}; see Confluence or docs for token setup.
+
+If you're stuck, contact *Ravi Vazhenkhat* (framework owner) or check the links below.
+
+
+*More:*
+* [Automation Testing Strategy for End-to-End Workflow|https://accelins.atlassian.net/wiki/spaces/TM/pages/1982333036/Automation+Testing+Strategy+for+End-to-End+Workflow]
+* [QA Automation Framework – Complete Workflow Guide|https://accelins.atlassian.net/wiki/spaces/TM/pages/2692710418/QA+Automation+Framework+-+Complete+Workflow+Guide]
+* [Automation Framework Presentation|https://accelins.atlassian.net/wiki/spaces/TM/pages/2977988792/Automation+Framework+Presentation] — slide-style overview; open {{docs/presentation/AutomationPresentation.html}} from the repo in a browser.
+
+
+---
+*Last updated: February 2025*
+*Parent:* [BSGQA Next-Version Planning Hub – Overview]

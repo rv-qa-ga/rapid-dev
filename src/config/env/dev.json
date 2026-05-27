@@ -1,0 +1,23 @@
+{
+  "name": "dev",
+  "description": "Development environment - sbxcmn sandbox",
+  "salesforce": {
+    "baseUrl": "https://arx--sbxcmn.sandbox.my.salesforce.com",
+    "apiVersion": "v60.0",
+    "loginUrl": "https://arx--sbxcmn.sandbox.my.salesforce.com"
+  },
+  "jira": {
+    "baseUrl": "https://accelins.atlassian.net/",
+    "projectKey": "SF"
+  },
+  "zephyr": {
+    "baseUrl": "https://accelins.atlassian.net/",
+    "projectKey": "SF"
+  },
+  "timeouts": {
+    "navigation": 30000,
+    "element": 10000,
+    "api": 30000
+  }
+}
+

@@ -1,0 +1,30 @@
+{
+  "key": "SF-521",
+  "summary": "Allow Users to Merge Potential Duplicate Records",
+  "type": "Story",
+  "status": "In QA",
+  "priority": "Medium",
+  "description": {
+    "raw": "GIVEN I encounter potential duplicates of a particular record WHEN I confirm that they are in fact duplicates AND i do not want to create a new duplicate record THEN I should have the option of merging the information between two records to make them one This should apply to all records within all objects Duplication rules can remain as-is",
+    "parsed": {
+      "sentences": [
+        "GIVEN I encounter potential duplicates of a particular record WHEN I confirm that they are in fact duplicates AND i do not want to create a new duplicate record THEN I should have the option of merging the information between two records to make them one This should apply to all records within all objects Duplication rules can remain as-is"
+      ],
+      "entities": [],
+      "fields": [],
+      "actions": [
+        "create"
+      ]
+    }
+  },
+  "acceptanceCriteria": [],
+  "comments": [],
+  "relatedIssues": [],
+  "fieldDefinitions": {},
+  "generatedFeatures": {
+    "ui": "src/features/ui/SF/SF-521.feature",
+    "api": "src/features/api/SF/SF-521.feature"
+  },
+  "qaReviewedFeatures": {},
+  "extractedAt": "2025-12-17T18:40:41.076Z"
+}

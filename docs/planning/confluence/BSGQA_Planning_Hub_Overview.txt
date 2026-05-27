@@ -1,0 +1,23 @@
+This hub provides the forward-looking plan for the QA team across three focus areas. Each area has a dedicated sub-page with current status and plan for the next weeks and months.
+
+h2. Three Focus Areas
+
+|| # || Section || Sub-page ||
+| 1 | Month-end process — current process, pain points, teams involved, plan to improve | [Month-End Process] |
+| 2 | End-to-end process — E2E pipeline, automation status, ODS/TDS/Dynamics F&O/Power BI expansion, QA scope, ADP in scope | [End-to-End Process] |
+| 3 | Automation testing — framework status, QA adoption runbook, plan to improve | [Automation Testing] |
+
+_Create the three child pages under this hub, then the links above will resolve._
+
+h2. Summary: Q1 Priorities
+
+# *Month-end:* Define month-end deliverables and add a short runbook/checklist linking to automation reports.
+# *End-to-end:* Runbook with env setup, access, ADP/ODS dependencies; expand framework with ODS, TDS, Dynamics F&O, and Power BI test cases; update Confluence as needed.
+# *Automation:* Publish and socialize the Automation Runbook; encourage use of Cursor and GitHub.
+
+h2. Progress Tracker
+
+Progress against this plan is tracked in the repo: {{docs/planning/PROGRESS_TRACKER.md}}
+
+---
+*Last updated: February 2025*

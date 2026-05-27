@@ -1,0 +1,31 @@
+{
+  "key": "SF-520",
+  "summary": "Account Status Field",
+  "type": "Story",
+  "status": "Blocked",
+  "priority": "Medium",
+  "description": {
+    "raw": "As a:  MRD I want to:  select the status of an account So that I can:  track the lifecycle of Accounts in line with business and reporting needs Scenario: Configure Account Status values Given I am a MRD When I need to select the status of an account Then the values must exist in this exact order: New Prospect Onboarding Contracted Active Runoff Offboarded And the field must be available on all Account record types And the field must be auditable in history tracking",
+    "parsed": {
+      "sentences": [
+        "As a:  MRD I want to:  select the status of an account So that I can:  track the lifecycle of Accounts in line with business and reporting needs Scenario: Configure Account Status values Given I am a MRD When I need to select the status of an account Then the values must exist in this exact order: New Prospect Onboarding Contracted Active Runoff Offboarded And the field must be available on all Account record types And the field must be auditable in history tracking"
+      ],
+      "entities": [
+        "Account",
+        "Contract"
+      ],
+      "fields": [],
+      "actions": []
+    }
+  },
+  "acceptanceCriteria": [],
+  "comments": [],
+  "relatedIssues": [],
+  "fieldDefinitions": {},
+  "generatedFeatures": {
+    "ui": "src/features/ui/SF/SF-520.feature",
+    "api": "src/features/api/SF/SF-520.feature"
+  },
+  "qaReviewedFeatures": {},
+  "extractedAt": "2025-12-17T18:40:27.744Z"
+}

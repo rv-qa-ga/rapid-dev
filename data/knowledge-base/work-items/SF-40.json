@@ -1,0 +1,39 @@
+{
+  "key": "SF-40",
+  "summary": "8105: Standard Account List Views - Member",
+  "type": "Story",
+  "status": "In development",
+  "priority": "Medium",
+  "description": {
+    "raw": "As a:  Member Relationship Director (MRD), or Member Operations Manager (MemberOps), or Actuarial Lead, or Underwriter tied to a Member Account I want to:  filter and find Accounts by lifecycle stage, type, and region So that I can:  quickly access the Accounts I own, need to review, or support as part of the Account Team Background: Given I am a Salesforce User with access to Accounts And the fields  Account Status, Account Type, and Region  are configured Scenario: Standard Account list views are available for all users When I navigate to the  Accounts tab Then the following standard list views must be available: List View Name Filter Criteria My Active Accounts My Account Team  AND  Account_Status = \"Active\" My Onboarding Members My Account Team  AND  Account_Status = \"Contracted\" Recently Updated All Accounts  AND  Last Modified Date = Last 7 Days Needs Review All Accounts  AND  Account_Status = \"New\" OR \"Funnel\" OR “Pipeline” OR “Onboarding” OR “Contracting”  And each view must display the columns:  Account Name, Type, Account Status, PTY Code, Owner And all list views must be sorted by  Last Modified Date (most recent first) And each list view must display these columns: Account Name Account Status Account Type PTY Code Owner And each view must be sorted by  Last Modified Date (most recent first) Scenario: Governance of standard list views Given standard Account list views are configured When Salesforce Users access Accounts Then Users must be able to  view and use  these standard list views And Users must  not be able to edit, rename, or delete  standard list views And Users must still be able to create and manage their own  personal list views  without restriction ✅  Business Value: Ensures  consistency and accuracy  in how Accounts are filtered and reported across the org. Prevents accidental changes to  critical, standard list views  that all teams rely on. Still allows flexibility for users to build  personalized views  to support their workflow.",
+    "parsed": {
+      "sentences": [
+        "As a:  Member Relationship Director (MRD), or Member Operations Manager (MemberOps), or Actuarial Lead, or Underwriter tied to a Member Account I want to:  filter and find Accounts by lifecycle stage, type, and region So that I can:  quickly access the Accounts I own, need to review, or support as part of the Account Team Background: Given I am a Salesforce User with access to Accounts And the fields  Account Status, Account Type, and Region  are configured Scenario: Standard Account list views are available for all users When I navigate to the  Accounts tab Then the following standard list views must be available: List View Name Filter Criteria My Active Accounts My Account Team  AND  Account_Status = \"Active\" My Onboarding Members My Account Team  AND  Account_Status = \"Contracted\" Recently Updated All Accounts  AND  Last Modified Date = Last 7 Days Needs Review All Accounts  AND  Account_Status = \"New\" OR \"Funnel\" OR “Pipeline” OR “Onboarding” OR “Contracting”  And each view must display the columns:  Account Name, Type, Account Status, PTY Code, Owner And all list views must be sorted by  Last Modified Date (most recent first) And each list view must display these columns: Account Name Account Status Account Type PTY Code Owner And each view must be sorted by  Last Modified Date (most recent first) Scenario: Governance of standard list views Given standard Account list views are configured When Salesforce Users access Accounts Then Users must be able to  view and use  these standard list views And Users must  not be able to edit, rename, or delete  standard list views And Users must still be able to create and manage their own  personal list views  without restriction ✅  Business Value: Ensures  consistency and accuracy  in how Accounts are filtered and reported across the org",
+        "Prevents accidental changes to  critical, standard list views  that all teams rely on",
+        "Still allows flexibility for users to build  personalized views  to support their workflow."
+      ],
+      "entities": [
+        "Account",
+        "Lead",
+        "Contract"
+      ],
+      "fields": [],
+      "actions": [
+        "display",
+        "create",
+        "update",
+        "delete"
+      ]
+    }
+  },
+  "acceptanceCriteria": [],
+  "comments": [],
+  "relatedIssues": [],
+  "fieldDefinitions": {},
+  "generatedFeatures": {
+    "ui": "src/features/ui/SF/SF-40.feature",
+    "api": "src/features/api/SF/SF-40.feature"
+  },
+  "qaReviewedFeatures": {},
+  "extractedAt": "2025-12-17T18:40:36.757Z"
+}

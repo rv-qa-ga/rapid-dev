@@ -1,0 +1,48 @@
+{
+  "key": "SF-480",
+  "summary": "Delete Account fields Mission_Series_MGA_c and Owned_MGA_c",
+  "type": "Story",
+  "status": "Ready for QA",
+  "priority": "Medium",
+  "description": {
+    "raw": "User Story: Replace Mission_Series_MGA_c and Owned_MGA_c with Ownership Field As a Product Owner / Business Analyst I want the custom fields Mission_Series_MGA_c and Owned_MGA_c removed from the Account object, and the Ownership field used in their place So that the Account object is simplified, unnecessary fields are removed, and the data model is standardized while ensuring no other Salesforce object, automation, integration, report, scheduled job, or managed package is negatively affected. Description / Scope Remove Mission_Series_MGA_c and Owned_MGA_c from the Account object only. Do not remove or alter fields with the same API names on other objects. Introduce or update the Ownership field on the Account object to serve the same business purpose previously handled by Mission_Series_MGA_c and Owned_MGA_c. The Ownership field must be a picklist with the following values only: Independent Mission Owned This change ensures future consistency and data integrity while reducing redundancy in field usage across Accounts. Acceptance Criteria Lead-only deletion GIVEN the change is deployed WHEN object schemas across the org are inspected THEN Mission_Series_MGA_c and Owned_MGA_c are removed from the Account object only, and any fields with the same API names on other objects remain unchanged. Ownership field configuration GIVEN the Account object WHEN the Ownership field is reviewed THEN it exists as a picklist with the values Independent, Mission, and Owned only. AND the field is used in place of Mission_Series_MGA_c and Owned_MGA_c for all business logic, layouts, automations, and integrations. Org-wide metadata and cross-object reference check GIVEN a full metadata and cross-object scan WHEN searching for references to Account.Mission_Series_MGA_c and Account.Owned_MGA_c THEN there are no unresolved references; any found references are remediated and tested so that no runtime errors occur. AND any replaced logic now references the Ownership field instead. Integration and external systems validation GIVEN integration owners and middleware mappings are engaged WHEN each owner confirms dependency status and tests their flows THEN no external ETL, job, API client, scheduled export, or downstream system fails due to the Account field deletions. AND integrations now correctly reference the Ownership field. Reports, dashboards, and BI validation GIVEN reports, dashboards, and BI jobs that referenced the removed fields are identified WHEN owners update or remove those references and run tests THEN scheduled and ad-hoc reports and BI jobs run without errors after deletion, and all reporting logic uses the Ownership field moving forward. Deduplication preserved GIVEN lead deduplication rules and any custom dedupe code or processes WHEN the fields are removed and replaced by Ownership THEN deduplication continues to behave as expected for existing and new Accounts, and any dedupe logic referencing the removed fields has been updated to use Ownership instead.",
+    "parsed": {
+      "sentences": [
+        "User Story: Replace Mission_Series_MGA_c and Owned_MGA_c with Ownership Field As a Product Owner / Business Analyst I want the custom fields Mission_Series_MGA_c and Owned_MGA_c removed from the Account object, and the Ownership field used in their place So that the Account object is simplified, unnecessary fields are removed, and the data model is standardized while ensuring no other Salesforce object, automation, integration, report, scheduled job, or managed package is negatively affected",
+        "Description / Scope Remove Mission_Series_MGA_c and Owned_MGA_c from the Account object only",
+        "Do not remove or alter fields with the same API names on other objects",
+        "Introduce or update the Ownership field on the Account object to serve the same business purpose previously handled by Mission_Series_MGA_c and Owned_MGA_c",
+        "The Ownership field must be a picklist with the following values only: Independent Mission Owned This change ensures future consistency and data integrity while reducing redundancy in field usage across Accounts",
+        "Acceptance Criteria Lead-only deletion GIVEN the change is deployed WHEN object schemas across the org are inspected THEN Mission_Series_MGA_c and Owned_MGA_c are removed from the Account object only, and any fields with the same API names on other objects remain unchanged",
+        "Ownership field configuration GIVEN the Account object WHEN the Ownership field is reviewed THEN it exists as a picklist with the values Independent, Mission, and Owned only",
+        "AND the field is used in place of Mission_Series_MGA_c and Owned_MGA_c for all business logic, layouts, automations, and integrations",
+        "Org-wide metadata and cross-object reference check GIVEN a full metadata and cross-object scan WHEN searching for references to Account.Mission_Series_MGA_c and Account.Owned_MGA_c THEN there are no unresolved references; any found references are remediated and tested so that no runtime errors occur",
+        "AND any replaced logic now references the Ownership field instead",
+        "Integration and external systems validation GIVEN integration owners and middleware mappings are engaged WHEN each owner confirms dependency status and tests their flows THEN no external ETL, job, API client, scheduled export, or downstream system fails due to the Account field deletions",
+        "AND integrations now correctly reference the Ownership field",
+        "Reports, dashboards, and BI validation GIVEN reports, dashboards, and BI jobs that referenced the removed fields are identified WHEN owners update or remove those references and run tests THEN scheduled and ad-hoc reports and BI jobs run without errors after deletion, and all reporting logic uses the Ownership field moving forward",
+        "Deduplication preserved GIVEN lead deduplication rules and any custom dedupe code or processes WHEN the fields are removed and replaced by Ownership THEN deduplication continues to behave as expected for existing and new Accounts, and any dedupe logic referencing the removed fields has been updated to use Ownership instead."
+      ],
+      "entities": [
+        "Account",
+        "Lead",
+        "Product"
+      ],
+      "fields": [],
+      "actions": [
+        "update",
+        "map"
+      ]
+    }
+  },
+  "acceptanceCriteria": [],
+  "comments": [],
+  "relatedIssues": [],
+  "fieldDefinitions": {},
+  "generatedFeatures": {
+    "ui": "src/features/ui/SF/SF-480.feature",
+    "api": "src/features/api/SF/SF-480.feature"
+  },
+  "qaReviewedFeatures": {},
+  "extractedAt": "2025-12-17T18:40:35.466Z"
+}

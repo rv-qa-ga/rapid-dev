@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lloyd's – Automation-First Testing Plan – TEMP REVIEW</title>
+  <style type="text/css">
+    body { font-family: Arial, sans-serif; line-height: 1.5; color: #333; max-width: 900px; margin: 0 auto; padding: 20px; }
+    h1 { color: #172b4d; border-bottom: 2px solid #0052cc; padding-bottom: 8px; font-size: 1.75em; }
+    h2 { color: #172b4d; margin-top: 24px; font-size: 1.35em; }
+    h3 { color: #42526e; margin-top: 16px; font-size: 1.15em; }
+    p { margin: 8px 0; }
+    ul { margin: 8px 0; padding-left: 24px; }
+    li { margin: 4px 0; }
+    table { border-collapse: collapse; width: 100%; margin: 12px 0; font-size: 14px; }
+    th, td { border: 1px solid #dfe1e6; padding: 8px 12px; text-align: left; }
+    th { background: #f4f5f7; color: #172b4d; font-weight: 600; }
+    tr:nth-child(even) { background: #fafafa; }
+    .review-banner { background: #fff4e5; border: 2px solid #ff991f; padding: 12px 16px; border-radius: 4px; margin-bottom: 20px; font-weight: 600; color: #172b4d; }
+    hr { border: none; border-top: 1px solid #dfe1e6; margin: 24px 0; }
+    code { background: #f4f5f7; padding: 2px 6px; border-radius: 3px; font-size: 13px; }
+    pre { background: #f4f5f7; padding: 12px; overflow: auto; font-size: 13px; border-radius: 4px; }
+  </style>
+</head>
+<body>
+
+<div class="review-banner">⚠ TEMP – FOR REVIEW ONLY. Source: docs/lloyds/LLOYDS_AUTOMATION_FIRST_APPROACH.md</div>
+
+<h1>Lloyd's Pipeline – Automation-First Testing Plan</h1>
+
+<p>This document outlines how to test the Lloyd's flows (Tagetik, Dynamics F&O, ResQ, Non-Lloyds) with <strong>maximum automation</strong> and <strong>minimal full E2E</strong>, by testing at <strong>API level</strong>, <strong>integration points</strong>, and <strong>individual systems</strong>. It aligns with the existing framework and the QA Testing Strategy.</p>
+
+<hr />
+
+<h2>1. Principles</h2>
+<table>
+  <thead>
+    <tr><th>Principle</th><th>Meaning</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><strong>Automation first</strong></td><td>Prefer automated API, data, and integration checks over manual or UI flows.</td></tr>
+    <tr><td><strong>Avoid full E2E where possible</strong></td><td>Full E2E (e.g. WBX file → … → Tagetik system) is slow and costly; use it only for a small set of critical paths or not at all in the first phase.</td></tr>
+    <tr><td><strong>Test modules at API level</strong></td><td>Each system (ADP, MuleSoft, TDS, ODS, Kafka, D365) is tested via its APIs or data interface.</td></tr>
+    <tr><td><strong>Validate integration points</strong></td><td>Test <strong>one boundary at a time</strong> (e.g. ADP → MuleSoft, MuleSoft → TDS) with minimal data and clear assertions.</td></tr>
+    <tr><td><strong>Reuse the framework</strong></td><td>Use existing MuleSoft steps, SQL Server/ODS steps, API clients, and tags; add Lloyd's-specific steps only when no reusable step exists.</td></tr>
+  </tbody>
+</table>
+
+<hr />
+
+<h2>2. Test Layers (Pyramid)</h2>
+<pre>        ┌─────────────────┐
+        │  Few / no      │  Full E2E (optional; only if business requires)
+        │  full E2E      │  e.g. one "slice" per flow with minimal data
+        ├─────────────────┤
+        │  Integration   │  One boundary at a time: trigger or stub one side,
+        │  point tests   │  assert on the other (e.g. MuleSoft → TDS row exists)
+        ├─────────────────┤
+        │  API / module  │  Many, fast: MuleSoft app status &amp; logs, TDS/ODS
+        │  &amp; data tests  │  schema and data checks, regression (Lloyd's not in ODS/TDS)
+        └─────────────────┘</pre>
+<ul>
+  <li><strong>Base (most tests):</strong> API and data checks – MuleSoft app status and logs, SQL assertions on TDS/ODS, regression queries. Fast, no end-to-end flow.</li>
+  <li><strong>Middle:</strong> Integration-point tests – one boundary per scenario (e.g. "after MuleSoft run, TDS loader has expected row"). Optional short "slices" (e.g. trigger MuleSoft with test payload → assert TDS + ODS) without full user journey.</li>
+  <li><strong>Top:</strong> Full E2E only if required; otherwise skip or keep to a single smoke path.</li>
+</ul>
+
+<hr />
+
+<h2>3. Per-Flow Ideas (What to Automate)</h2>
+
+<h3>3.1 Tagetik flow (ADP → MuleSoft → TDS Tagetik loader → Tagetik system)</h3>
+<table>
+  <thead>
+    <tr><th>Layer</th><th>What to test</th><th>How (framework)</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><strong>Module</strong></td><td>MuleSoft app for Tagetik flow is running and logs are accessible</td><td>Reuse MuleSoft-Log-Verification pattern: get application, get logs, search for flow name / correlation ID.</td></tr>
+    <tr><td><strong>Module</strong></td><td>TDS Tagetik loader table exists and has expected columns</td><td>Reuse SQL Server steps: run query against TDS DB (e.g. INFORMATION_SCHEMA.COLUMNS for loader table). Same pattern as ENG-145.</td></tr>
+    <tr><td><strong>Module</strong></td><td>After a known trigger, TDS Tagetik loader has expected row(s)</td><td>SQL step: SELECT from TDS Tagetik loader WHERE RepositoryID = @testId. Use test data factory.</td></tr>
+    <tr><td><strong>Integration</strong></td><td>ADP → MuleSoft: after ADP publishes, MuleSoft logs show flow execution</td><td>Trigger or use existing ADP event; search MuleSoft logs by correlation ID or flow name; assert log entries. No UI.</td></tr>
+    <tr><td><strong>Integration</strong></td><td>MuleSoft → TDS: after MuleSoft run, loader table updated</td><td>Trigger MuleSoft (API or scheduled run with test data); poll/wait; run SQL to assert row in TDS Tagetik loader.</td></tr>
+    <tr><td><strong>No full E2E</strong></td><td>Do not automate "WBX file → … → Tagetik system" in one scenario; break into the above.</td><td>—</td></tr>
+  </tbody>
+</table>
+
+<h3>3.2 ResQ flow (ADP → MuleSoft → TDS ResQ loader → ResQ system)</h3>
+<table>
+  <thead>
+    <tr><th>Layer</th><th>What to test</th><th>How (framework)</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><strong>Module</strong></td><td>MuleSoft app for ResQ flow is running; logs accessible</td><td>Same as Tagetik: MuleSoft steps (app status, get logs, search logs).</td></tr>
+    <tr><td><strong>Module</strong></td><td>TDS ResQ loader table exists and schema correct</td><td>SQL Server steps: query TDS for ResQ loader table and columns.</td></tr>
+    <tr><td><strong>Module</strong></td><td>After trigger, TDS ResQ loader has expected data</td><td>SQL assertion on ResQ loader table (e.g. by test key or batch ID).</td></tr>
+    <tr><td><strong>Integration</strong></td><td>MuleSoft → TDS ResQ loader</td><td>Trigger MuleSoft (or use existing run); assert TDS ResQ loader row.</td></tr>
+    <tr><td><strong>No full E2E</strong></td><td>Do not automate full ADP → … → ResQ system in one go.</td><td>—</td></tr>
+  </tbody>
+</table>
+
+<h3>3.3 Dynamics F&O flow (Lloyds XML – journal posting to D365/ODS)</h3>
+<table>
+  <thead>
+    <tr><th>Layer</th><th>What to test</th><th>How (framework)</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><strong>Module</strong></td><td>MuleSoft apps for Lloyds XML flow running and logs accessible</td><td>MuleSoft steps: get application(s), get logs, search for flow/correlation ID.</td></tr>
+    <tr><td><strong>Module</strong></td><td>ODS Repository ID status (e.g. Work Item Complete)</td><td>SQL or API: query ODS (or D365) for Repository ID status. Reuse pattern from ENG-145.</td></tr>
+    <tr><td><strong>Module</strong></td><td>Kafka events (xmlGenerated, xmlApproved, JournalPosted)</td><td>If framework can query/consume Kafka: assert event present. Otherwise stub or skip until capability exists.</td></tr>
+    <tr><td><strong>Integration</strong></td><td>MuleSoft → Kafka: after MuleSoft run, expected event in Kafka</td><td>Trigger MuleSoft; assert Kafka has event (by test ID or correlation).</td></tr>
+    <tr><td><strong>Integration</strong></td><td>MuleSoft → ODS: Repository ID status updated</td><td>After MuleSoft run, query ODS for Repository ID status = Work Item Complete.</td></tr>
+    <tr><td><strong>No full E2E</strong></td><td>Do not automate full "D365 status → … → Journal Posted → ODS" in one UI flow.</td><td>—</td></tr>
+  </tbody>
+</table>
+
+<h3>3.4 Non-Lloyds flow (regression)</h3>
+<table>
+  <thead>
+    <tr><th>Layer</th><th>What to test</th><th>How (framework)</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><strong>Module / regression</strong></td><td>Lloyd's data does <strong>not</strong> appear in ODS or TDS</td><td>SQL: query ODS/TDS for Lloyd's identifiers; expect 0 rows in non-Lloyds tables. Reuse SQL Server steps and ENG-145-style queries.</td></tr>
+    <tr><td><strong>Module / regression</strong></td><td>ResQ / non-Lloyds data still flows (path stable)</td><td>SQL: assert ResQ or non-Lloyds data present in TDS (e.g. row counts or sample rows).</td></tr>
+  </tbody>
+</table>
+
+<hr />
+
+<h2>4. Leveraging the Framework</h2>
+
+<h3>4.1 Existing assets to reuse</h3>
+<table>
+  <thead>
+    <tr><th>Asset</th><th>Use for Lloyd's</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><strong>MuleSoft steps</strong> (src/features/api/MuleSoft/, step-definitions)</td><td>Get application status, get logs, search logs by flow/correlation ID, check for errors.</td></tr>
+    <tr><td><strong>SQL Server steps</strong> (src/step-definitions/api/sqlserver/sqlserver.steps.ts)</td><td>Run query in Reference / Intrali / Logging / Warehouse / TDS; execute stored procedure; run SSIS job step. Reuse for TDS loader checks, ODS Repository ID, regression.</td></tr>
+    <tr><td><strong>ENG-145 feature</strong> (integration/sqlserver/ENG-145-ods-source-repositoryid-from-adp.feature)</td><td>Pattern for ODS/Reference, BordereauRepository, Intrali Bordereaux_Lloyds views. Adapt for Lloyd's Repository ID and regression.</td></tr>
+    <tr><td><strong>Integration features</strong> (integration/mulesoft/, integration/sqlserver/)</td><td>Pattern for "trigger one side, assert other side." Lloyd's integration tests follow same style.</td></tr>
+    <tr><td><strong>Axios / API clients</strong></td><td>HTTP calls to ADP, D365, or Kafka (if REST available).</td></tr>
+    <tr><td><strong>Test data factory</strong></td><td>Build minimal payloads (e.g. test Repository ID, one WBX-like record) for repeatable tests.</td></tr>
+  </tbody>
+</table>
+
+<h3>4.2 Where to put Lloyd's tests</h3>
+<ul>
+  <li><strong>API / module / data:</strong> <code>src/features/lloyds/</code> (e.g. tagetik-flow-api.feature, resq-flow-api.feature, dynamics-fo-flow-api.feature, regression-lloyds-exclusion.feature) or under api/ / integration/sqlserver/ with <code>@lloyds</code> tag.</li>
+  <li><strong>Tags:</strong> <code>@lloyds</code> for all; <code>@api</code> for API-level; <code>@integration</code> for integration-point tests; <code>@smoke</code> for critical path; avoid <code>@e2e</code> unless necessary.</li>
+</ul>
+
+<h3>4.3 Run commands</h3>
+<pre># Lloyd's API and integration tests only (no UI, no full E2E)
+npm run test:api -- --tags "@lloyds and (@api or @integration)"
+
+# Smoke: MuleSoft + critical data/regression
+npm run test:api -- --tags "@lloyds and @smoke"
+
+# Regression only (Lloyd's exclusion + non-Lloyds path stable)
+npm run test:api -- --tags "@lloyds and @regression"
+
+# All Lloyd's (API + integration; exclude @e2e if you tag full E2E)
+npm run test:api -- --tags "@lloyds"</pre>
+
+<hr />
+
+<h2>5. Optional: Short "Slice" Tests (Minimal E2E)</h2>
+<p>If you need a small number of "almost E2E" scenarios without full UI or full journey:</p>
+<ul>
+  <li><strong>Tagetik slice:</strong> Trigger MuleSoft with test payload → wait for completion (poll) → assert TDS Tagetik loader has row and (if applicable) Tagetik system received data.</li>
+  <li><strong>ResQ slice:</strong> Same idea for ResQ flow: trigger → assert TDS ResQ loader.</li>
+  <li><strong>Dynamics F&O slice:</strong> Trigger MuleSoft (e.g. journal flow) → wait → assert ODS Repository ID status and/or Kafka event.</li>
+</ul>
+<p>Use test data factory for payloads and identifiers so slices stay stable and fast.</p>
+
+<hr />
+
+<h2>6. Summary</h2>
+<table>
+  <thead>
+    <tr><th>Goal</th><th>Approach</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Automate as much as possible</td><td>API + integration + data tests; reuse MuleSoft, SQL Server, and integration patterns.</td></tr>
+    <tr><td>Avoid costly full E2E</td><td>Do not implement full WBX → … → Tagetik (or full Lloyds XML journey) as single E2E; split into module + integration-point tests.</td></tr>
+    <tr><td>Test modules at API level</td><td>MuleSoft (app + logs), TDS/ODS (SQL), ADP/D365/Kafka (APIs where available).</td></tr>
+    <tr><td>Validate integration points</td><td>One boundary at a time: ADP↔MuleSoft, MuleSoft↔TDS, MuleSoft↔Kafka, MuleSoft↔ODS, with clear assertions.</td></tr>
+    <tr><td>Leverage framework</td><td>Existing MuleSoft steps, SQL Server steps, ENG-145-style features, tags, <code>npm run test:api -- --tags @lloyds</code>.</td></tr>
+  </tbody>
+</table>
+
+<p><em>This gives you an <strong>automation-first</strong> strategy that maximizes coverage and speed while keeping cost and runtime under control.</em></p>
+
+</body>
+</html>

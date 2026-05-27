@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lloyd's ENG & PP Test Plan – TEMP Review</title>
+  <style>
+    :root { --bg: #0f1419; --surface: #1a2332; --text: #e6edf3; --muted: #8b949e; --accent: #58a6ff; --success: #3fb950; --warning: #d29922; --danger: #f85149; --border: #30363d; }
+    * { box-sizing: border-box; }
+    body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; max-width: 980px; margin: 0 auto; padding: 2rem; }
+    h1 { font-size: 1.6rem; margin-bottom: 0.25rem; }
+    .subtitle { color: var(--muted); font-size: 0.9rem; margin-bottom: 1.5rem; }
+    h2 { font-size: 1.2rem; margin-top: 1.75rem; margin-bottom: 0.5rem; padding-bottom: 0.3rem; border-bottom: 1px solid var(--border); color: var(--accent); }
+    h3 { font-size: 1rem; margin-top: 1rem; margin-bottom: 0.4rem; }
+    p { margin: 0.5rem 0; }
+    ul, ol { margin: 0.5rem 0; padding-left: 1.5rem; }
+    li { margin: 0.25rem 0; }
+    table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.88rem; background: var(--surface); border-radius: 6px; border: 1px solid var(--border); }
+    th, td { padding: 0.5rem 0.75rem; text-align: left; border-bottom: 1px solid var(--border); }
+    th { background: rgba(88, 166, 255, 0.12); color: var(--accent); font-weight: 600; }
+    tr:last-child td { border-bottom: none; }
+    .flow-box { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1rem; margin: 1rem 0; }
+    .badge { display: inline-block; padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.7rem; font-weight: 600; }
+    .badge-epic { background: rgba(88, 166, 255, 0.2); color: var(--accent); }
+    code { background: rgba(255,255,255,0.08); padding: 0.15rem 0.4rem; border-radius: 3px; font-size: 0.85em; }
+    .note { font-style: italic; color: var(--muted); font-size: 0.9rem; }
+    hr { border: none; border-top: 1px solid var(--border); margin: 1.5rem 0; }
+  </style>
+</head>
+<body>
+
+<div style="background:#fff4e5; border:2px solid #ff991f; padding:10px 14px; border-radius:4px; margin-bottom:1.5rem; font-weight:600;">⚠ TEMP – FOR REVIEW ONLY. Lloyd's ENG & PP Test Plan (module-first, stubbing, E2E later).</div>
+
+<h1>Lloyd's ENG & PP Test Plan – Generic Utilities and Test Cases</h1>
+<p class="subtitle"><strong>Scope:</strong> ENG- and PP- only. <strong>Out of scope:</strong> AC-. <strong>Source:</strong> <code>data/excel/plans_lloyds_deliverables_18032026.csv</code>. List ENG/PP: <code>npx ts-node scripts/read-lloyds-deliverables-csv.ts --eng-pp</code>. Last updated: March 2026.</p>
+
+<section>
+  <h2>0. Strategy: module-first, E2E later (limited QA time)</h2>
+  <p><strong>Priority:</strong> Test <strong>individual modules</strong> first with <strong>stubbed or seeded data</strong> so we can validate each component without waiting for full pipelines or live E2E data. <strong>End-to-end testing</strong> is a later phase when time and environment allow.</p>
+  <ul>
+    <li><strong>Module-first:</strong> Each test target is a single module or integration point (e.g. MuleSoft API, ODS table, Tagetik loader, CMT view). We assert on that module's contract or state only.</li>
+    <li><strong>Stub / seed to unblock:</strong> Use stubs (e.g. mock MuleSoft log responses, fixture DB state) or minimal seeded data so tests can run without full ADP/MuleSoft/D365 flows.</li>
+    <li><strong>E2E later:</strong> Once module-level tests are in place and the pipeline is stable, add a small set of E2E scenarios. Optional in the first delivery window.</li>
+  </ul>
+  <p><strong>Implications:</strong> Design utilities and steps to accept <strong>real</strong> or <strong>stubbed</strong> inputs; prefer seeded DB/fixtures for DB tests; document what is stubbed per scenario.</p>
+</section>
+
+<section>
+  <h2>1. In-scope work items (ENG & PP only)</h2>
+  <h3>1.1 Engineering (ENG-)</h3>
+  <table>
+    <thead><tr><th>Key</th><th>Title</th><th>Status</th><th>Test focus</th></tr></thead>
+    <tbody>
+      <tr><td><strong>ENG-47</strong></td><td>Lloyds - MuleSoft Integration Happy Path - D365 F&O</td><td>Blocked</td><td>MuleSoft API, D365/ODS status, E2E</td></tr>
+      <tr><td>ENG-223</td><td>Mulesoft Access</td><td>In Progress</td><td>MuleSoft auth, API availability</td></tr>
+      <tr><td>ENG-179</td><td>Happy Path - Operational Totals + Dimensions review (D365 F&O)</td><td>Blocked</td><td>API/DB: totals, dimensions</td></tr>
+      <tr><td>ENG-167</td><td>Happy Path - Approval to Event Handover D365 F&O</td><td>Blocked</td><td>MuleSoft + DB: approval → event</td></tr>
+      <tr><td>ENG-54</td><td>Happy Path - Deliver File to D365 F&O</td><td>Blocked</td><td>MuleSoft + DB: file delivery</td></tr>
+      <tr><td>ENG-168</td><td>Happy Path - Status Updates to ADP D365 F&O</td><td>Blocked</td><td>DB/API: status propagation to ADP</td></tr>
+      <tr><td><strong>ENG-166</strong></td><td>Lloyds - MuleSoft Integration Error Handling - D365 F&O</td><td>To Do</td><td>MuleSoft logs, DLQ, error paths</td></tr>
+      <tr><td><strong>ENG-50</strong></td><td>Lloyds - MuleSoft Integration - Tagetik IAE Happy Path</td><td>To Do</td><td>MuleSoft → Tagetik loader table</td></tr>
+      <tr><td>ENG-64</td><td>Investigating Mulesoft Integration Tools / Access Requirements</td><td>Blocked</td><td>MuleSoft access (spike)</td></tr>
+      <tr><td>ENG-79</td><td>TAGETIK Happy Path - Deliver data to target tables</td><td>To Do</td><td>DB: Tagetik loader table</td></tr>
+      <tr><td><strong>ENG-176</strong></td><td>Lloyds - MuleSoft Integration - Tagetik IAE Error Handling</td><td>To Do</td><td>Error paths, exceptions</td></tr>
+      <tr><td><strong>ENG-1</strong></td><td>Lloyds Syndicate - ODS & TDS Changes</td><td>In Progress</td><td>DB: ODS/TDS/Reference</td></tr>
+      <tr><td>ENG-74</td><td>ODS Reference Data for CMT - Update to include Broker field</td><td>Done</td><td>DB: Reference/CMT Broker</td></tr>
+      <tr><td>ENG-45</td><td>Build new TAGETIK loader table for Lloyds Written data</td><td>Done</td><td>DB: Tagetik loader schema/data</td></tr>
+      <tr><td>ENG-52</td><td>Build new ResQ underwriting table for Lloyds feed via ADP</td><td>Done</td><td>DB: ResQ underwriting schema/data</td></tr>
+      <tr><td>ENG-12</td><td>Physicalise vwDataProduct_TP_BU_AFF for ADP consumption</td><td>In Progress</td><td>DB: Reference table</td></tr>
+      <tr><td>ENG-2</td><td>Update vwDataProduct_TP_BU_AFF for Lloyds Syndicate Business</td><td>Blocked</td><td>DB: Reference view</td></tr>
+    </tbody>
+  </table>
+  <h3>1.2 Power Platform (PP-)</h3>
+  <table>
+    <thead><tr><th>Key</th><th>Title</th><th>Status</th><th>Test focus</th></tr></thead>
+    <tbody>
+      <tr><td>PP-10</td><td>Counterparty Level Flag for DCR Processing in CMT</td><td>Done</td><td>CMT/RDM data or API</td></tr>
+      <tr><td><strong>PP-5</strong></td><td>Interim and Target Pattern for Lloyd's Grouped UMRs</td><td>Done</td><td>CMT: Master UMR, hierarchy</td></tr>
+      <tr><td>PP-6–PP-9</td><td>(1)–(4) Master Lloyd's Agreement, UMR hierarchy, ingestion, governance</td><td>Done</td><td>CMT data/API</td></tr>
+      <tr><td><strong>PP-13</strong></td><td>Lloyds Agency Commission Flags and Rate Capture</td><td>ON HOLD</td><td>CMT: Agency commission config</td></tr>
+      <tr><td>PP-14, PP-15, PP-16, PP-300, PP-389</td><td>Agency Commission config, backfill, maintenance, UAT changes</td><td>Done / ON HOLD</td><td>CMT data</td></tr>
+      <tr><td>PP-17</td><td>Lloyd's Project - Exposure Requirements</td><td>Done</td><td>RDM/Exposure</td></tr>
+      <tr><td><strong>PP-71</strong></td><td>Integration | Events | Service Bus</td><td>To Do</td><td>Service Bus / Feedback Loop</td></tr>
+      <tr><td>PP-242</td><td>RDM | Exposure | London Fire Brigade Postal Code</td><td>ON HOLD</td><td>RDM table</td></tr>
+      <tr><td>PP-278, PP-284</td><td>Lloyd's Broker adding to RDM/CMT, Counterparty Role</td><td>Done</td><td>RDM/CMT</td></tr>
+      <tr><td>PP-301, PP-302</td><td>CMT | Lloyd's UAT | Syndicate Counterparty from Insurer</td><td>Done</td><td>CMT</td></tr>
+      <tr><td>PP-448</td><td>Preserve Written Contract Reference on Cloned Exposure Records</td><td>To Do</td><td>CMT/Exposure</td></tr>
+      <tr><td><strong>PP-390</strong></td><td>Lloyd's | Phase 2 | D365 Journal Integration Feedback & 3‑Way Reconciliation Loop</td><td>To Do</td><td>Service Bus, D365 feedback</td></tr>
+      <tr><td>PP-267</td><td>Lloyd's | Phase 2 | Section Codes</td><td>To Do</td><td>RDM/CMT</td></tr>
+      <tr><td>PP-273</td><td>Lloyd's | Phase 2 | Routing CMT Contracts to ODS vs ADP Using CMT UMR Routing Flag</td><td>To Do</td><td>CMT + ODS/ADP routing</td></tr>
+      <tr><td><strong>PP-460</strong></td><td>Enable Many-to-Many Master UMR Relationship</td><td>To Do</td><td>CMT data model</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section>
+  <h2>2. Generic utilities (reuse-first)</h2>
+  <p>Extend existing framework components; add new utilities only where no equivalent exists.</p>
+  <h3>2.1 MuleSoft API validation</h3>
+  <p><strong>Reuse:</strong> <code>MuleSoftAPIClient</code>, <code>mulesoft.steps.ts</code>. Health/deployment check; log search by correlation ID; log assertion by message type; error/DLQ assertion. <strong>Stub:</strong> Support fixture JSON + stub mode (e.g. <code>@stub-mulesoft-logs</code> or env flag).</p>
+  <h3>2.2 Database validation (ODS, TDS, Reference)</h3>
+  <p><strong>Reuse:</strong> <code>SqlServerClient</code>, <code>validation.ts</code>. <code>assertTableExists</code>; row count / at least N rows; <code>queryRepositoryStatus</code>; Lloyd's table config (Tagetik loader, ResQ underwriting, vwDataProduct_TP_BU_AFF).</p>
+  <h3>2.3 Correlation ID / tracing</h3>
+  <p>Store correlation ID in world; optional combined assert (MuleSoft logs + DB status for same correlation).</p>
+  <h3>2.4 Service Bus (when PP-71 active)</h3>
+  <p>Constants for queue names and message types; Azure Service Bus/Function checks TBD.</p>
+  <h3>2.5 Stubbing and test data plan</h3>
+  <table>
+    <thead><tr><th>Module</th><th>Stub or seed approach</th><th>Purpose</th></tr></thead>
+    <tbody>
+      <tr><td>MuleSoft API (logs)</td><td>Fixture JSON or mock; stub mode in steps</td><td>Run log steps without live MuleSoft</td></tr>
+      <tr><td>MuleSoft auth</td><td>Real for ENG-223; cached/skip when using stub logs</td><td>Minimise auth calls</td></tr>
+      <tr><td>ODS / TDS / Reference DB</td><td>Seed SQL scripts; or real for "table exists" only</td><td>DB tests independent of live ingestion</td></tr>
+      <tr><td>Repository ID / status</td><td>Seed row with known repo ID + status; step queries real DB</td><td>Test "repository ID has status" without full workflow</td></tr>
+      <tr><td>Correlation ID</td><td>Fixed value in world + fixture logs containing that ID</td><td>Test correlation search without real flow</td></tr>
+      <tr><td>Service Bus</td><td>Constants + optional mock; or test DB/API outcomes only</td><td>Module tests without live Service Bus</td></tr>
+      <tr><td>CMT / RDM</td><td>Seed replica tables or fixture JSON</td><td>Test CMT/RDM without live Power Platform</td></tr>
+    </tbody>
+  </table>
+  <p><strong>Implementation:</strong> Fixtures folder (e.g. <code>mulesoft-logs-success.json</code>, <code>mulesoft-logs-error.json</code>); seed scripts under <code>scripts/lloyds/</code> (e.g. <code>seed-tagetik-loader-sample.sql</code>, <code>seed-repository-status-sample.sql</code>); steps support stub mode; document per scenario what is stubbed vs real.</p>
+  <table>
+    <thead><tr><th>Situation</th><th>Prefer</th></tr></thead>
+    <tbody>
+      <tr><td>CI / quick regression</td><td>Stub or seed</td></tr>
+      <tr><td>ENG-223 (MuleSoft access)</td><td>Real MuleSoft auth and list apps</td></tr>
+      <tr><td>DB table/schema checks</td><td>Real DB</td></tr>
+      <tr><td>"Logs contain message type X"</td><td>Stub in CI; real in nightly/E2E</td></tr>
+      <tr><td>"Repository ID has status Y"</td><td>Seed row + real DB query</td></tr>
+      <tr><td>Full flow (ADP → MuleSoft → D365/ODS)</td><td>E2E later; real when env and time allow</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section>
+  <h2>3. Mapping work items → test type (module-first)</h2>
+  <p class="note">Scenarios implemented as <strong>module-level</strong> tests first (stubs/seeds). E2E variants in Phase 3.</p>
+  <h3>3.1 ENG-47, ENG-166 (MuleSoft D365 F&O)</h3>
+  <p>ENG-223: API (auth, list apps). ENG-179/167/54/168: API+DB or module-level with stubbed logs + seeded DB. ENG-166: stubbed error logs.</p>
+  <h3>3.2 ENG-50, ENG-176 (Tagetik IAE)</h3>
+  <p>ENG-79: DB (loader table exists, schema, optional seeded rows). ENG-50/176: module-level with stub logs + DB assertion.</p>
+  <h3>3.3 ENG-1 (ODS & TDS)</h3>
+  <p>ENG-74, ENG-45, ENG-52, ENG-12, ENG-2: DB table/schema existence, row count, field presence. Real DB; seed if needed for "repository ID" or row count.</p>
+  <h3>3.4 PP (CMT / RDM / UMR, Service Bus)</h3>
+  <p>PP-5–PP-9, PP-13, PP-278, PP-301, PP-273, PP-460: DB or API checks; seeded CMT/RDM where needed. PP-71, PP-390: Service Bus constants; integration tests when available.</p>
+</section>
+
+<section>
+  <h2>4. Phased implementation (module-first, then E2E)</h2>
+  <h3>Phase 1 – Foundation: utilities, stubs, module-level steps</h3>
+  <ul>
+    <li>MuleSoft: correlation-ID search, message-type assertion, <strong>stub mode + fixtures</strong>.</li>
+    <li>Database: <code>assertTableExists</code>, <code>queryRepositoryStatus</code>, steps; <strong>at least one seed script</strong>.</li>
+    <li>Config: Lloyd's DB names and table names.</li>
+    <li>First Lloyd's feature file(s) under <code>src/features/lloyds/</code> (modules only).</li>
+  </ul>
+  <h3>Phase 2 – Module-level test cases by epic</h3>
+  <ul>
+    <li>ENG-223: real auth + list apps.</li>
+    <li>ENG-1: DB-only for ENG-74, ENG-45, ENG-52, ENG-12 (ENG-2 when unblocked); seed if needed.</li>
+    <li>ENG-50, ENG-79: Tagetik loader existence/schema; optional seeded rows.</li>
+    <li>ENG-47 (module-level): stubbed logs + seeded DB; no E2E yet.</li>
+    <li>ENG-166, ENG-176: stubbed error logs.</li>
+    <li>PP-5, PP-278, PP-301: CMT/RDM DB checks; seeded data if available.</li>
+  </ul>
+  <h3>Phase 3 – E2E and Service Bus (when time and env allow)</h3>
+  <ul>
+    <li>PP-71, PP-390: queue/message constants; integration tests for feedback loop and 3-way reconciliation.</li>
+    <li>E2E: small set of full-flow scenarios (ADP → MuleSoft → D365/ODS); nightly or manual; not required for first delivery if time is short.</li>
+  </ul>
+</section>
+
+<section>
+  <h2>5. Open questions</h2>
+  <ol>
+    <li>Database access: ODS, TDS, Reference in .env with logical names?</li>
+    <li>CMT/RDM: SQL Server (replicated tables) or Dataverse/Power API?</li>
+    <li>Tagetik / ResQ: exact table names and schema?</li>
+    <li>Repository ID: which database and table/view for "Work Item Complete"?</li>
+    <li>Priority: Phase 1 order or prioritise a specific epic (e.g. ENG-1 first)?</li>
+    <li>Stub/fixture ownership: fixture folder location; who maintains seed SQL scripts?</li>
+  </ol>
+</section>
+
+<section>
+  <h2>6. Summary</h2>
+  <table>
+    <thead><tr><th>Area</th><th>Action</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Strategy</strong></td><td>Module-first, E2E later. Stubbed/seeded data; limited QA time.</td></tr>
+      <tr><td><strong>Scope</strong></td><td>ENG- and PP- only; AC- out of scope.</td></tr>
+      <tr><td><strong>Stubbing</strong></td><td>MuleSoft → fixtures + stub mode; DB → seed scripts; correlation ID → fixed + stub logs; CMT/RDM → seeded or fixture. Document per scenario.</td></tr>
+      <tr><td><strong>Utilities</strong></td><td>MuleSoft (correlation-ID, message type, stub support); DB (table exists, repository status); correlation ID in world; Service Bus constants when PP-71 ready.</td></tr>
+      <tr><td><strong>Reuse</strong></td><td>MuleSoftAPIClient, SqlServerClient, sqlserver.steps.ts, validation.ts.</td></tr>
+      <tr><td><strong>Phases</strong></td><td>Phase 1: utilities + stubs + seed script(s) + first feature files. Phase 2: module-level cases per epic. Phase 3: E2E and Service Bus when time allows.</td></tr>
+      <tr><td><strong>Next</strong></td><td>Answer open questions; then implement Phase 1 (utilities, stub mode, one seed script, one Lloyd's feature file).</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<p class="subtitle" style="margin-top: 2rem;">TEMP – Lloyd's ENG & PP Test Plan for review. Source: <code>docs/lloyds/LLOYDS_ENG_PP_TEST_PLAN.md</code>. Last updated: March 2026.</p>
+
+</body>
+</html>

@@ -1,0 +1,190 @@
+﻿
+Test scenarios-
+
+@PP-391-UI-001 :
+
+  Scenario: Verify that when new ADP data set is ready and XmlGenerated event is received in Blob folder
+
+
+    Given new ADP data is set
+    And I navigate to â€œ Blob urlâ€
+    When I select â€œXYZ resorse groupâ€
+    And I should be able to see XML generated even is received
+      And I take a screenshot as evidence
+
+
+
+@PP-391-UI-002 :
+
+Scenario: Verify that when XmlGenerated event is received then retrieved from event triggered.
+
+Given new ADP data is set
+    And I navigate to â€œ Blob urlâ€
+    When I select â€œXYZ resorse groupâ€
+    And I should be able to see XML generated even is received
+   Then payload contains File ID (auto-increment from MuleSoft
+RepositoryID,LegalEntity,FileName,CorrelationId,BlobId,ADP_Currency,ADP_TotalPremium,ADP_TotalTax,ADP_TotalOtherContributions
+,ADP_TotalAgencyCommission,ADP_TotalCommissionAmoun
+ And I take a screenshot as evidence
+
+@PP-391-UI-003 :
+Scenario: Verify that when XML file exists in Azure Blob Storage and Dataverse retrieves file contents, XML file should be scanned and summary of financials must be persisted on XML record
+
+Given new XML file exists in Azure Blob Storage
+    When Dataverse retrieves file contents
+    Then  XML file should be scanned and summary of financials must be persisted on XML record 
+    And XMl record should contain XML_Currency,XML_TotalPremium,XML_TotalTax,XML_TotalOtherContributions,XML_TotalAgencyCommission,XML_TotalCommissionAmount,Process Path = ADP
+ And I take a screenshot as evidence
+
+
+
+
+
+
+
+
+@PP-391-UI-004 :
+
+Scenario: Verify that when all of the values are populated, then status reason is approved to Awaiting Approval
+
+
+Given all values are populated in XML
+    When user logged in to Ops for XML verification
+    Then  status reason is approved to awaiting approval
+ And I take a screenshot as evidence
+
+@PP-391-UI-005 :
+
+Scenario- When all value match between ADP and XML each value toggle is updated and overall toggle is updated.
+
+Given all values are populated in XML
+    When user logged in to Ops for XML verification
+And all values match between ADP and XML
+    Then each value toggle is updated and overall toggle is also updated 
+ And I take a screenshot as evidence
+
+
+@PP-391-UI-006 :
+
+Scenario- When all value do not exact match between ADP and XML each value then toggle should be updated considering ABS comparison with tolerance of 5 units of any currency
+
+Given all values are populated in XML
+    When user logged in to Ops for XML verification
+And all values varies between ADP and XML
+    Then toggle should be updated considering ABS comparison with tolerance of 5 units of any currency
+ And I take a screenshot as evidence
+
+@PP-391-UI-007 :
+
+  Scenario: Verify that creation on mule xml file by adding adp values
+
+    Given mule generation link
+    And I navigate to â€œMule xml generationâ€
+    When I select â€œADP values with correlation IDâ€
+    And I should be able to see XML generated even is received on OPS XML list
+      And I take a screenshot as evidence
+
+
+
+
+
+
+
+
+
+@PP-391-UI-008 :
+
+  Scenario: Verify that total XML calculations according to received xml debit and credit values
+
+
+    Given new ADP data is set
+    And I navigate to resources
+    When I select/search for specific file of payload
+    And I should be able to download XML generated 
+Then Calculate all debit-credit values of XMP according to types
+And all respective values should be displayed on XML value section of ops xml
+      And I take a screenshot as evidence
+
+
+@PP-391-UI-009 :
+
+  Scenario: Verify that when same correlation value entered ,same file can update itâ€™s values
+
+    Given new ADP data is set
+    And I navigate to mule xml geneation
+    When I select â€œpayload â€for which already xml genearated
+    And I should be able to see XML updated even is received
+      And I take a screenshot as evidence
+
+@PP-391-UI-0010 :
+
+  Scenario: Verify that when value matches between ADp and XML,approved status can be seen Audit log
+
+    Given all values are populated in XML
+    When user logged in to Ops for XML verification
+And all values match between ADP and XML
+    Then each value toggle is updated and overall toggle is also updated 
+And status will be updated as â€˜Approvedâ€™
+And can be seen by accessing audit log.
+ And I take a screenshot as evidence
+
+
+@PP-391-UI-0011 :
+
+  Scenario: Verify that when value does not matches between ADp and XML,â€™Awaiting approvalâ€™ status can be seen Audit log with approve/decline options
+
+    Given all values are populated in XML
+    When user logged in to Ops for XML verification
+And all values does not match between ADP and XML
+    Then each value toggle is updated and overall toggle is also updated 
+And status will be updated as â€˜Awaiting approvalâ€™
+And can be seen by accessing audit log.
+ And I take a screenshot as evidence
+
+PP-391-UI-0012 :
+
+  Scenario: Verify that when incorrect file/blob id is entered and tried to create mule soft xml generation
+
+    Given logged in to mule soft generation
+    When user send wrong payload with incorrect blob id
+    Then record should not created
+And Dead queue should be updated with error message
+ And I take a screenshot as evidence
+
+
+PP-391-UI-0013 :
+  Scenario: Verify that when xml values changed and uploaded and values does not match with ADP,status should be â€˜awaiting approvalâ€
+
+    Given logged in to mule soft generation
+    When user send upload changed dimensions xml file
+    Then record must be showing new values after passing payload
+When values are not matching for ADP and XML
+Then record status should be â€˜Awaiting approvalâ€™
+And I take a screenshot as evidence
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

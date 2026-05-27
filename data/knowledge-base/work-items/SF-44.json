@@ -1,0 +1,45 @@
+{
+  "key": "SF-44",
+  "summary": "8108: Binding Authority Limited Flag",
+  "type": "Story",
+  "status": "In QA",
+  "priority": "Medium",
+  "description": {
+    "raw": "As a:  Salesforce User I want to:  flag and manage Accounts where binding authority is restricted So that I can:  view restrictions on the Account, ensure compliance review, and notify the MRD Scenario: Conditional display of Reason field Given I am viewing a Member Account When the  Binding Authority Limited  checkbox is unchecked Then the  Reason  field is hidden When the checkbox is checked Then the  Reason  field becomes visible and  required And I must enter a reason before saving Scenario: View restriction in Account header Given a Member Account has  Binding Authority Limited = TRUE When any user views the Account record Then “ BINDING AUTHORITY LIMITED ” appears in a dynamic Standard Rich Text Lightning Web Component at the top right ⅓ of the page And the limitation  Reason  is visible in the Account  Details tab And the  field history  shows who set the limitation and when ✅  Governance & Compliance Benefits: Ensures  restricted Accounts  are visibly flagged to all users. Creates an  audit trail  for who applied the restriction and why. Automatically involves  Compliance  and alerts the  MRD  for oversight. Testing Edit",
+    "parsed": {
+      "sentences": [
+        "As a:  Salesforce User I want to:  flag and manage Accounts where binding authority is restricted So that I can:  view restrictions on the Account, ensure compliance review, and notify the MRD Scenario: Conditional display of Reason field Given I am viewing a Member Account When the  Binding Authority Limited  checkbox is unchecked Then the  Reason  field is hidden When the checkbox is checked Then the  Reason  field becomes visible and  required And I must enter a reason before saving Scenario: View restriction in Account header Given a Member Account has  Binding Authority Limited = TRUE When any user views the Account record Then “ BINDING AUTHORITY LIMITED ” appears in a dynamic Standard Rich Text Lightning Web Component at the top right ⅓ of the page And the limitation  Reason  is visible in the Account  Details tab And the  field history  shows who set the limitation and when ✅  Governance & Compliance Benefits: Ensures  restricted Accounts  are visibly flagged to all users",
+        "Creates an  audit trail  for who applied the restriction and why",
+        "Automatically involves  Compliance  and alerts the  MRD  for oversight",
+        "Testing Edit"
+      ],
+      "entities": [
+        "Account"
+      ],
+      "fields": [
+        "Given"
+      ],
+      "actions": [
+        "display",
+        "show",
+        "create"
+      ]
+    }
+  },
+  "acceptanceCriteria": [],
+  "comments": [],
+  "relatedIssues": [],
+  "fieldDefinitions": {
+    "Given": {
+      "type": "Text",
+      "required": false,
+      "description": "Field: Given"
+    }
+  },
+  "generatedFeatures": {
+    "ui": "src/features/ui/SF/SF-44.feature",
+    "api": "src/features/api/SF/SF-44.feature"
+  },
+  "qaReviewedFeatures": {},
+  "extractedAt": "2025-12-17T18:40:36.339Z"
+}

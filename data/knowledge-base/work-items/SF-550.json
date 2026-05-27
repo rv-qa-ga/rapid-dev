@@ -1,0 +1,33 @@
+{
+  "key": "SF-550",
+  "summary": "Add TPA Group as an Account Type",
+  "type": "Story",
+  "status": "In QA",
+  "priority": "Medium",
+  "description": {
+    "raw": "As a Claims Manager I want  TPA Group  added as a value in the Account Type picklist So that accounts representing a group of TPAs can be classified correctly within Salesforce. Scenario 1: Add TPA Group to Account Type picklist   Given the Account object contains a picklist field named \"Type\"   When the picklist values are updated   Then \"TPA Group\" must be added as an available value in the picklist Scenario 2: Restrict Account Type to approved values only   Given \"TPA Group\" is now part of the approved values   When a user selects a value for Account Type   Then only approved values, including \"TPA Group\", may be selected   And any unapproved value must be rejected Scenario 3: Integration and automation alignment   Given Account Type is referenced in automation, reporting, and integrations   When \"TPA Group\" is added as a picklist value   Then these processes must recognise and accept \"TPA Group\" as a valid Account Type",
+    "parsed": {
+      "sentences": [
+        "As a Claims Manager I want  TPA Group  added as a value in the Account Type picklist So that accounts representing a group of TPAs can be classified correctly within Salesforce",
+        "Scenario 1: Add TPA Group to Account Type picklist   Given the Account object contains a picklist field named \"Type\"   When the picklist values are updated   Then \"TPA Group\" must be added as an available value in the picklist Scenario 2: Restrict Account Type to approved values only   Given \"TPA Group\" is now part of the approved values   When a user selects a value for Account Type   Then only approved values, including \"TPA Group\", may be selected   And any unapproved value must be rejected Scenario 3: Integration and automation alignment   Given Account Type is referenced in automation, reporting, and integrations   When \"TPA Group\" is added as a picklist value   Then these processes must recognise and accept \"TPA Group\" as a valid Account Type"
+      ],
+      "entities": [
+        "Account"
+      ],
+      "fields": [],
+      "actions": [
+        "update"
+      ]
+    }
+  },
+  "acceptanceCriteria": [],
+  "comments": [],
+  "relatedIssues": [],
+  "fieldDefinitions": {},
+  "generatedFeatures": {
+    "ui": "src/features/ui/SF/SF-550.feature",
+    "api": "src/features/api/SF/SF-550.feature"
+  },
+  "qaReviewedFeatures": {},
+  "extractedAt": "2025-12-17T18:40:28.945Z"
+}

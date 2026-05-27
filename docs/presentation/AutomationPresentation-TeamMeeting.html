@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QA Automation Framework | Team Meeting</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6366f1; --primary-light: #818cf8; --primary-glow: rgba(99,102,241,0.3);
+            --accent: #06b6d4; --accent-light: #22d3ee;
+            --success: #10b981; --warning: #f59e0b; --danger: #ef4444;
+            --bg: #0f172a; --bg-card: rgba(30,41,59,0.8); --bg-slide: #0f172a;
+            --border: rgba(99,102,241,0.2);
+            --text: #e2e8f0; --text-dim: #94a3b8; --text-bright: #f8fafc;
+            --gradient-1: linear-gradient(135deg,#6366f1,#06b6d4);
+            --gradient-2: linear-gradient(135deg,#f59e0b,#ef4444);
+            --gradient-3: linear-gradient(135deg,#10b981,#06b6d4);
+        }
+        *{margin:0;padding:0;box-sizing:border-box;}
+        html,body{height:100%;overflow:hidden;}
+        body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);}
+
+        .slide{position:absolute;top:0;left:0;width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:3rem 4rem;opacity:0;transform:scale(0.95);transition:opacity 0.5s ease,transform 0.5s ease;pointer-events:none;overflow-y:auto;}
+        .slide.active{opacity:1;transform:scale(1);pointer-events:all;}
+        .slide::before{content:'';position:absolute;top:0;left:0;width:100%;height:100%;background:radial-gradient(ellipse at 50% 30%,rgba(99,102,241,0.08) 0%,transparent 60%);pointer-events:none;}
+
+        .slide-content{position:relative;z-index:1;text-align:center;max-width:1000px;width:100%;}
+
+        h1{font-size:clamp(2.5rem,5vw,4.5rem);font-weight:900;line-height:1.1;margin-bottom:1.5rem;}
+        h2{font-size:clamp(2rem,4vw,3.5rem);font-weight:800;line-height:1.15;margin-bottom:1.5rem;}
+        h3{font-size:clamp(1.5rem,3vw,2.2rem);font-weight:700;line-height:1.2;margin-bottom:1rem;}
+        .subtitle{font-size:clamp(1.1rem,2vw,1.5rem);color:var(--text-dim);line-height:1.6;max-width:700px;margin:0 auto 2rem;}
+        .gradient-text{background:var(--gradient-1);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+        .gradient-text-2{background:var(--gradient-2);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+        .gradient-text-3{background:var(--gradient-3);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+
+        .badge{display:inline-block;font-size:0.85rem;font-weight:600;padding:0.5rem 1.25rem;border-radius:100px;margin-bottom:1.5rem;letter-spacing:1px;text-transform:uppercase;}
+        .badge-primary{background:rgba(99,102,241,0.15);color:var(--primary-light);border:1px solid rgba(99,102,241,0.3);}
+        .badge-accent{background:rgba(6,182,212,0.15);color:var(--accent-light);border:1px solid rgba(6,182,212,0.3);}
+        .badge-success{background:rgba(16,185,129,0.15);color:var(--success);border:1px solid rgba(16,185,129,0.3);}
+
+        .emoji-big{font-size:4rem;margin-bottom:1.5rem;display:block;}
+        .emoji-row{display:flex;justify-content:center;gap:1rem;margin-bottom:2rem;font-size:3rem;}
+
+        .card-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.5rem;text-align:left;margin-top:2rem;}
+        .card{background:var(--bg-card);border:1px solid var(--border);border-radius:16px;padding:1.75rem;transition:all 0.3s ease;}
+        .card:hover{border-color:var(--primary-light);transform:translateY(-3px);box-shadow:0 10px 40px rgba(0,0,0,0.3);}
+        .card .icon{font-size:2rem;margin-bottom:1rem;}
+        .card h4{font-size:1.1rem;font-weight:700;color:var(--text-bright);margin-bottom:0.5rem;}
+        .card p{font-size:0.9rem;color:var(--text-dim);line-height:1.6;}
+
+        .comparison{display:grid;grid-template-columns:1fr auto 1fr;gap:2rem;align-items:center;margin-top:2rem;max-width:900px;margin-left:auto;margin-right:auto;}
+        .compare-box{background:var(--bg-card);border:1px solid var(--border);border-radius:16px;padding:2rem;text-align:left;}
+        .compare-box.before{border-color:rgba(239,68,68,0.3);}
+        .compare-box.after{border-color:rgba(16,185,129,0.3);}
+        .compare-box h4{font-size:1rem;font-weight:700;margin-bottom:1rem;}
+        .compare-box.before h4{color:var(--danger);}
+        .compare-box.after h4{color:var(--success);}
+        .compare-box ul{list-style:none;padding:0;}
+        .compare-box ul li{padding:0.4rem 0;font-size:0.9rem;color:var(--text-dim);display:flex;align-items:center;gap:0.5rem;}
+        .compare-arrow{font-size:2.5rem;color:var(--primary-light);}
+
+        .stat-row{display:flex;justify-content:center;gap:3rem;flex-wrap:wrap;margin-top:2.5rem;}
+        .stat-item{text-align:center;}
+        .stat-num{font-size:3rem;font-weight:900;display:block;}
+        .stat-num.purple{color:var(--primary-light);}
+        .stat-num.cyan{color:var(--accent);}
+        .stat-num.green{color:var(--success);}
+        .stat-num.orange{color:var(--warning);}
+        .stat-desc{font-size:0.85rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-top:0.25rem;}
+
+        .step-list{text-align:left;max-width:700px;margin:2rem auto 0;}
+        .step-item{display:flex;align-items:flex-start;gap:1.25rem;margin-bottom:1.5rem;}
+        .step-num{width:40px;height:40px;border-radius:50%;background:var(--gradient-1);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1.1rem;color:white;flex-shrink:0;}
+        .step-text h4{font-size:1.05rem;font-weight:700;color:var(--text-bright);margin-bottom:0.25rem;}
+        .step-text p{font-size:0.88rem;color:var(--text-dim);line-height:1.5;}
+
+        .cta-btn{display:inline-flex;align-items:center;gap:0.5rem;font-family:'Inter',sans-serif;font-size:1.1rem;font-weight:700;padding:1rem 2.5rem;border-radius:12px;border:none;cursor:pointer;transition:all 0.3s ease;text-decoration:none;margin-top:1.5rem;}
+        .cta-btn.primary{background:var(--gradient-1);color:white;box-shadow:0 0 30px var(--primary-glow);}
+        .cta-btn.primary:hover{transform:translateY(-2px);box-shadow:0 0 50px var(--primary-glow);}
+
+        .progress-bar{position:fixed;top:0;left:0;height:3px;background:var(--gradient-1);z-index:100;transition:width 0.4s ease;}
+        .slide-number{position:fixed;bottom:1.5rem;right:2rem;font-size:0.85rem;color:var(--text-dim);z-index:100;font-weight:500;}
+        .nav-hint{position:fixed;bottom:1.5rem;left:2rem;font-size:0.8rem;color:var(--text-dim);z-index:100;opacity:0.6;}
+
+        .speaker-notes{position:fixed;bottom:0;left:0;width:100%;background:rgba(0,0,0,0.95);border-top:2px solid var(--primary);padding:1.25rem 2rem;z-index:200;transform:translateY(100%);transition:transform 0.3s ease;max-height:30vh;overflow-y:auto;}
+        .speaker-notes.visible{transform:translateY(0);}
+        .speaker-notes-label{font-size:0.7rem;text-transform:uppercase;letter-spacing:2px;color:var(--primary-light);margin-bottom:0.5rem;font-weight:600;}
+        .speaker-notes p{font-size:0.95rem;color:var(--text);line-height:1.7;}
+        .speaker-notes .key-phrase{color:var(--accent-light);font-weight:600;}
+        .notes-toggle{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);font-size:0.75rem;color:var(--text-dim);z-index:100;opacity:0.4;background:rgba(0,0,0,0.5);padding:0.3rem 1rem;border-radius:100px;}
+
+        .workflow-visual{display:flex;align-items:center;justify-content:center;gap:0.5rem;flex-wrap:wrap;margin-top:2rem;}
+        .wf-step{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:0.75rem 1.25rem;font-size:0.85rem;font-weight:600;color:var(--text-bright);text-align:center;min-width:100px;}
+        .wf-arrow{color:var(--primary-light);font-size:1.2rem;}
+
+        .quote-box{background:var(--bg-card);border-left:4px solid var(--primary);border-radius:0 12px 12px 0;padding:2rem 2.5rem;margin:2rem auto;max-width:700px;text-align:left;}
+        .quote-box p{font-size:1.15rem;line-height:1.7;color:var(--text);font-style:italic;}
+        .quote-box .author{font-size:0.85rem;color:var(--text-dim);margin-top:0.75rem;font-style:normal;font-weight:600;}
+
+        @media(max-width:768px){
+            .slide{padding:2rem;}
+            .comparison{grid-template-columns:1fr;gap:1rem;}
+            .compare-arrow{transform:rotate(90deg);}
+            .stat-row{gap:1.5rem;}
+            .card-grid{grid-template-columns:1fr;}
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-bar" id="progress"></div>
+    <div class="slide-number"><span id="slideNum">1</span> / <span id="slideTotal">14</span></div>
+    <div class="nav-hint">Arrow keys or click to navigate</div>
+    <div class="notes-toggle">Press <strong>N</strong> to show speaker notes</div>
+
+    <!-- SLIDE 1: TITLE -->
+    <div class="slide active" data-notes="Welcome everyone, thanks for joining. Today I want to show you something that is going to make your daily QA work much easier. This is not about replacing anyone - this is about giving you superpowers. By the end of this session, you will see tools that can save you hours every week. Let us get started.">
+        <div class="slide-content">
+            <span class="emoji-big">&#9889;</span>
+            <h1><span class="gradient-text">Your New QA Superpowers</span></h1>
+            <p class="subtitle">How our automation framework saves you hours every week &mdash; across Salesforce, Dynamics CRM, ODS, TDS &amp; MuleSoft &mdash; and how you can be part of it</p>
+            <div style="margin-top:2rem;">
+                <span class="badge badge-primary">QA Team Meeting</span>
+                <span class="badge badge-accent">February 2026</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- SLIDE 2: THE PROBLEM -->
+    <div class="slide" data-notes="Let us be honest about the work we do every day. On the left you see what our typical day looks like. Writing test cases manually in Zephyr takes a lot of time. Copying field names, writing steps, uploading one by one. Creating test data by hand in Salesforce, Dynamics, or setting up records in ODS and TDS. Running tests and taking screenshots for evidence. This is repetitive work. And it does not matter which system you work on - Salesforce, Dynamics CRM, or the SQL Server databases - the pain is the same. Now look at the right side - that is what the framework does for you. Same work, but automated. The key message here is: this framework does not replace your QA brain. It removes the boring, repetitive parts so you can focus on the smart work - finding real bugs.">
+        <div class="slide-content">
+            <span class="badge badge-primary">The Reality</span>
+            <h2>Sound <span class="gradient-text-2">Familiar?</span></h2>
+            <div class="comparison">
+                <div class="compare-box before">
+                    <h4>&#9200; Your Day Today</h4>
+                    <ul>
+                        <li>&#128531; Writing test cases in Zephyr manually</li>
+                        <li>&#128531; Copy-pasting field names and steps</li>
+                        <li>&#128531; Creating test data by hand in SF / Dynamics / ODS</li>
+                        <li>&#128531; Taking screenshots one by one</li>
+                        <li>&#128531; Uploading results to Zephyr manually</li>
+                        <li>&#128531; Cleaning up test data after tests</li>
+                    </ul>
+                </div>
+                <div class="compare-arrow">&#10132;</div>
+                <div class="compare-box after">
+                    <h4>&#9889; Your Day With The Framework</h4>
+                    <ul>
+                        <li>&#9989; Test cases generated in seconds</li>
+                        <li>&#9989; Uploaded to Zephyr with one command</li>
+                        <li>&#9989; Test data created automatically</li>
+                        <li>&#9989; Screenshots captured during tests</li>
+                        <li>&#9989; Results uploaded to Zephyr automatically</li>
+                        <li>&#9989; Test data cleaned up after every run</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SLIDE 3: THE BIG IDEA -->
+    <div class="slide" data-notes="Here is the simple idea behind all of this. You know the work you do every day - the test cases, the data, the uploads. We have built tools that do those repetitive tasks for you. You run one command, and it is done. Think of it like a dishwasher. You still decide what to cook and how to serve it. But you do not have to wash every dish by hand anymore. Your QA expertise, your domain knowledge - that is irreplaceable. The framework just handles the repetitive parts.">
+        <div class="slide-content">
+            <span class="badge badge-accent">The Big Idea</span>
+            <h2>One Command.<br><span class="gradient-text">Hours Saved.</span></h2>
+            <p class="subtitle">We built tools that handle the repetitive parts of your job &mdash; so you can focus on what matters: <strong style="color:var(--text-bright);">finding real bugs</strong> and <strong style="color:var(--text-bright);">understanding the system</strong></p>
+            <div class="quote-box">
+                <p>"The framework does not replace your brain. It replaces the copy-paste, the manual uploads, and the repetitive clicks. Your QA expertise is what makes it work."</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- SLIDE 4: DAILY TOOLS OVERVIEW -->
+    <div class="slide" data-notes="Now let me show you the actual tools you can use starting today. There are four main tools that will save you the most time. First is the Test Case Generator - it reads a Jira work item and creates complete test cases for you, whether it is a Salesforce story, a Dynamics CRM story, or an ODS TDS database validation. Second is the Zephyr Uploader - it takes those test cases and puts them directly into Zephyr Scale, linked to the right Jira story. Third is Test Data creation - it creates records automatically in Salesforce, Dynamics, or validates data in the SQL Server databases. And fourth is the Result Uploader - after tests run, it uploads the pass or fail results back to Zephyr. Let me show each one in detail.">
+        <div class="slide-content">
+            <span class="badge badge-success">Your Daily Toolkit</span>
+            <h2>4 Tools That <span class="gradient-text-3">Save You Hours</span></h2>
+            <p class="subtitle">These are real tools you can use right now. Each one replaces hours of manual work.</p>
+            <div class="card-grid">
+                <div class="card">
+                    <div class="icon">&#128221;</div>
+                    <h4>Test Case Generator</h4>
+                    <p>Give it a Jira work item &rarr; get complete test cases in seconds. Positive, negative, and edge cases included.</p>
+                </div>
+                <div class="card">
+                    <div class="icon">&#128228;</div>
+                    <h4>Zephyr Uploader</h4>
+                    <p>One command uploads all test cases to Zephyr Scale and links them to the Jira story. No manual copy-paste.</p>
+                </div>
+                <div class="card">
+                    <div class="icon">&#128202;</div>
+                    <h4>Test Data Creator</h4>
+                    <p>Creates records in Salesforce, Dynamics, and validates data in ODS/TDS. All required fields filled. Cleans up after itself.</p>
+                </div>
+                <div class="card">
+                    <div class="icon">&#128200;</div>
+                    <h4>Result Uploader</h4>
+                    <p>After tests run, results are uploaded to Zephyr automatically with screenshots and evidence attached.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SLIDE 5: TOOL 1 - TEST CASE GENERATOR -->
+    <div class="slide" data-notes="Let us look at the first tool in detail. The Test Case Generator. Here is how it works. You have a Jira story - it could be a Salesforce story like SF-520, or a Dynamics story, or an ODS database validation story. You open your terminal and type this one command. The framework goes to Jira, reads the story, reads the acceptance criteria, reads the field definitions. Then it generates complete Gherkin test cases - those are the Given, When, Then format. It creates scenarios for happy path, error cases, and edge cases. This works for all our systems - Salesforce, Dynamics, ODS, TDS. The output is a feature file that is ready to use. What used to take you maybe one to two hours of writing test cases in Zephyr, this does in about 30 seconds. And the best part? You review and improve it. The framework learns from your corrections and gets better next time.">
+        <div class="slide-content">
+            <span class="badge badge-primary">Tool 1</span>
+            <h2><span class="gradient-text">&#128221; Test Case Generator</span></h2>
+            <p class="subtitle">From Jira story to complete test cases in seconds</p>
+            <div class="step-list">
+                <div class="step-item">
+                    <div class="step-num">1</div>
+                    <div class="step-text">
+                        <h4>You have a Jira work item</h4>
+                        <p>Any QA-ready story &mdash; Salesforce (SF-520), Dynamics, ODS/TDS, or any project</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-num">2</div>
+                    <div class="step-text">
+                        <h4>Run one command</h4>
+                        <p style="font-family:'JetBrains Mono';color:var(--success);font-size:0.95rem;background:rgba(0,0,0,0.3);padding:0.5rem 1rem;border-radius:8px;margin-top:0.25rem;">npm run jira:generate -- --work-item SF-520</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-num">3</div>
+                    <div class="step-text">
+                        <h4>Get complete test cases</h4>
+                        <p>Positive, negative, and edge case scenarios &mdash; all in Given/When/Then format</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-num">4</div>
+                    <div class="step-text">
+                        <h4>Review and improve</h4>
+                        <p>You add your domain expertise. The framework learns from your corrections.</p>
+                    </div>
+                </div>
+            </div>
+            <div style="margin-top:2rem;padding:1rem 1.5rem;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.3);border-radius:12px;display:inline-block;">
+                <span style="font-size:1.1rem;color:var(--success);font-weight:600;">&#9200; 1-2 hours of manual work &#10132; 30 seconds</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- SLIDE 6: TOOL 2 - ZEPHYR UPLOADER -->
+    <div class="slide" data-notes="Next tool - the Zephyr Uploader. We all know how tedious it is to upload test cases to Zephyr manually. You have to create each test case, add steps, link it to the story. With this tool, you run one command. It reads the generated test cases, creates them in Zephyr Scale with all the steps, and links them to the Jira story automatically. It even handles duplicates - if the test case already exists, it updates it instead of creating a duplicate. And when tests finish running, there is another command to upload the results - pass, fail, with screenshots attached. No more manual status updates in Zephyr.">
+        <div class="slide-content">
+            <span class="badge badge-primary">Tool 2</span>
+            <h2><span class="gradient-text">&#128228; Zephyr Upload</span></h2>
+            <p class="subtitle">Upload test cases AND results to Zephyr with one command each</p>
+            <div class="card-grid" style="grid-template-columns:1fr 1fr;max-width:800px;margin:2rem auto 0;">
+                <div class="card" style="border-color:rgba(99,102,241,0.4);">
+                    <div class="icon">&#128228;</div>
+                    <h4>Upload Test Cases</h4>
+                    <p style="font-family:'JetBrains Mono';color:var(--success);font-size:0.82rem;background:rgba(0,0,0,0.3);padding:0.5rem;border-radius:6px;margin:0.75rem 0;">npm run zephyr:UploadTestCase -- --work-item SF-520</p>
+                    <p>Creates test cases in Zephyr Scale with all steps. Links to Jira story. Handles duplicates.</p>
+                </div>
+                <div class="card" style="border-color:rgba(16,185,129,0.4);">
+                    <div class="icon">&#128200;</div>
+                    <h4>Upload Results</h4>
+                    <p style="font-family:'JetBrains Mono';color:var(--success);font-size:0.82rem;background:rgba(0,0,0,0.3);padding:0.5rem;border-radius:6px;margin:0.75rem 0;">npm run zephyr:UploadResult -- --work-item SF-520</p>
+                    <p>Uploads pass/fail results with screenshots and evidence. No manual status updates.</p>
+                </div>
+            </div>
+            <div style="margin-top:2.5rem;padding:1rem 1.5rem;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.3);border-radius:12px;display:inline-block;">
+                <span style="font-size:1.1rem;color:var(--success);font-weight:600;">&#9200; 30+ min of clicking in Zephyr &#10132; 1 command</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- SLIDE 7: TOOL 3 - TEST DATA -->
+    <div class="slide" data-notes="Third tool - Test Data Creator. You know how painful it is to create test data by hand, whether that is in Salesforce, Dynamics CRM, or setting up records for ODS and TDS validation. You need to fill in required fields, look up picklist values, make sure the country and state match, and so on. Our Test Data Factory handles this across all systems. For Salesforce, it creates Accounts with 24 plus fields correctly filled, with linked Contacts and Opportunities. For Dynamics, it tracks and manages records with the Dynamics Record Tracker. For ODS and TDS, it sets up the data needed for cross-system validation. And the best part - it automatically cleans up after itself. No leftover test records in any system.">
+        <div class="slide-content">
+            <span class="badge badge-primary">Tool 3</span>
+            <h2><span class="gradient-text">&#128202; Test Data Creator</span></h2>
+            <p class="subtitle">Creates test data across all systems &mdash; and cleans up after itself</p>
+            <div class="card-grid" style="grid-template-columns:1fr 1fr 1fr 1fr;max-width:1000px;margin:2rem auto 0;">
+                <div class="card">
+                    <div class="icon">&#9889;</div>
+                    <h4>Salesforce</h4>
+                    <p>Accounts with 24+ fields, linked Contacts, Opportunities, Leads. Country, currency all matching.</p>
+                </div>
+                <div class="card">
+                    <div class="icon">&#9881;&#65039;</div>
+                    <h4>Dynamics CRM</h4>
+                    <p>Records tracked via Dynamics Record Tracker. RDM and CMT data setup with auto-cleanup.</p>
+                </div>
+                <div class="card">
+                    <div class="icon">&#128451;&#65039;</div>
+                    <h4>ODS / TDS</h4>
+                    <p>SQL Server data for cross-system validation. Query automation and data integrity checks.</p>
+                </div>
+                <div class="card">
+                    <div class="icon">&#128165;</div>
+                    <h4>Auto Cleanup</h4>
+                    <p>All created data is automatically deleted after tests. No leftovers in any system.</p>
+                </div>
+            </div>
+            <div style="margin-top:2rem;">
+                <p style="font-family:'JetBrains Mono';color:var(--success);font-size:0.92rem;background:rgba(0,0,0,0.3);padding:0.75rem 1.25rem;border-radius:8px;display:inline-block;">npm run cleanup:accounts</p>
+                <p style="color:var(--text-dim);font-size:0.85rem;margin-top:0.5rem;">Manual cleanup also available any time</p>
+            </div>
+            <div style="margin-top:1.5rem;padding:1rem 1.5rem;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.3);border-radius:12px;display:inline-block;">
+                <span style="font-size:1.1rem;color:var(--success);font-weight:600;">&#9200; 15-20 min of manual data setup &#10132; automatic</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- SLIDE 8: TOOL 4 - FIND QA READY ITEMS -->
+    <div class="slide" data-notes="Here is a new utility we recently added. Instead of manually checking Jira every day to find which stories are ready for QA, this tool scans Jira automatically and tells you which work items are QA-ready and do not have test cases yet. It is like having an assistant that says - hey, these 8 stories need your attention. No more missing work items, no more searching through Jira boards. You run this one command and get a clear list of what needs to be done. It saves time and makes sure nothing falls through the cracks.">
+        <div class="slide-content">
+            <span class="badge badge-primary">Tool 4</span>
+            <h2><span class="gradient-text">&#128270; Find QA-Ready Items</span></h2>
+            <p class="subtitle">Never miss a story again &mdash; automatically finds work items that need test cases</p>
+            <div class="step-list">
+                <div class="step-item">
+                    <div class="step-num">1</div>
+                    <div class="step-text">
+                        <h4>Run the finder utility</h4>
+                        <p style="font-family:'JetBrains Mono';color:var(--success);font-size:0.95rem;background:rgba(0,0,0,0.3);padding:0.5rem 1rem;border-radius:8px;margin-top:0.25rem;">npm run jira:find-missing</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-num">2</div>
+                    <div class="step-text">
+                        <h4>Get a clear list</h4>
+                        <p>Shows all QA-ready stories that do not have test cases yet, with priority and summary</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-num">3</div>
+                    <div class="step-text">
+                        <h4>Pick one and generate</h4>
+                        <p>Choose a work item from the list and run the test case generator on it</p>
+                    </div>
+                </div>
+            </div>
+            <div style="margin-top:2rem;padding:1rem 1.5rem;background:rgba(6,182,212,0.1);border:1px solid rgba(6,182,212,0.3);border-radius:12px;display:inline-block;">
+                <span style="font-size:1.1rem;color:var(--accent);font-weight:600;">&#128161; No more searching Jira manually for QA-ready stories</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- SLIDE 9: THE COMPLETE DAILY WORKFLOW -->
+    <div class="slide" data-notes="So let me put it all together. Here is your complete daily workflow using these tools. Step one, run find-missing to see what needs test cases. Step two, pick a story and generate test cases. Step three, review the generated test cases and add your expertise. Step four, upload to Zephyr with one command. Step five, run the tests if scripts are ready. Step six, upload results to Zephyr. That is it. Six steps, mostly one command each. What used to take half a day now takes about an hour, including your review time. And the review time is where your real value is - that is where your domain knowledge matters.">
+        <div class="slide-content">
+            <span class="badge badge-success">Daily Workflow</span>
+            <h2>Your <span class="gradient-text-3">New Daily Routine</span></h2>
+            <p class="subtitle">Six simple steps. Mostly one command each.</p>
+            <div class="step-list">
+                <div class="step-item">
+                    <div class="step-num">1</div>
+                    <div class="step-text">
+                        <h4>Find what needs testing</h4>
+                        <p><code style="color:var(--success);">npm run jira:find-missing</code> &mdash; see all QA-ready stories</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-num">2</div>
+                    <div class="step-text">
+                        <h4>Generate test cases</h4>
+                        <p><code style="color:var(--success);">npm run jira:generate -- --work-item SF-520</code> &mdash; creates feature files</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-num">3</div>
+                    <div class="step-text">
+                        <h4>Review and improve &#11088;</h4>
+                        <p>This is where YOUR domain expertise matters &mdash; add, correct, refine the test cases</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-num">4</div>
+                    <div class="step-text">
+                        <h4>Upload to Zephyr</h4>
+                        <p><code style="color:var(--success);">npm run zephyr:UploadAndLink -- --work-item SF-520</code> &mdash; test cases in Zephyr</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-num">5</div>
+                    <div class="step-text">
+                        <h4>Run tests (if scripts ready)</h4>
+                        <p><code style="color:var(--success);">npm run test:feature -- --tags "@SF-520"</code> &mdash; automated execution</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-num">6</div>
+                    <div class="step-text">
+                        <h4>Upload results</h4>
+                        <p><code style="color:var(--success);">npm run zephyr:UploadResult -- --work-item SF-520</code> &mdash; done!</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SLIDE 10: THE NUMBERS -->
+    <div class="slide" data-notes="Let me give you some numbers to show how much this framework has grown. We have 261 feature files. That is 261 sets of test cases already written and ready across all our systems. Over 1500 test scenarios covering Salesforce, Dynamics CRM, ODS, TDS, and MuleSoft. Whether you work on Salesforce, Dynamics, or the database layer, there are already test cases for your area. We have over 120 automation commands, and about 44 step definition files that power the test execution. These numbers grow every week. And with your help, they will grow faster. Every test case you generate and improve becomes part of this framework.">
+        <div class="slide-content">
+            <span class="badge badge-accent">The Numbers</span>
+            <h2>What We Have <span class="gradient-text">Built So Far</span></h2>
+            <p class="subtitle">And it keeps growing every week</p>
+            <div class="stat-row">
+                <div class="stat-item"><span class="stat-num purple">261</span><span class="stat-desc">Feature Files</span></div>
+                <div class="stat-item"><span class="stat-num cyan">1500+</span><span class="stat-desc">Test Scenarios</span></div>
+                <div class="stat-item"><span class="stat-num green">120+</span><span class="stat-desc">Commands</span></div>
+                <div class="stat-item"><span class="stat-num orange">4</span><span class="stat-desc">Systems Covered</span></div>
+            </div>
+            <div style="margin-top:3rem;">
+                <div class="workflow-visual">
+                    <div class="wf-step" style="border-color:rgba(99,102,241,0.5);">&#9889; Salesforce</div>
+                    <div class="wf-step" style="border-color:rgba(16,185,129,0.5);">&#9881;&#65039; Dynamics CRM</div>
+                    <div class="wf-step" style="border-color:rgba(239,68,68,0.5);">&#128451;&#65039; ODS / TDS</div>
+                    <div class="wf-step" style="border-color:rgba(168,85,247,0.5);">&#128279; MuleSoft</div>
+                </div>
+                <p style="color:var(--text-dim);font-size:0.9rem;margin-top:1rem;">No matter which system you work on &mdash; the framework has you covered</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- SLIDE 11: YOU DON'T NEED TO BE A CODER -->
+    <div class="slide" data-notes="Now I know what some of you are thinking. I am not a coder. I do not know TypeScript. How can I use this? Here is the good news. For the daily tools I just showed you, you do not need to write any code. You run commands. That is it. And for anything more advanced, we have Cursor AI. Cursor is like having a coding assistant sitting next to you. You tell it what you want in plain English, and it writes the code for you. Want to add a new test scenario? Tell Cursor. Want to update a field name? Tell Cursor. It understands our framework and does the work for you. You just review and approve. So even if you have never written a line of code, you can contribute to this framework. That is the whole point.">
+        <div class="slide-content">
+            <span class="badge badge-success">No Code Fear</span>
+            <h2>You Do Not Need to <span class="gradient-text-2">Be a Coder</span></h2>
+            <p class="subtitle">For daily tools: just run commands. For everything else: Cursor AI helps you.</p>
+            <div class="card-grid" style="grid-template-columns:1fr 1fr;max-width:800px;margin:2rem auto 0;">
+                <div class="card" style="border-color:rgba(16,185,129,0.4);">
+                    <div class="icon">&#128187;</div>
+                    <h4>Daily Tools = Just Commands</h4>
+                    <p>Copy the command, paste in terminal, press Enter. That is all. No coding required for test generation, upload, or data creation.</p>
+                </div>
+                <div class="card" style="border-color:rgba(99,102,241,0.4);">
+                    <div class="icon">&#129302;</div>
+                    <h4>Cursor AI = Your Coding Partner</h4>
+                    <p>Tell it what you want in plain English. It writes the code. You review and approve. It understands our framework already.</p>
+                </div>
+            </div>
+            <div class="quote-box" style="margin-top:2.5rem;">
+                <p>"Add a test scenario that checks the Account Status field is required when Account Type is Agency"</p>
+                <div class="author">&#8593; That is all you type in Cursor. It writes the complete test code for you.</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SLIDE 12: THE LEARNING LOOP -->
+    <div class="slide" data-notes="Here is something really important. This framework gets smarter every time you use it. When the framework generates version 1 of the test cases, and you review and improve them, the framework detects what you changed. It learns from your corrections. Next time it generates test cases for a similar story, it remembers your improvements. So the more you use it and the more you review and correct, the better it gets. Your domain knowledge is literally making the framework smarter. That is why your involvement is so valuable. You are not just a user of this tool, you are training it.">
+        <div class="slide-content">
+            <span class="badge badge-accent">The Smart Part</span>
+            <h2>It Gets <span class="gradient-text">Smarter</span> With Your Help</h2>
+            <p class="subtitle">Every correction you make teaches the framework something new</p>
+            <div class="step-list" style="max-width:750px;">
+                <div class="step-item">
+                    <div class="step-num" style="background:var(--gradient-1);">1</div>
+                    <div class="step-text">
+                        <h4>Framework generates test cases (V1)</h4>
+                        <p>AI creates the first version from the Jira story</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-num" style="background:linear-gradient(135deg,#f59e0b,#ef4444);">2</div>
+                    <div class="step-text">
+                        <h4>You review and improve them &#11088;</h4>
+                        <p>Add missing scenarios, fix edge cases, refine steps &mdash; your domain expertise</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-num" style="background:var(--gradient-3);">3</div>
+                    <div class="step-text">
+                        <h4>Framework learns from your changes</h4>
+                        <p>Detects what you corrected and updates its knowledge base</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-num" style="background:var(--gradient-1);">4</div>
+                    <div class="step-text">
+                        <h4>Next generation is smarter (V2)</h4>
+                        <p>Future test cases are more accurate, need fewer corrections. The cycle continues.</p>
+                    </div>
+                </div>
+            </div>
+            <div style="margin-top:2rem;padding:1rem 1.5rem;background:rgba(99,102,241,0.1);border:1px solid rgba(99,102,241,0.3);border-radius:12px;display:inline-block;">
+                <span style="font-size:1.05rem;color:var(--primary-light);font-weight:600;">&#128260; You are not just using the framework &mdash; you are training it</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- SLIDE 13: HOW TO GET STARTED -->
+    <div class="slide" data-notes="So how do you get started? It is simple. Step one, get the project set up on your machine. The QA automation team will help everyone with this. It is just cloning the repo and running npm install. Step two, learn the four daily commands I showed you. That is your starting point. Step three, try it on a real work item. Pick a Jira story, generate test cases, review them, upload to Zephyr. Step four, as you get comfortable, start exploring more. And here is the exciting part - step five - you can build your own utilities and contribute them to the framework. If you see a repetitive task in your daily work, you can create a tool for it using Cursor AI and add it to the framework. That way everyone benefits. This framework is not owned by one person. It is ours. The more people contribute, the more powerful it becomes.">
+        <div class="slide-content">
+            <span class="badge badge-success">Getting Started</span>
+            <h2>Your <span class="gradient-text-3">Journey</span></h2>
+            <p class="subtitle">Start small. Grow at your own pace. Then help the framework grow too.</p>
+            <div class="step-list" style="max-width:750px;">
+                <div class="step-item">
+                    <div class="step-num">1</div>
+                    <div class="step-text">
+                        <h4>Get set up</h4>
+                        <p>Clone the repo, run npm install, configure your environment. The QA automation team will help.</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-num">2</div>
+                    <div class="step-text">
+                        <h4>Learn the 4 daily commands</h4>
+                        <p>find-missing, jira:generate, zephyr:UploadTestCase, zephyr:UploadResult</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-num">3</div>
+                    <div class="step-text">
+                        <h4>Try it on a real story</h4>
+                        <p>Pick a Jira work item, generate test cases, review them, upload to Zephyr</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-num">4</div>
+                    <div class="step-text">
+                        <h4>Explore and grow</h4>
+                        <p>Use Cursor AI to help with changes. Ask questions. Get comfortable.</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-num" style="background:linear-gradient(135deg,#f59e0b,#ef4444);">5</div>
+                    <div class="step-text">
+                        <h4>Build your own utilities &#11088;</h4>
+                        <p>See a repetitive task? Build a tool for it with Cursor AI and add it to the framework. Everyone benefits.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="quote-box" style="margin-top:1.5rem;border-color:var(--accent);">
+                <p style="font-style:normal;color:var(--accent);">"This framework belongs to the whole team. The more people contribute, the more powerful it becomes."</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- SLIDE 14: CALL TO ACTION -->
+    <div class="slide" data-notes="So here is my ask to all of you. Let us build this together. You bring the QA expertise, the domain knowledge, the understanding of how our systems work. The framework handles the repetitive work. But it does not stop there. You can also build your own utilities. If you find a repetitive task in your daily work, you can create a tool for it using Cursor AI and contribute it back to the framework. That way the whole team benefits. Think of it like a shared toolbox. Right now there are 120 plus tools in it. Imagine what it looks like when every one of you adds even one tool. The framework grows, becomes more useful, and saves even more time for everyone. Together, we can cover more stories, find more bugs, and deliver higher quality faster. If you have questions, let us discuss now. To get started, reach out to anyone on the QA automation team and we will help you get set up. Thank you for your time.">
+        <div class="slide-content">
+            <span class="emoji-big">&#127775;</span>
+            <h2>Let Us Build This <span class="gradient-text">Together</span></h2>
+            <p class="subtitle">You bring the QA expertise.<br>The framework handles the repetitive work.<br><strong style="color:var(--accent-light);">And you can make it even better.</strong></p>
+            <div class="card-grid" style="grid-template-columns:1fr 1fr 1fr 1fr;max-width:1000px;margin:2rem auto;">
+                <div class="card" style="text-align:center;border-color:rgba(99,102,241,0.4);">
+                    <div class="icon">&#128170;</div>
+                    <h4>Use It</h4>
+                    <p>Start with the daily commands. Save hours on test cases, uploads, and data.</p>
+                </div>
+                <div class="card" style="text-align:center;border-color:rgba(6,182,212,0.4);">
+                    <div class="icon">&#128218;</div>
+                    <h4>Improve It</h4>
+                    <p>Review generated test cases. Your corrections make the framework smarter.</p>
+                </div>
+                <div class="card" style="text-align:center;border-color:rgba(245,158,11,0.4);">
+                    <div class="icon">&#128295;</div>
+                    <h4>Build For It</h4>
+                    <p>See a repetitive task? Build a utility with Cursor AI and add it. Everyone benefits.</p>
+                </div>
+                <div class="card" style="text-align:center;border-color:rgba(16,185,129,0.4);">
+                    <div class="icon">&#128640;</div>
+                    <h4>Grow It</h4>
+                    <p>120+ tools today. Imagine what happens when every team member contributes.</p>
+                </div>
+            </div>
+            <div style="margin-top:2rem;">
+                <p style="font-size:1.2rem;font-weight:700;color:var(--text-bright);">Ready to get started? Reach out to anyone on the QA automation team &mdash; we will help you get set up.</p>
+            </div>
+            <div style="margin-top:1.5rem;">
+                <span class="badge badge-primary" style="font-size:1rem;padding:0.75rem 2rem;">Questions?</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- SPEAKER NOTES PANEL -->
+    <div class="speaker-notes" id="speakerNotes">
+        <div class="speaker-notes-label">Speaker Notes (press N to hide)</div>
+        <p id="notesContent">Welcome everyone, thanks for joining. Today I want to show you something that is going to make your daily QA work much easier.</p>
+    </div>
+
+    <script>
+    var slides = document.querySelectorAll('.slide');
+    var current = 0;
+    var notesVisible = false;
+    var notesPanel = document.getElementById('speakerNotes');
+    var notesContent = document.getElementById('notesContent');
+
+    function goTo(idx) {
+        if (idx < 0 || idx >= slides.length) return;
+        slides[current].classList.remove('active');
+        current = idx;
+        slides[current].classList.add('active');
+        document.getElementById('slideNum').textContent = current + 1;
+        document.getElementById('slideTotal').textContent = slides.length;
+        document.getElementById('progress').style.width = ((current + 1) / slides.length * 100) + '%';
+        var notes = slides[current].getAttribute('data-notes');
+        if (notes) notesContent.textContent = notes;
+    }
+
+    function next() { goTo(current + 1); }
+    function prev() { goTo(current - 1); }
+    function toggleNotes() {
+        notesVisible = !notesVisible;
+        notesPanel.classList.toggle('visible', notesVisible);
+        document.querySelector('.notes-toggle').textContent = notesVisible ? 'Press N to hide speaker notes' : 'Press N to show speaker notes';
+    }
+
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ' || e.key === 'PageDown') { e.preventDefault(); next(); }
+        else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp' || e.key === 'PageUp') { e.preventDefault(); prev(); }
+        else if (e.key === 'n' || e.key === 'N') { toggleNotes(); }
+        else if (e.key === 'Home') { e.preventDefault(); goTo(0); }
+        else if (e.key === 'End') { e.preventDefault(); goTo(slides.length - 1); }
+    });
+
+    document.addEventListener('click', function(e) {
+        if (e.target.closest('.speaker-notes') || e.target.closest('.notes-toggle')) return;
+        var x = e.clientX;
+        if (x > window.innerWidth * 0.5) next(); else prev();
+    });
+
+    goTo(0);
+    </script>
+</body>
+</html>

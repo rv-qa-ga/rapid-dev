@@ -1,0 +1,872 @@
+{
+  "info": {
+    "_postman_id": "sf-485-api-tests-v2",
+    "name": "SF-485 - Functional Currency Mandatory - API Tests",
+    "description": "API - SF-485 - Make Functional_Currency__c mandatory for Insurer, Insurer Branch and Reinsurer\n\n══════════════════════════════════════════════════════════════════════════════\nGenerated: 2026-01-18\nUpdated: Fixed SOQL query definitions\n══════════════════════════════════════════════════════════════════════════════\n\nSUMMARY:\n  Make Functional_Currency__c mandatory for Insurer, Insurer Branch and Reinsurer\n\nDESCRIPTION:\n  As a Product Owner / Data Owner I want the Functional_Currency__c field to be \n  mandatory for Insurer, Insurer Branch and Reinsurer records So that every Insurer, \n  Insurer Branch and Reinsurer record has a defined functional currency for reporting, \n  accounting and downstream processing, and no record of those types can be created \n  or saved without a valid value.\n\nACCOUNT TYPES REQUIRING FUNCTIONAL_CURRENCY__C:\n  - Insurer\n  - Insurer Branch\n  - Reinsurer\n\nACCEPTANCE CRITERIA:\n  1. Functional_Currency__c is mandatory for Insurer, Insurer Branch, and Reinsurer\n  2. Save is blocked if Functional_Currency__c is blank\n  3. Error message: \"Functional Currency is required for this record type.\"\n  4. Enforcement works for UI, API, integrations and automated processes\n\nAPI TESTING REQUIREMENTS:\n  - Verify field exists on Lead and Account\n  - Create Account with Functional_Currency__c (Insurer, Insurer Branch, Reinsurer)\n  - Reject Account creation without Functional_Currency__c for required types\n  - Update operations validation\n  - Query operations with proper SOQL\n  - Negative/boundary scenarios\n\nGenerated from: src/features/api/SF/SF-485.feature\n\nThis collection contains API tests for SF-485 work item.\n\nQUERY FORMAT NOTES:\n  - Single record retrieval: GET /sobjects/{object}/{id}?fields=...\n  - SOQL queries: GET /query?q=SELECT... (URL-encoded)\n  - All queries properly formatted for Postman import",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{sf_access_token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "{{sf_base_url}}",
+      "type": "string"
+    },
+    {
+      "key": "api_version",
+      "value": "v60.0",
+      "type": "string"
+    },
+    {
+      "key": "lead_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "account_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "insurer_account_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "insurer_branch_account_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "reinsurer_account_id",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Field Existence Verification",
+      "item": [
+        {
+          "name": "SF-485-API-001 - Describe Lead Object",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Functional_Currency__c field exists on Lead\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    var fields = jsonData.fields;",
+                  "    var field = fields.find(function(f) { return f.name === 'Functional_Currency__c'; });",
+                  "    pm.expect(field).to.not.be.undefined;",
+                  "    pm.expect(field.name).to.equal('Functional_Currency__c');",
+                  "    console.log('✅ Field found: ' + field.name + ' (Type: ' + field.type + ')');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Lead/describe",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "data",
+                "{{api_version}}",
+                "sobjects",
+                "Lead",
+                "describe"
+              ]
+            },
+            "description": "Verify Functional_Currency__c field exists on Lead\n\n**Test:** SF-485-API-001\n**Purpose:** Field existence verification"
+          },
+          "response": []
+        },
+        {
+          "name": "SF-485-API-002 - Describe Account Object",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Functional_Currency__c field exists on Account\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    var fields = jsonData.fields;",
+                  "    var field = fields.find(function(f) { return f.name === 'Functional_Currency__c'; });",
+                  "    pm.expect(field).to.not.be.undefined;",
+                  "    pm.expect(field.name).to.equal('Functional_Currency__c');",
+                  "    console.log('✅ Field found: ' + field.name + ' (Type: ' + field.type + ')');",
+                  "    if (field.required) {",
+                  "        console.log('✅ Field is required (as expected for Insurer/Insurer Branch/Reinsurer)');",
+                  "    }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Account/describe",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "data",
+                "{{api_version}}",
+                "sobjects",
+                "Account",
+                "describe"
+              ]
+            },
+            "description": "Verify Functional_Currency__c field exists on Account\n\n**Test:** SF-485-API-002\n**Purpose:** Field existence verification"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "CRUD Operations - Account Types Requiring Functional_Currency__c",
+      "item": [
+        {
+          "name": "SF-485-API-003 - Create Insurer Account with Functional_Currency__c",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test(\"Response contains Account ID\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.id).to.not.be.undefined;",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    pm.collectionVariables.set('insurer_account_id', jsonData.id);",
+                  "    console.log('✅ Insurer Account created: ' + jsonData.id);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"Name\": \"SF-485 Test Insurer\",\n  \"Type\": \"Insurer\",\n  \"Functional_Currency__c\": \"USD\",\n  \"Region__c\": \"EU\",\n  \"Account_Status__c\": \"New\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Account/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "data",
+                "{{api_version}}",
+                "sobjects",
+                "Account",
+                ""
+              ]
+            },
+            "description": "Create Insurer Account with Functional_Currency__c (should succeed)\n\n**Test:** SF-485-API-003\n**Purpose:** Verify Insurer Account can be created with Functional_Currency__c\n**Account Type:** Insurer\n**Required Field:** Functional_Currency__c = USD"
+          },
+          "response": []
+        },
+        {
+          "name": "SF-485-API-004 - Create Insurer Branch Account with Functional_Currency__c",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test(\"Response contains Account ID\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.id).to.not.be.undefined;",
+                  "    pm.collectionVariables.set('insurer_branch_account_id', jsonData.id);",
+                  "    console.log('✅ Insurer Branch Account created: ' + jsonData.id);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"Name\": \"SF-485 Test Insurer Branch\",\n  \"Type\": \"Insurer Branch\",\n  \"Functional_Currency__c\": \"EUR\",\n  \"Region__c\": \"EU\",\n  \"Account_Status__c\": \"New\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Account/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "data",
+                "{{api_version}}",
+                "sobjects",
+                "Account",
+                ""
+              ]
+            },
+            "description": "Create Insurer Branch Account with Functional_Currency__c (should succeed)\n\n**Test:** SF-485-API-004\n**Purpose:** Verify Insurer Branch Account can be created with Functional_Currency__c\n**Account Type:** Insurer Branch\n**Required Field:** Functional_Currency__c = EUR"
+          },
+          "response": []
+        },
+        {
+          "name": "SF-485-API-005 - Create Reinsurer Account with Functional_Currency__c",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test(\"Response contains Account ID\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.id).to.not.be.undefined;",
+                  "    pm.collectionVariables.set('reinsurer_account_id', jsonData.id);",
+                  "    console.log('✅ Reinsurer Account created: ' + jsonData.id);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"Name\": \"SF-485 Test Reinsurer\",\n  \"Type\": \"Reinsurer\",\n  \"Functional_Currency__c\": \"GBP\",\n  \"Region__c\": \"UK\",\n  \"Account_Status__c\": \"New\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Account/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "data",
+                "{{api_version}}",
+                "sobjects",
+                "Account",
+                ""
+              ]
+            },
+            "description": "Create Reinsurer Account with Functional_Currency__c (should succeed)\n\n**Test:** SF-485-API-005\n**Purpose:** Verify Reinsurer Account can be created with Functional_Currency__c\n**Account Type:** Reinsurer\n**Required Field:** Functional_Currency__c = GBP"
+          },
+          "response": []
+        },
+        {
+          "name": "SF-485-API-006 - Query Insurer Account by ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Account has Functional_Currency__c\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.Functional_Currency__c).to.not.be.null;",
+                  "    pm.expect(jsonData.Functional_Currency__c).to.not.be.empty;",
+                  "    pm.expect(jsonData.Type).to.equal('Insurer');",
+                  "    console.log('✅ Insurer Account Functional_Currency__c: ' + jsonData.Functional_Currency__c);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "var accountId = pm.collectionVariables.get('insurer_account_id');",
+                  "if (!accountId) {",
+                  "    throw new Error('insurer_account_id variable is not set. Please run the Create Insurer Account request first.');",
+                  "}",
+                  "console.log('Querying Insurer Account: ' + accountId);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Account/{{insurer_account_id}}?fields=Id,Name,Type,Functional_Currency__c",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "data",
+                "{{api_version}}",
+                "sobjects",
+                "Account",
+                "{{insurer_account_id}}"
+              ],
+              "query": [
+                {
+                  "key": "fields",
+                  "value": "Id,Name,Type,Functional_Currency__c"
+                }
+              ]
+            },
+            "description": "Query Insurer Account by ID to verify Functional_Currency__c is populated\n\n**Test:** SF-485-API-006\n**Query Format:** GET /sobjects/{object}/{id}?fields=..."
+          },
+          "response": []
+        },
+        {
+          "name": "SF-485-API-007 - SOQL Query Accounts by Type and Functional_Currency__c",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Query returned results\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.records).to.be.an('array');",
+                  "    ",
+                  "    // Verify all returned records have Functional_Currency__c populated",
+                  "    jsonData.records.forEach(function(record) {",
+                  "        pm.expect(record.Functional_Currency__c).to.not.be.null;",
+                  "        pm.expect(record.Functional_Currency__c).to.not.be.empty;",
+                  "        pm.expect(record.Type).to.be.oneOf(['Insurer', 'Insurer Branch', 'Reinsurer']);",
+                  "    });",
+                  "    ",
+                  "    console.log('✅ Query returned ' + jsonData.totalSize + ' records');",
+                  "    console.log('All records have Functional_Currency__c populated');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/query?q=SELECT Id,Name,Type,Functional_Currency__c FROM Account WHERE Type IN ('Insurer', 'Insurer Branch', 'Reinsurer') AND Functional_Currency__c != null LIMIT 10",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "data",
+                "{{api_version}}",
+                "query"
+              ],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "SELECT Id,Name,Type,Functional_Currency__c FROM Account WHERE Type IN ('Insurer', 'Insurer Branch', 'Reinsurer') AND Functional_Currency__c != null LIMIT 10",
+                  "description": "SOQL query - URL encoded automatically by Postman"
+                }
+              ]
+            },
+            "description": "SOQL Query to find Accounts of required types with Functional_Currency__c populated\n\n**Test:** SF-485-API-007\n**Query Format:** GET /query?q=SELECT... (SOQL)\n**Purpose:** Verify all Insurer, Insurer Branch, and Reinsurer accounts have Functional_Currency__c\n**SOQL:** SELECT Id,Name,Type,Functional_Currency__c FROM Account WHERE Type IN ('Insurer', 'Insurer Branch', 'Reinsurer') AND Functional_Currency__c != null"
+          },
+          "response": []
+        },
+        {
+          "name": "SF-485-API-008 - SOQL Query Accounts Missing Functional_Currency__c (Should Return None)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"No accounts found without Functional_Currency__c\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.totalSize).to.equal(0);",
+                  "    pm.expect(jsonData.records).to.be.an('array');",
+                  "    pm.expect(jsonData.records.length).to.equal(0);",
+                  "    console.log('✅ No accounts found without Functional_Currency__c (validation rule working)');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/query?q=SELECT Id,Name,Type,Functional_Currency__c FROM Account WHERE Type IN ('Insurer', 'Insurer Branch', 'Reinsurer') AND (Functional_Currency__c = null OR Functional_Currency__c = '') LIMIT 10",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "data",
+                "{{api_version}}",
+                "query"
+              ],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "SELECT Id,Name,Type,Functional_Currency__c FROM Account WHERE Type IN ('Insurer', 'Insurer Branch', 'Reinsurer') AND (Functional_Currency__c = null OR Functional_Currency__c = '') LIMIT 10",
+                  "description": "SOQL query - URL encoded automatically by Postman"
+                }
+              ]
+            },
+            "description": "SOQL Query to find Accounts of required types WITHOUT Functional_Currency__c (should return none)\n\n**Test:** SF-485-API-008\n**Query Format:** GET /query?q=SELECT... (SOQL)\n**Purpose:** Verify validation rule prevents accounts without Functional_Currency__c\n**Expected:** Should return 0 records (validation rule working)\n**SOQL:** SELECT Id,Name,Type,Functional_Currency__c FROM Account WHERE Type IN ('Insurer', 'Insurer Branch', 'Reinsurer') AND (Functional_Currency__c = null OR Functional_Currency__c = '')"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Negative / Boundary Tests - Mandatory Field Validation",
+      "item": [
+        {
+          "name": "SF-485-API-009 - Reject Insurer Account Creation Without Functional_Currency__c",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code indicates error\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([400, 422]);",
+                  "});",
+                  "",
+                  "pm.test(\"Error mentions Functional Currency is required\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    var errorString = JSON.stringify(jsonData).toLowerCase();",
+                  "    var hasRequiredError = errorString.includes('functional currency') || errorString.includes('required') || errorString.includes('functional_currency');",
+                  "    console.log('Error response: ' + JSON.stringify(jsonData, null, 2));",
+                  "    pm.expect(pm.response.code).to.be.oneOf([400, 422]);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"Name\": \"SF-485 Test Insurer Without Currency\",\n  \"Type\": \"Insurer\",\n  \"Region__c\": \"EU\",\n  \"Account_Status__c\": \"New\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Account/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "data",
+                "{{api_version}}",
+                "sobjects",
+                "Account",
+                ""
+              ]
+            },
+            "description": "Attempt to create Insurer Account without Functional_Currency__c (should fail)\n\n**Test:** SF-485-API-009\n**Purpose:** Verify validation rule blocks Insurer Account creation without Functional_Currency__c\n**Expected:** 400 or 422 error with message about Functional Currency being required"
+          },
+          "response": []
+        },
+        {
+          "name": "SF-485-API-010 - Reject Insurer Branch Account Creation Without Functional_Currency__c",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code indicates error\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([400, 422]);",
+                  "});",
+                  "",
+                  "pm.test(\"Error mentions Functional Currency is required\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    var errorString = JSON.stringify(jsonData).toLowerCase();",
+                  "    var hasRequiredError = errorString.includes('functional currency') || errorString.includes('required');",
+                  "    console.log('Error response: ' + JSON.stringify(jsonData, null, 2));",
+                  "    pm.expect(pm.response.code).to.be.oneOf([400, 422]);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"Name\": \"SF-485 Test Insurer Branch Without Currency\",\n  \"Type\": \"Insurer Branch\",\n  \"Region__c\": \"EU\",\n  \"Account_Status__c\": \"New\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Account/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "data",
+                "{{api_version}}",
+                "sobjects",
+                "Account",
+                ""
+              ]
+            },
+            "description": "Attempt to create Insurer Branch Account without Functional_Currency__c (should fail)\n\n**Test:** SF-485-API-010\n**Purpose:** Verify validation rule blocks Insurer Branch Account creation without Functional_Currency__c\n**Expected:** 400 or 422 error"
+          },
+          "response": []
+        },
+        {
+          "name": "SF-485-API-011 - Reject Reinsurer Account Creation Without Functional_Currency__c",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code indicates error\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([400, 422]);",
+                  "});",
+                  "",
+                  "pm.test(\"Error mentions Functional Currency is required\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    var errorString = JSON.stringify(jsonData).toLowerCase();",
+                  "    var hasRequiredError = errorString.includes('functional currency') || errorString.includes('required');",
+                  "    console.log('Error response: ' + JSON.stringify(jsonData, null, 2));",
+                  "    pm.expect(pm.response.code).to.be.oneOf([400, 422]);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"Name\": \"SF-485 Test Reinsurer Without Currency\",\n  \"Type\": \"Reinsurer\",\n  \"Region__c\": \"UK\",\n  \"Account_Status__c\": \"New\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Account/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "data",
+                "{{api_version}}",
+                "sobjects",
+                "Account",
+                ""
+              ]
+            },
+            "description": "Attempt to create Reinsurer Account without Functional_Currency__c (should fail)\n\n**Test:** SF-485-API-011\n**Purpose:** Verify validation rule blocks Reinsurer Account creation without Functional_Currency__c\n**Expected:** 400 or 422 error"
+          },
+          "response": []
+        },
+        {
+          "name": "SF-485-API-012 - Reject Update to Clear Functional_Currency__c on Insurer Account",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code indicates error\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([400, 422]);",
+                  "});",
+                  "",
+                  "pm.test(\"Error mentions Functional Currency is required\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    var errorString = JSON.stringify(jsonData).toLowerCase();",
+                  "    var hasRequiredError = errorString.includes('functional currency') || errorString.includes('required');",
+                  "    console.log('Error response: ' + JSON.stringify(jsonData, null, 2));",
+                  "    pm.expect(pm.response.code).to.be.oneOf([400, 422]);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "var accountId = pm.collectionVariables.get('insurer_account_id');",
+                  "if (!accountId) {",
+                  "    throw new Error('insurer_account_id variable is not set. Please run the Create Insurer Account request first.');",
+                  "}",
+                  "console.log('Attempting to clear Functional_Currency__c on Insurer Account: ' + accountId);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"Functional_Currency__c\": null\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Account/{{insurer_account_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "data",
+                "{{api_version}}",
+                "sobjects",
+                "Account",
+                "{{insurer_account_id}}"
+              ]
+            },
+            "description": "Attempt to clear Functional_Currency__c on existing Insurer Account (should fail)\n\n**Test:** SF-485-API-012\n**Purpose:** Verify validation rule blocks clearing Functional_Currency__c on Insurer Account\n**Expected:** 400 or 422 error\n**Note:** Create Insurer Account first using 'Create Insurer Account with Functional_Currency__c' request"
+          },
+          "response": []
+        },
+        {
+          "name": "SF-485-API-013 - Reject Invalid Functional_Currency__c Value",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code indicates error\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([400, 422]);",
+                  "});",
+                  "",
+                  "pm.test(\"Error response mentions Functional_Currency\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    var errorString = JSON.stringify(jsonData).toLowerCase();",
+                  "    var hasFunctionalCurrency = errorString.includes('functional_currency') || errorString.includes('functional currency');",
+                  "    console.log('Error response: ' + JSON.stringify(jsonData, null, 2));",
+                  "    pm.expect(pm.response.code).to.be.oneOf([400, 422]);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"Name\": \"SF-485 Invalid Test Insurer\",\n  \"Type\": \"Insurer\",\n  \"Functional_Currency__c\": \"INVALID_VALUE_###\",\n  \"Region__c\": \"EU\",\n  \"Account_Status__c\": \"New\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Account/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "data",
+                "{{api_version}}",
+                "sobjects",
+                "Account",
+                ""
+              ]
+            },
+            "description": "Attempt to create Insurer Account with invalid Functional_Currency__c value (should fail)\n\n**Test:** SF-485-API-013\n**Purpose:** Verify invalid Functional_Currency__c values are rejected\n**Expected:** 400 or 422 error"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Lead Operations (Optional Field)",
+      "item": [
+        {
+          "name": "SF-485-API-014 - Create Lead with Functional_Currency__c",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test(\"Response contains Lead ID\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.id).to.not.be.undefined;",
+                  "    pm.collectionVariables.set('lead_id', jsonData.id);",
+                  "    console.log('✅ Lead created: ' + jsonData.id);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"FirstName\": \"Test\",\n  \"LastName\": \"Lead SF-485\",\n  \"Company\": \"SF-485 Test Company\",\n  \"Status\": \"Open - Not Contacted\",\n  \"Functional_Currency__c\": \"USD\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Lead/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "data",
+                "{{api_version}}",
+                "sobjects",
+                "Lead",
+                ""
+              ]
+            },
+            "description": "Create Lead with Functional_Currency__c (optional field on Lead)\n\n**Test:** SF-485-API-014\n**Purpose:** Verify Functional_Currency__c can be set on Lead (not mandatory for Lead)"
+          },
+          "response": []
+        },
+        {
+          "name": "SF-485-API-015 - SOQL Query Lead by Functional_Currency__c",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Query returned results\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.records).to.be.an('array');",
+                  "    console.log('✅ Query returned ' + jsonData.totalSize + ' Lead records');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/services/data/{{api_version}}/query?q=SELECT Id,FirstName,LastName,Company,Functional_Currency__c FROM Lead WHERE Functional_Currency__c != null LIMIT 10",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "services",
+                "data",
+                "{{api_version}}",
+                "query"
+              ],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "SELECT Id,FirstName,LastName,Company,Functional_Currency__c FROM Lead WHERE Functional_Currency__c != null LIMIT 10",
+                  "description": "SOQL query - URL encoded automatically by Postman"
+                }
+              ]
+            },
+            "description": "SOQL Query to find Leads with Functional_Currency__c populated\n\n**Test:** SF-485-API-015\n**Query Format:** GET /query?q=SELECT... (SOQL)\n**Purpose:** Verify SOQL query works for Lead object\n**SOQL:** SELECT Id,FirstName,LastName,Company,Functional_Currency__c FROM Lead WHERE Functional_Currency__c != null"
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

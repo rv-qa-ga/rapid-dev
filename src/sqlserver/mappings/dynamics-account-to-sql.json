@@ -1,0 +1,80 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "description": "Mapping from Dynamics 365 Account entity to SQL Server table",
+  "source": {
+    "system": "Dynamics",
+    "entity": "account"
+  },
+  "target": {
+    "database": "ODS",
+    "table": "DynamicsAccounts",
+    "schema": "dbo"
+  },
+  "fieldMappings": [
+    {
+      "sourceField": "accountid",
+      "sqlColumn": "DynamicsAccountId",
+      "description": "Dynamics Account ID (GUID)"
+    },
+    {
+      "sourceField": "name",
+      "sqlColumn": "AccountName",
+      "description": "Account name"
+    },
+    {
+      "sourceField": "accountnumber",
+      "sqlColumn": "AccountNumber",
+      "description": "Account number"
+    },
+    {
+      "sourceField": "telephone1",
+      "sqlColumn": "Phone",
+      "description": "Primary phone number"
+    },
+    {
+      "sourceField": "websiteurl",
+      "sqlColumn": "Website",
+      "description": "Website URL"
+    },
+    {
+      "sourceField": "address1_line1",
+      "sqlColumn": "AddressLine1",
+      "description": "Street address line 1"
+    },
+    {
+      "sourceField": "address1_city",
+      "sqlColumn": "City",
+      "description": "City"
+    },
+    {
+      "sourceField": "address1_stateorprovince",
+      "sqlColumn": "State",
+      "description": "State or province"
+    },
+    {
+      "sourceField": "address1_postalcode",
+      "sqlColumn": "PostalCode",
+      "description": "Postal/ZIP code"
+    },
+    {
+      "sourceField": "createdon",
+      "sqlColumn": "CreatedDate",
+      "description": "Record creation date",
+      "transform": "datetime"
+    },
+    {
+      "sourceField": "modifiedon",
+      "sqlColumn": "LastModifiedDate",
+      "description": "Last modification date",
+      "transform": "datetime"
+    }
+  ],
+  "keyFields": [
+    {
+      "sourceField": "accountid",
+      "sqlColumn": "DynamicsAccountId",
+      "description": "Primary key for matching records"
+    }
+  ]
+}
+

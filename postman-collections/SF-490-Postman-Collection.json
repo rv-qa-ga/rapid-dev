@@ -1,0 +1,383 @@
+{
+	"info": {
+		"_postman_id": "sf-490-api-tests",
+		"name": "SF-490 - Hide Annual_GWP_Estimate_Year_1_c and POS_FSCS_Exposure on Account - API Tests",
+		"description": "Postman collection for SF-490 API tests. Tests for hiding Annual_GWP_Estimate_Year_1_c__c and POS_FSCS_Exposure__c fields on Account (visible to Admins/support only).\n\n## Setup Instructions:\n1. Import this collection into Postman\n2. Create a new environment (or use existing Salesforce QA environment)\n3. Set the following environment variables:\n   - `sf_base_url`: https://arx--qa.sandbox.my.salesforce.com\n   - `sf_api_version`: v60.0\n   - `sf_access_token`: Your Salesforce access token (get via OAuth or JWT)\n   - `sf_instance_url`: Your Salesforce instance URL\n   - `lead_id`: Lead ID for update/query operations\n\n## Authentication:\nThis collection uses Bearer Token authentication. Obtain an access token via:\n- OAuth 2.0 flow\n- JWT Bearer Token flow\n- Username/Password flow\n\n## Test Scenarios:\n- Verify Account__c field exists on Lead and Account\n- Create Lead with Account\n- Update Account__c on Lead\n- Query Lead by Account\n- Reject invalid Account__c values",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{sf_access_token}}",
+				"type": "string"
+			}
+		]
+	},
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "{{sf_base_url}}",
+			"type": "string"
+		},
+		{
+			"key": "api_version",
+			"value": "{{sf_api_version}}",
+			"type": "string"
+		},
+		{
+			"key": "lead_id",
+			"value": "",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "SF-490-API-001 - Verify Account__c field exists on Lead",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Account__c field exists\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.fields).to.be.an('array');",
+							"    var field = jsonData.fields.find(f => f.name === 'Account__c');",
+							"    pm.expect(field).to.not.be.undefined;",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Lead/describe",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"services",
+						"data",
+						"{{api_version}}",
+						"sobjects",
+						"Lead",
+						"describe"
+					]
+				},
+				"description": "API - Verify Account__c field exists on Lead\n\n**Test ID:** SF-490-API-001\n**Priority:** p1\n**Tags:** @smoke @field-exists"
+			},
+			"response": []
+		},
+		{
+			"name": "SF-490-API-002 - Verify Account__c field exists on Account",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Account__c field exists\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.fields).to.be.an('array');",
+							"    var field = jsonData.fields.find(f => f.name === 'Account__c');",
+							"    pm.expect(field).to.not.be.undefined;",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Account/describe",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"services",
+						"data",
+						"{{api_version}}",
+						"sobjects",
+						"Account",
+						"describe"
+					]
+				},
+				"description": "API - Verify Account__c field exists on Account\n\n**Test ID:** SF-490-API-002\n**Priority:** p1\n**Tags:** @field-exists"
+			},
+			"response": []
+		},
+		{
+			"name": "SF-490-API-003 - Create Lead with Account",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"pm.test(\"Response contains Lead ID\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property('id');",
+							"    pm.expect(jsonData.id).to.not.be.empty;",
+							"    pm.collectionVariables.set('lead_id', jsonData.id);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"LastName\": \"API Test Lead\",\n  \"Company\": \"Test Company\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Lead/",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"services",
+						"data",
+						"{{api_version}}",
+						"sobjects",
+						"Lead",
+						""
+					]
+				},
+				"description": "API - Create Lead with Account\n\n**Test ID:** SF-490-API-003\n**Priority:** p1\n**Tags:** @api-create"
+			},
+			"response": []
+		},
+		{
+			"name": "SF-490-API-004 - Update Account__c on Lead",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 204\", function () {",
+							"    pm.response.to.have.status(204);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"Account__c\": \"Updated Value\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Lead/{{lead_id}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"services",
+						"data",
+						"{{api_version}}",
+						"sobjects",
+						"Lead",
+						"{{lead_id}}"
+					]
+				},
+				"description": "API - Update Account__c on Lead\n\n**Test ID:** SF-490-API-004\n**Priority:** p1\n**Tags:** @api-update\n\n**Prerequisite:** Requires an existing Lead record (set lead_id variable)"
+			},
+			"response": []
+		},
+		{
+			"name": "SF-490-API-005 - Query Lead by Account",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response contains records\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property('records');",
+							"    pm.expect(jsonData.records).to.be.an('array');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/services/data/{{api_version}}/query/?q=SELECT Id, LastName, Company, Account__c FROM Lead LIMIT 10",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"services",
+						"data",
+						"{{api_version}}",
+						"query",
+						""
+					],
+					"query": [
+						{
+							"key": "q",
+							"value": "SELECT Id, LastName, Company, Account__c FROM Lead LIMIT 10"
+						}
+					]
+				},
+				"description": "API - Query Lead by Account\n\n**Test ID:** SF-490-API-005\n**Priority:** p2\n**Tags:** @api-query\n\n**Prerequisite:** Requires an existing Lead record"
+			},
+			"response": []
+		},
+		{
+			"name": "SF-490-API-006 - Reject invalid Account__c value",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code indicates error\", function () {",
+							"    pm.expect(pm.response.code).to.be.oneOf([400, 422]);",
+							"});",
+							"",
+							"pm.test(\"Error response mentions Account\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    var errorText = JSON.stringify(jsonData);",
+							"    pm.expect(errorText.toLowerCase()).to.include('account');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"LastName\": \"Invalid Test Lead\",\n  \"Company\": \"Test Company\",\n  \"Account__c\": \"INVALID_VALUE_###\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/services/data/{{api_version}}/sobjects/Lead/",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"services",
+						"data",
+						"{{api_version}}",
+						"sobjects",
+						"Lead",
+						""
+					]
+				},
+				"description": "API - Reject invalid Account__c value\n\n**Test ID:** SF-490-API-006\n**Priority:** p2\n**Tags:** @negative @invalid-value\n\n**Expected:** API should reject invalid Account__c value and return error mentioning \"Account\""
+			},
+			"response": []
+		},
+		{
+			"name": "SF-490-API-007 - Handle null Account__c value",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Account__c is null or empty\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    if (jsonData.records && jsonData.records.length > 0) {",
+							"        var record = jsonData.records[0];",
+							"        pm.expect(record.Account__c === null || record.Account__c === '' || record.Account__c === undefined).to.be.true;",
+							"    }",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/services/data/{{api_version}}/query/?q=SELECT Id, LastName, Company, Account__c FROM Lead WHERE Account__c = null LIMIT 1",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"services",
+						"data",
+						"{{api_version}}",
+						"query",
+						""
+					],
+					"query": [
+						{
+							"key": "q",
+							"value": "SELECT Id, LastName, Company, Account__c FROM Lead WHERE Account__c = null LIMIT 1"
+						}
+					]
+				},
+				"description": "API - Handle null Account__c value\n\n**Test ID:** SF-490-API-007\n**Priority:** p2\n**Tags:** @negative @null-value\n\n**Prerequisite:** Requires a test Lead created via API without Account"
+			},
+			"response": []
+		}
+	]
+}
+
