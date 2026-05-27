@@ -38,7 +38,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           # repository_dispatch → client_payload.branch; workflow_dispatch → inputs.branch
           ref: ${{ github.event.client_payload.branch || github.event.inputs.branch || 'main' }}
