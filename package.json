@@ -389,7 +389,7 @@
     "@azure/keyvault-secrets": "^4.10.0",
     "@azure/service-bus": "^7.9.5",
     "@azure/storage-blob": "^12.31.0",
-    "@cucumber/cucumber": "^12.5.0",
+    "@cucumber/cucumber": "^12.9.0",
     "@playwright/test": "^1.40.0",
     "axios": "1.13.5",
     "dotenv": "^16.3.1",
